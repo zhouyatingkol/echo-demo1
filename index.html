@@ -553,19 +553,27 @@
             
             // 设置中文男声参数
             utterance.lang = 'zh-CN';
-            utterance.rate = 0.85;  // 缓慢沉稳
-            utterance.pitch = 0.9;  // 低沉
+            utterance.rate = 0.82;  // 缓慢沉稳
+            utterance.pitch = 0.7;  // 更低沉
             utterance.volume = 1.0; // 最大音量
 
             // 尝试选择中文男声
             const voices = window.speechSynthesis.getVoices();
-            const chineseMaleVoice = voices.find(voice => 
+            // 常见中文男声名称
+            const maleVoiceNames = ['Yun', 'Tian', 'Kangkang', 'Yunjian', 'Male', 'Li', 'Wang'];
+            let chineseMaleVoice = voices.find(voice => 
                 voice.lang.includes('zh') && 
-                (voice.name.includes('Male') || voice.name.includes('男') || voice.name.includes('Yun') || voice.name.includes('Tian'))
+                maleVoiceNames.some(name => voice.name.includes(name))
             );
+            
+            // 如果没找到特定男声，选择第一个中文语音（通常默认是男声）
+            if (!chineseMaleVoice) {
+                chineseMaleVoice = voices.find(voice => voice.lang.includes('zh'));
+            }
             
             if (chineseMaleVoice) {
                 utterance.voice = chineseMaleVoice;
+                console.log('Using voice:', chineseMaleVoice.name);
             }
 
             currentSpeech = utterance;
