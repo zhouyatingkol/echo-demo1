@@ -91,27 +91,153 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: #000;
+            background: linear-gradient(135deg, #0a0a0f 0%, #000 50%, #0a0f14 100%);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 100;
-            transition: opacity 1s;
+            transition: opacity 1s ease, transform 1s ease;
         }
-        .loading.hidden { opacity: 0; pointer-events: none; }
+        .loading.hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
+        .loading-content {
+            text-align: center;
+        }
+        .loading-logo {
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(100, 200, 255, 0.3);
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto 30px;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+        .loading-logo::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 60px; height: 60px;
+            border: 2px solid rgba(200, 180, 100, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: logoSpin 3s linear infinite;
+        }
+        .loading-logo::after {
+            content: 'ECHO';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(100, 200, 255, 0.9);
+            font-size: 11px;
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(100, 200, 255, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(100, 200, 255, 0.4), 0 0 60px rgba(200, 180, 100, 0.2); }
+        }
+        @keyframes logoSpin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
         .loading-text {
-            color: rgba(100,200,255,0.8);
-            font-size: 14px;
-            letter-spacing: 4px;
+            color: rgba(100, 200, 255, 0.7);
+            font-size: 12px;
+            letter-spacing: 6px;
+            font-weight: 300;
+        }
+        .loading-progress {
+            width: 200px;
+            height: 1px;
+            background: rgba(100, 200, 255, 0.1);
+            margin: 20px auto 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .loading-progress-bar {
+            position: absolute;
+            top: 0; left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #64c8ff, #c8b464);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .loading-percentage {
+            color: rgba(200, 180, 100, 0.8);
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* 悬停提示框 */
+        .hover-tooltip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            transform: translate(-50%, -100%);
+            margin-top: -15px;
+        }
+        .hover-tooltip.visible {
+            opacity: 1;
+        }
+        .tooltip-content {
+            background: rgba(10, 15, 20, 0.95);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(100, 200, 255, 0.1);
+        }
+        .tooltip-title {
+            color: #c8b464;
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .tooltip-desc {
+            color: rgba(200, 210, 220, 0.8);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .tooltip-arrow {
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid rgba(100, 200, 255, 0.3);
         }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">
-        <div class="loading-text">INITIALIZING WEBGL...</div>
+        <div class="loading-content">
+            <div class="loading-logo"></div>
+            <div class="loading-text">INITIALIZING PROTOCOL</div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="progressBar"></div>
+            </div>
+            <div class="loading-percentage" id="progressText">0%</div>
+        </div>
     </div>
     
     <div id="canvas-container"></div>
+    
+    <!-- 悬停提示 -->
+    <div class="hover-tooltip" id="hoverTooltip">
+        <div class="tooltip-content">
+            <div class="tooltip-title" id="tooltipTitle">MOLECULE</div>
+            <div class="tooltip-desc" id="tooltipDesc">Description</div>
+        </div>
+        <div class="tooltip-arrow"></div>
+    </div>
     
     <div class="ui-layer">
         <div class="timecode" id="timecode">00:00 / 08:30</div>
@@ -300,6 +426,107 @@
             },
             disableBokeh: () => { bokehPass.enabled = false; }
         };
+
+        // ==================== 鼠标交互系统 ====================
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredObject = null;
+        const tooltip = document.getElementById('hoverTooltip');
+        const tooltipTitle = document.getElementById('tooltipTitle');
+        const tooltipDesc = document.getElementById('tooltipDesc');
+        
+        // 分子信息映射
+        const moleculeInfo = {
+            'PDB-001': { title: 'PDB STRUCTURE', desc: 'Protein Data Bank Entry' },
+            'CHEM-002': { title: 'CHEMICAL DATA', desc: 'Molecular Structure Data' },
+            'GENE-003': { title: 'GENE SEQUENCE', desc: 'Genomic Information Asset' },
+            'VSCREEN-004': { title: 'VIRTUAL SCREEN', desc: 'Computational Screening Data' },
+            'NeuroBlok': { title: 'NEUROBLOK', desc: 'Collaborative Drug Discovery Asset' },
+            'token': { title: 'YIELD TOKEN', desc: 'Revenue Rights Certificate' },
+            'value_core': { title: 'VALUE CORE', desc: 'Network Consensus Center' }
+        };
+        
+        function updateTooltip(obj, x, y) {
+            const info = moleculeInfo[obj.name] || moleculeInfo[obj.userData.type] || 
+                        { title: 'ASSET', desc: 'Protocol Data Unit' };
+            
+            tooltipTitle.textContent = info.title;
+            tooltipDesc.textContent = info.desc;
+            
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+            tooltip.classList.add('visible');
+        }
+        
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+        
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // 检测悬停
+            raycaster.setFromCamera(mouse, camera);
+            
+            // 收集所有可交互对象
+            const interactables = [];
+            Object.values(sceneGroups).forEach(group => {
+                if (group.visible) {
+                    group.children.forEach(child => {
+                        if (child.userData.type || child.name === 'token' || child.name === 'value_core') {
+                            interactables.push(child);
+                        }
+                    });
+                }
+            });
+            
+            const intersects = raycaster.intersectObjects(interactables, true);
+            
+            if (intersects.length > 0) {
+                document.body.style.cursor = 'pointer';
+                const obj = intersects[0].object;
+                const parent = obj.parent;
+                
+                // 高亮效果
+                if (hoveredObject !== parent) {
+                    // 恢复之前的高亮
+                    if (hoveredObject && hoveredObject.children[0] && hoveredObject.children[0].material) {
+                        hoveredObject.children[0].material.emissiveIntensity = hoveredObject.userData.originalEmissive || 0.2;
+                    }
+                    
+                    hoveredObject = parent;
+                    
+                    // 保存原始发光强度
+                    if (hoveredObject && hoveredObject.children[0] && hoveredObject.children[0].material) {
+                        if (!hoveredObject.userData.originalEmissive) {
+                            hoveredObject.userData.originalEmissive = hoveredObject.children[0].material.emissiveIntensity;
+                        }
+                        
+                        // 增强发光
+                        hoveredObject.children[0].material.emissiveIntensity = 0.8;
+                    }
+                    
+                    // 显示提示
+                    updateTooltip(parent, event.clientX, event.clientY);
+                } else {
+                    // 更新提示位置
+                    tooltip.style.left = event.clientX + 'px';
+                    tooltip.style.top = event.clientY + 'px';
+                }
+            } else {
+                document.body.style.cursor = 'default';
+                if (hoveredObject) {
+                    if (hoveredObject.children[0] && hoveredObject.children[0].material) {
+                        hoveredObject.children[0].material.emissiveIntensity = hoveredObject.userData.originalEmissive || 0.2;
+                    }
+                    hoveredObject = null;
+                    hideTooltip();
+                }
+            }
+        }
+        
+        window.addEventListener('mousemove', onMouseMove, false);
 
         // ==================== 音效系统 ====================
         const audioSystem = {
@@ -1454,6 +1681,31 @@
         }
 
         // ==================== 初始化 ====================
+        // 模拟加载进度
+        let loadProgress = 0;
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        
+        function updateLoadingProgress() {
+            loadProgress += Math.random() * 15 + 5;
+            if (loadProgress > 100) loadProgress = 100;
+            
+            progressBar.style.width = loadProgress + '%';
+            progressText.textContent = Math.floor(loadProgress) + '%';
+            
+            if (loadProgress < 100) {
+                setTimeout(updateLoadingProgress, 100 + Math.random() * 200);
+            } else {
+                // 加载完成，延迟隐藏
+                setTimeout(() => {
+                    document.getElementById('loading').classList.add('hidden');
+                }, 500);
+            }
+        }
+        
+        // 开始加载动画
+        updateLoadingProgress();
+        
         createOpeningScene();
         createPhase1Scene();
         createPhase2Scene();
@@ -1462,11 +1714,6 @@
         createFailureScene();
         createEndingScene();
         setScene(0);
-        
-        // 隐藏loading
-        setTimeout(() => {
-            document.getElementById('loading').classList.add('hidden');
-        }, 1000);
 
         animate();
 
