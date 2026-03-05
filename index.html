@@ -896,6 +896,104 @@
             }
         };
 
+        // ==================== 阶段三：融资对比动画 ====================
+        const phase3Animation = {
+            animateTokenForge: function() {
+                const token = sceneGroups.phase3.children.find(c => c.name === 'token');
+                const ring = sceneGroups.phase3.children.find(c =>
+                    c.geometry && c.geometry.type === 'TorusGeometry'
+                );
+                if (!token) return;
+                token.position.y = -5;
+                token.material.emissiveIntensity = 0;
+                const startTime = Date.now();
+                const duration = 1500;
+                function rise() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    token.position.y = -5 + ease * 3.5;
+                    token.material.emissiveIntensity = ease * 0.5;
+                    token.rotation.z = ease * Math.PI * 2;
+                    if (ring) {
+                        ring.position.y = token.position.y;
+                        ring.scale.setScalar(1 + ease * 0.5);
+                    }
+                    if (progress < 1) requestAnimationFrame(rise);
+                }
+                rise();
+            }
+        };
+
+        // ==================== 阶段四：价值流动动画 ====================
+        const phase4Animation = {
+            valueFlowParticles: [],
+            createValueFlow: function() {
+                this.valueFlowParticles.forEach(p => scene.remove(p));
+                this.valueFlowParticles = [];
+                const contributors = [
+                    { pos: new THREE.Vector3(-8, 0, 0) },
+                    { pos: new THREE.Vector3(8, 0, 0) },
+                    { pos: new THREE.Vector3(0, 0, -8) },
+                    { pos: new THREE.Vector3(0, 0, 8) }
+                ];
+                contributors.forEach((c, idx) => {
+                    for (let i = 0; i < 15; i++) {
+                        const geo = new THREE.SphereGeometry(0.06, 8, 8);
+                        const mat = new THREE.MeshBasicMaterial({
+                            color: 0xc8b464,
+                            transparent: true,
+                            opacity: 0.8,
+                            blending: THREE.AdditiveBlending
+                        });
+                        const p = new THREE.Mesh(geo, mat);
+                        p.position.set(0, -2, 0);
+                        const direction = c.pos.clone().normalize();
+                        const speed = 0.03 + Math.random() * 0.02;
+                        p.userData = {
+                            velocity: direction.multiplyScalar(speed),
+                            life: 1.0,
+                            delay: idx * 200 + i * 50,
+                            startTime: Date.now()
+                        };
+                        scene.add(p);
+                        this.valueFlowParticles.push(p);
+                    }
+                });
+            },
+            updateValueFlow: function() {
+                this.valueFlowParticles.forEach(p => {
+                    const elapsed = Date.now() - p.userData.startTime;
+                    if (elapsed < p.userData.delay) return;
+                    p.position.add(p.userData.velocity);
+                    p.userData.life -= 0.005;
+                    p.material.opacity = p.userData.life;
+                    if (p.userData.life <= 0 || p.position.length() > 12) {
+                        p.position.set(0, -2, 0);
+                        p.userData.life = 1.0;
+                    }
+                });
+            },
+            lightUpContributors: function() {
+                const contributors = sceneGroups.phase4.children.filter(c =>
+                    c.name && ['智药科技', '康源医院', '公共联盟', '元生资本'].includes(c.name)
+                );
+                contributors.forEach((node, i) => {
+                    setTimeout(() => {
+                        const startTime = Date.now();
+                        function pulse() {
+                            const elapsed = Date.now() - startTime;
+                            const progress = Math.min(elapsed / 500, 1);
+                            node.material.emissiveIntensity = 0.2 + 0.6 * Math.sin(progress * Math.PI);
+                            if (progress < 1) requestAnimationFrame(pulse);
+                            else node.material.emissiveIntensity = 0.2;
+                        }
+                        pulse();
+                    }, i * 300);
+                });
+            }
+        };
+
         // ==================== 碰撞冲击波系统 ====================
         const collisionEffect = {
             // 创建冲击波 - 镜头13要求
@@ -1954,6 +2052,13 @@
                     collisionEffect.createShockwave(new THREE.Vector3(8, -2, 0), 0xc8b464);
                     // 停止光标拖尾
                     cursorTrail.deactivate();
+                } else if (currentShot.action === 'tokenGenerate') {
+                    // 镜头17: 触发令牌铸造
+                    phase3Animation.animateTokenForge();
+                } else if (currentShot.action === 'fundFlow') {
+                    // 镜头18-23: 触发价值流动
+                    phase4Animation.createValueFlow();
+                    phase4Animation.lightUpContributors();
                 }
             }
             
@@ -2195,6 +2300,9 @@
             
             // 更新粒子系统
             particleSystem.update();
+            
+            // 更新价值流动
+            phase4Animation.updateValueFlow();
 
             controls.update();
             composer.render();
