@@ -182,6 +182,37 @@
             transition: opacity 0.3s ease;
         }
 
+        /* 开场标题 - 镜头2要求 */
+        .opening-title {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            color: #fff;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 52px;
+            font-weight: 300;
+            letter-spacing: 14px;
+            text-align: center;
+            opacity: 0;
+            z-index: 50;
+            pointer-events: none;
+            text-shadow: 
+                0 0 20px rgba(100, 200, 255, 0.5),
+                0 0 40px rgba(100, 200, 255, 0.3),
+                0 0 60px rgba(100, 200, 255, 0.2);
+            transition: opacity 0.5s ease;
+        }
+        .opening-title.visible {
+            opacity: 1;
+            animation: titleScale 7s ease forwards;
+        }
+        @keyframes titleScale {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            14% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
         /* 悬停提示框 */
         .hover-tooltip {
             position: fixed;
@@ -229,6 +260,9 @@
     </style>
 </head>
 <body>
+    <!-- 开场标题 - 镜头2 -->
+    <div class="opening-title" id="openingTitle">价值溯源：一款新药的数字旅程</div>
+    
     <div class="loading" id="loading">
         <div class="loading-content">
             <div class="loading-logo"></div>
@@ -1465,19 +1499,27 @@
         function createOpeningScene() {
             const group = sceneGroups.opening;
             
-            // 三层细胞膜
+            // 三层细胞膜 - 文档要求精确大小
+            // 内层：50vmax直径，中层：75vmax，外层：100vmax
+            const membraneSizes = [5, 7.5, 10]; // 对应50/75/100vmax
+            const membraneDelays = [0, -1.3, -2.6]; // 波纹延迟
+            
             for (let i = 0; i < 3; i++) {
-                const geometry = new THREE.SphereGeometry(5 + i * 2.5, 128, 128);
+                const geometry = new THREE.SphereGeometry(membraneSizes[i], 128, 128);
                 const material = new THREE.ShaderMaterial({
                     vertexShader: membraneVertexShader,
                     fragmentShader: membraneFragmentShader,
-                    uniforms: { uTime: { value: i * 1.3 } },
+                    uniforms: { 
+                        uTime: { value: membraneDelays[i] },
+                        uOpacity: { value: 0.3 - i * 0.05 }
+                    },
                     transparent: true,
                     side: THREE.DoubleSide,
                     depthWrite: false
                 });
                 const membrane = new THREE.Mesh(geometry, material);
-                membrane.userData = { layer: i };
+                membrane.userData = { layer: i, originalScale: 1 };
+                membrane.name = 'membrane_' + i;
                 group.add(membrane);
             }
 
@@ -2187,6 +2229,10 @@
                     audioSystem.playTextActivate();
                     // 镜头2: 触发代码粒子
                     particleSystem.triggerCodeParticles();
+                    // 显示标题
+                    const title = document.getElementById('openingTitle');
+                    title.classList.add('visible');
+                    setTimeout(() => title.classList.remove('visible'), 7000);
                 } else if (currentShot.action === 'hoverPDB') {
                     audioSystem.playHover();
                 } else if (currentShot.action === 'moleculesAppear') {
@@ -2215,6 +2261,41 @@
                 } else if (currentShot.action === 'traceBack') {
                     // 镜头27-28: 触发清算
                     phase5Animation.animateLiquidation();
+                }
+            }
+            
+            // 精确运镜控制
+            if (activeScene) {
+                // 镜头3: 细胞膜接近 - 匀速推镜 0.6x→1.4x，每秒10%
+                if (activeScene.action === 'membrane') {
+                    const camProgress = (timeline.currentTime - activeScene.time) / activeScene.duration;
+                    const scale = 0.6 + camProgress * 0.8; // 0.6 → 1.4
+                    sceneGroups.opening.children.forEach(child => {
+                        if (child.name && child.name.startsWith('membrane')) {
+                            child.scale.setScalar(scale);
+                        }
+                    });
+                }
+                
+                // 镜头4: 穿透 - 加速推镜 0.2秒内速度提升30%
+                if (activeScene.action === 'penetrate') {
+                    const camProgress = (timeline.currentTime - activeScene.time) / activeScene.duration;
+                    // 前0.2秒加速，后面匀速
+                    let scale;
+                    if (camProgress < 0.04) { // 0.2秒 / 5秒 = 0.04
+                        // 加速阶段
+                        const accelProgress = camProgress / 0.04;
+                        scale = 1.4 + accelProgress * 0.3 * 2.2; // 加速30%
+                    } else {
+                        // 匀速阶段
+                        scale = 1.4 + 0.3 * 2.2 + (camProgress - 0.04) * 0.8;
+                    }
+                    scale = Math.min(scale, 2.2);
+                    sceneGroups.opening.children.forEach(child => {
+                        if (child.name && child.name.startsWith('membrane')) {
+                            child.scale.setScalar(scale);
+                        }
+                    });
                 }
             }
             
