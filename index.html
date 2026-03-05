@@ -1625,6 +1625,7 @@
             const result = originalSetScene.apply(this, arguments);
             return result;
         };
+        
         const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
         scene.add(ambientLight);
 
