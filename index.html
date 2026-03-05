@@ -125,6 +125,7 @@
             <button onclick="setScene(3)" id="btn-3">阶段三</button>
             <button onclick="setScene(4)" id="btn-4">阶段四</button>
             <button onclick="setScene(5)" id="btn-5" style="color:#ff9696">失败分支</button>
+            <button onclick="setScene(6)" id="btn-6" style="color:#c8b464">结尾</button>
             <button onclick="togglePlay()" id="playBtn">▶ 播放完整版</button>
             <button onclick="jumpToTime(0)">|&lt;</button>
             <button onclick="jumpToTime(90)">阶段二</button>
@@ -151,7 +152,7 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         // ==================== 场景管理 ====================
-        const scenes = ['opening', 'phase1', 'phase2', 'phase3', 'phase4', 'failure'];
+        const scenes = ['opening', 'phase1', 'phase2', 'phase3', 'phase4', 'failure', 'ending'];
         let currentScene = 0;
 
         // ==================== 核心设置 ====================
@@ -477,7 +478,8 @@
             phase2: new THREE.Group(),
             phase3: new THREE.Group(),
             phase4: new THREE.Group(),
-            failure: new THREE.Group()
+            failure: new THREE.Group(),
+            ending: new THREE.Group()
         };
 
         Object.values(sceneGroups).forEach(g => {
@@ -992,6 +994,102 @@
             group.add(hint);
         }
 
+        // ==================== 结尾场景：价值重塑 ====================
+        function createEndingScene() {
+            const group = sceneGroups.ending;
+            
+            // 暖色背景光（金蓝平衡）
+            const warmLight = new THREE.PointLight(0xc8b464, 1, 100);
+            warmLight.position.set(0, 10, 10);
+            group.add(warmLight);
+            
+            const coolLight = new THREE.PointLight(0x64c8ff, 0.8, 100);
+            coolLight.position.set(-10, 5, 10);
+            group.add(coolLight);
+            
+            // 中央光球（价值网络核心）
+            const coreGeo = new THREE.SphereGeometry(2, 64, 64);
+            const coreMat = new THREE.MeshPhysicalMaterial({
+                color: 0xc8b464,
+                metalness: 0.5,
+                roughness: 0.2,
+                emissive: 0xc8b464,
+                emissiveIntensity: 0.3,
+                transparent: true,
+                opacity: 0.9
+            });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            core.name = 'value_core';
+            group.add(core);
+            
+            // 环绕轨道
+            for (let i = 0; i < 3; i++) {
+                const orbitGeo = new THREE.TorusGeometry(3 + i * 1.5, 0.02, 16, 100);
+                const orbitMat = new THREE.MeshBasicMaterial({ 
+                    color: i % 2 === 0 ? 0xc8b464 : 0x64c8ff,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const orbit = new THREE.Mesh(orbitGeo, orbitMat);
+                orbit.rotation.x = Math.PI / 2 + i * 0.3;
+                orbit.rotation.y = i * 0.5;
+                orbit.name = 'orbit_ring';
+                group.add(orbit);
+            }
+            
+            // 轨道上的小粒子（代表所有资产）
+            const assets = ['PDB', 'CHEM', 'GENE', 'VSCREEN', 'TOKEN'];
+            assets.forEach((name, i) => {
+                const angle = (i / assets.length) * Math.PI * 2;
+                const radius = 4 + Math.random() * 2;
+                const particleGeo = new THREE.SphereGeometry(0.15, 16, 16);
+                const particleMat = new THREE.MeshBasicMaterial({ 
+                    color: [0x64c8ff, 0x64ff96, 0x64dddd, 0x96ffc8, 0xc8b464][i]
+                });
+                const particle = new THREE.Mesh(particleGeo, particleMat);
+                particle.position.set(
+                    Math.cos(angle) * radius,
+                    (Math.random() - 0.5) * 2,
+                    Math.sin(angle) * radius
+                );
+                particle.userData = { 
+                    angle: angle, 
+                    radius: radius, 
+                    speed: 0.2 + Math.random() * 0.3,
+                    yOffset: particle.position.y
+                };
+                particle.name = 'orbit_particle';
+                group.add(particle);
+            });
+            
+            // ECHO文字（3D立体）
+            const echoGeo = new THREE.BoxGeometry(4, 1, 0.5);
+            const echoMat = new THREE.MeshPhysicalMaterial({
+                color: 0xc8b464,
+                metalness: 0.8,
+                roughness: 0.2,
+                emissive: 0x64c8ff,
+                emissiveIntensity: 0.2
+            });
+            const echoText = new THREE.Mesh(echoGeo, echoMat);
+            echoText.position.set(0, -5, 0);
+            echoText.name = 'echo_text';
+            group.add(echoText);
+            
+            // 底部光晕
+            const glowGeo = new THREE.CircleGeometry(6, 64);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: 0xc8b464,
+                transparent: true,
+                opacity: 0.2,
+                side: THREE.DoubleSide
+            });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.rotation.x = -Math.PI / 2;
+            glow.position.y = -6;
+            group.add(glow);
+        }
+
         window.setScene = function(index) {
             currentScene = index;
             timeline.isPlaying = false;
@@ -1006,11 +1104,11 @@
             
             // 更新按钮状态
             document.querySelectorAll('.controls button').forEach((btn, i) => {
-                if (i < 6) btn.classList.toggle('active', i === index);
+                if (i < 7) btn.classList.toggle('active', i === index);
             });
 
             // 更新阶段标签
-            const labels = ['阶段零：开场', '阶段一：基础资产', '阶段二：首次协作', '阶段三：风险融资', '阶段四：价值分配', '隐藏分支：失败案例'];
+            const labels = ['阶段零：开场', '阶段一：基础资产', '阶段二：首次协作', '阶段三：风险融资', '阶段四：价值分配', '隐藏分支：失败案例', '结尾：价值重塑'];
             document.getElementById('phaseLabel').textContent = labels[index];
 
             // 场景切换时触发摄像机运镜
@@ -1020,7 +1118,8 @@
                 { pos: [10, 5, 12], target: [5, 0, 0], duration: 2 },
                 { pos: [0, 0, 20], target: [0, 0, 0], duration: 2 },
                 { pos: [0, 12, 22], target: [0, 0, 0], duration: 2 },
-                { pos: [0, 5, 15], target: [0, 2, 0], duration: 2 }
+                { pos: [0, 5, 15], target: [0, 2, 0], duration: 2 },
+                { pos: [0, 5, 18], target: [0, 0, 0], duration: 3 }
             ];
             
             const preset = presets[index];
@@ -1321,6 +1420,32 @@
                 });
             }
 
+            // 更新结尾场景
+            if (sceneGroups.ending.visible) {
+                sceneGroups.ending.children.forEach(child => {
+                    // 中央光球脉动
+                    if (child.name === 'value_core') {
+                        const scale = 1 + Math.sin(animTime * 2) * 0.05;
+                        child.scale.set(scale, scale, scale);
+                    }
+                    // 环绕轨道旋转
+                    if (child.name === 'orbit_ring') {
+                        child.rotation.z += 0.005;
+                    }
+                    // 轨道粒子公转
+                    if (child.name === 'orbit_particle') {
+                        child.userData.angle += child.userData.speed * 0.01;
+                        child.position.x = Math.cos(child.userData.angle) * child.userData.radius;
+                        child.position.z = Math.sin(child.userData.angle) * child.userData.radius;
+                        child.position.y = child.userData.yOffset + Math.sin(animTime + child.userData.angle) * 0.3;
+                    }
+                    // ECHO文字发光
+                    if (child.name === 'echo_text') {
+                        child.material.emissiveIntensity = 0.2 + Math.sin(animTime * 3) * 0.1;
+                    }
+                });
+            }
+
             // 更新摄像机运动
             cameraRig.update();
 
@@ -1335,6 +1460,7 @@
         createPhase3Scene();
         createPhase4Scene();
         createFailureScene();
+        createEndingScene();
         setScene(0);
         
         // 隐藏loading
