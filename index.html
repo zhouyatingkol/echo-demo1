@@ -170,6 +170,18 @@
             font-family: 'Courier New', monospace;
         }
         
+        /* 光标拖尾效果 */
+        .cursor-trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, rgba(100, 200, 255, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: opacity 0.3s ease;
+        }
+
         /* 悬停提示框 */
         .hover-tooltip {
             position: fixed;
@@ -229,6 +241,9 @@
     </div>
     
     <div id="canvas-container"></div>
+    
+    <!-- 光标拖尾容器 -->
+    <div id="cursorTrailContainer"></div>
     
     <!-- 悬停提示 -->
     <div class="hover-tooltip" id="hoverTooltip">
@@ -427,6 +442,53 @@
             disableBokeh: () => { bokehPass.enabled = false; }
         };
 
+        // ==================== 光标拖尾系统 ====================
+        const cursorTrail = {
+            trails: [],
+            maxTrails: 8,
+            container: document.getElementById('cursorTrailContainer'),
+            isActive: false,
+            
+            init: function() {
+                for (let i = 0; i < this.maxTrails; i++) {
+                    const trail = document.createElement('div');
+                    trail.className = 'cursor-trail';
+                    trail.style.opacity = (1 - i / this.maxTrails) * 0.6;
+                    trail.style.transform = 'scale(' + (1 - i * 0.1) + ')';
+                    this.container.appendChild(trail);
+                    this.trails.push({
+                        element: trail,
+                        x: 0,
+                        y: 0,
+                        delay: i * 2
+                    });
+                }
+            },
+            
+            update: function(x, y) {
+                if (!this.isActive) return;
+                
+                this.trails.forEach((trail, i) => {
+                    setTimeout(() => {
+                        trail.element.style.left = x + 'px';
+                        trail.element.style.top = y + 'px';
+                    }, trail.delay * 10);
+                });
+            },
+            
+            activate: function() {
+                this.isActive = true;
+                this.trails.forEach(t => t.element.style.display = 'block');
+            },
+            
+            deactivate: function() {
+                this.isActive = false;
+                this.trails.forEach(t => t.element.style.display = 'none');
+            }
+        };
+        
+        cursorTrail.init();
+
         // ==================== 鼠标交互系统 ====================
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
@@ -465,6 +527,9 @@
         function onMouseMove(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // 更新光标拖尾
+            cursorTrail.update(event.clientX, event.clientY);
             
             // 检测悬停
             raycaster.setFromCamera(mouse, camera);
@@ -779,6 +844,140 @@
                         Math.sin(angle) * Math.cos(elevation) * speed
                     );
                 });
+            }
+        };
+
+        // ==================== 连接线绘制动画系统 ====================
+        const lineAnimation = {
+            // 绘制连接线 - 镜头7要求银色细线+淡蓝色数据流
+            animateLineDraw: function(lineMesh, duration = 1500) {
+                const positions = lineMesh.geometry.attributes.position.array;
+                const originalPositions = positions.slice();
+                const pointCount = positions.length / 3;
+                
+                // 隐藏所有点
+                for (let i = 0; i < positions.length; i++) {
+                    positions[i] = 0;
+                }
+                lineMesh.geometry.attributes.position.needsUpdate = true;
+                
+                const startTime = Date.now();
+                
+                function draw() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                    
+                    const currentPoint = Math.floor(easeProgress * pointCount);
+                    
+                    for (let i = 0; i <= currentPoint && i < pointCount; i++) {
+                        positions[i * 3] = originalPositions[i * 3];
+                        positions[i * 3 + 1] = originalPositions[i * 3 + 1];
+                        positions[i * 3 + 2] = originalPositions[i * 3 + 2];
+                    }
+                    
+                    lineMesh.geometry.attributes.position.needsUpdate = true;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(draw);
+                    }
+                }
+                
+                draw();
+            },
+            
+            // 触发阶段二连接线绘制
+            triggerPhase2Lines: function() {
+                sceneGroups.phase2.children.forEach(child => {
+                    if (child.name && child.name.startsWith('connection')) {
+                        this.animateLineDraw(child, 1500);
+                    }
+                });
+            }
+        };
+
+        // ==================== 碰撞冲击波系统 ====================
+        const collisionEffect = {
+            // 创建冲击波 - 镜头13要求
+            createShockwave: function(position, color = 0xc8b464) {
+                const group = new THREE.Group();
+                group.position.copy(position);
+                
+                // 主冲击波环
+                const ringGeo = new THREE.RingGeometry(0.1, 0.3, 64);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.8,
+                    side: THREE.DoubleSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = -Math.PI / 2;
+                group.add(ring);
+                
+                // 金色能量粒子
+                for (let i = 0; i < 30; i++) {
+                    const pGeo = new THREE.SphereGeometry(0.05 + Math.random() * 0.05, 8, 8);
+                    const pMat = new THREE.MeshBasicMaterial({
+                        color: color,
+                        transparent: true,
+                        opacity: 0.9,
+                        blending: THREE.AdditiveBlending
+                    });
+                    const particle = new THREE.Mesh(pGeo, pMat);
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const elevation = (Math.random() - 0.5) * Math.PI * 0.5;
+                    const speed = 0.1 + Math.random() * 0.2;
+                    
+                    particle.position.set(0, 0, 0);
+                    particle.userData = {
+                        velocity: new THREE.Vector3(
+                            Math.cos(angle) * Math.cos(elevation) * speed,
+                            Math.sin(elevation) * speed,
+                            Math.sin(angle) * Math.cos(elevation) * speed
+                        ),
+                        life: 1.0,
+                        decay: 0.02 + Math.random() * 0.01
+                    };
+                    
+                    group.add(particle);
+                }
+                
+                scene.add(group);
+                
+                // 动画
+                const startTime = Date.now();
+                const duration = 1000;
+                
+                function animate() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = elapsed / duration;
+                    
+                    if (progress >= 1) {
+                        scene.remove(group);
+                        return;
+                    }
+                    
+                    // 冲击波扩散
+                    const scale = 1 + progress * 20;
+                    ring.scale.set(scale, scale, scale);
+                    ring.material.opacity = 0.8 * (1 - progress);
+                    
+                    // 粒子扩散
+                    group.children.forEach((child, i) => {
+                        if (i > 0 && child.userData.velocity) { // 跳过环
+                            child.position.add(child.userData.velocity);
+                            child.userData.life -= child.userData.decay;
+                            child.material.opacity = child.userData.life;
+                        }
+                    });
+                    
+                    requestAnimationFrame(animate);
+                }
+                
+                animate();
             }
         };
 
@@ -1745,6 +1944,16 @@
                 } else if (currentShot.action === 'moleculesAppear') {
                     // 镜头6: 触发分子生长动画
                     growthAnimation.triggerPhase1Growth();
+                } else if (currentShot.action === 'dragStart') {
+                    // 镜头12-13: 触发连接线绘制
+                    lineAnimation.triggerPhase2Lines();
+                    // 激活光标拖尾
+                    cursorTrail.activate();
+                } else if (currentShot.action === 'collision') {
+                    // 镜头13: 触发碰撞冲击波
+                    collisionEffect.createShockwave(new THREE.Vector3(8, -2, 0), 0xc8b464);
+                    // 停止光标拖尾
+                    cursorTrail.deactivate();
                 }
             }
             
