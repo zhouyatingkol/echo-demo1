@@ -1456,6 +1456,12 @@
             ctx: null,
             oscillators: [],
             gainNodes: [],
+            ambientNode: null,
+            
+            // dB转gain值 - 精确音频控制
+            dbToGain: function(db) {
+                return Math.pow(10, db / 20);
+            },
             
             init: function() {
                 if (!this.ctx) {
@@ -1463,7 +1469,7 @@
                 }
             },
             
-            // 环境嗡鸣音（贯穿全程）
+            // 环境嗡鸣音（贯穿全程）- 精确实现
             playAmbient: function() {
                 this.init();
                 const osc = this.ctx.createOscillator();
@@ -1474,20 +1480,70 @@
                 filter.connect(gain);
                 gain.connect(this.ctx.destination);
                 
+                // 50Hz正弦波，-30dB，渐入0.5秒
                 osc.frequency.value = 50;
                 osc.type = 'sine';
                 filter.type = 'lowpass';
                 filter.frequency.value = 100;
-                gain.gain.value = 0.02;
+                
+                // 从-60dB渐入到-30dB，持续0.5秒
+                const startGain = this.dbToGain(-60);
+                const targetGain = this.dbToGain(-30);
+                gain.gain.setValueAtTime(startGain, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(targetGain, this.ctx.currentTime + 0.5);
                 
                 osc.start();
                 this.oscillators.push(osc);
                 this.gainNodes.push(gain);
+                this.ambientNode = { osc, gain };
                 
                 return { osc, gain };
             },
             
-            // 文字激活音
+            // 调整环境音量 - 用于镜头5恢复-23dB
+            setAmbientVolume: function(db, duration = 0.5) {
+                if (this.ambientNode && this.ambientNode.gain) {
+                    const targetGain = this.dbToGain(db);
+                    this.ambientNode.gain.gain.linearRampToValueAtTime(
+                        targetGain, 
+                        this.ctx.currentTime + duration
+                    );
+                }
+            },
+            
+            // 400Hz带通噪音 - 镜头3沙沙生物音
+            playBioNoise: function() {
+                this.init();
+                // 创建噪音缓冲区
+                const bufferSize = this.ctx.sampleRate * 2; // 2秒
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+                
+                // 400Hz带通滤波
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 400;
+                filter.Q.value = 1;
+                
+                const gain = this.ctx.createGain();
+                gain.gain.value = this.dbToGain(-40); // 背景音量
+                
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                noise.start();
+                return { noise, gain };
+            },
+            
+            // 文字激活音 - 1.2kHz清脆电子音
             playTextActivate: function() {
                 this.init();
                 const osc = this.ctx.createOscillator();
@@ -1496,18 +1552,19 @@
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 
+                // 1.2kHz→1.8kHz，衰减0.15秒
                 osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(1800, this.ctx.currentTime + 0.05);
                 osc.type = 'sine';
                 
-                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.setValueAtTime(this.dbToGain(-20), this.ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
                 
                 osc.start();
                 osc.stop(this.ctx.currentTime + 0.15);
             },
             
-            // 穿透音效
+            // 穿透音效 - 80Hz低频脉冲带混响
             playPenetration: function() {
                 this.init();
                 const osc = this.ctx.createOscillator();
@@ -1516,11 +1573,12 @@
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 
+                // 80Hz→40Hz，混响效果用滤波模拟
                 osc.frequency.setValueAtTime(80, this.ctx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.4);
                 osc.type = 'sawtooth';
                 
-                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.setValueAtTime(this.dbToGain(-14), this.ctx.currentTime); // -14dB
                 gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
                 
                 osc.start();
@@ -1532,6 +1590,19 @@
                 this.init();
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.frequency.value = 2000;
+                osc.type = 'sine';
+                
+                gain.gain.setValueAtTime(this.dbToGain(-26), this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            },
                 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
@@ -2707,24 +2778,45 @@
         const progressText = document.getElementById('progressText');
         
         function updateLoadingProgress() {
-            loadProgress += Math.random() * 15 + 5;
-            if (loadProgress > 100) loadProgress = 100;
-            
-            progressBar.style.width = loadProgress + '%';
-            progressText.textContent = Math.floor(loadProgress) + '%';
-            
-            if (loadProgress < 100) {
-                setTimeout(updateLoadingProgress, 100 + Math.random() * 200);
-            } else {
-                // 加载完成，延迟隐藏
-                setTimeout(() => {
-                    document.getElementById('loading').classList.add('hidden');
-                }, 500);
+            try {
+                loadProgress += Math.random() * 15 + 5;
+                if (loadProgress > 100) loadProgress = 100;
+                
+                if (progressBar) progressBar.style.width = loadProgress + '%';
+                if (progressText) progressText.textContent = Math.floor(loadProgress) + '%';
+                
+                if (loadProgress < 100) {
+                    setTimeout(updateLoadingProgress, 100 + Math.random() * 200);
+                } else {
+                    // 加载完成，延迟隐藏
+                    setTimeout(() => {
+                        const loading = document.getElementById('loading');
+                        if (loading) loading.classList.add('hidden');
+                    }, 500);
+                }
+            } catch (e) {
+                console.error('Loading progress error:', e);
+                // 出错时直接隐藏loading
+                const loading = document.getElementById('loading');
+                if (loading) loading.classList.add('hidden');
             }
         }
         
-        // 开始加载动画
-        updateLoadingProgress();
+        // 确保DOM加载完成后再开始
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateLoadingProgress);
+        } else {
+            updateLoadingProgress();
+        }
+        
+        // 备用：3秒后强制隐藏loading（防止卡住）
+        setTimeout(() => {
+            const loading = document.getElementById('loading');
+            if (loading && !loading.classList.contains('hidden')) {
+                loading.classList.add('hidden');
+                console.log('Loading timeout - force hide');
+            }
+        }, 3000);
         
         createOpeningScene();
         createPhase1Scene();
