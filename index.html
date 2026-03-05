@@ -401,7 +401,224 @@
             });
         }
 
-        // ==================== 场景切换 ====================
+        // ==================== 阶段二：工作台与协作 ====================
+        function createPhase2Scene() {
+            const group = sceneGroups.phase2;
+            
+            // 工作台
+            const workbenchGeo = new THREE.BoxGeometry(6, 0.3, 4);
+            const workbenchMat = new THREE.MeshPhysicalMaterial({
+                color: 0x1a1a40,
+                metalness: 0.7,
+                roughness: 0.3,
+                emissive: 0x64c8ff,
+                emissiveIntensity: 0.1
+            });
+            const workbench = new THREE.Mesh(workbenchGeo, workbenchMat);
+            workbench.position.set(8, -2, 0);
+            workbench.name = 'workbench';
+            group.add(workbench);
+
+            // 工作台发光边框
+            const edges = new THREE.EdgesGeometry(workbenchGeo);
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x64c8ff, linewidth: 2 });
+            const wireframe = new THREE.LineSegments(edges, lineMat);
+            workbench.add(wireframe);
+
+            // 提示文字板
+            const textGeo = new THREE.PlaneGeometry(4, 0.8);
+            const textMat = new THREE.MeshBasicMaterial({ 
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.8
+            });
+            const textPanel = new THREE.Mesh(textGeo, textMat);
+            textPanel.position.set(0, 1, 0);
+            workbench.add(textPanel);
+
+            // 源分子（左侧）
+            const chemMol = createMolecule('CHEM', 0x64ff96, new THREE.Vector3(-6, 0, -2), 0.9);
+            chemMol.name = 'source_chem';
+            chemMol.userData.draggable = true;
+            group.add(chemMol);
+
+            const geneMol = createMolecule('GENE', 0x64dddd, new THREE.Vector3(-6, 0, 2), 0.95);
+            geneMol.name = 'source_gene';
+            geneMol.userData.draggable = true;
+            group.add(geneMol);
+
+            // 关系图谱连线
+            const lineMat2 = new THREE.LineBasicMaterial({ 
+                color: 0x64c8ff, 
+                transparent: true, 
+                opacity: 0.5 
+            });
+            
+            // CHEM -> 工作台
+            const line1Points = [
+                new THREE.Vector3(-6, 0, -2),
+                new THREE.Vector3(0, 0, -1),
+                new THREE.Vector3(8, -2, 0)
+            ];
+            const line1Geo = new THREE.BufferGeometry().setFromPoints(line1Points);
+            const line1 = new THREE.Line(line1Geo, lineMat2);
+            line1.name = 'connection_chem';
+            group.add(line1);
+
+            // GENE -> 工作台
+            const line2Points = [
+                new THREE.Vector3(-6, 0, 2),
+                new THREE.Vector3(0, 0, 1),
+                new THREE.Vector3(8, -2, 0)
+            ];
+            const line2Geo = new THREE.BufferGeometry().setFromPoints(line2Points);
+            const line2 = new THREE.Line(line2Geo, lineMat2);
+            line2.name = 'connection_gene';
+            group.add(line2);
+
+            // 数据流动画粒子
+            const flowParticleGeo = new THREE.SphereGeometry(0.1, 8, 8);
+            const flowParticleMat = new THREE.MeshBasicMaterial({ color: 0x64ff96 });
+            
+            for (let i = 0; i < 10; i++) {
+                const particle = new THREE.Mesh(flowParticleGeo, flowParticleMat);
+                particle.userData = { 
+                    progress: i / 10, 
+                    speed: 0.01 + Math.random() * 0.01,
+                    path: line1Points 
+                };
+                particle.name = 'flow_particle';
+                group.add(particle);
+            }
+        }
+
+        // ==================== 阶段三：融资对比 ====================
+        function createPhase3Scene() {
+            const group = sceneGroups.phase3;
+            
+            // 分割线
+            const splitGeo = new THREE.BoxGeometry(0.1, 12, 0.1);
+            const splitMat = new THREE.MeshBasicMaterial({ 
+                color: 0x64c8ff,
+                transparent: true,
+                opacity: 0.6
+            });
+            const splitLine = new THREE.Mesh(splitGeo, splitMat);
+            group.add(splitLine);
+
+            // 左侧：传统融资（灰色压抑）
+            const traditionalGeo = new THREE.BoxGeometry(4, 5, 2);
+            const traditionalMat = new THREE.MeshPhysicalMaterial({
+                color: 0x555555,
+                metalness: 0.3,
+                roughness: 0.8,
+                transparent: true,
+                opacity: 0.6
+            });
+            const traditional = new THREE.Mesh(traditionalGeo, traditionalMat);
+            traditional.position.set(-6, 0, 0);
+            group.add(traditional);
+
+            // 右侧：ECHO融资（金色明亮）
+            const vscreenMol = createMolecule('VSCREEN', 0x96ffc8, new THREE.Vector3(6, 1, 0), 1.2);
+            group.add(vscreenMol);
+
+            // 收益权令牌
+            const tokenGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32);
+            const tokenMat = new THREE.MeshPhysicalMaterial({
+                color: 0xc8b464,
+                metalness: 1,
+                roughness: 0.2,
+                emissive: 0xc8b464,
+                emissiveIntensity: 0.3
+            });
+            const token = new THREE.Mesh(tokenGeo, tokenMat);
+            token.position.set(6, -1.5, 0);
+            token.rotation.x = Math.PI / 2;
+            group.add(token);
+
+            // 令牌发光环
+            const ringGeo = new THREE.TorusGeometry(1, 0.05, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xc8b464 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.set(6, -1.5, 0);
+            group.add(ring);
+        }
+
+        // ==================== 阶段四：价值分配 ====================
+        function createPhase4Scene() {
+            const group = sceneGroups.phase4;
+            
+            // 中央资金池
+            const poolGeo = new THREE.CylinderGeometry(5, 5, 1, 64);
+            const poolMat = new THREE.MeshPhysicalMaterial({
+                color: 0xc8b464,
+                metalness: 0.9,
+                roughness: 0.1,
+                emissive: 0xc8b464,
+                emissiveIntensity: 0.2,
+                transparent: true,
+                opacity: 0.8
+            });
+            const pool = new THREE.Mesh(poolGeo, poolMat);
+            pool.position.y = -3;
+            group.add(pool);
+
+            // 波纹效果（同心圆环）
+            for (let i = 0; i < 5; i++) {
+                const rippleGeo = new THREE.RingGeometry(2 + i, 2.2 + i, 64);
+                const rippleMat = new THREE.MeshBasicMaterial({
+                    color: 0xc8b464,
+                    transparent: true,
+                    opacity: 0.3 - i * 0.05,
+                    side: THREE.DoubleSide
+                });
+                const ripple = new THREE.Mesh(rippleGeo, rippleMat);
+                ripple.rotation.x = -Math.PI / 2;
+                ripple.position.y = -2.4;
+                ripple.userData = { index: i, speed: 0.02 };
+                ripple.name = 'ripple';
+                group.add(ripple);
+            }
+
+            // NeuroBlok分子（上方）
+            const neuroMol = createMolecule('NeuroBlok', 0xc8b464, new THREE.Vector3(0, 4, 0), 1.8);
+            group.add(neuroMol);
+
+            // 贡献节点（四周）
+            const contributors = [
+                { name: '智药科技', color: 0x64c8ff, pos: new THREE.Vector3(-8, 0, 0) },
+                { name: '康源医院', color: 0x64ff96, pos: new THREE.Vector3(8, 0, 0) },
+                { name: '公共联盟', color: 0x64dddd, pos: new THREE.Vector3(0, 0, -8) },
+                { name: '元生资本', color: 0xc8b464, pos: new THREE.Vector3(0, 0, 8) }
+            ];
+
+            contributors.forEach(c => {
+                const nodeGeo = new THREE.SphereGeometry(0.8, 32, 32);
+                const nodeMat = new THREE.MeshPhysicalMaterial({
+                    color: c.color,
+                    metalness: 0.5,
+                    roughness: 0.3,
+                    emissive: c.color,
+                    emissiveIntensity: 0.2
+                });
+                const node = new THREE.Mesh(nodeGeo, nodeMat);
+                node.position.copy(c.pos);
+                node.name = c.name;
+                group.add(node);
+
+                // 连接线到资金池
+                const linePoints = [c.pos, new THREE.Vector3(0, -2, 0)];
+                const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
+                const lineMat = new THREE.LineBasicMaterial({ 
+                    color: c.color, 
+                    transparent: true, 
+                    opacity: 0.4 
+                });
+                const line = new THREE.Line(lineGeo, lineMat);
+                group.add(line);
+            });
+        }
         window.setScene = function(index) {
             currentScene = index;
             
@@ -479,6 +696,58 @@
                 });
             }
 
+            // 更新阶段二：数据流动画
+            if (sceneGroups.phase2.visible) {
+                sceneGroups.phase2.children.forEach(child => {
+                    if (child.name === 'flow_particle') {
+                        child.userData.progress += child.userData.speed;
+                        if (child.userData.progress > 1) child.userData.progress = 0;
+                        
+                        const path = child.userData.path;
+                        const idx = Math.floor(child.userData.progress * (path.length - 1));
+                        const nextIdx = Math.min(idx + 1, path.length - 1);
+                        const localT = (child.userData.progress * (path.length - 1)) % 1;
+                        
+                        child.position.lerpVectors(path[idx], path[nextIdx], localT);
+                    }
+                    if (child.userData.type) {
+                        child.children[0].rotation.y += 0.01;
+                    }
+                });
+            }
+
+            // 更新阶段三：令牌旋转
+            if (sceneGroups.phase3.visible) {
+                sceneGroups.phase3.children.forEach(child => {
+                    if (child.geometry?.type === 'CylinderGeometry') {
+                        child.rotation.z += 0.02;
+                    }
+                    if (child.geometry?.type === 'TorusGeometry') {
+                        child.rotation.x += 0.01;
+                        child.rotation.y += 0.01;
+                    }
+                    if (child.userData.type) {
+                        child.children[0].rotation.y += 0.01;
+                    }
+                });
+            }
+
+            // 更新阶段四：波纹扩散
+            if (sceneGroups.phase4.visible) {
+                sceneGroups.phase4.children.forEach(child => {
+                    if (child.name === 'ripple') {
+                        child.scale.addScalar(child.userData.speed);
+                        if (child.scale.x > 1.5) {
+                            child.scale.set(1, 1, 1);
+                        }
+                        child.material.opacity = 0.3 - child.userData.index * 0.05 - (child.scale.x - 1) * 0.2;
+                    }
+                    if (child.userData.type) {
+                        child.children[0].rotation.y += 0.01;
+                    }
+                });
+            }
+
             controls.update();
             composer.render();
         }
@@ -486,6 +755,9 @@
         // ==================== 初始化 ====================
         createOpeningScene();
         createPhase1Scene();
+        createPhase2Scene();
+        createPhase3Scene();
+        createPhase4Scene();
         setScene(0);
         
         // 隐藏loading
