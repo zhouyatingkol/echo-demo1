@@ -3,96 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHO Protocol - WebGL Demo</title>
+    <title>ECHO Protocol - 价值溯源</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
             background: #020208;
             color: #fff;
-            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
             overflow: hidden;
         }
-
-        /* ==================== Stage System ==================== */
+        
         .stage {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
         }
-        .stage.active {
-            display: flex;
-        }
-
-        /* 3D Background Container */
+        
+        .stage.active { display: flex; flex-direction: column; }
+        
+        /* 3D背景容器 */
         .bg-3d {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 0;
         }
         .bg-3d canvas {
             width: 100% !important;
             height: 100% !important;
         }
-
-        /* Content Container */
-        .content {
-            position: relative;
-            z-index: 10;
-            pointer-events: auto;
-        }
-
-        /* Progress Bar */
-        .progress-bar {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 12px;
-            z-index: 100;
-            pointer-events: auto;
-        }
-        .progress-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(0, 240, 255, 0.2);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .progress-dot:hover {
-            background: rgba(0, 240, 255, 0.4);
-            transform: scale(1.2);
-        }
-        .progress-dot.active {
-            background: #00f0ff;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
-        }
-        .progress-dot.gold {
-            border-color: rgba(255, 215, 0, 0.3);
-            background: rgba(255, 215, 0, 0.2);
-        }
-        .progress-dot.gold:hover {
-            background: rgba(255, 215, 0, 0.4);
-        }
-        .progress-dot.gold.active {
-            background: #ffd700;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-        }
-
-        /* Glass Card */
+        
+        /* 玻璃卡片 */
         .glass-card {
             background: rgba(10, 15, 30, 0.7);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -103,8 +49,8 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.05),
                 0 0 60px rgba(0, 150, 255, 0.1);
         }
-
-        /* Glow Effects */
+        
+        /* 发光文字 */
         .glow-cyan { 
             color: #00f0ff; 
             text-shadow: 0 0 20px rgba(0, 240, 255, 0.6), 0 0 40px rgba(0, 240, 255, 0.3);
@@ -113,343 +59,128 @@
             color: #ffd700; 
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 40px rgba(255, 215, 0, 0.2);
         }
-
-        /* ==================== Stage Specific Styles ==================== */
-
-        /* Stage 0: Opening */
-        .stage-0 .content {
-            text-align: center;
-            padding: 60px 80px;
+        .glow-purple {
+            color: #e066ff;
+            text-shadow: 0 0 20px rgba(224, 102, 255, 0.5);
         }
-        .stage-0 h1 {
-            font-size: 42px;
-            font-weight: 500;
-            letter-spacing: 8px;
-            margin-bottom: 30px;
-        }
-        .stage-0 p {
-            color: rgba(220, 220, 240, 0.8);
-            font-size: 16px;
-            letter-spacing: 3px;
-            margin-bottom: 50px;
-        }
-        .start-btn {
-            padding: 18px 48px;
-            font-size: 14px;
-            letter-spacing: 4px;
-            border: 1px solid rgba(255, 215, 0, 0.4);
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(200, 150, 0, 0.05) 100%);
-            color: #ffd700;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 12px;
-            text-transform: uppercase;
-        }
-        .start-btn:hover {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(200, 150, 0, 0.1) 100%);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
-            transform: translateY(-2px);
-        }
-
-        /* Stage 1: Phase 1 - Molecules */
-        .stage-1 .content {
-            position: absolute;
-            right: 60px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 380px;
-            padding: 40px;
-        }
-        .stage-1 h2 {
-            font-size: 18px;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-        }
-        .stage-1 .molecule-list {
-            list-style: none;
-        }
-        .stage-1 .molecule-list li {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
-            color: rgba(220, 230, 240, 0.9);
-            font-size: 13px;
-        }
-        .stage-1 .molecule-list li:last-child {
-            border-bottom: none;
-        }
-        .stage-1 .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-        .stage-1 .dot.cyan { background: #64c8ff; box-shadow: 0 0 10px #64c8ff; }
-        .stage-1 .dot.green { background: #64ff96; box-shadow: 0 0 10px #64ff96; }
-        .stage-1 .dot.teal { background: #64dddd; box-shadow: 0 0 10px #64dddd; }
-        .stage-1 .dot.mint { background: #96ffc8; box-shadow: 0 0 10px #96ffc8; }
-        .stage-1 .dot.gold { background: #c8b464; box-shadow: 0 0 10px #c8b464; }
-
-        /* Stage 2: Phase 2 - Workbench */
-        .stage-2 .content {
-            position: absolute;
-            left: 60px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 400px;
-            padding: 40px;
-        }
-        .stage-2 h2 {
-            font-size: 18px;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
-        }
-        .stage-2 .flow-step {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 20px 0;
-            padding: 16px;
-            background: rgba(0, 240, 255, 0.05);
-            border-radius: 12px;
-            border-left: 3px solid rgba(0, 240, 255, 0.4);
-        }
-        .stage-2 .flow-num {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(0, 240, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .stage-2 .flow-text {
-            color: rgba(220, 230, 240, 0.9);
-            font-size: 13px;
-        }
-
-        /* Stage 3: Phase 3 - Token */
-        .stage-3 .content {
-            position: absolute;
-            right: 60px;
-            bottom: 100px;
-            width: 360px;
-            padding: 40px;
-        }
-        .stage-3 h2 {
-            font-size: 18px;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-        }
-        .stage-3 .comparison {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 20px;
-        }
-        .stage-3 .compare-item {
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .stage-3 .compare-item.trad {
-            background: rgba(100, 100, 100, 0.1);
-            border: 1px solid rgba(100, 100, 100, 0.3);
-        }
-        .stage-3 .compare-item.echo {
-            background: rgba(200, 180, 100, 0.1);
-            border: 1px solid rgba(200, 180, 100, 0.3);
-        }
-        .stage-3 .compare-title {
-            font-size: 11px;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-        .stage-3 .compare-value {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        /* Stage 4: Phase 4 - Value Distribution */
-        .stage-4 .content {
-            position: absolute;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 30px 50px;
-            text-align: center;
-        }
-        .stage-4 h2 {
-            font-size: 18px;
-            letter-spacing: 4px;
-            margin-bottom: 12px;
-        }
-        .stage-4 p {
-            color: rgba(220, 230, 240, 0.8);
-            font-size: 13px;
-        }
-        .stage-4 .contributors-bar {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 30px;
-            padding: 24px 40px;
-            background: rgba(10, 15, 30, 0.7);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 16px;
-            backdrop-filter: blur(20px);
-        }
-        .stage-4 .contributor {
-            text-align: center;
-        }
-        .stage-4 .contrib-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            margin: 0 auto 8px;
-        }
-        .stage-4 .contrib-name {
-            font-size: 11px;
-            letter-spacing: 1px;
-            color: rgba(220, 230, 240, 0.8);
-        }
-
-        /* Stage 5: Phase 5 - Failure Case */
-        .stage-5 .content {
-            position: absolute;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 30px 60px;
-            text-align: center;
-            border-color: rgba(255, 80, 80, 0.3);
-            background: rgba(50, 10, 10, 0.5);
-        }
-        .stage-5 h2 {
-            font-size: 18px;
-            letter-spacing: 4px;
-            margin-bottom: 12px;
+        .glow-red {
             color: #ff6464;
             text-shadow: 0 0 20px rgba(255, 100, 100, 0.4);
         }
-        .stage-5 p {
-            color: rgba(255, 200, 200, 0.8);
-            font-size: 13px;
-        }
-        .stage-5 .liquidation-info {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 40px;
-            padding: 24px 50px;
-            background: rgba(30, 15, 20, 0.7);
-            border: 1px solid rgba(255, 80, 80, 0.2);
-            border-radius: 16px;
-            backdrop-filter: blur(20px);
-        }
-        .stage-5 .liquid-item {
-            text-align: center;
-        }
-        .stage-5 .liquid-amount {
-            font-size: 24px;
-            font-weight: 600;
-            color: #6496c8;
-            text-shadow: 0 0 10px rgba(100, 150, 200, 0.3);
-        }
-        .stage-5 .liquid-label {
-            font-size: 11px;
-            letter-spacing: 1px;
-            color: rgba(200, 200, 220, 0.7);
-            margin-top: 4px;
-        }
-
-        /* Stage 6: Ending */
-        .stage-6 .content {
-            text-align: center;
-            padding: 60px 100px;
-        }
-        .stage-6 .echo-logo {
-            width: 120px;
-            height: 120px;
-            border: 2px solid rgba(200, 180, 100, 0.5);
-            border-radius: 50%;
-            margin: 0 auto 40px;
-            position: relative;
-            animation: logoPulse 2s ease-in-out infinite;
-        }
-        .stage-6 .echo-logo::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 80px; height: 80px;
-            border: 2px solid rgba(0, 240, 255, 0.4);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            animation: logoSpin 3s linear infinite;
-        }
-        .stage-6 .echo-logo::after {
-            content: 'ECHO';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: #c8b464;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            letter-spacing: 6px;
-            font-weight: 600;
-            text-shadow: 0 0 10px rgba(200, 180, 100, 0.5);
-        }
-        @keyframes logoPulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(200, 180, 100, 0.2); }
-            50% { box-shadow: 0 0 60px rgba(200, 180, 100, 0.4), 0 0 90px rgba(0, 240, 255, 0.2); }
-        }
-        @keyframes logoSpin {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        .stage-6 h2 {
-            font-size: 28px;
-            letter-spacing: 6px;
-            margin-bottom: 20px;
-        }
-        .stage-6 p {
-            color: rgba(220, 230, 240, 0.8);
-            font-size: 14px;
-            letter-spacing: 2px;
-            line-height: 2;
-        }
-        .stage-6 .restart-btn {
-            margin-top: 40px;
-            padding: 14px 36px;
-            font-size: 12px;
-            letter-spacing: 3px;
+        
+        /* 按钮 */
+        .btn-tech {
+            padding: 16px 36px;
             border: 1px solid rgba(0, 240, 255, 0.4);
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(0, 100, 200, 0.05) 100%);
             color: #00f0ff;
             font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
             cursor: pointer;
             transition: all 0.3s;
             border-radius: 12px;
-            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
         }
-        .stage-6 .restart-btn:hover {
+        
+        .btn-tech:hover {
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(0, 100, 200, 0.1) 100%);
             box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
             transform: translateY(-2px);
+        }
+        
+        .btn-gold {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(200, 150, 0, 0.05) 100%);
+            color: #ffd700;
+        }
+        
+        .btn-gold:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(200, 150, 0, 0.1) 100%);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* 进度条 */
+        .progress-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            z-index: 1000;
+        }
+        
+        .progress-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: rgba(100, 150, 200, 0.2);
+            border: 1px solid rgba(100, 150, 200, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .progress-dot:hover { 
+            background: rgba(0, 240, 255, 0.3); 
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        .progress-dot.active { 
+            background: #00f0ff; 
+            box-shadow: 0 0 15px #00f0ff, 0 0 30px rgba(0, 240, 255, 0.5);
+            border-color: #00f0ff;
+        }
+        .progress-dot.completed { background: #ffd700; border-color: #ffd700; }
+        
+        /* 旁白面板 */
+        .narration-panel {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 24px 40px;
+            background: rgba(5, 10, 20, 0.9);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            text-align: center;
+            font-size: 15px;
+            color: rgba(200, 220, 255, 0.95);
+            z-index: 1000;
+            max-width: 800px;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 音频控制 */
+        .audio-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 1000;
+        }
+        
+        .audio-btn {
+            padding: 10px 18px;
+            border-radius: 24px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+            color: #00f0ff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .audio-btn:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: rgba(0, 240, 255, 0.5);
+        }
+        
+        .audio-btn.active {
+            background: rgba(0, 240, 255, 0.25);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
         }
 
         /* Loading Screen */
@@ -539,63 +270,246 @@
             margin-top: 12px;
         }
 
-        /* Hover Tooltip */
-        .hover-tooltip {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            transform: translate(-50%, -100%);
-            margin-top: -15px;
+        /* Stage specific styles from ECHO */
+        .stage-0 .content {
+            text-align: center;
+            padding: 60px 80px;
         }
-        .hover-tooltip.visible { opacity: 1; }
-        .tooltip-content {
-            background: rgba(10, 15, 30, 0.9);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 16px;
-            padding: 16px 20px;
-            backdrop-filter: blur(20px);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.5),
-                0 0 30px rgba(0, 240, 255, 0.1);
+        .stage-0 h1 {
+            font-size: 42px;
+            font-weight: 500;
+            letter-spacing: 8px;
+            margin-bottom: 30px;
         }
-        .tooltip-title {
-            color: #ffd700;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            letter-spacing: 2px;
-            margin-bottom: 6px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        .stage-0 p {
+            color: rgba(220, 220, 240, 0.8);
+            font-size: 16px;
+            letter-spacing: 3px;
+            margin-bottom: 50px;
         }
-        .tooltip-desc {
-            color: rgba(220, 230, 240, 0.9);
-            font-size: 12px;
-            line-height: 1.5;
-        }
-        .tooltip-arrow {
+        .stage-1 .content {
             position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid rgba(0, 240, 255, 0.3);
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 380px;
+            padding: 40px;
+        }
+        .stage-1 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .stage-1 .molecule-list {
+            list-style: none;
+        }
+        .stage-1 .molecule-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+            color: rgba(220, 230, 240, 0.9);
+            font-size: 13px;
+        }
+        .stage-1 .molecule-list li:last-child {
+            border-bottom: none;
+        }
+        .stage-1 .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .stage-1 .dot.cyan { background: #64c8ff; box-shadow: 0 0 10px #64c8ff; }
+        .stage-1 .dot.green { background: #64ff96; box-shadow: 0 0 10px #64ff96; }
+        .stage-1 .dot.teal { background: #64dddd; box-shadow: 0 0 10px #64dddd; }
+        .stage-1 .dot.mint { background: #96ffc8; box-shadow: 0 0 10px #96ffc8; }
+        .stage-1 .dot.gold { background: #c8b464; box-shadow: 0 0 10px #c8b464; }
+
+        .stage-2 .content {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            padding: 40px;
+        }
+        .stage-2 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+        }
+        .stage-2 .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0;
+            padding: 16px;
+            background: rgba(0, 240, 255, 0.05);
+            border-radius: 12px;
+            border-left: 3px solid rgba(0, 240, 255, 0.4);
+        }
+        .stage-2 .flow-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 240, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .stage-2 .flow-text {
+            color: rgba(220, 230, 240, 0.9);
+            font-size: 13px;
         }
 
-        /* Cursor Trail */
-        .cursor-trail {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(0, 240, 255, 0.6);
+        .stage-3 .content {
+            position: absolute;
+            right: 60px;
+            bottom: 100px;
+            width: 360px;
+            padding: 40px;
+        }
+        .stage-3 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .stage-3 .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .stage-3 .compare-item {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stage-3 .compare-item.trad {
+            background: rgba(100, 100, 100, 0.1);
+            border: 1px solid rgba(100, 100, 100, 0.3);
+        }
+        .stage-3 .compare-item.echo {
+            background: rgba(200, 180, 100, 0.1);
+            border: 1px solid rgba(200, 180, 100, 0.3);
+        }
+        .stage-3 .compare-title {
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .stage-3 .compare-value {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .stage-4 .content {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 30px 50px;
+            text-align: center;
+        }
+        .stage-4 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+        .stage-4 p {
+            color: rgba(220, 230, 240, 0.8);
+            font-size: 13px;
+        }
+        .stage-4 .contributors-bar {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            padding: 24px 40px;
+            background: rgba(10, 15, 30, 0.7);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+        }
+        .stage-4 .contributor {
+            text-align: center;
+        }
+        .stage-4 .contrib-dot {
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            display: none;
+            margin: 0 auto 8px;
+        }
+        .stage-4 .contrib-name {
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: rgba(220, 230, 240, 0.8);
+        }
+
+        .stage-5 .content {
+            text-align: center;
+            padding: 60px 100px;
+        }
+        .stage-5 .echo-logo {
+            width: 120px;
+            height: 120px;
+            border: 2px solid rgba(200, 180, 100, 0.5);
+            border-radius: 50%;
+            margin: 0 auto 40px;
+            position: relative;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+        .stage-5 .echo-logo::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 80px; height: 80px;
+            border: 2px solid rgba(0, 240, 255, 0.4);
+            border-radius: 50%;
             transform: translate(-50%, -50%);
+            animation: logoSpin 3s linear infinite;
+        }
+        .stage-5 .echo-logo::after {
+            content: 'ECHO';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #c8b464;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 6px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(200, 180, 100, 0.5);
+        }
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(200, 180, 100, 0.2); }
+            50% { box-shadow: 0 0 60px rgba(200, 180, 100, 0.4), 0 0 90px rgba(0, 240, 255, 0.2); }
+        }
+        @keyframes logoSpin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .stage-5 h2 {
+            font-size: 28px;
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+        }
+        .stage-5 p {
+            color: rgba(220, 230, 240, 0.8);
+            font-size: 14px;
+            letter-spacing: 2px;
+            line-height: 2;
         }
     </style>
 </head>
@@ -603,36 +517,44 @@
     <!-- Loading Screen -->
     <div class="loading" id="loading">
         <div class="loading-logo"></div>
-        <div class="loading-text">INITIALIZING PROTOCOL</div>
+        <div class="loading-text">INITIALIZING ECHO PROTOCOL</div>
         <div class="loading-progress">
-            <div class="loading-progress-bar" id="progressBar"></div>
+            <div class="loading-progress-bar" id="loadingBar"></div>
         </div>
-        <div class="loading-percentage" id="progressText">0%</div>
+        <div class="loading-percentage" id="loadingText">0%</div>
     </div>
 
-    <!-- Cursor Trail Container -->
-    <div id="cursorTrailContainer"></div>
-
-    <!-- Hover Tooltip -->
-    <div class="hover-tooltip" id="hoverTooltip">
-        <div class="tooltip-content">
-            <div class="tooltip-title" id="tooltipTitle">MOLECULE</div>
-            <div class="tooltip-desc" id="tooltipDesc">Description</div>
-        </div>
-        <div class="tooltip-arrow"></div>
+    <!-- 音频控制 -->
+    <div class="audio-panel">
+        <button class="audio-btn active" id="ttsBtn" onclick="toggleTTS()">🔊 旁白</button>
+        <button class="audio-btn" id="bgmBtn" onclick="toggleBGM()">🎵 音乐</button>
+        <button class="audio-btn active" id="sfxBtn" onclick="toggleSFX()">✨ 音效</button>
     </div>
+    
+    <!-- 进度条 -->
+    <div class="progress-bar" id="progressDots">
+        <div class="progress-dot active" onclick="goToStage(0)"></div>
+        <div class="progress-dot" onclick="goToStage(1)"></div>
+        <div class="progress-dot" onclick="goToStage(2)"></div>
+        <div class="progress-dot" onclick="goToStage(3)"></div>
+        <div class="progress-dot" onclick="goToStage(4)"></div>
+        <div class="progress-dot" onclick="goToStage(5)"></div>
+    </div>
+    
+    <!-- 旁白 -->
+    <div class="narration-panel" id="narration">欢迎来到ECHO价值溯源演示。点击「开始探索」开启您的旅程。</div>
 
-    <!-- Stage 0: Opening -->
+    <!-- ==================== STAGE 0: 开场 ==================== -->
     <div class="stage stage-0 active" id="stage0">
         <div class="bg-3d" id="bg3d-0"></div>
         <div class="content glass-card">
             <h1 class="glow-gold">价值溯源</h1>
             <p>一款新药的数字旅程</p>
-            <button class="start-btn" onclick="goToStage(1)">开始探索</button>
+            <button class="btn-tech btn-gold" onclick="goToStage(1)" onmouseenter="playHoverSound()">开始探索</button>
         </div>
     </div>
 
-    <!-- Stage 1: Phase 1 - Base Assets -->
+    <!-- ==================== STAGE 1: 阶段一 - 基础资产 ==================== -->
     <div class="stage stage-1" id="stage1">
         <div class="bg-3d" id="bg3d-1"></div>
         <div class="content glass-card">
@@ -650,7 +572,7 @@
         </div>
     </div>
 
-    <!-- Stage 2: Phase 2 - Collaboration -->
+    <!-- ==================== STAGE 2: 阶段二 - 首次协作 ==================== -->
     <div class="stage stage-2" id="stage2">
         <div class="bg-3d" id="bg3d-2"></div>
         <div class="content glass-card">
@@ -673,7 +595,7 @@
         </div>
     </div>
 
-    <!-- Stage 3: Phase 3 - Tokenization -->
+    <!-- ==================== STAGE 3: 阶段三 - 风险融资 ==================== -->
     <div class="stage stage-3" id="stage3">
         <div class="bg-3d" id="bg3d-3"></div>
         <div class="content glass-card">
@@ -694,7 +616,7 @@
         </div>
     </div>
 
-    <!-- Stage 4: Phase 4 - Value Distribution -->
+    <!-- ==================== STAGE 4: 阶段四 - 价值分配 ==================== -->
     <div class="stage stage-4" id="stage4">
         <div class="bg-3d" id="bg3d-4"></div>
         <div class="content glass-card">
@@ -721,36 +643,9 @@
         </div>
     </div>
 
-    <!-- Stage 5: Phase 5 - Failure Case -->
+    <!-- ==================== STAGE 5: 结尾 - 价值重塑 ==================== -->
     <div class="stage stage-5" id="stage5">
         <div class="bg-3d" id="bg3d-5"></div>
-        <div class="content glass-card">
-            <h2>隐藏分支：失败清算</h2>
-            <p>即使失败，ECHO协议也能确保公平清算，保护每一位参与者的权益</p>
-        </div>
-        <div class="liquidation-info">
-            <div class="liquid-item">
-                <div class="liquid-amount">70万</div>
-                <div class="liquid-label">公共联盟</div>
-            </div>
-            <div class="liquid-item">
-                <div class="liquid-amount">840万</div>
-                <div class="liquid-label">智药科技</div>
-            </div>
-            <div class="liquid-item">
-                <div class="liquid-amount">420万</div>
-                <div class="liquid-label">康源医院</div>
-            </div>
-            <div class="liquid-item">
-                <div class="liquid-amount">300万</div>
-                <div class="liquid-label">元生资本</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stage 6: Ending -->
-    <div class="stage stage-6" id="stage6">
-        <div class="bg-3d" id="bg3d-6"></div>
         <div class="content glass-card">
             <div class="echo-logo"></div>
             <h2 class="glow-gold">价值重塑</h2>
@@ -759,19 +654,8 @@
                 每一份贡献都被铭记<br>
                 每一次创新都被传承
             </p>
-            <button class="restart-btn" onclick="goToStage(0)">重新开始</button>
+            <button class="btn-tech" style="margin-top: 40px;" onclick="goToStage(0)" onmouseenter="playHoverSound()">← 重新开始</button>
         </div>
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="progress-bar" id="progressBar">
-        <div class="progress-dot active" onclick="goToStage(0)"></div>
-        <div class="progress-dot" onclick="goToStage(1)"></div>
-        <div class="progress-dot" onclick="goToStage(2)"></div>
-        <div class="progress-dot" onclick="goToStage(3)"></div>
-        <div class="progress-dot" onclick="goToStage(4)"></div>
-        <div class="progress-dot gold" onclick="goToStage(5)"></div>
-        <div class="progress-dot gold" onclick="goToStage(6)"></div>
     </div>
 
     <script type="importmap">
@@ -791,34 +675,128 @@
         import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
         // ==================== Global State ====================
-        let currentStage = 0;
-        const totalStages = 7;
+        window.currentStage = 0;
+        const totalStages = 6;
+
+        // ==================== Narrations ====================
+        window.narrations = [
+            "欢迎来到ECHO价值溯源演示。一款新药的诞生，背后是无数数据的交织与协作。让我带您踏上这段数字旅程。",
+            "阶段一：基础资产。在ECHO协议上，每一份数据都是可追溯的资产——蛋白质结构、化合物库、基因组信息，这些都是新药研发的基石。",
+            "阶段二：首次协作。不同来源的资产在工作台上融合，AI算力加速筛选，智能合约自动记录每一次贡献，生成新的协作成果NeuroBlok。",
+            "阶段三：风险融资。ECHO协议实现了所有权与收益权的分离。您获得推进临床试验的资金，却从未丢失数据的控制权，实现零股权稀释。",
+            "阶段四：价值分配。当新药成功上市，收益沿链条逆流而上，智药科技、康源医院、公共联盟、元生资本，每一位贡献者都获得应有的回报。",
+            "价值重塑。在ECHO协议构建的生态中，每一份贡献都被铭记，每一次创新都被传承。这就是价值溯源的力量。"
+        ];
+
+        // ==================== Audio System ====================
+        window.ttsEnabled = true;
+        window.sfxEnabled = true;
+        window.bgmEnabled = false;
+        window.audioCtx = null;
+        window.bgmOsc = null;
+
+        window.initAudio = function() {
+            if (!window.audioCtx) {
+                window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        };
+
+        window.playTone = function(freq, duration, type = 'sine', vol = 0.12) {
+            if (!window.sfxEnabled || !window.audioCtx) return;
+            
+            const osc = window.audioCtx.createOscillator();
+            const gain = window.audioCtx.createGain();
+            const filter = window.audioCtx.createBiquadFilter();
+            
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(window.audioCtx.destination);
+            
+            osc.frequency.value = freq;
+            osc.type = type;
+            filter.type = 'lowpass';
+            filter.frequency.value = 3000;
+            
+            gain.gain.setValueAtTime(0, window.audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(vol, window.audioCtx.currentTime + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + duration);
+            
+            osc.start(window.audioCtx.currentTime);
+            osc.stop(window.audioCtx.currentTime + duration);
+        };
+
+        window.playHoverSound = function() { window.playTone(880, 0.12, 'sine', 0.08); };
+        window.playClickSound = function() { window.playTone(1320, 0.15, 'sine', 0.1); };
+
+        window.toggleTTS = function() {
+            window.ttsEnabled = !window.ttsEnabled;
+            document.getElementById('ttsBtn').classList.toggle('active', window.ttsEnabled);
+            if (window.ttsEnabled) window.speak('旁白已开启');
+        };
+
+        window.toggleBGM = function() {
+            window.bgmEnabled = !window.bgmEnabled;
+            document.getElementById('bgmBtn').classList.toggle('active', window.bgmEnabled);
+            window.initAudio();
+        };
+
+        window.toggleSFX = function() {
+            window.sfxEnabled = !window.sfxEnabled;
+            document.getElementById('sfxBtn').classList.toggle('active', window.sfxEnabled);
+        };
+
+        window.speak = function(text) {
+            if (!window.ttsEnabled || !window.speechSynthesis) return;
+            
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.88;
+            utterance.pitch = 0.92;
+            utterance.volume = 0.85;
+            
+            window.speechSynthesis.speak(utterance);
+        };
 
         // ==================== Stage Management ====================
         window.goToStage = function(index) {
             if (index < 0 || index >= totalStages) return;
+            
+            window.initAudio();
+            window.playClickSound();
 
             // Hide current stage
             document.querySelectorAll('.stage').forEach(stage => {
                 stage.classList.remove('active');
             });
 
-            // Show new stage
-            document.getElementById(`stage${index}`).classList.add('active');
-
             // Update progress dots
-            document.querySelectorAll('.progress-dot').forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
+            const dots = document.querySelectorAll('#progressDots .progress-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.remove('active', 'completed');
+                if (i < index) dot.classList.add('completed');
+                if (i === index) dot.classList.add('active');
             });
+
+            // Show new stage
+            const newStage = document.getElementById(`stage${index}`);
+            newStage.classList.add('active');
+            gsap.from(newStage, { opacity: 0, duration: 0.6 });
+
+            window.currentStage = index;
+
+            // Update narration
+            const narrationEl = document.getElementById('narration');
+            narrationEl.textContent = window.narrations[index];
+            window.speak(window.narrations[index]);
 
             // Update scene visibility
             Object.values(stageScenes).forEach((scene, i) => {
                 if (scene) scene.visible = (i === index);
             });
 
-            currentStage = index;
-
-            // Trigger camera animation for this stage
+            // Animate camera for this stage
             animateCameraForStage(index);
         };
 
@@ -845,7 +823,7 @@
             const container = document.getElementById(`bg3d-${i}`);
             if (container) container.appendChild(renderer.domElement);
 
-            // Post-processing
+            // Post-processing with Bloom
             const composer = new EffectComposer(renderer);
             const renderPass = new RenderPass(scene, camera);
             composer.addPass(renderPass);
@@ -876,12 +854,6 @@
             const goldLight = new THREE.PointLight(0xc8b464, 1.5, 80);
             goldLight.position.set(0, 5, 10);
             scene.add(goldLight);
-
-            if (i === 5) {
-                const blueLight = new THREE.PointLight(0x6496c8, 1.5, 100);
-                blueLight.position.set(0, 10, 10);
-                scene.add(blueLight);
-            }
         }
 
         // Show only stage 0 initially
@@ -932,7 +904,7 @@
         function createMolecule(type, color, position, scale = 1) {
             const group = new THREE.Group();
 
-            // Core
+            // Core - glowing sphere with bloom effect
             const coreGeo = new THREE.IcosahedronGeometry(0.8 * scale, 2);
             const coreMat = new THREE.MeshPhysicalMaterial({
                 color: color,
@@ -941,12 +913,12 @@
                 transmission: 0.6,
                 thickness: 1,
                 emissive: color,
-                emissiveIntensity: 0.3
+                emissiveIntensity: 0.5
             });
             const core = new THREE.Mesh(coreGeo, coreMat);
             group.add(core);
 
-            // Rings
+            // Rotating rings
             const ringGeo = new THREE.TorusGeometry(1.2 * scale, 0.05 * scale, 16, 100);
             const ringMat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.5 });
 
@@ -957,7 +929,7 @@
                 group.add(ring);
             }
 
-            // Satellites
+            // Orbiting satellites
             const satGeo = new THREE.SphereGeometry(0.15 * scale, 16, 16);
             const satMat = new THREE.MeshBasicMaterial({ color: color });
             for (let i = 0; i < 6; i++) {
@@ -982,7 +954,7 @@
         function initStage0() {
             const scene = stageScenes[0];
 
-            // Cell membranes
+            // Animated cell membranes
             const sizes = [5, 7.5, 10];
             const delays = [0, -1.3, -2.6];
 
@@ -1017,11 +989,11 @@
             cameras[0].position.set(0, 0, 25);
         }
 
-        // ==================== Stage 1: Phase 1 ====================
+        // ==================== Stage 1: Phase 1 - 5 Molecules ====================
         function initStage1() {
             const scene = stageScenes[1];
 
-            // Platform
+            // Golden platform
             const platformGeo = new THREE.CylinderGeometry(8, 8, 0.5, 64);
             const platformMat = new THREE.MeshPhysicalMaterial({
                 color: 0xc8b464,
@@ -1034,7 +1006,7 @@
             platform.position.y = -3;
             scene.add(platform);
 
-            // Molecules
+            // 5 Floating molecules
             const molecules = [
                 { type: 'PDB-001', color: 0x64c8ff, pos: new THREE.Vector3(-4, 0, -2), scale: 1 },
                 { type: 'CHEM-002', color: 0x64ff96, pos: new THREE.Vector3(0, 1, 2), scale: 0.9 },
@@ -1052,11 +1024,11 @@
             cameras[1].position.set(0, 8, 18);
         }
 
-        // ==================== Stage 2: Phase 2 ====================
+        // ==================== Stage 2: Phase 2 - Workbench ====================
         function initStage2() {
             const scene = stageScenes[2];
 
-            // Workbench
+            // Tech workbench
             const workbenchGeo = new THREE.BoxGeometry(6, 0.3, 4);
             const workbenchMat = new THREE.MeshPhysicalMaterial({
                 color: 0x1a1a40,
@@ -1079,31 +1051,33 @@
             geneMol.name = 'source_gene';
             scene.add(geneMol);
 
-            // Connection lines
+            // Animated connection lines
             const lineMat = new THREE.LineBasicMaterial({ color: 0x64c8ff, transparent: true, opacity: 0.5 });
 
             const line1Points = [new THREE.Vector3(-6, 0, -2), new THREE.Vector3(0, 0, -1), new THREE.Vector3(8, -2, 0)];
             const line1 = new THREE.Line(new THREE.BufferGeometry().setFromPoints(line1Points), lineMat);
+            line1.name = 'flow_line';
             scene.add(line1);
 
             const line2Points = [new THREE.Vector3(-6, 0, 2), new THREE.Vector3(0, 0, 1), new THREE.Vector3(8, -2, 0)];
             const line2 = new THREE.Line(new THREE.BufferGeometry().setFromPoints(line2Points), lineMat);
+            line2.name = 'flow_line';
             scene.add(line2);
 
             cameras[2].position.set(10, 5, 12);
         }
 
-        // ==================== Stage 3: Phase 3 ====================
+        // ==================== Stage 3: Phase 3 - Financing ====================
         function initStage3() {
             const scene = stageScenes[3];
 
-            // Split line
+            // Split line - traditional vs ECHO
             const splitGeo = new THREE.BoxGeometry(0.1, 12, 0.1);
             const splitMat = new THREE.MeshBasicMaterial({ color: 0x64c8ff, transparent: true, opacity: 0.6 });
             const splitLine = new THREE.Mesh(splitGeo, splitMat);
             scene.add(splitLine);
 
-            // Traditional (gray)
+            // Traditional side (gray/dull)
             const tradGeo = new THREE.BoxGeometry(4, 5, 2);
             const tradMat = new THREE.MeshPhysicalMaterial({
                 color: 0x555555,
@@ -1116,18 +1090,18 @@
             traditional.position.set(-6, 0, 0);
             scene.add(traditional);
 
-            // ECHO side (golden)
+            // ECHO side - glowing molecule
             const vscreenMol = createMolecule('VSCREEN', 0x96ffc8, new THREE.Vector3(6, 1, 0), 1.2);
             scene.add(vscreenMol);
 
-            // Token
+            // Golden token
             const tokenGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32);
             const tokenMat = new THREE.MeshPhysicalMaterial({
                 color: 0xc8b464,
                 metalness: 1,
                 roughness: 0.2,
                 emissive: 0xc8b464,
-                emissiveIntensity: 0.3
+                emissiveIntensity: 0.5
             });
             const token = new THREE.Mesh(tokenGeo, tokenMat);
             token.position.set(6, -1.5, 0);
@@ -1145,18 +1119,18 @@
             cameras[3].position.set(0, 0, 20);
         }
 
-        // ==================== Stage 4: Phase 4 ====================
+        // ==================== Stage 4: Phase 4 - Value Distribution ====================
         function initStage4() {
             const scene = stageScenes[4];
 
-            // Central pool
+            // Central value pool
             const poolGeo = new THREE.CylinderGeometry(5, 5, 1, 64);
             const poolMat = new THREE.MeshPhysicalMaterial({
                 color: 0xc8b464,
                 metalness: 0.9,
                 roughness: 0.1,
                 emissive: 0xc8b464,
-                emissiveIntensity: 0.2,
+                emissiveIntensity: 0.3,
                 transparent: true,
                 opacity: 0.8
             });
@@ -1164,7 +1138,7 @@
             pool.position.y = -3;
             scene.add(pool);
 
-            // Ripples
+            // Animated ripples
             for (let i = 0; i < 5; i++) {
                 const rippleGeo = new THREE.RingGeometry(2 + i, 2.2 + i, 64);
                 const rippleMat = new THREE.MeshBasicMaterial({
@@ -1181,11 +1155,11 @@
                 scene.add(ripple);
             }
 
-            // NeuroBlok above
+            // NeuroBlok above pool
             const neuroMol = createMolecule('NeuroBlok', 0xc8b464, new THREE.Vector3(0, 4, 0), 1.8);
             scene.add(neuroMol);
 
-            // Contributors
+            // Contributors around pool
             const contributors = [
                 { name: '智药科技', color: 0x64c8ff, pos: new THREE.Vector3(-8, 0, 0) },
                 { name: '康源医院', color: 0x64ff96, pos: new THREE.Vector3(8, 0, 0) },
@@ -1200,13 +1174,14 @@
                     metalness: 0.5,
                     roughness: 0.3,
                     emissive: c.color,
-                    emissiveIntensity: 0.2
+                    emissiveIntensity: 0.3
                 });
                 const node = new THREE.Mesh(nodeGeo, nodeMat);
                 node.position.copy(c.pos);
                 node.name = c.name;
                 scene.add(node);
 
+                // Connection lines to pool
                 const linePoints = [c.pos, new THREE.Vector3(0, -2, 0)];
                 const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
                 const lineMat = new THREE.LineBasicMaterial({ color: c.color, transparent: true, opacity: 0.4 });
@@ -1217,66 +1192,18 @@
             cameras[4].position.set(0, 12, 22);
         }
 
-        // ==================== Stage 5: Failure ====================
+        // ==================== Stage 5: Ending - Network Panorama ====================
         function initStage5() {
             const scene = stageScenes[5];
 
-            // Broken NeuroBlok
-            const brokenMol = createMolecule('NeuroBlok', 0x6496c8, new THREE.Vector3(0, 3, 0), 1.5);
-            brokenMol.children.forEach(child => {
-                if (child.material) {
-                    child.material.emissiveIntensity = 0.1;
-                    child.material.opacity = 0.6;
-                    child.material.transparent = true;
-                }
-            });
-
-            // Cracks
-            for (let i = 0; i < 5; i++) {
-                const crackGeo = new THREE.BufferGeometry();
-                const crackPoints = [
-                    new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2 + 3, (Math.random() - 0.5) * 2),
-                    new THREE.Vector3((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3 + 3, (Math.random() - 0.5) * 3)
-                ];
-                crackGeo.setFromPoints(crackPoints);
-                const crackMat = new THREE.LineBasicMaterial({ color: 0xff6464, transparent: true, opacity: 0.6 });
-                const crack = new THREE.Line(crackGeo, crackMat);
-                crack.name = 'crack';
-                scene.add(crack);
-            }
-
-            scene.add(brokenMol);
-
-            // Liquidation pool
-            const poolGeo = new THREE.CylinderGeometry(4, 4, 0.8, 64);
-            const poolMat = new THREE.MeshPhysicalMaterial({
-                color: 0x6496c8,
-                metalness: 0.5,
-                roughness: 0.4,
-                emissive: 0x6496c8,
-                emissiveIntensity: 0.1,
-                transparent: true,
-                opacity: 0.6
-            });
-            const pool = new THREE.Mesh(poolGeo, poolMat);
-            pool.position.y = -3;
-            scene.add(pool);
-
-            cameras[5].position.set(0, 5, 15);
-        }
-
-        // ==================== Stage 6: Ending ====================
-        function initStage6() {
-            const scene = stageScenes[6];
-
-            // Central core
+            // Central value core - pulsing
             const coreGeo = new THREE.SphereGeometry(2, 64, 64);
             const coreMat = new THREE.MeshPhysicalMaterial({
                 color: 0xc8b464,
                 metalness: 0.5,
                 roughness: 0.2,
                 emissive: 0xc8b464,
-                emissiveIntensity: 0.3,
+                emissiveIntensity: 0.5,
                 transparent: true,
                 opacity: 0.9
             });
@@ -1299,7 +1226,7 @@
                 scene.add(orbit);
             }
 
-            // Orbit particles
+            // Orbiting particles representing assets
             const assets = ['PDB', 'CHEM', 'GENE', 'VSCREEN', 'TOKEN'];
             assets.forEach((name, i) => {
                 const angle = (i / assets.length) * Math.PI * 2;
@@ -1324,7 +1251,7 @@
                 scene.add(particle);
             });
 
-            cameras[6].position.set(0, 5, 18);
+            cameras[5].position.set(0, 5, 18);
         }
 
         // Initialize all stages
@@ -1334,7 +1261,6 @@
         initStage3();
         initStage4();
         initStage5();
-        initStage6();
 
         // ==================== Camera Animation ====================
         function animateCameraForStage(stageIndex) {
@@ -1345,7 +1271,6 @@
                 { pos: [10, 5, 12], duration: 2 },
                 { pos: [0, 0, 20], duration: 2 },
                 { pos: [0, 12, 22], duration: 2 },
-                { pos: [0, 5, 15], duration: 2 },
                 { pos: [0, 5, 18], duration: 3 }
             ];
 
@@ -1458,20 +1383,8 @@
                     });
                 }
 
-                // Stage 5: Failure - crack flicker
+                // Stage 5: Ending - core pulse and orbits
                 if (stageIndex === 5) {
-                    scene.children.forEach(child => {
-                        if (child.name === 'crack') {
-                            child.material.opacity = 0.4 + Math.sin(time * 3) * 0.2;
-                        }
-                        if (child.userData.type) {
-                            child.children[0].rotation.y += 0.002;
-                        }
-                    });
-                }
-
-                // Stage 6: Ending - core pulse and orbits
-                if (stageIndex === 6) {
                     scene.children.forEach(child => {
                         if (child.name === 'value_core') {
                             const scale = 1 + Math.sin(time * 2) * 0.05;
@@ -1498,16 +1411,16 @@
 
         // ==================== Loading Screen ====================
         let loadProgress = 0;
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
+        const loadingBar = document.getElementById('loadingBar');
+        const loadingText = document.getElementById('loadingText');
 
         function updateLoadingProgress() {
             try {
                 loadProgress += Math.random() * 15 + 5;
                 if (loadProgress > 100) loadProgress = 100;
 
-                if (progressBar) progressBar.style.width = loadProgress + '%';
-                if (progressText) progressText.textContent = Math.floor(loadProgress) + '%';
+                if (loadingBar) loadingBar.style.width = loadProgress + '%';
+                if (loadingText) loadingText.textContent = Math.floor(loadProgress) + '%';
 
                 if (loadProgress < 100) {
                     setTimeout(updateLoadingProgress, 100 + Math.random() * 200);
@@ -1546,7 +1459,12 @@
             }
         });
 
-        console.log('ECHO Protocol - Page Structure Initialized');
+        // Initial narration
+        setTimeout(() => {
+            window.speak(window.narrations[0]);
+        }, 1500);
+
+        console.log('ECHO Protocol - Value Provenance Initialized');
     </script>
 </body>
 </html>
