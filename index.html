@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHO Protocol - WebGL Demo</title>
+    <title>ECHO Protocol - WebGL Demo v2</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -34,6 +34,15 @@
             padding: 8px 16px;
             border-radius: 8px;
         }
+        .phase-label {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(200, 180, 100, 0.9);
+            font-size: 13px;
+            letter-spacing: 4px;
+        }
         .subtitle {
             position: absolute;
             bottom: 120px;
@@ -57,17 +66,19 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px;
+            gap: 8px;
             pointer-events: auto;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         button {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: 1px solid rgba(100,200,255,0.3);
             background: rgba(0,0,0,0.6);
             color: rgba(200,230,255,0.9);
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
-            border-radius: 20px;
+            border-radius: 16px;
             transition: all 0.3s;
         }
         button:hover {
@@ -104,15 +115,15 @@
     
     <div class="ui-layer">
         <div class="timecode" id="timecode">00:00 / 08:30</div>
+        <div class="phase-label" id="phaseLabel">阶段零：开场</div>
         <div class="subtitle" id="subtitle"></div>
+        
         <div class="controls">
-            <button onclick="jumpTo(0)" id="btn-0">开场</button>
-            <button onclick="jumpTo(30)" id="btn-1">阶段一</button>
-            <button onclick="jumpTo(90)" id="btn-2">阶段二</button>
-            <button onclick="jumpTo(180)" id="btn-3">阶段三</button>
-            <button onclick="jumpTo(270)" id="btn-4">阶段四</button>
-            <button onclick="jumpTo(390)" id="btn-5">失败</button>
-            <button onclick="jumpTo(480)" id="btn-6">结尾</button>
+            <button onclick="setScene(0)" id="btn-0" class="active">开场</button>
+            <button onclick="setScene(1)" id="btn-1">阶段一</button>
+            <button onclick="setScene(2)" id="btn-2">阶段二</button>
+            <button onclick="setScene(3)" id="btn-3">阶段三</button>
+            <button onclick="setScene(4)" id="btn-4">阶段四</button>
             <button onclick="togglePlay()" id="playBtn">▶ 播放</button>
         </div>
     </div>
@@ -131,8 +142,15 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // ==================== 场景设置 ====================
+        // ==================== 场景管理 ====================
+        const scenes = ['opening', 'phase1', 'phase2', 'phase3', 'phase4'];
+        let currentScene = 0;
+        let time = 0;
+        let isPlaying = false;
+
+        // ==================== 核心设置 ====================
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0a30);
         scene.fog = new THREE.FogExp2(0x0a0a30, 0.02);
@@ -146,6 +164,10 @@
         renderer.toneMapping = THREE.ReinhardToneMapping;
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
         // ==================== 后处理 ====================
         const composer = new EffectComposer(renderer);
         const renderPass = new RenderPass(scene, camera);
@@ -153,13 +175,27 @@
 
         const bloomPass = new UnrealBloomPass(
             new THREE.Vector2(window.innerWidth, window.innerHeight),
-            1.5,  // strength
-            0.4,  // radius
-            0.85  // threshold
+            1.5, 0.4, 0.85
         );
         composer.addPass(bloomPass);
 
-        // ==================== 细胞膜着色器 ====================
+        // ==================== 灯光系统 ====================
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+        scene.add(ambientLight);
+
+        const cyanLight = new THREE.PointLight(0x64c8ff, 2, 100);
+        cyanLight.position.set(10, 10, 10);
+        scene.add(cyanLight);
+
+        const greenLight = new THREE.PointLight(0x64ff96, 1, 50);
+        greenLight.position.set(-5, -5, 5);
+        scene.add(greenLight);
+
+        const goldLight = new THREE.PointLight(0xc8b464, 1.5, 80);
+        goldLight.position.set(0, 5, 10);
+        scene.add(goldLight);
+
+        // ==================== 着色器定义 ====================
         const membraneVertexShader = `
             varying vec2 vUv;
             varying vec3 vPosition;
@@ -169,16 +205,11 @@
             void main() {
                 vUv = uv;
                 vNormal = normal;
-                
                 vec3 pos = position;
-                
-                // 有机波动
                 float wave1 = sin(pos.x * 2.0 + uTime) * 0.1;
                 float wave2 = sin(pos.y * 3.0 + uTime * 0.8) * 0.08;
                 float wave3 = sin((pos.x + pos.y) * 1.5 + uTime * 1.2) * 0.05;
-                
                 pos += normal * (wave1 + wave2 + wave3);
-                
                 vPosition = pos;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
             }
@@ -191,197 +222,278 @@
             uniform float uTime;
             
             void main() {
-                // 基础淡绿色
                 vec3 baseColor = vec3(0.39, 1.0, 0.59);
-                
-                // 边缘发光
                 float fresnel = pow(1.0 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
                 vec3 glowColor = vec3(0.39, 1.0, 0.59) * fresnel * 2.0;
-                
-                // 内部能量纹理
                 float energy = sin(vPosition.x * 10.0 + uTime) * sin(vPosition.y * 10.0 + uTime * 0.7);
                 energy = energy * 0.5 + 0.5;
                 energy = pow(energy, 3.0) * 0.3;
-                
                 vec3 finalColor = baseColor * 0.1 + glowColor + baseColor * energy;
                 float alpha = 0.3 + fresnel * 0.4;
-                
                 gl_FragColor = vec4(finalColor, alpha);
             }
         `;
 
-        // 创建细胞膜
-        function createMembrane(radius, timeOffset = 0) {
-            const geometry = new THREE.SphereGeometry(radius, 128, 128);
-            const material = new THREE.ShaderMaterial({
-                vertexShader: membraneVertexShader,
-                fragmentShader: membraneFragmentShader,
-                uniforms: {
-                    uTime: { value: timeOffset }
-                },
-                transparent: true,
-                side: THREE.DoubleSide,
-                depthWrite: false
-            });
-            
-            const membrane = new THREE.Mesh(geometry, material);
-            return membrane;
-        }
+        // ==================== 场景元素容器 ====================
+        const sceneGroups = {
+            opening: new THREE.Group(),
+            phase1: new THREE.Group(),
+            phase2: new THREE.Group(),
+            phase3: new THREE.Group(),
+            phase4: new THREE.Group()
+        };
 
-        // ==================== 粒子系统 ====================
-        const particleCount = 1000;
-        const particleGeometry = new THREE.BufferGeometry();
-        const particlePositions = new Float32Array(particleCount * 3);
-        const particleVelocities = [];
-
-        for (let i = 0; i < particleCount; i++) {
-            particlePositions[i * 3] = (Math.random() - 0.5) * 50;
-            particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 50;
-            particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 50;
-            
-            particleVelocities.push({
-                x: (Math.random() - 0.5) * 0.02,
-                y: (Math.random() - 0.5) * 0.02,
-                z: (Math.random() - 0.5) * 0.02
-            });
-        }
-
-        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-
-        const particleMaterial = new THREE.PointsMaterial({
-            color: 0x64c8ff,
-            size: 0.1,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
+        Object.values(sceneGroups).forEach(g => {
+            g.visible = false;
+            scene.add(g);
         });
 
-        const particles = new THREE.Points(particleGeometry, particleMaterial);
-        scene.add(particles);
-
-        // ==================== 场景内容 ====================
-        const membranes = [];
-        const membraneGroup = new THREE.Group();
-        
-        // 三层细胞膜
-        const m1 = createMembrane(5, 0);
-        const m2 = createMembrane(7.5, 1.3);
-        m2.material.uniforms.uTime.value = 1.3;
-        m2.material.opacity = 0.7;
-        
-        const m3 = createMembrane(10, 2.6);
-        m3.material.uniforms.uTime.value = 2.6;
-        m3.material.opacity = 0.5;
-        
-        membranes.push(m1, m2, m3);
-        membraneGroup.add(m1, m2, m3);
-        scene.add(membraneGroup);
-
-        // 灯光
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
-        scene.add(ambientLight);
-
-        const pointLight = new THREE.PointLight(0x64c8ff, 2, 100);
-        pointLight.position.set(10, 10, 10);
-        scene.add(pointLight);
-
-        const bioLight = new THREE.PointLight(0x64ff96, 1, 50);
-        bioLight.position.set(-5, -5, 5);
-        scene.add(bioLight);
-
-        // ==================== 动画循环 ====================
-        let time = 0;
-        let isPlaying = false;
-        let currentTime = 0;
-
-        function animate() {
-            requestAnimationFrame(animate);
+        // ==================== 开场场景：细胞膜 ====================
+        function createOpeningScene() {
+            const group = sceneGroups.opening;
             
-            if (isPlaying) {
-                time += 0.016;
-                currentTime += 0.016;
-                updateTimecode();
+            // 三层细胞膜
+            for (let i = 0; i < 3; i++) {
+                const geometry = new THREE.SphereGeometry(5 + i * 2.5, 128, 128);
+                const material = new THREE.ShaderMaterial({
+                    vertexShader: membraneVertexShader,
+                    fragmentShader: membraneFragmentShader,
+                    uniforms: { uTime: { value: i * 1.3 } },
+                    transparent: true,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+                const membrane = new THREE.Mesh(geometry, material);
+                membrane.userData = { layer: i };
+                group.add(membrane);
             }
+
+            // 背景粒子
+            const particleCount = 1000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 50;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const material = new THREE.PointsMaterial({
+                color: 0x64c8ff, size: 0.1, transparent: true, opacity: 0.6
+            });
+            const particles = new THREE.Points(geometry, material);
+            particles.name = 'particles';
+            group.add(particles);
+        }
+
+        // ==================== 阶段一：分子模型 ====================
+        function createMolecule(type, color, position, scale = 1) {
+            const group = new THREE.Group();
             
-            // 更新细胞膜
-            membranes.forEach((m, i) => {
-                m.material.uniforms.uTime.value = time + i * 1.3;
-                m.rotation.y = time * 0.05;
+            // 核心球体
+            const coreGeo = new THREE.IcosahedronGeometry(0.8 * scale, 2);
+            const coreMat = new THREE.MeshPhysicalMaterial({
+                color: color,
+                metalness: 0.1,
+                roughness: 0.2,
+                transmission: 0.6,
+                thickness: 1,
+                emissive: color,
+                emissiveIntensity: 0.3
+            });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            group.add(core);
+
+            // 轨道环
+            const ringGeo = new THREE.TorusGeometry(1.2 * scale, 0.05 * scale, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ 
+                color: color, 
+                transparent: true, 
+                opacity: 0.5 
             });
             
-            // 更新粒子
-            const positions = particles.geometry.attributes.position.array;
-            for (let i = 0; i < particleCount; i++) {
-                positions[i * 3] += particleVelocities[i].x;
-                positions[i * 3 + 1] += particleVelocities[i].y;
-                positions[i * 3 + 2] += particleVelocities[i].z;
-                
-                // 边界重置
-                if (Math.abs(positions[i * 3]) > 25) particleVelocities[i].x *= -1;
-                if (Math.abs(positions[i * 3 + 1]) > 25) particleVelocities[i].y *= -1;
-                if (Math.abs(positions[i * 3 + 2]) > 25) particleVelocities[i].z *= -1;
+            for (let i = 0; i < 3; i++) {
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = Math.PI / 2 + i * (Math.PI / 3);
+                ring.rotation.y = i * (Math.PI / 4);
+                group.add(ring);
             }
-            particles.geometry.attributes.position.needsUpdate = true;
-            particles.rotation.y = time * 0.02;
-            
-            // 摄像机运动（示例：缓慢推镜）
-            if (isPlaying && currentTime > 12 && currentTime < 20) {
-                camera.position.z = 20 - (currentTime - 12) * 0.5;
+
+            // 卫星粒子
+            const satGeo = new THREE.SphereGeometry(0.15 * scale, 16, 16);
+            const satMat = new THREE.MeshBasicMaterial({ color: color });
+            for (let i = 0; i < 6; i++) {
+                const sat = new THREE.Mesh(satGeo, satMat);
+                const angle = (i / 6) * Math.PI * 2;
+                sat.position.set(
+                    Math.cos(angle) * 1.5 * scale,
+                    Math.sin(angle) * 0.5 * scale,
+                    Math.sin(angle) * 1.5 * scale
+                );
+                sat.userData = { angle: angle, radius: 1.5 * scale, speed: 0.5 + Math.random() * 0.5 };
+                sat.name = 'satellite';
+                group.add(sat);
             }
+
+            group.position.copy(position);
+            group.userData = { type: type, originalScale: scale };
+            return group;
+        }
+
+        function createPhase1Scene() {
+            const group = sceneGroups.phase1;
             
-            composer.render();
+            // 资产仓库平台
+            const platformGeo = new THREE.CylinderGeometry(8, 8, 0.5, 64);
+            const platformMat = new THREE.MeshPhysicalMaterial({
+                color: 0xc8b464,
+                metalness: 0.8,
+                roughness: 0.3,
+                emissive: 0x64ff96,
+                emissiveIntensity: 0.1
+            });
+            const platform = new THREE.Mesh(platformGeo, platformMat);
+            platform.position.y = -3;
+            group.add(platform);
+
+            // 5个分子模型
+            const molecules = [
+                { type: 'PDB-001', color: 0x64c8ff, pos: new THREE.Vector3(-4, 0, -2), scale: 1 },
+                { type: 'CHEM-002', color: 0x64ff96, pos: new THREE.Vector3(0, 1, 2), scale: 0.9 },
+                { type: 'GENE-003', color: 0x64dddd, pos: new THREE.Vector3(4, 0, -2), scale: 0.95 },
+                { type: 'VSCREEN-004', color: 0x96ffc8, pos: new THREE.Vector3(-2, -1, 3), scale: 1.1 },
+                { type: 'NeuroBlok', color: 0xc8b464, pos: new THREE.Vector3(2, 2, 0), scale: 1.5 }
+            ];
+
+            molecules.forEach(m => {
+                const mol = createMolecule(m.type, m.color, m.pos, m.scale);
+                mol.name = m.type;
+                group.add(mol);
+            });
+
+            // 关系图谱框架（左侧）
+            const frameGeo = new THREE.BoxGeometry(0.2, 12, 8);
+            const frameMat = new THREE.MeshPhysicalMaterial({
+                color: 0xc8c8dc,
+                metalness: 0.9,
+                roughness: 0.1,
+                transparent: true,
+                opacity: 0.3
+            });
+            const frame = new THREE.Mesh(frameGeo, frameMat);
+            frame.position.set(-12, 0, 0);
+            group.add(frame);
+
+            // 图谱节点
+            const nodePositions = [
+                new THREE.Vector3(-12, 3, 0),
+                new THREE.Vector3(-12, 1, 2),
+                new THREE.Vector3(-12, -1, -2),
+                new THREE.Vector3(-12, -3, 0)
+            ];
+            
+            nodePositions.forEach((pos, i) => {
+                const nodeGeo = new THREE.SphereGeometry(0.3, 32, 32);
+                const nodeMat = new THREE.MeshBasicMaterial({ 
+                    color: [0x64c8ff, 0x64ff96, 0x64dddd, 0xc8b464][i] 
+                });
+                const node = new THREE.Mesh(nodeGeo, nodeMat);
+                node.position.copy(pos);
+                group.add(node);
+            });
         }
 
-        // ==================== UI控制 ====================
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
-            return `${mins}:${secs}`;
-        }
-
-        function updateTimecode() {
-            document.getElementById('timecode').textContent = 
-                `${formatTime(currentTime)} / 08:30`;
-        }
-
-        function showSubtitle(text) {
-            const sub = document.getElementById('subtitle');
-            sub.textContent = text;
-            sub.classList.add('visible');
-            setTimeout(() => sub.classList.remove('visible'), 4000);
-        }
-
-        window.jumpTo = function(seconds) {
-            currentTime = seconds;
-            updateTimecode();
+        // ==================== 场景切换 ====================
+        window.setScene = function(index) {
+            currentScene = index;
+            
+            // 隐藏所有场景
+            Object.values(sceneGroups).forEach(g => g.visible = false);
+            
+            // 显示当前场景
+            sceneGroups[scenes[index]].visible = true;
             
             // 更新按钮状态
-            document.querySelectorAll('.controls button').forEach(btn => {
-                btn.classList.remove('active');
+            document.querySelectorAll('.controls button').forEach((btn, i) => {
+                if (i < 5) btn.classList.toggle('active', i === index);
             });
-            
-            if (seconds < 30) document.getElementById('btn-0').classList.add('active');
-            else if (seconds < 90) document.getElementById('btn-1').classList.add('active');
-            else if (seconds < 180) document.getElementById('btn-2').classList.add('active');
-            else if (seconds < 270) document.getElementById('btn-3').classList.add('active');
-            else if (seconds < 390) document.getElementById('btn-4').classList.add('active');
-            else if (seconds < 480) document.getElementById('btn-5').classList.add('active');
-            else document.getElementById('btn-6').classList.add('active');
-            
-            // 场景切换逻辑
-            if (seconds < 12) {
-                membraneGroup.visible = false;
-                particles.visible = false;
-            } else {
-                membraneGroup.visible = true;
-                particles.visible = true;
-            }
+
+            // 更新阶段标签
+            const labels = ['阶段零：开场', '阶段一：基础资产', '阶段二：首次协作', '阶段三：风险融资', '阶段四：价值分配'];
+            document.getElementById('phaseLabel').textContent = labels[index];
+
+            // 重置摄像机
+            camera.position.set(0, 0, 20);
+            controls.reset();
         };
 
         window.togglePlay = function() {
             isPlaying = !isPlaying;
             document.getElementById('playBtn').textContent = isPlaying ? '⏸ 暂停' : '▶ 播放';
         };
+
+        // ==================== 动画循环 ====================
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (isPlaying) {
+                time += 0.016;
+            }
+
+            // 更新开场场景
+            if (sceneGroups.opening.visible) {
+                sceneGroups.opening.children.forEach((child, i) => {
+                    if (child.material?.uniforms?.uTime) {
+                        child.material.uniforms.uTime.value = time + i * 1.3;
+                    }
+                    if (child.name === 'particles') {
+                        child.rotation.y = time * 0.02;
+                    }
+                });
+            }
+
+            // 更新阶段一：分子旋转
+            if (sceneGroups.phase1.visible) {
+                sceneGroups.phase1.children.forEach(child => {
+                    if (child.userData.type) {
+                        // 核心旋转
+                        child.children[0].rotation.y += 0.01;
+                        child.children[0].rotation.x += 0.005;
+                        
+                        // 轨道环旋转
+                        for (let i = 1; i <= 3; i++) {
+                            if (child.children[i]) {
+                                child.children[i].rotation.x += 0.02 * (i % 2 === 0 ? 1 : -1);
+                                child.children[i].rotation.z += 0.01;
+                            }
+                        }
+                        
+                        // 卫星粒子公转
+                        for (let i = 4; i < child.children.length; i++) {
+                            const sat = child.children[i];
+                            if (sat.name === 'satellite') {
+                                sat.userData.angle += 0.02 * sat.userData.speed;
+                                sat.position.x = Math.cos(sat.userData.angle) * sat.userData.radius;
+                                sat.position.z = Math.sin(sat.userData.angle) * sat.userData.radius;
+                            }
+                        }
+                    }
+                });
+            }
+
+            controls.update();
+            composer.render();
+        }
+
+        // ==================== 初始化 ====================
+        createOpeningScene();
+        createPhase1Scene();
+        setScene(0);
+        
+        // 隐藏loading
+        setTimeout(() => {
+            document.getElementById('loading').classList.add('hidden');
+        }, 1000);
+
+        animate();
 
         // 窗口调整
         window.addEventListener('resize', () => {
@@ -391,15 +503,7 @@
             composer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // 初始化
-        animate();
-        
-        // 隐藏loading
-        setTimeout(() => {
-            document.getElementById('loading').classList.add('hidden');
-        }, 1000);
-
-        console.log('ECHO Protocol WebGL Initialized');
+        console.log('ECHO Protocol v2 Initialized');
     </script>
 </body>
 </html>
