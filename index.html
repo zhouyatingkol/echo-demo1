@@ -176,6 +176,115 @@
         .feature-dot.red { background: #ff4757; box-shadow: 0 0 10px rgba(255, 71, 87, 0.5); }
         .feature-dot.purple { background: #a29bfe; box-shadow: 0 0 10px rgba(162, 155, 254, 0.5); }
 
+        /* 分子卡片 - 可拖拽 */
+        .molecule-card {
+            width: 140px;
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: grab;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            transition: all 0.3s;
+            border: 2px solid;
+            position: relative;
+        }
+        .molecule-card:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+        .molecule-card.dragging {
+            cursor: grabbing;
+            opacity: 0.8;
+            transform: scale(1.1);
+            z-index: 100;
+        }
+        .molecule-card.placed {
+            opacity: 0.4;
+            cursor: default;
+            transform: scale(0.95);
+        }
+        .molecule-card .mol-icon {
+            font-size: 32px;
+        }
+        .molecule-card .mol-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        .molecule-card .mol-desc {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        
+        .mol-cyan { 
+            border-color: rgba(0, 240, 255, 0.6); 
+            box-shadow: 0 8px 32px rgba(0, 240, 255, 0.2);
+        }
+        .mol-cyan .mol-name { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        
+        .mol-purple { 
+            border-color: rgba(162, 155, 254, 0.6); 
+            box-shadow: 0 8px 32px rgba(162, 155, 254, 0.2);
+        }
+        .mol-purple .mol-name { color: #a29bfe; text-shadow: 0 0 10px rgba(162, 155, 254, 0.5); }
+        
+        .mol-gold { 
+            border-color: rgba(255, 215, 0, 0.6); 
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.2);
+        }
+        .mol-gold .mol-name { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        
+        /* 融合舱 */
+        .fusion-chamber {
+            width: 280px;
+            height: 280px;
+            border: 3px dashed rgba(0, 240, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, transparent 70%);
+            transition: all 0.4s ease;
+        }
+        .fusion-chamber.drag-over {
+            border-color: #00f0ff;
+            border-style: solid;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
+            box-shadow: 0 0 60px rgba(0, 240, 255, 0.3);
+            transform: scale(1.05);
+        }
+        .fusion-chamber.success {
+            border-color: #ffd700;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .fusion-chamber .fusion-text {
+            text-align: center;
+            z-index: 10;
+        }
+        .fusion-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 50%;
+            animation: rotate 4s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
         /* 统计数据展示 */
         .stats-grid {
             display: grid;
@@ -367,20 +476,64 @@
         </div>
     </div>
 
-    <!-- Stage 2: 协作衍生 -->
+    <!-- Stage 2: 协作衍生 - 可拖拽交互版 -->
     <div class="stage" id="stage2">
-        <div class="glass-card" data-index="2">
-            <h2 class="glow-gold">协作与衍生</h2>
-            <p>
-                不同来源的资产在工作台上融合，生成新的价值。<br>
-                智能合约自动记录每个人的贡献比例。
-            </p>
-            <p style="color: #00f0ff; font-size: 14px; border-left: 2px solid #00f0ff; padding-left: 15px; text-align: left;">
-                "每一次协作都生成新的资产，权属像基因一样被继承和组合。"
-            </p>
-            <div style="margin-top: 30px;">
-                <button class="btn" onclick="goTo(1)">上一步</button>
-                <button class="btn" onclick="goTo(3)">下一步</button>
+        <div class="interaction-container" style="display: flex; align-items: center; justify-content: center; gap: 60px; width: 90%; max-width: 1200px;">
+            
+            <!-- 左侧：分子库 -->
+            <div class="glass-card" style="padding: 30px; min-width: 200px;">
+                <h3 style="color: #00f0ff; font-size: 14px; letter-spacing: 2px; margin-bottom: 20px;">资产库</h3>
+                <div class="molecule-container" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="molecule-card mol-cyan" draggable="true" data-type="PDB">
+                        <div class="mol-icon">🧬</div>
+                        <div class="mol-name">PDB</div>
+                        <div class="mol-desc">蛋白质结构</div>
+                    </div>
+                    <div class="molecule-card mol-purple" draggable="true" data-type="CHEM">
+                        <div class="mol-icon">⚗️</div>
+                        <div class="mol-name">CHEM</div>
+                        <div class="mol-desc">化合物库</div>
+                    </div>
+                    <div class="molecule-card mol-gold" draggable="true" data-type="GENE">
+                        <div class="mol-icon">🧪</div>
+                        <div class="mol-name">GENE</div>
+                        <div class="mol-desc">基因序列</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 中央：工作台/融合舱 -->
+            <div class="fusion-area">
+                <div class="fusion-chamber" id="fusionChamber">
+                    <div class="fusion-text">
+                        <div style="font-size: 18px; color: #00f0ff; margin-bottom: 10px;">协作工作台</div>
+                        <div style="font-size: 12px; color: rgba(200,220,240,0.6);">拖拽分子到此处</div>
+                    </div>
+                    <div class="fusion-ring"></div>
+                    <div class="fusion-ring" style="animation-delay: -0.5s;"></div>
+                    <div class="fusion-ring" style="animation-delay: -1s;"></div>
+                </div>
+                <div class="fusion-status" id="fusionStatus" style="margin-top: 20px; text-align: center; opacity: 0; transition: opacity 0.3s;">
+                    <span style="color: #ffd700; font-size: 14px;">✨ 协作成功！正在生成新资产...</span>
+                </div>
+            </div>
+            
+            <!-- 右侧：说明 -->
+            <div class="glass-card" style="padding: 30px; min-width: 250px; max-width: 300px;">
+                <h2 class="glow-gold" style="font-size: 20px; margin-bottom: 15px;">协作与衍生</h2>
+                <p style="font-size: 13px; margin-bottom: 15px;">
+                    将两个不同来源的资产拖入工作台，触发智能合约自动记录贡献比例。
+                </p>
+                <div class="collab-progress" style="margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: rgba(200,220,240,0.6); margin-bottom: 5px;">
+                        <span>已放置</span>
+                        <span id="placedCount">0/2</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+                        <div id="progressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #00f0ff, #ffd700); transition: width 0.5s;"></div>
+                    </div>
+                </div>
+                <button class="btn" onclick="goTo(3)" id="nextBtn2" style="opacity: 0.5; pointer-events: none;">下一步</button>
             </div>
         </div>
     </div>
@@ -687,6 +840,119 @@
             });
         }
 
+        // ============ 拖拽交互系统 ============
+        let draggedElement = null;
+        let placedCount = 0;
+        const maxPlace = 2;
+        
+        function initDragAndDrop() {
+            const molecules = document.querySelectorAll('.molecule-card');
+            const chamber = document.getElementById('fusionChamber');
+            
+            molecules.forEach(mol => {
+                mol.addEventListener('dragstart', (e) => {
+                    if (mol.classList.contains('placed')) {
+                        e.preventDefault();
+                        return;
+                    }
+                    draggedElement = mol;
+                    mol.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                
+                mol.addEventListener('dragend', () => {
+                    mol.classList.remove('dragging');
+                    draggedElement = null;
+                });
+            });
+            
+            if (chamber) {
+                chamber.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (placedCount < maxPlace) {
+                        chamber.classList.add('drag-over');
+                    }
+                });
+                
+                chamber.addEventListener('dragleave', () => {
+                    chamber.classList.remove('drag-over');
+                });
+                
+                chamber.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    chamber.classList.remove('drag-over');
+                    
+                    if (draggedElement && placedCount < maxPlace) {
+                        // 标记为已放置
+                        draggedElement.classList.add('placed');
+                        draggedElement.setAttribute('draggable', 'false');
+                        
+                        // 更新计数
+                        placedCount++;
+                        updateProgress();
+                        
+                        // 播放音效（如果开启）
+                        if (sfxEnabled) {
+                            playDropSound();
+                        }
+                        
+                        // 检查是否完成
+                        if (placedCount >= maxPlace) {
+                            chamber.classList.add('success');
+                            document.getElementById('fusionStatus').style.opacity = '1';
+                            document.getElementById('nextBtn2').style.opacity = '1';
+                            document.getElementById('nextBtn2').style.pointerEvents = 'auto';
+                            
+                            // 播放成功音效
+                            if (sfxEnabled) {
+                                playSuccessSound();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function updateProgress() {
+            const countEl = document.getElementById('placedCount');
+            const barEl = document.getElementById('progressBar');
+            if (countEl && barEl) {
+                countEl.textContent = `${placedCount}/${maxPlace}`;
+                barEl.style.width = `${(placedCount / maxPlace) * 100}%`;
+            }
+        }
+        
+        function playDropSound() {
+            // 简单的放置音效
+            const audio = new Audio();
+            audio.volume = 0.3;
+            // 使用Web Audio API生成简单音效
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 800;
+            gain.gain.value = 0.1;
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+            osc.stop(ctx.currentTime + 0.1);
+        }
+        
+        function playSuccessSound() {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.setValueAtTime(400, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.2);
+            gain.gain.value = 0.2;
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+            osc.stop(ctx.currentTime + 0.5);
+        }
+
         window.goTo = function(index) {
             if (isAnimating || index < 0 || index >= totalStages || index === currentStage) {
                 return;
@@ -726,6 +992,9 @@
         function init() {
             const firstCard = document.querySelector('#stage0 .glass-card');
             animateCardIn(firstCard);
+            
+            // 初始化拖拽系统
+            initDragAndDrop();
             
             // 延迟播放开场旁白，给用户准备时间
             setTimeout(() => {
