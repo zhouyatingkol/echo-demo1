@@ -146,6 +146,8 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         // ==================== 场景管理 ====================
@@ -261,7 +263,7 @@
             }
         };
 
-        // ==================== 后处理 ====================
+        // ==================== 后处理管线 ====================
         const composer = new EffectComposer(renderer);
         const renderPass = new RenderPass(scene, camera);
         composer.addPass(renderPass);
@@ -271,6 +273,32 @@
             1.5, 0.4, 0.85
         );
         composer.addPass(bloomPass);
+        
+        // 景深效果（Bokeh）
+        const bokehPass = new BokehPass(scene, camera, {
+            focus: 10.0,
+            aperture: 0.005,
+            maxblur: 0.01,
+            width: window.innerWidth,
+            height: window.innerHeight
+        });
+        bokehPass.enabled = false;
+        composer.addPass(bokehPass);
+        
+        // 色调映射输出
+        const outputPass = new OutputPass();
+        composer.addPass(outputPass);
+        
+        // 后处理控制器
+        const postProcess = {
+            setBloomStrength: (s) => { bloomPass.strength = s; },
+            setFocus: (dist, apt = 0.005) => {
+                bokehPass.uniforms['focus'].value = dist;
+                bokehPass.uniforms['aperture'].value = apt;
+                bokehPass.enabled = true;
+            },
+            disableBokeh: () => { bokehPass.enabled = false; }
+        };
 
         // ==================== 灯光系统 ====================
         const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
@@ -984,6 +1012,23 @@
                         new THREE.Vector3(...cam.target),
                         cam.duration
                     );
+                }
+            }
+            
+            // 后期效果控制
+            if (activeScene) {
+                // 特写镜头启用景深
+                if (activeScene.action === 'hoverPDB' || activeScene.action === 'blueprintShow') {
+                    postProcess.setFocus(10, 0.01);
+                } else if (activeScene.action === 'valueHall' || activeScene.action === 'splitScreen') {
+                    postProcess.disableBokeh();
+                }
+                
+                // 高能量场景增强Bloom
+                if (activeScene.action === 'penetrate' || activeScene.action === 'collision') {
+                    postProcess.setBloomStrength(2.5);
+                } else {
+                    postProcess.setBloomStrength(1.5);
                 }
             }
             
