@@ -257,11 +257,153 @@
             border-right: 6px solid transparent;
             border-top: 6px solid rgba(100, 200, 255, 0.3);
         }
+
+        /* 蓝图面板 - 镜头10要求 */
+        .blueprint-panel {
+            position: fixed;
+            right: -400px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 350px;
+            background: rgba(10, 15, 20, 0.95);
+            border: 1px solid rgba(200, 180, 100, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            z-index: 100;
+            transition: right 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 40px rgba(200, 180, 100, 0.2),
+                inset 0 0 60px rgba(200, 180, 100, 0.05);
+        }
+        .blueprint-panel.visible {
+            right: 40px;
+        }
+        .blueprint-header {
+            color: #c8b464;
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(200, 180, 100, 0.3);
+        }
+        .blueprint-item {
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            background: rgba(100, 200, 255, 0.05);
+            border-left: 2px solid rgba(100, 200, 255, 0.3);
+            border-radius: 0 6px 6px 0;
+        }
+        .blueprint-label {
+            color: rgba(150, 160, 170, 0.9);
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .blueprint-value {
+            color: rgba(230, 240, 250, 0.95);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .blueprint-highlight {
+            color: #c8b464;
+            font-size: 11px;
+            margin-top: 12px;
+            padding: 8px;
+            background: rgba(200, 180, 100, 0.1);
+            border-radius: 4px;
+            animation: highlightPulse 2s ease-in-out infinite;
+        }
+        @keyframes highlightPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        /* 警告框 - 镜头17要求 */
+        .warning-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(255, 100, 100, 0.15);
+            border: 1px solid rgba(255, 100, 100, 0.5);
+            border-radius: 12px;
+            padding: 24px 32px;
+            z-index: 200;
+            backdrop-filter: blur(15px);
+            text-align: center;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .warning-popup.visible {
+            transform: translate(-50%, -50%) scale(1);
+            animation: warningShake 0.5s ease-in-out;
+        }
+        @keyframes warningShake {
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
+            20% { transform: translate(-50%, -50%) scale(1) translateX(-10px); }
+            40% { transform: translate(-50%, -50%) scale(1) translateX(10px); }
+            60% { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
+            80% { transform: translate(-50%, -50%) scale(1) translateX(5px); }
+        }
+        .warning-title {
+            color: #ff6464;
+            font-size: 14px;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+        }
+        .warning-text {
+            color: rgba(255, 200, 200, 0.9);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* 工作台提示 - 镜头13要求 */
+        .workbench-hint {
+            position: fixed;
+            right: 100px;
+            top: 40%;
+            color: rgba(100, 200, 255, 0.8);
+            font-size: 11px;
+            letter-spacing: 2px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            animation: hintBreathe 2s ease-in-out infinite;
+        }
+        .workbench-hint.visible {
+            opacity: 1;
+        }
+        @keyframes hintBreathe {
+            0%, 100% { text-shadow: 0 0 10px rgba(100, 200, 255, 0.3); }
+            50% { text-shadow: 0 0 20px rgba(100, 200, 255, 0.6), 0 0 30px rgba(100, 200, 255, 0.3); }
+        }
     </style>
 </head>
 <body>
     <!-- 开场标题 - 镜头2 -->
     <div class="opening-title" id="openingTitle">价值溯源：一款新药的数字旅程</div>
+    
+    <!-- 蓝图面板 - 镜头10 -->
+    <div class="blueprint-panel" id="blueprintPanel">
+        <div class="blueprint-header">全息权属蓝图</div>
+        <div class="blueprint-item">
+            <div class="blueprint-label">贡献者</div>
+            <div class="blueprint-value">公共科研联盟 (100%)</div>
+        </div>
+        <div class="blueprint-item">
+            <div class="blueprint-label">关键规则</div>
+            <div class="blueprint-value">商业衍生品须反馈1%收入</div>
+        </div>
+        <div class="blueprint-highlight">⚡ 贡献被ECHO协议永久铭记</div>
+    </div>
+    
+    <!-- 警告框 - 镜头17 -->
+    <div class="warning-popup" id="warningPopup">
+        <div class="warning-title">⚠ 规则冲突</div>
+        <div class="warning-text">违反上游'1%反馈'规则<br/>调整无效</div>
+    </div>
+    
+    <!-- 工作台提示 - 镜头13 -->
+    <div class="workbench-hint" id="workbenchHint">拖拽资产至此处</div>
     
     <div class="loading" id="loading">
         <div class="loading-content">
@@ -2248,8 +2390,17 @@
                     collisionEffect.createShockwave(new THREE.Vector3(8, -2, 0), 0xc8b464);
                     // 停止光标拖尾
                     cursorTrail.deactivate();
+                } else if (currentShot.action === 'blueprintShow') {
+                    // 镜头10: 显示蓝图面板
+                    document.getElementById('blueprintPanel').classList.add('visible');
+                } else if (currentShot.action === 'workbenchAppear') {
+                    // 镜头13: 显示工作台提示
+                    document.getElementById('workbenchHint').classList.add('visible');
                 } else if (currentShot.action === 'tokenGenerate') {
-                    // 镜头17: 触发令牌铸造
+                    // 镜头17: 显示警告框 + 触发令牌铸造
+                    document.getElementById('warningPopup').classList.add('visible');
+                    document.getElementById('blueprintPanel').classList.remove('visible');
+                    document.getElementById('workbenchHint').classList.remove('visible');
                     phase3Animation.animateTokenForge();
                 } else if (currentShot.action === 'fundFlow') {
                     // 镜头18-23: 触发价值流动
