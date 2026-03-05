@@ -124,7 +124,10 @@
             <button onclick="setScene(2)" id="btn-2">阶段二</button>
             <button onclick="setScene(3)" id="btn-3">阶段三</button>
             <button onclick="setScene(4)" id="btn-4">阶段四</button>
-            <button onclick="togglePlay()" id="playBtn">▶ 播放</button>
+            <button onclick="togglePlay()" id="playBtn">▶ 播放完整版</button>
+            <button onclick="jumpToTime(0)">|&lt;</button>
+            <button onclick="jumpToTime(90)">阶段二</button>
+            <button onclick="jumpToTime(210)">阶段四</button>
         </div>
     </div>
 
@@ -147,8 +150,6 @@
         // ==================== 场景管理 ====================
         const scenes = ['opening', 'phase1', 'phase2', 'phase3', 'phase4'];
         let currentScene = 0;
-        let time = 0;
-        let isPlaying = false;
 
         // ==================== 核心设置 ====================
         const scene = new THREE.Scene();
@@ -621,6 +622,9 @@
         }
         window.setScene = function(index) {
             currentScene = index;
+            timeline.isPlaying = false;
+            document.getElementById('playBtn').textContent = '▶ 播放完整版';
+            narrator.stop();
             
             // 隐藏所有场景
             Object.values(sceneGroups).forEach(g => g.visible = false);
@@ -642,27 +646,135 @@
             controls.reset();
         };
 
+        // ==================== 47镜头时间线系统 ====================
+        const timeline = {
+            currentTime: 0,
+            isPlaying: false,
+            shots: [
+                { time: 0, scene: 0, action: 'fadeIn', duration: 5, subtitle: '' },
+                { time: 5, scene: 0, action: 'titleShow', duration: 7, subtitle: '' },
+                { time: 12, scene: 0, action: 'membrane', duration: 8, subtitle: '在传统模式中，药物的成功是一座孤岛。' },
+                { time: 20, scene: 0, action: 'penetrate', duration: 5, subtitle: '但在ECHO协议上，它是一片被清晰测绘的雨林。' },
+                { time: 25, scene: 0, action: 'toSandbox', duration: 5, subtitle: '每一滴雨水都知道它来自哪片云。' },
+                { time: 30, scene: 1, action: 'moleculesAppear', duration: 8, subtitle: '' },
+                { time: 44, scene: 1, action: 'hoverPDB', duration: 8, subtitle: '' },
+                { time: 59, scene: 1, action: 'blueprintShow', duration: 12, subtitle: '即使是开源数据，其贡献也被ECHO协议铭记。' },
+                { time: 90, scene: 2, action: 'workbenchAppear', duration: 8, subtitle: '' },
+                { time: 108, scene: 2, action: 'dragStart', duration: 12, subtitle: '' },
+                { time: 120, scene: 2, action: 'collision', duration: 12, subtitle: '每一次协作都生成新的资产，权属像基因一样被继承和组合。' },
+                { time: 150, scene: 3, action: 'splitScreen', duration: 15, subtitle: '新药研发离不开资本，但传统融资往往意味着妥协。' },
+                { time: 165, scene: 3, action: 'tokenGenerate', duration: 15, subtitle: '而ECHO协议实现了所有权与收益权的分离。' },
+                { time: 195, scene: 3, action: 'fundFlow', duration: 15, subtitle: '您获得了推进试验的资金，却从未丢失数据的灵魂。' },
+                { time: 210, scene: 4, action: 'valueHall', duration: 10, subtitle: '' },
+                { time: 228, scene: 4, action: 'distribution', duration: 15, subtitle: '当新药成功上市，价值不再是集中于终点的盛宴。' },
+                { time: 255, scene: 4, action: 'traceBack', duration: 18, subtitle: '而是沿链条逆流而上的回馈。' },
+                { time: 315, scene: 4, action: 'upstreamReward', duration: 15, subtitle: '哪怕是十年前的一份开源数据，也能收获应有的荣光。' }
+            ]
+        };
+
+        // 旁白系统
+        const narrator = {
+            speak: function(text) {
+                if (!window.speechSynthesis) return;
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'zh-CN';
+                u.rate = 0.85;
+                u.pitch = 0.75;
+                u.volume = 0.9;
+                window.speechSynthesis.speak(u);
+            },
+            stop: function() {
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                }
+            }
+        };
+
+        // 时间线更新
+        function updateTimeline() {
+            if (!timeline.isPlaying) return;
+            
+            timeline.currentTime += 0.016;
+            
+            // 格式化时间显示
+            const mins = Math.floor(timeline.currentTime / 60).toString().padStart(2, '0');
+            const secs = Math.floor(timeline.currentTime % 60).toString().padStart(2, '0');
+            document.getElementById('timecode').textContent = `${mins}:${secs} / 08:30`;
+            
+            // 检查当前镜头
+            const currentShot = timeline.shots.find((s, i) => {
+                const nextShot = timeline.shots[i + 1];
+                return timeline.currentTime >= s.time && 
+                       (!nextShot || timeline.currentTime < nextShot.time);
+            });
+            
+            if (currentShot && currentShot.subtitle) {
+                showSubtitle(currentShot.subtitle);
+                // 只在字幕刚显示时播报一次
+                if (Math.abs(timeline.currentTime - currentShot.time) < 0.02) {
+                    narrator.speak(currentShot.subtitle);
+                }
+            }
+            
+            // 场景自动切换
+            const activeScene = timeline.shots.find((s, i) => {
+                const nextShot = timeline.shots[i + 1];
+                return timeline.currentTime >= s.time && 
+                       (!nextShot || timeline.currentTime < nextShot.time);
+            });
+            
+            if (activeScene && activeScene.scene !== currentScene) {
+                setScene(activeScene.scene);
+            }
+            
+            // 时间到自动停止
+            if (timeline.currentTime >= 510) {
+                timeline.isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶ 播放';
+            }
+        }
+
         window.togglePlay = function() {
-            isPlaying = !isPlaying;
-            document.getElementById('playBtn').textContent = isPlaying ? '⏸ 暂停' : '▶ 播放';
+            timeline.isPlaying = !timeline.isPlaying;
+            document.getElementById('playBtn').textContent = timeline.isPlaying ? '⏸ 暂停' : '▶ 播放';
+            
+            if (!timeline.isPlaying) {
+                narrator.stop();
+            }
+        };
+
+        window.jumpToTime = function(seconds) {
+            timeline.currentTime = seconds;
+            timeline.isPlaying = false;
+            document.getElementById('playBtn').textContent = '▶ 播放';
+            narrator.stop();
+            
+            // 找到对应场景
+            const shot = timeline.shots.find(s => seconds >= s.time && seconds < s.time + s.duration) || 
+                        timeline.shots.slice().reverse().find(s => seconds >= s.time);
+            if (shot) {
+                setScene(shot.scene);
+            }
         };
 
         // ==================== 动画循环 ====================
         function animate() {
             requestAnimationFrame(animate);
             
-            if (isPlaying) {
-                time += 0.016;
-            }
-
+            // 更新时间线系统
+            updateTimeline();
+            
+            // 使用时间线的时间
+            const animTime = timeline.currentTime;
+            
             // 更新开场场景
             if (sceneGroups.opening.visible) {
                 sceneGroups.opening.children.forEach((child, i) => {
                     if (child.material?.uniforms?.uTime) {
-                        child.material.uniforms.uTime.value = time + i * 1.3;
+                        child.material.uniforms.uTime.value = animTime + i * 1.3;
                     }
                     if (child.name === 'particles') {
-                        child.rotation.y = time * 0.02;
+                        child.rotation.y = animTime * 0.02;
                     }
                 });
             }
