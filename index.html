@@ -1603,19 +1603,6 @@
                 osc.start();
                 osc.stop(this.ctx.currentTime + 0.05);
             },
-                
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                osc.frequency.value = 2000;
-                osc.type = 'sine';
-                
-                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
-                
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.05);
-            },
             
             // 停止所有音效
             stopAll: function() {
@@ -2470,8 +2457,10 @@
                 } else if (currentShot.action === 'tokenGenerate') {
                     // 镜头17: 显示警告框 + 触发令牌铸造
                     document.getElementById('warningPopup').classList.add('visible');
-                    document.getElementById('blueprintPanel').classList.remove('visible');
-                    document.getElementById('workbenchHint').classList.remove('visible');
+                    const blueprintPanel = document.getElementById('blueprintPanel');
+                    const workbenchHint = document.getElementById('workbenchHint');
+                    if (blueprintPanel) blueprintPanel.classList.remove('visible');
+                    if (workbenchHint) workbenchHint.classList.remove('visible');
                     phase3Animation.animateTokenForge();
                 } else if (currentShot.action === 'fundFlow') {
                     // 镜头18-23: 触发价值流动
