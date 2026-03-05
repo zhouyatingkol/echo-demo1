@@ -528,6 +528,260 @@
         
         window.addEventListener('mousemove', onMouseMove, false);
 
+        // ==================== 精确粒子系统 ====================
+        const particleSystem = {
+            particles: [],
+            codeParticles: [],
+            trailParticles: [],
+            dataFlowParticles: [],
+            
+            // 创建代码粒子（0/1/片假名）- 镜头2要求80个
+            createCodeParticles: function(count = 80) {
+                const chars = ['0', '1', 'ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク'];
+                const group = new THREE.Group();
+                group.name = 'codeParticles';
+                
+                for (let i = 0; i < count; i++) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 32;
+                    canvas.height = 32;
+                    const ctx = canvas.getContext('2d');
+                    ctx.font = 'bold 20px monospace';
+                    ctx.fillStyle = '#64c8ff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(chars[Math.floor(Math.random() * chars.length)], 16, 16);
+                    
+                    const texture = new THREE.CanvasTexture(canvas);
+                    const material = new THREE.SpriteMaterial({ 
+                        map: texture, 
+                        transparent: true,
+                        opacity: 0.8,
+                        blending: THREE.AdditiveBlending
+                    });
+                    const sprite = new THREE.Sprite(material);
+                    
+                    // 从中心向外随机分布
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 5 + Math.random() * 10;
+                    sprite.position.set(
+                        Math.cos(angle) * radius,
+                        (Math.random() - 0.5) * 8,
+                        Math.sin(angle) * radius
+                    );
+                    sprite.scale.set(0.5, 0.5, 0.5);
+                    
+                    sprite.userData = {
+                        velocity: new THREE.Vector3(
+                            (Math.random() - 0.5) * 0.1,
+                            0.05 + Math.random() * 0.1,
+                            (Math.random() - 0.5) * 0.1
+                        ),
+                        life: 1.0,
+                        decay: 0.02 + Math.random() * 0.02
+                    };
+                    
+                    group.add(sprite);
+                    this.codeParticles.push(sprite);
+                }
+                
+                scene.add(group);
+                return group;
+            },
+            
+            // 创建绿色飘散粒子带轨迹残影 - 镜头4要求60个
+            createGreenTrailParticles: function(count = 60) {
+                const group = new THREE.Group();
+                group.name = 'greenTrailParticles';
+                
+                for (let i = 0; i < count; i++) {
+                    const geometry = new THREE.SphereGeometry(0.08, 8, 8);
+                    const material = new THREE.MeshBasicMaterial({
+                        color: 0x64ff96,
+                        transparent: true,
+                        opacity: 0.9,
+                        blending: THREE.AdditiveBlending
+                    });
+                    const particle = new THREE.Mesh(geometry, material);
+                    
+                    // 从中心向外爆发
+                    const angle = Math.random() * Math.PI * 2;
+                    const elevation = (Math.random() - 0.5) * Math.PI;
+                    const speed = 0.2 + Math.random() * 0.3;
+                    
+                    particle.position.set(0, 0, 0);
+                    particle.userData = {
+                        velocity: new THREE.Vector3(
+                            Math.cos(angle) * Math.cos(elevation) * speed,
+                            Math.sin(elevation) * speed,
+                            Math.sin(angle) * Math.cos(elevation) * speed
+                        ),
+                        trail: [],
+                        maxTrailLength: 10,
+                        life: 1.0,
+                        decay: 0.008
+                    };
+                    
+                    group.add(particle);
+                    this.trailParticles.push(particle);
+                }
+                
+                scene.add(group);
+                return group;
+            },
+            
+            // 创建蓝色数据流点 - 镜头3要求25个
+            createDataFlowPoints: function(count = 25) {
+                const group = new THREE.Group();
+                group.name = 'dataFlowPoints';
+                
+                for (let i = 0; i < count; i++) {
+                    const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+                    const material = new THREE.MeshBasicMaterial({
+                        color: 0x64c8ff,
+                        transparent: true,
+                        opacity: 0.6,
+                        blending: THREE.AdditiveBlending
+                    });
+                    const point = new THREE.Mesh(geometry, material);
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 15 + Math.random() * 20;
+                    point.position.set(
+                        Math.cos(angle) * radius,
+                        (Math.random() - 0.5) * 20,
+                        Math.sin(angle) * radius
+                    );
+                    
+                    point.userData = {
+                        angle: angle,
+                        radius: radius,
+                        speed: 0.0005 + Math.random() * 0.001,
+                        yOffset: point.position.y,
+                        ySpeed: 0.01 + Math.random() * 0.02
+                    };
+                    
+                    group.add(point);
+                    this.dataFlowParticles.push(point);
+                }
+                
+                scene.add(group);
+                return group;
+            },
+            
+            // 创建能量涟漪 - 镜头4要求
+            createEnergyRipple: function() {
+                const geometry = new THREE.RingGeometry(0.1, 0.5, 64);
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0x64c8ff,
+                    transparent: true,
+                    opacity: 0.8,
+                    side: THREE.DoubleSide,
+                    blending: THREE.AdditiveBlending
+                });
+                const ripple = new THREE.Mesh(geometry, material);
+                ripple.rotation.x = -Math.PI / 2;
+                ripple.position.set(0, 0, 0);
+                ripple.userData = {
+                    scale: 1,
+                    maxScale: 200,
+                    life: 1.0,
+                    decay: 0.015
+                };
+                
+                scene.add(ripple);
+                this.particles.push(ripple);
+                return ripple;
+            },
+            
+            // 更新所有粒子
+            update: function() {
+                // 更新代码粒子
+                this.codeParticles.forEach((p, i) => {
+                    p.position.add(p.userData.velocity);
+                    p.userData.life -= p.userData.decay;
+                    p.material.opacity = p.userData.life * 0.8;
+                    
+                    if (p.userData.life <= 0) {
+                        // 重置粒子
+                        const angle = Math.random() * Math.PI * 2;
+                        const radius = 5 + Math.random() * 10;
+                        p.position.set(
+                            Math.cos(angle) * radius,
+                            (Math.random() - 0.5) * 8,
+                            Math.sin(angle) * radius
+                        );
+                        p.userData.life = 1.0;
+                    }
+                });
+                
+                // 更新绿色轨迹粒子
+                this.trailParticles.forEach(p => {
+                    // 保存轨迹点
+                    p.userData.trail.push(p.position.clone());
+                    if (p.userData.trail.length > p.userData.maxTrailLength) {
+                        p.userData.trail.shift();
+                    }
+                    
+                    p.position.add(p.userData.velocity);
+                    p.userData.life -= p.userData.decay;
+                    p.material.opacity = p.userData.life;
+                    
+                    if (p.userData.life <= 0) {
+                        p.visible = false;
+                    }
+                });
+                
+                // 更新数据流点
+                this.dataFlowParticles.forEach(p => {
+                    p.userData.angle += p.userData.speed;
+                    p.position.x = Math.cos(p.userData.angle) * p.userData.radius;
+                    p.position.z = Math.sin(p.userData.angle) * p.userData.radius;
+                    p.position.y = p.userData.yOffset + Math.sin(Date.now() * 0.001 * p.userData.ySpeed) * 2;
+                });
+                
+                // 更新能量涟漪
+                this.particles.forEach((p, i) => {
+                    if (p.userData.maxScale) {
+                        p.userData.scale += 2;
+                        p.scale.set(p.userData.scale, p.userData.scale, p.userData.scale);
+                        p.userData.life -= p.userData.decay;
+                        p.material.opacity = p.userData.life * 0.8;
+                        
+                        if (p.userData.life <= 0) {
+                            scene.remove(p);
+                            this.particles.splice(i, 1);
+                        }
+                    }
+                });
+            },
+            
+            // 触发粒子效果
+            triggerCodeParticles: function() {
+                this.codeParticles.forEach(p => {
+                    p.userData.life = 1.0;
+                    p.visible = true;
+                });
+            },
+            
+            triggerGreenExplosion: function() {
+                this.trailParticles.forEach(p => {
+                    p.position.set(0, 0, 0);
+                    p.userData.life = 1.0;
+                    p.visible = true;
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const elevation = (Math.random() - 0.5) * Math.PI;
+                    const speed = 0.2 + Math.random() * 0.3;
+                    p.userData.velocity.set(
+                        Math.cos(angle) * Math.cos(elevation) * speed,
+                        Math.sin(elevation) * speed,
+                        Math.sin(angle) * Math.cos(elevation) * speed
+                    );
+                });
+            }
+        };
+
         // ==================== 音效系统 ====================
         const audioSystem = {
             ctx: null,
@@ -1433,8 +1687,13 @@
             if (currentShot && Math.abs(timeline.currentTime - currentShot.time) < 0.02) {
                 if (currentShot.action === 'penetrate') {
                     audioSystem.playPenetration();
+                    // 镜头4: 触发绿色粒子爆发+能量涟漪
+                    particleSystem.triggerGreenExplosion();
+                    particleSystem.createEnergyRipple();
                 } else if (currentShot.action === 'titleShow') {
                     audioSystem.playTextActivate();
+                    // 镜头2: 触发代码粒子
+                    particleSystem.triggerCodeParticles();
                 } else if (currentShot.action === 'hoverPDB') {
                     audioSystem.playHover();
                 }
@@ -1675,6 +1934,9 @@
 
             // 更新摄像机运动
             cameraRig.update();
+            
+            // 更新粒子系统
+            particleSystem.update();
 
             controls.update();
             composer.render();
@@ -1713,6 +1975,12 @@
         createPhase4Scene();
         createFailureScene();
         createEndingScene();
+        
+        // 创建粒子系统
+        particleSystem.createCodeParticles(80);
+        particleSystem.createDataFlowPoints(25);
+        particleSystem.createGreenTrailParticles(60);
+        
         setScene(0);
 
         animate();
