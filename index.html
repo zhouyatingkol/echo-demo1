@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHO Protocol - WebGL Demo v2</title>
+    <title>ECHO Protocol - WebGL Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #000;
+            background: #020208;
             color: #fff;
-            font-family: 'Noto Sans SC', sans-serif;
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
             overflow: hidden;
         }
         #canvas-container {
@@ -24,100 +25,155 @@
             pointer-events: none;
             z-index: 10;
         }
+
+        /* Glass Card */
+        .glass-card {
+            background: rgba(10, 15, 30, 0.7);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 0 60px rgba(0, 150, 255, 0.1);
+        }
+
+        /* Glow Effects */
+        .glow-cyan { 
+            color: #00f0ff; 
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.6), 0 0 40px rgba(0, 240, 255, 0.3);
+        }
+        .glow-gold { 
+            color: #ffd700; 
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 40px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Timecode */
         .timecode {
             position: absolute;
             top: 20px; left: 20px;
-            color: rgba(100, 200, 255, 0.8);
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            background: rgba(0,0,0,0.5);
-            padding: 8px 16px;
-            border-radius: 8px;
+            color: #00f0ff;
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            letter-spacing: 2px;
+            background: rgba(10, 15, 30, 0.7);
+            padding: 12px 20px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
         }
+
+        /* Phase Label */
         .phase-label {
             position: absolute;
             top: 30px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(200, 180, 100, 0.9);
-            font-size: 13px;
+            color: #ffd700;
+            font-size: 12px;
             letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
+
+        /* Subtitle */
         .subtitle {
             position: absolute;
-            bottom: 120px;
+            bottom: 140px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(220, 220, 240, 0.9);
-            font-size: 16px;
+            color: rgba(220, 220, 240, 0.95);
+            font-size: 15px;
             text-align: center;
             max-width: 80%;
-            background: rgba(10,15,35,0.7);
-            padding: 12px 24px;
-            border-radius: 12px;
-            border: 1px solid rgba(100,200,255,0.2);
+            background: rgba(10, 15, 30, 0.7);
+            padding: 16px 32px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            backdrop-filter: blur(15px);
             opacity: 0;
             transition: opacity 0.5s;
         }
         .subtitle.visible { opacity: 1; }
+
+        /* Controls */
         .controls {
             position: absolute;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 8px;
+            gap: 10px;
             pointer-events: auto;
             flex-wrap: wrap;
             justify-content: center;
         }
-        button {
-            padding: 8px 16px;
-            border: 1px solid rgba(100,200,255,0.3);
-            background: rgba(0,0,0,0.6);
-            color: rgba(200,230,255,0.9);
-            font-size: 12px;
+
+        /* Tech Buttons */
+        .btn-tech {
+            padding: 12px 24px;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(0, 100, 200, 0.05) 100%);
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
             cursor: pointer;
-            border-radius: 16px;
             transition: all 0.3s;
+            border-radius: 12px;
+            text-transform: uppercase;
         }
-        button:hover {
-            background: rgba(100,200,255,0.2);
+        .btn-tech:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(0, 100, 200, 0.1) 100%);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px);
         }
-        button.active {
-            background: rgba(100,200,255,0.3);
+        .btn-tech.active {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.3) 0%, rgba(0, 100, 200, 0.15) 100%);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
         }
+        .btn-gold {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(200, 150, 0, 0.05) 100%);
+            color: #ffd700;
+        }
+        .btn-gold:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(200, 150, 0, 0.1) 100%);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Loading Screen */
         .loading {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0a0a0f 0%, #000 50%, #0a0f14 100%);
+            background: #020208;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 100;
-            transition: opacity 1s ease, transform 1s ease;
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
-        .loading.hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
-        .loading-content {
-            text-align: center;
+        .loading.hidden { 
+            opacity: 0; 
+            pointer-events: none; 
+            transform: scale(1.1); 
         }
         .loading-logo {
-            width: 80px;
-            height: 80px;
-            border: 2px solid rgba(100, 200, 255, 0.3);
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(0, 240, 255, 0.3);
             border-radius: 50%;
             position: relative;
-            margin: 0 auto 30px;
+            margin-bottom: 40px;
             animation: logoPulse 2s ease-in-out infinite;
         }
         .loading-logo::before {
             content: '';
             position: absolute;
             top: 50%; left: 50%;
-            width: 60px; height: 60px;
-            border: 2px solid rgba(200, 180, 100, 0.5);
+            width: 70px; height: 70px;
+            border: 2px solid rgba(255, 215, 0, 0.5);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             animation: logoSpin 3s linear infinite;
@@ -127,80 +183,70 @@
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            color: rgba(100, 200, 255, 0.9);
-            font-size: 11px;
-            letter-spacing: 3px;
-            font-weight: 300;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 4px;
+            font-weight: 500;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
         }
         @keyframes logoPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(100, 200, 255, 0.2); }
-            50% { box-shadow: 0 0 40px rgba(100, 200, 255, 0.4), 0 0 60px rgba(200, 180, 100, 0.2); }
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(0, 240, 255, 0.4), 0 0 60px rgba(255, 215, 0, 0.2); }
         }
         @keyframes logoSpin {
             from { transform: translate(-50%, -50%) rotate(0deg); }
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
         .loading-text {
-            color: rgba(100, 200, 255, 0.7);
-            font-size: 12px;
+            color: rgba(0, 240, 255, 0.8);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
             letter-spacing: 6px;
-            font-weight: 300;
+            margin-bottom: 30px;
         }
         .loading-progress {
-            width: 200px;
-            height: 1px;
-            background: rgba(100, 200, 255, 0.1);
-            margin: 20px auto 0;
-            position: relative;
+            width: 240px;
+            height: 2px;
+            background: rgba(0, 240, 255, 0.1);
+            border-radius: 1px;
             overflow: hidden;
+            position: relative;
         }
         .loading-progress-bar {
-            position: absolute;
-            top: 0; left: 0;
             height: 100%;
-            background: linear-gradient(90deg, #64c8ff, #c8b464);
+            background: linear-gradient(90deg, #00f0ff, #ffd700);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
             width: 0%;
             transition: width 0.3s ease;
         }
         .loading-percentage {
-            color: rgba(200, 180, 100, 0.8);
+            color: #ffd700;
+            font-family: 'Orbitron', monospace;
             font-size: 10px;
-            letter-spacing: 2px;
-            margin-top: 10px;
-            font-family: 'Courier New', monospace;
-        }
-        
-        /* 光标拖尾效果 */
-        .cursor-trail {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background: radial-gradient(circle, rgba(100, 200, 255, 0.8) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9998;
-            transition: opacity 0.3s ease;
+            letter-spacing: 3px;
+            margin-top: 12px;
         }
 
-        /* 开场标题 - 镜头2要求 */
+        /* Opening Title */
         .opening-title {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            color: #fff;
-            font-family: 'Noto Serif SC', serif;
-            font-size: 52px;
-            font-weight: 300;
-            letter-spacing: 14px;
+            color: #ffd700;
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+            font-size: 42px;
+            font-weight: 500;
+            letter-spacing: 8px;
             text-align: center;
             opacity: 0;
             z-index: 50;
             pointer-events: none;
             text-shadow: 
-                0 0 20px rgba(100, 200, 255, 0.5),
-                0 0 40px rgba(100, 200, 255, 0.3),
-                0 0 60px rgba(100, 200, 255, 0.2);
+                0 0 20px rgba(255, 215, 0, 0.6),
+                0 0 40px rgba(255, 215, 0, 0.4),
+                0 0 60px rgba(255, 215, 0, 0.2);
             transition: opacity 0.5s ease;
         }
         .opening-title.visible {
@@ -213,7 +259,7 @@
             100% { transform: translate(-50%, -50%) scale(1); }
         }
 
-        /* 悬停提示框 */
+        /* Tooltip */
         .hover-tooltip {
             position: fixed;
             pointer-events: none;
@@ -223,26 +269,27 @@
             transform: translate(-50%, -100%);
             margin-top: -15px;
         }
-        .hover-tooltip.visible {
-            opacity: 1;
-        }
+        .hover-tooltip.visible { opacity: 1; }
         .tooltip-content {
-            background: rgba(10, 15, 20, 0.95);
-            border: 1px solid rgba(100, 200, 255, 0.3);
-            border-radius: 8px;
-            padding: 12px 16px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(100, 200, 255, 0.1);
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(0, 240, 255, 0.1);
         }
         .tooltip-title {
-            color: #c8b464;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
             font-size: 11px;
             letter-spacing: 2px;
-            margin-bottom: 4px;
-            font-weight: 500;
+            margin-bottom: 6px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
         .tooltip-desc {
-            color: rgba(200, 210, 220, 0.8);
+            color: rgba(220, 230, 240, 0.9);
             font-size: 12px;
             line-height: 1.5;
         }
@@ -255,44 +302,45 @@
             height: 0;
             border-left: 6px solid transparent;
             border-right: 6px solid transparent;
-            border-top: 6px solid rgba(100, 200, 255, 0.3);
+            border-top: 6px solid rgba(0, 240, 255, 0.3);
         }
 
-        /* 蓝图面板 - 镜头10要求 */
+        /* Blueprint Panel */
         .blueprint-panel {
             position: fixed;
             right: -400px;
             top: 50%;
             transform: translateY(-50%);
-            width: 350px;
-            background: rgba(10, 15, 20, 0.95);
-            border: 1px solid rgba(200, 180, 100, 0.4);
-            border-radius: 12px;
-            padding: 24px;
+            width: 360px;
+            background: rgba(10, 15, 30, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            padding: 28px;
             z-index: 100;
             transition: right 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             box-shadow: 
-                0 0 40px rgba(200, 180, 100, 0.2),
-                inset 0 0 60px rgba(200, 180, 100, 0.05);
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 0 60px rgba(0, 150, 255, 0.1);
         }
-        .blueprint-panel.visible {
-            right: 40px;
-        }
+        .blueprint-panel.visible { right: 40px; }
         .blueprint-header {
-            color: #c8b464;
-            font-size: 12px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
             letter-spacing: 3px;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(200, 180, 100, 0.3);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
         .blueprint-item {
-            margin-bottom: 12px;
-            padding: 10px 12px;
-            background: rgba(100, 200, 255, 0.05);
-            border-left: 2px solid rgba(100, 200, 255, 0.3);
-            border-radius: 0 6px 6px 0;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            background: rgba(0, 240, 255, 0.05);
+            border-left: 3px solid rgba(0, 240, 255, 0.4);
+            border-radius: 0 12px 12px 0;
         }
         .blueprint-label {
             color: rgba(150, 160, 170, 0.9);
@@ -319,20 +367,24 @@
             50% { opacity: 1; }
         }
 
-        /* 警告框 - 镜头17要求 */
+        /* Warning Popup */
         .warning-popup {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            background: rgba(255, 100, 100, 0.15);
-            border: 1px solid rgba(255, 100, 100, 0.5);
-            border-radius: 12px;
-            padding: 24px 32px;
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid rgba(255, 80, 80, 0.5);
+            border-radius: 20px;
+            padding: 32px 40px;
             z-index: 200;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
             text-align: center;
             transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(255, 80, 80, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
         .warning-popup.visible {
             transform: translate(-50%, -50%) scale(1);
@@ -346,28 +398,37 @@
             80% { transform: translate(-50%, -50%) scale(1) translateX(5px); }
         }
         .warning-title {
-            color: #ff6464;
+            color: #ff5050;
+            font-family: 'Orbitron', sans-serif;
             font-size: 14px;
             letter-spacing: 3px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            text-shadow: 0 0 20px rgba(255, 80, 80, 0.5);
         }
         .warning-text {
             color: rgba(255, 200, 200, 0.9);
-            font-size: 12px;
+            font-size: 13px;
             line-height: 1.6;
         }
 
-        /* 工作台提示 - 镜头13要求 */
+        /* Workbench Hint */
         .workbench-hint {
             position: fixed;
             right: 100px;
             top: 40%;
-            color: rgba(100, 200, 255, 0.8);
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
             font-size: 11px;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             opacity: 0;
             transition: opacity 0.5s ease;
             animation: hintBreathe 2s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        .workbench-hint.visible { opacity: 1; }
+        @keyframes hintBreathe {
+            0%, 100% { text-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
+            50% { text-shadow: 0 0 20px rgba(0, 240, 255, 0.6), 0 0 30px rgba(0, 240, 255, 0.3); }
         }
         .workbench-hint.visible {
             opacity: 1;
@@ -436,17 +497,20 @@
         <div class="subtitle" id="subtitle"></div>
         
         <div class="controls">
-            <button onclick="setScene(0)" id="btn-0" class="active">开场</button>
-            <button onclick="setScene(1)" id="btn-1">阶段一</button>
-            <button onclick="setScene(2)" id="btn-2">阶段二</button>
-            <button onclick="setScene(3)" id="btn-3">阶段三</button>
-            <button onclick="setScene(4)" id="btn-4">阶段四</button>
-            <button onclick="setScene(5)" id="btn-5" style="color:#ff9696">失败分支</button>
-            <button onclick="setScene(6)" id="btn-6" style="color:#c8b464">结尾</button>
-            <button onclick="togglePlay()" id="playBtn">▶ 播放完整版</button>
-            <button onclick="jumpToTime(0)">|&lt;</button>
-            <button onclick="jumpToTime(90)">阶段二</button>
-            <button onclick="jumpToTime(210)">阶段四</button>
+            <button onclick="setScene(0)" id="btn-0" class="btn-tech active">开场</button>
+            <button onclick="setScene(1)" id="btn-1" class="btn-tech">阶段一</button>
+            <button onclick="setScene(2)" id="btn-2" class="btn-tech">阶段二</button>
+            <button onclick="setScene(3)" id="btn-3" class="btn-tech">阶段三</button>
+            <button onclick="setScene(4)" id="btn-4" class="btn-tech">阶段四</button>
+            <button onclick="setScene(5)" id="btn-5" class="btn-gold">失败分支</button>
+            <button onclick="setScene(6)" id="btn-6" class="btn-gold">结尾</button>
+            <button onclick="togglePlay()" id="playBtn" class="btn-tech">▶ 播放完整版</button>
+            <button onclick="setScene(5)" id="btn-5" class="btn-gold">失败分支</button>
+            <button onclick="setScene(6)" id="btn-6" class="btn-gold">结尾</button>
+            <button onclick="togglePlay()" id="playBtn" class="btn-tech">▶ 播放完整版</button>
+            <button onclick="jumpToTime(0)" class="btn-tech">|&lt;</button>
+            <button onclick="jumpToTime(90)" class="btn-tech">阶段二</button>
+            <button onclick="jumpToTime(210)" class="btn-tech">阶段四</button>
         </div>
     </div>
 
