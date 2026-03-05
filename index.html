@@ -167,8 +167,99 @@
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
+        // ==================== 摄像机运动系统 ====================
+        const cameraRig = {
+            target: new THREE.Vector3(0, 0, 0),
+            current: new THREE.Vector3(0, 0, 20),
+            isMoving: false,
+            moveStartTime: 0,
+            moveDuration: 0,
+            startPos: new THREE.Vector3(),
+            endPos: new THREE.Vector3(),
+            startTarget: new THREE.Vector3(),
+            endTarget: new THREE.Vector3(),
+            
+            // 缓动函数
+            easeInOutCubic: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+            easeOutExpo: (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+            
+            // 移动到指定位置
+            moveTo: function(pos, target, duration = 2, easing = 'easeInOutCubic') {
+                this.startPos.copy(camera.position);
+                this.endPos.copy(pos);
+                this.startTarget.copy(this.target);
+                this.endTarget.copy(target || new THREE.Vector3(0, 0, 0));
+                this.moveStartTime = performance.now() / 1000;
+                this.moveDuration = duration;
+                this.isMoving = true;
+            },
+            
+            // 推镜效果（匀速）
+            dolly: function(startDist, endDist, duration = 8) {
+                const start = new THREE.Vector3(0, 0, startDist);
+                const end = new THREE.Vector3(0, 0, endDist);
+                this.moveTo(end, new THREE.Vector3(0, 0, 0), duration, 'linear');
+            },
+            
+            // 环绕运镜
+            orbit: function(radius, height, duration = 5) {
+                const angle = (performance.now() / 1000 / duration) * Math.PI * 2;
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                this.moveTo(new THREE.Vector3(x, height, z), new THREE.Vector3(0, 0, 0), 0.1);
+            },
+            
+            // 更新
+            update: function() {
+                if (!this.isMoving) return;
+                
+                const now = performance.now() / 1000;
+                const elapsed = now - this.moveStartTime;
+                const progress = Math.min(elapsed / this.moveDuration, 1);
+                
+                const eased = this.easeInOutCubic(progress);
+                
+                // 插值位置
+                camera.position.lerpVectors(this.startPos, this.endPos, eased);
+                this.target.lerpVectors(this.startTarget, this.endTarget, eased);
+                camera.lookAt(this.target);
+                
+                if (progress >= 1) {
+                    this.isMoving = false;
+                }
+            },
+            
+            // 场景预设运镜
+            presets: {
+                opening: {
+                    wide: { pos: [0, 0, 30], target: [0, 0, 0] },
+                    push: { pos: [0, 0, 15], target: [0, 0, 0], duration: 8 },
+                    penetrate: { pos: [0, 0, 5], target: [0, 0, 0], duration: 0.5 }
+                },
+                phase1: {
+                    overview: { pos: [0, 10, 20], target: [0, 0, 0] },
+                    closeup: { pos: [5, 2, 8], target: [0, 0, 0] },
+                    blueprint: { pos: [-8, 0, 12], target: [-5, 0, 0] }
+                },
+                phase2: {
+                    workbench: { pos: [12, 5, 10], target: [8, -2, 0] },
+                    collision: { pos: [5, 0, 8], target: [8, -2, 0] }
+                },
+                phase3: {
+                    split: { pos: [0, 0, 20], target: [0, 0, 0] },
+                    token: { pos: [8, 0, 12], target: [6, 0, 0] }
+                },
+                phase4: {
+                    hall: { pos: [0, 15, 25], target: [0, 0, 0] },
+                    pool: { pos: [0, -5, 10], target: [0, -2, 0] },
+                    trace: { pos: [-10, 5, 15], target: [0, 0, 0] }
+                },
+                failure: {
+                    broken: { pos: [0, 5, 15], target: [0, 3, 0] },
+                    liquidation: { pos: [0, -5, 12], target: [0, -2, 0] }
+                }
+            }
+        };
 
         // ==================== 后处理 ====================
         const composer = new EffectComposer(renderer);
@@ -779,9 +870,24 @@
             const labels = ['阶段零：开场', '阶段一：基础资产', '阶段二：首次协作', '阶段三：风险融资', '阶段四：价值分配', '隐藏分支：失败案例'];
             document.getElementById('phaseLabel').textContent = labels[index];
 
-            // 重置摄像机
-            camera.position.set(0, 0, 20);
-            controls.reset();
+            // 场景切换时触发摄像机运镜
+            const presets = [
+                { pos: [0, 0, 25], target: [0, 0, 0], duration: 2 },
+                { pos: [0, 8, 18], target: [0, 0, 0], duration: 2 },
+                { pos: [10, 5, 12], target: [5, 0, 0], duration: 2 },
+                { pos: [0, 0, 20], target: [0, 0, 0], duration: 2 },
+                { pos: [0, 12, 22], target: [0, 0, 0], duration: 2 },
+                { pos: [0, 5, 15], target: [0, 2, 0], duration: 2 }
+            ];
+            
+            const preset = presets[index];
+            if (preset) {
+                cameraRig.moveTo(
+                    new THREE.Vector3(...preset.pos),
+                    new THREE.Vector3(...preset.target),
+                    preset.duration
+                );
+            }
         };
 
         // ==================== 47镜头时间线系统 ====================
@@ -789,24 +895,24 @@
             currentTime: 0,
             isPlaying: false,
             shots: [
-                { time: 0, scene: 0, action: 'fadeIn', duration: 5, subtitle: '' },
-                { time: 5, scene: 0, action: 'titleShow', duration: 7, subtitle: '' },
-                { time: 12, scene: 0, action: 'membrane', duration: 8, subtitle: '在传统模式中，药物的成功是一座孤岛。' },
-                { time: 20, scene: 0, action: 'penetrate', duration: 5, subtitle: '但在ECHO协议上，它是一片被清晰测绘的雨林。' },
-                { time: 25, scene: 0, action: 'toSandbox', duration: 5, subtitle: '每一滴雨水都知道它来自哪片云。' },
-                { time: 30, scene: 1, action: 'moleculesAppear', duration: 8, subtitle: '' },
-                { time: 44, scene: 1, action: 'hoverPDB', duration: 8, subtitle: '' },
-                { time: 59, scene: 1, action: 'blueprintShow', duration: 12, subtitle: '即使是开源数据，其贡献也被ECHO协议铭记。' },
-                { time: 90, scene: 2, action: 'workbenchAppear', duration: 8, subtitle: '' },
-                { time: 108, scene: 2, action: 'dragStart', duration: 12, subtitle: '' },
-                { time: 120, scene: 2, action: 'collision', duration: 12, subtitle: '每一次协作都生成新的资产，权属像基因一样被继承和组合。' },
-                { time: 150, scene: 3, action: 'splitScreen', duration: 15, subtitle: '新药研发离不开资本，但传统融资往往意味着妥协。' },
-                { time: 165, scene: 3, action: 'tokenGenerate', duration: 15, subtitle: '而ECHO协议实现了所有权与收益权的分离。' },
-                { time: 195, scene: 3, action: 'fundFlow', duration: 15, subtitle: '您获得了推进试验的资金，却从未丢失数据的灵魂。' },
-                { time: 210, scene: 4, action: 'valueHall', duration: 10, subtitle: '' },
-                { time: 228, scene: 4, action: 'distribution', duration: 15, subtitle: '当新药成功上市，价值不再是集中于终点的盛宴。' },
-                { time: 255, scene: 4, action: 'traceBack', duration: 18, subtitle: '而是沿链条逆流而上的回馈。' },
-                { time: 315, scene: 4, action: 'upstreamReward', duration: 15, subtitle: '哪怕是十年前的一份开源数据，也能收获应有的荣光。' }
+                { time: 0, scene: 0, action: 'fadeIn', duration: 5, subtitle: '', camera: { pos: [0, 0, 30], target: [0, 0, 0], duration: 5 } },
+                { time: 5, scene: 0, action: 'titleShow', duration: 7, subtitle: '', camera: { pos: [0, 0, 25], target: [0, 0, 0], duration: 3 } },
+                { time: 12, scene: 0, action: 'membrane', duration: 8, subtitle: '在传统模式中，药物的成功是一座孤岛。', camera: { pos: [0, 0, 18], target: [0, 0, 0], duration: 4 } },
+                { time: 20, scene: 0, action: 'penetrate', duration: 5, subtitle: '但在ECHO协议上，它是一片被清晰测绘的雨林。', camera: { pos: [0, 0, 8], target: [0, 0, 0], duration: 1 } },
+                { time: 25, scene: 0, action: 'toSandbox', duration: 5, subtitle: '每一滴雨水都知道它来自哪片云。', camera: { pos: [0, 5, 22], target: [0, 0, 0], duration: 3 } },
+                { time: 30, scene: 1, action: 'moleculesAppear', duration: 8, subtitle: '', camera: { pos: [0, 10, 20], target: [0, 0, 0], duration: 4 } },
+                { time: 44, scene: 1, action: 'hoverPDB', duration: 8, subtitle: '', camera: { pos: [-5, 3, 10], target: [-3, 0, 0], duration: 3 } },
+                { time: 59, scene: 1, action: 'blueprintShow', duration: 12, subtitle: '即使是开源数据，其贡献也被ECHO协议铭记。', camera: { pos: [-8, 0, 12], target: [-5, 0, 0], duration: 4 } },
+                { time: 90, scene: 2, action: 'workbenchAppear', duration: 8, subtitle: '', camera: { pos: [12, 8, 15], target: [8, 0, 0], duration: 4 } },
+                { time: 108, scene: 2, action: 'dragStart', duration: 12, subtitle: '', camera: { pos: [0, 5, 12], target: [0, 0, 0], duration: 3 } },
+                { time: 120, scene: 2, action: 'collision', duration: 12, subtitle: '每一次协作都生成新的资产，权属像基因一样被继承和组合。', camera: { pos: [8, 2, 10], target: [8, -2, 0], duration: 4 } },
+                { time: 150, scene: 3, action: 'splitScreen', duration: 15, subtitle: '新药研发离不开资本，但传统融资往往意味着妥协。', camera: { pos: [0, 0, 22], target: [0, 0, 0], duration: 5 } },
+                { time: 165, scene: 3, action: 'tokenGenerate', duration: 15, subtitle: '而ECHO协议实现了所有权与收益权的分离。', camera: { pos: [8, 2, 12], target: [6, 0, 0], duration: 4 } },
+                { time: 195, scene: 3, action: 'fundFlow', duration: 15, subtitle: '您获得了推进试验的资金，却从未丢失数据的灵魂。', camera: { pos: [6, 0, 10], target: [6, -1, 0], duration: 5 } },
+                { time: 210, scene: 4, action: 'valueHall', duration: 10, subtitle: '', camera: { pos: [0, 15, 28], target: [0, 0, 0], duration: 5 } },
+                { time: 228, scene: 4, action: 'distribution', duration: 15, subtitle: '当新药成功上市，价值不再是集中于终点的盛宴。', camera: { pos: [0, 8, 18], target: [0, -2, 0], duration: 5 } },
+                { time: 255, scene: 4, action: 'traceBack', duration: 18, subtitle: '而是沿链条逆流而上的回馈。', camera: { pos: [-8, 5, 15], target: [0, 0, 0], duration: 6 } },
+                { time: 315, scene: 4, action: 'upstreamReward', duration: 15, subtitle: '哪怕是十年前的一份开源数据，也能收获应有的荣光。', camera: { pos: [-12, 2, 12], target: [-8, 0, 0], duration: 5 } }
             ]
         };
 
@@ -863,6 +969,22 @@
             
             if (activeScene && activeScene.scene !== currentScene) {
                 setScene(activeScene.scene);
+            }
+            
+            // 触发摄像机运动
+            if (activeScene && activeScene.camera) {
+                const cam = activeScene.camera;
+                const startTime = activeScene.time;
+                const camProgress = (timeline.currentTime - startTime) / cam.duration;
+                
+                // 只在摄像机运动期间更新
+                if (camProgress >= 0 && camProgress <= 1 && camProgress < 0.1) {
+                    cameraRig.moveTo(
+                        new THREE.Vector3(...cam.pos),
+                        new THREE.Vector3(...cam.target),
+                        cam.duration
+                    );
+                }
             }
             
             // 时间到自动停止
@@ -1027,6 +1149,9 @@
                     }
                 });
             }
+
+            // 更新摄像机运动
+            cameraRig.update();
 
             controls.update();
             composer.render();
