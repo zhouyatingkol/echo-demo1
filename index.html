@@ -124,6 +124,7 @@
             <button onclick="setScene(2)" id="btn-2">阶段二</button>
             <button onclick="setScene(3)" id="btn-3">阶段三</button>
             <button onclick="setScene(4)" id="btn-4">阶段四</button>
+            <button onclick="setScene(5)" id="btn-5" style="color:#ff9696">失败分支</button>
             <button onclick="togglePlay()" id="playBtn">▶ 播放完整版</button>
             <button onclick="jumpToTime(0)">|&lt;</button>
             <button onclick="jumpToTime(90)">阶段二</button>
@@ -148,7 +149,7 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
         // ==================== 场景管理 ====================
-        const scenes = ['opening', 'phase1', 'phase2', 'phase3', 'phase4'];
+        const scenes = ['opening', 'phase1', 'phase2', 'phase3', 'phase4', 'failure'];
         let currentScene = 0;
 
         // ==================== 核心设置 ====================
@@ -241,7 +242,8 @@
             phase1: new THREE.Group(),
             phase2: new THREE.Group(),
             phase3: new THREE.Group(),
-            phase4: new THREE.Group()
+            phase4: new THREE.Group(),
+            failure: new THREE.Group()
         };
 
         Object.values(sceneGroups).forEach(g => {
@@ -620,6 +622,142 @@
                 group.add(line);
             });
         }
+
+        // ==================== 阶段五：隐藏分支 - 失败案例 ====================
+        function createFailureScene() {
+            const group = sceneGroups.failure;
+            
+            // 冷蓝色背景效果（通过雾和灯光）
+            const blueLight = new THREE.PointLight(0x6496c8, 1.5, 100);
+            blueLight.position.set(0, 10, 10);
+            group.add(blueLight);
+            
+            // 破裂的NeuroBlok分子
+            const brokenMol = createMolecule('NeuroBlok', 0x6496c8, new THREE.Vector3(0, 3, 0), 1.5);
+            
+            // 降低亮度和添加裂痕效果
+            brokenMol.children.forEach(child => {
+                if (child.material) {
+                    child.material.emissiveIntensity = 0.1;
+                    child.material.opacity = 0.6;
+                    child.material.transparent = true;
+                }
+            });
+            
+            // 添加裂痕线条
+            for (let i = 0; i < 5; i++) {
+                const crackGeo = new THREE.BufferGeometry();
+                const crackPoints = [
+                    new THREE.Vector3(
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2 + 3,
+                        (Math.random() - 0.5) * 2
+                    ),
+                    new THREE.Vector3(
+                        (Math.random() - 0.5) * 3,
+                        (Math.random() - 0.5) * 3 + 3,
+                        (Math.random() - 0.5) * 3
+                    )
+                ];
+                crackGeo.setFromPoints(crackPoints);
+                const crackMat = new THREE.LineBasicMaterial({ 
+                    color: 0xff6464, 
+                    transparent: true, 
+                    opacity: 0.6 
+                });
+                const crack = new THREE.Line(crackGeo, crackMat);
+                crack.name = 'crack';
+                group.add(crack);
+            }
+            
+            group.add(brokenMol);
+
+            // 清算资金池（冷色调）
+            const poolGeo = new THREE.CylinderGeometry(4, 4, 0.8, 64);
+            const poolMat = new THREE.MeshPhysicalMaterial({
+                color: 0x6496c8,
+                metalness: 0.5,
+                roughness: 0.4,
+                emissive: 0x6496c8,
+                emissiveIntensity: 0.1,
+                transparent: true,
+                opacity: 0.6
+            });
+            const pool = new THREE.Mesh(poolGeo, poolMat);
+            pool.position.y = -3;
+            pool.name = 'liquidation_pool';
+            group.add(pool);
+
+            // 清算流向（蓝色粒子流）
+            const contributors = [
+                { name: '公共联盟', color: 0x6496c8, pos: new THREE.Vector3(-6, 0, 0), amount: '70万' },
+                { name: '智药科技', color: 0x6496c8, pos: new THREE.Vector3(6, 0, 0), amount: '840万' },
+                { name: '康源医院', color: 0x6496c8, pos: new THREE.Vector3(0, 0, -6), amount: '420万' },
+                { name: '元生资本', color: 0x6496c8, pos: new THREE.Vector3(0, 0, 6), amount: '300万' }
+            ];
+
+            contributors.forEach(c => {
+                // 节点
+                const nodeGeo = new THREE.SphereGeometry(0.6, 32, 32);
+                const nodeMat = new THREE.MeshPhysicalMaterial({
+                    color: c.color,
+                    metalness: 0.3,
+                    roughness: 0.5,
+                    emissive: c.color,
+                    emissiveIntensity: 0.15,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                const node = new THREE.Mesh(nodeGeo, nodeMat);
+                node.position.copy(c.pos);
+                node.name = c.name;
+                group.add(node);
+
+                // 连接线（虚线效果用多段短线模拟）
+                const linePoints = [c.pos, new THREE.Vector3(0, -2.5, 0)];
+                const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
+                const lineMat = new THREE.LineBasicMaterial({ 
+                    color: c.color, 
+                    transparent: true, 
+                    opacity: 0.3
+                });
+                const line = new THREE.Line(lineGeo, lineMat);
+                line.name = 'liquidation_line';
+                group.add(line);
+                
+                // 缓慢流动的粒子
+                for (let i = 0; i < 5; i++) {
+                    const pGeo = new THREE.SphereGeometry(0.08, 8, 8);
+                    const pMat = new THREE.MeshBasicMaterial({ 
+                        color: 0x96c8ff,
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    const p = new THREE.Mesh(pGeo, pMat);
+                    p.userData = {
+                        progress: i / 5,
+                        speed: 0.005 + Math.random() * 0.003,
+                        path: linePoints
+                    };
+                    p.name = 'liquidation_particle';
+                    group.add(p);
+                }
+            });
+            
+            // 失败提示文字板（半透明）
+            const hintGeo = new THREE.PlaneGeometry(8, 1.5);
+            const hintMat = new THREE.MeshBasicMaterial({
+                color: 0xff6464,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const hint = new THREE.Mesh(hintGeo, hintMat);
+            hint.position.set(0, 6, 0);
+            hint.name = 'failure_hint';
+            group.add(hint);
+        }
+
         window.setScene = function(index) {
             currentScene = index;
             timeline.isPlaying = false;
@@ -634,11 +772,11 @@
             
             // 更新按钮状态
             document.querySelectorAll('.controls button').forEach((btn, i) => {
-                if (i < 5) btn.classList.toggle('active', i === index);
+                if (i < 6) btn.classList.toggle('active', i === index);
             });
 
             // 更新阶段标签
-            const labels = ['阶段零：开场', '阶段一：基础资产', '阶段二：首次协作', '阶段三：风险融资', '阶段四：价值分配'];
+            const labels = ['阶段零：开场', '阶段一：基础资产', '阶段二：首次协作', '阶段三：风险融资', '阶段四：价值分配', '隐藏分支：失败案例'];
             document.getElementById('phaseLabel').textContent = labels[index];
 
             // 重置摄像机
@@ -860,6 +998,36 @@
                 });
             }
 
+            // 更新阶段五：失败场景
+            if (sceneGroups.failure.visible) {
+                // 裂痕闪烁
+                sceneGroups.failure.children.forEach(child => {
+                    if (child.name === 'crack') {
+                        child.material.opacity = 0.4 + Math.sin(animTime * 3) * 0.2;
+                    }
+                    if (child.name === 'liquidation_particle') {
+                        // 缓慢清算流动
+                        child.userData.progress += child.userData.speed;
+                        if (child.userData.progress > 1) child.userData.progress = 0;
+                        
+                        const path = child.userData.path;
+                        const idx = Math.floor(child.userData.progress * (path.length - 1));
+                        const nextIdx = Math.min(idx + 1, path.length - 1);
+                        const localT = (child.userData.progress * (path.length - 1)) % 1;
+                        
+                        child.position.lerpVectors(path[idx], path[nextIdx], localT);
+                    }
+                    if (child.name === 'failure_hint') {
+                        // 提示板呼吸效果
+                        child.material.opacity = 0.2 + Math.sin(animTime * 2) * 0.1;
+                    }
+                    if (child.userData.type) {
+                        // 破裂分子缓慢旋转
+                        child.children[0].rotation.y += 0.002;
+                    }
+                });
+            }
+
             controls.update();
             composer.render();
         }
@@ -870,6 +1038,7 @@
         createPhase2Scene();
         createPhase3Scene();
         createPhase4Scene();
+        createFailureScene();
         setScene(0);
         
         // 隐藏loading
