@@ -1079,6 +1079,156 @@
             }
         };
 
+        // ==================== 阶段五：破碎清算动画 ====================
+        const phase5Animation = {
+            cracks: [],
+            liquidationParticles: [],
+            
+            // 裂开动画 - 镜头26
+            animateCrack: function() {
+                const brokenMol = sceneGroups.failure.children.find(c => 
+                    c.userData.type === 'NeuroBlok'
+                );
+                if (!brokenMol) return;
+                
+                // 创建动态裂痕
+                for (let i = 0; i < 8; i++) {
+                    const crackGeo = new THREE.BufferGeometry();
+                    const startPoint = new THREE.Vector3(
+                        (Math.random() - 0.5) * 1.5,
+                        3 + (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 1.5
+                    );
+                    const endPoint = startPoint.clone().add(new THREE.Vector3(
+                        (Math.random() - 0.5) * 3,
+                        (Math.random() - 0.5) * 3,
+                        (Math.random() - 0.5) * 3
+                    ));
+                    crackGeo.setFromPoints([startPoint, endPoint]);
+                    
+                    const crackMat = new THREE.LineBasicMaterial({ 
+                        color: 0xff6464, 
+                        transparent: true, 
+                        opacity: 0,
+                        linewidth: 2
+                    });
+                    const crack = new THREE.Line(crackGeo, crackMat);
+                    crack.name = 'dynamic_crack';
+                    sceneGroups.failure.add(crack);
+                    this.cracks.push(crack);
+                    
+                    // 裂痕出现动画
+                    setTimeout(() => {
+                        const startTime = Date.now();
+                        function fadeIn() {
+                            const elapsed = Date.now() - startTime;
+                            const progress = Math.min(elapsed / 400, 1);
+                            crack.material.opacity = progress * 0.8;
+                            if (progress < 1) requestAnimationFrame(fadeIn);
+                        }
+                        fadeIn();
+                    }, i * 80);
+                }
+                
+                // 分子变暗动画
+                brokenMol.children.forEach((child, idx) => {
+                    if (child.material) {
+                        const origEmissive = child.material.emissiveIntensity;
+                        const startTime = Date.now() + idx * 50;
+                        function dim() {
+                            const elapsed = Date.now() - startTime;
+                            const progress = Math.min(elapsed / 1000, 1);
+                            child.material.emissiveIntensity = origEmissive * (1 - progress * 0.8);
+                            child.material.opacity = 0.6 + progress * 0.2;
+                            if (progress < 1) requestAnimationFrame(dim);
+                        }
+                        setTimeout(dim, idx * 50);
+                    }
+                });
+            },
+            
+            // 清算流动画 - 镜头27-28
+            animateLiquidation: function() {
+                const pool = sceneGroups.failure.children.find(c => c.name === 'liquidation_pool');
+                if (!pool) return;
+                
+                // 资金池收缩动画
+                const startTime = Date.now();
+                const origScale = pool.scale.x;
+                function shrink() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / 2000, 1);
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    const scale = origScale * (1 - ease * 0.3);
+                    pool.scale.set(scale, 1, scale);
+                    pool.material.emissiveIntensity = 0.1 * (1 - ease * 0.5);
+                    if (progress < 1) requestAnimationFrame(shrink);
+                }
+                shrink();
+                
+                // 创建清算粒子流
+                const contributors = [
+                    { pos: new THREE.Vector3(-6, 0, 0), amount: 0.7 },
+                    { pos: new THREE.Vector3(6, 0, 0), amount: 0.84 },
+                    { pos: new THREE.Vector3(0, 0, -6), amount: 0.42 },
+                    { pos: new THREE.Vector3(0, 0, 6), amount: 0.3 }
+                ];
+                
+                contributors.forEach((c, idx) => {
+                    const particleCount = Math.floor(c.amount * 20);
+                    for (let i = 0; i < particleCount; i++) {
+                        const geo = new THREE.SphereGeometry(0.05, 6, 6);
+                        const mat = new THREE.MeshBasicMaterial({
+                            color: 0x6496c8,
+                            transparent: true,
+                            opacity: 0.7
+                        });
+                        const p = new THREE.Mesh(geo, mat);
+                        p.position.set(0, -2, 0);
+                        
+                        const direction = c.pos.clone().normalize();
+                        p.userData = {
+                            velocity: direction.multiplyScalar(0.02 + Math.random() * 0.02),
+                            delay: idx * 500 + i * 30,
+                            startTime: Date.now()
+                        };
+                        
+                        sceneGroups.failure.add(p);
+                        this.liquidationParticles.push(p);
+                    }
+                });
+            },
+            
+            // 更新清算粒子
+            updateLiquidation: function() {
+                this.liquidationParticles.forEach(p => {
+                    const elapsed = Date.now() - p.userData.startTime;
+                    if (elapsed < p.userData.delay) return;
+                    
+                    p.position.add(p.userData.velocity);
+                    
+                    // 接近目标时淡出
+                    if (p.position.length() > 5) {
+                        p.material.opacity -= 0.01;
+                    }
+                    
+                    if (p.material.opacity <= 0) {
+                        p.position.set(0, -2, 0);
+                        p.material.opacity = 0.7;
+                    }
+                });
+            },
+            
+            // 裂痕闪烁
+            updateCracks: function() {
+                this.cracks.forEach(crack => {
+                    if (crack.material.opacity > 0) {
+                        crack.material.opacity = 0.6 + Math.sin(Date.now() * 0.003) * 0.2;
+                    }
+                });
+            }
+        };
+
         // ==================== 分子生长动画系统 ====================
         const growthAnimation = {
             // 弹性生长曲线
@@ -2059,6 +2209,12 @@
                     // 镜头18-23: 触发价值流动
                     phase4Animation.createValueFlow();
                     phase4Animation.lightUpContributors();
+                } else if (currentShot.action === 'distribution') {
+                    // 镜头26: 触发破碎动画
+                    phase5Animation.animateCrack();
+                } else if (currentShot.action === 'traceBack') {
+                    // 镜头27-28: 触发清算
+                    phase5Animation.animateLiquidation();
                 }
             }
             
@@ -2303,6 +2459,10 @@
             
             // 更新价值流动
             phase4Animation.updateValueFlow();
+            
+            // 更新清算动画
+            phase5Animation.updateLiquidation();
+            phase5Animation.updateCracks();
 
             controls.update();
             composer.render();
