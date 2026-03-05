@@ -13,17 +13,83 @@
             font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
             overflow: hidden;
         }
-        #canvas-container {
+
+        /* ==================== Stage System ==================== */
+        .stage {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
         }
-        .ui-layer {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
+        .stage.active {
+            display: flex;
+        }
+
+        /* 3D Background Container */
+        .bg-3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .bg-3d canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Content Container */
+        .content {
+            position: relative;
             z-index: 10;
+            pointer-events: auto;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+            pointer-events: auto;
+        }
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0, 240, 255, 0.2);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .progress-dot:hover {
+            background: rgba(0, 240, 255, 0.4);
+            transform: scale(1.2);
+        }
+        .progress-dot.active {
+            background: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+        }
+        .progress-dot.gold {
+            border-color: rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.2);
+        }
+        .progress-dot.gold:hover {
+            background: rgba(255, 215, 0, 0.4);
+        }
+        .progress-dot.gold.active {
+            background: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
 
         /* Glass Card */
@@ -48,97 +114,342 @@
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 40px rgba(255, 215, 0, 0.2);
         }
 
-        /* Timecode */
-        .timecode {
-            position: absolute;
-            top: 20px; left: 20px;
-            color: #00f0ff;
-            font-family: 'Orbitron', monospace;
-            font-size: 16px;
-            letter-spacing: 2px;
-            background: rgba(10, 15, 30, 0.7);
-            padding: 12px 20px;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-        }
+        /* ==================== Stage Specific Styles ==================== */
 
-        /* Phase Label */
-        .phase-label {
-            position: absolute;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #ffd700;
-            font-size: 12px;
-            letter-spacing: 4px;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-        }
-
-        /* Subtitle */
-        .subtitle {
-            position: absolute;
-            bottom: 140px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(220, 220, 240, 0.95);
-            font-size: 15px;
+        /* Stage 0: Opening */
+        .stage-0 .content {
             text-align: center;
-            max-width: 80%;
-            background: rgba(10, 15, 30, 0.7);
-            padding: 16px 32px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            backdrop-filter: blur(15px);
-            opacity: 0;
-            transition: opacity 0.5s;
+            padding: 60px 80px;
         }
-        .subtitle.visible { opacity: 1; }
-
-        /* Controls */
-        .controls {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            pointer-events: auto;
-            flex-wrap: wrap;
-            justify-content: center;
+        .stage-0 h1 {
+            font-size: 42px;
+            font-weight: 500;
+            letter-spacing: 8px;
+            margin-bottom: 30px;
         }
-
-        /* Tech Buttons */
-        .btn-tech {
-            padding: 12px 24px;
-            border: 1px solid rgba(0, 240, 255, 0.4);
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(0, 100, 200, 0.05) 100%);
-            color: #00f0ff;
+        .stage-0 p {
+            color: rgba(220, 220, 240, 0.8);
+            font-size: 16px;
+            letter-spacing: 3px;
+            margin-bottom: 50px;
+        }
+        .start-btn {
+            padding: 18px 48px;
+            font-size: 14px;
+            letter-spacing: 4px;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(200, 150, 0, 0.05) 100%);
+            color: #ffd700;
             font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            letter-spacing: 2px;
             cursor: pointer;
             transition: all 0.3s;
             border-radius: 12px;
             text-transform: uppercase;
         }
-        .btn-tech:hover {
+        .start-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(200, 150, 0, 0.1) 100%);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Stage 1: Phase 1 - Molecules */
+        .stage-1 .content {
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 380px;
+            padding: 40px;
+        }
+        .stage-1 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .stage-1 .molecule-list {
+            list-style: none;
+        }
+        .stage-1 .molecule-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+            color: rgba(220, 230, 240, 0.9);
+            font-size: 13px;
+        }
+        .stage-1 .molecule-list li:last-child {
+            border-bottom: none;
+        }
+        .stage-1 .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .stage-1 .dot.cyan { background: #64c8ff; box-shadow: 0 0 10px #64c8ff; }
+        .stage-1 .dot.green { background: #64ff96; box-shadow: 0 0 10px #64ff96; }
+        .stage-1 .dot.teal { background: #64dddd; box-shadow: 0 0 10px #64dddd; }
+        .stage-1 .dot.mint { background: #96ffc8; box-shadow: 0 0 10px #96ffc8; }
+        .stage-1 .dot.gold { background: #c8b464; box-shadow: 0 0 10px #c8b464; }
+
+        /* Stage 2: Phase 2 - Workbench */
+        .stage-2 .content {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            padding: 40px;
+        }
+        .stage-2 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+        }
+        .stage-2 .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0;
+            padding: 16px;
+            background: rgba(0, 240, 255, 0.05);
+            border-radius: 12px;
+            border-left: 3px solid rgba(0, 240, 255, 0.4);
+        }
+        .stage-2 .flow-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 240, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .stage-2 .flow-text {
+            color: rgba(220, 230, 240, 0.9);
+            font-size: 13px;
+        }
+
+        /* Stage 3: Phase 3 - Token */
+        .stage-3 .content {
+            position: absolute;
+            right: 60px;
+            bottom: 100px;
+            width: 360px;
+            padding: 40px;
+        }
+        .stage-3 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .stage-3 .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .stage-3 .compare-item {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stage-3 .compare-item.trad {
+            background: rgba(100, 100, 100, 0.1);
+            border: 1px solid rgba(100, 100, 100, 0.3);
+        }
+        .stage-3 .compare-item.echo {
+            background: rgba(200, 180, 100, 0.1);
+            border: 1px solid rgba(200, 180, 100, 0.3);
+        }
+        .stage-3 .compare-title {
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .stage-3 .compare-value {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* Stage 4: Phase 4 - Value Distribution */
+        .stage-4 .content {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 30px 50px;
+            text-align: center;
+        }
+        .stage-4 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+        .stage-4 p {
+            color: rgba(220, 230, 240, 0.8);
+            font-size: 13px;
+        }
+        .stage-4 .contributors-bar {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            padding: 24px 40px;
+            background: rgba(10, 15, 30, 0.7);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+        }
+        .stage-4 .contributor {
+            text-align: center;
+        }
+        .stage-4 .contrib-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+        }
+        .stage-4 .contrib-name {
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: rgba(220, 230, 240, 0.8);
+        }
+
+        /* Stage 5: Phase 5 - Failure Case */
+        .stage-5 .content {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 30px 60px;
+            text-align: center;
+            border-color: rgba(255, 80, 80, 0.3);
+            background: rgba(50, 10, 10, 0.5);
+        }
+        .stage-5 h2 {
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+            color: #ff6464;
+            text-shadow: 0 0 20px rgba(255, 100, 100, 0.4);
+        }
+        .stage-5 p {
+            color: rgba(255, 200, 200, 0.8);
+            font-size: 13px;
+        }
+        .stage-5 .liquidation-info {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+            padding: 24px 50px;
+            background: rgba(30, 15, 20, 0.7);
+            border: 1px solid rgba(255, 80, 80, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+        }
+        .stage-5 .liquid-item {
+            text-align: center;
+        }
+        .stage-5 .liquid-amount {
+            font-size: 24px;
+            font-weight: 600;
+            color: #6496c8;
+            text-shadow: 0 0 10px rgba(100, 150, 200, 0.3);
+        }
+        .stage-5 .liquid-label {
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: rgba(200, 200, 220, 0.7);
+            margin-top: 4px;
+        }
+
+        /* Stage 6: Ending */
+        .stage-6 .content {
+            text-align: center;
+            padding: 60px 100px;
+        }
+        .stage-6 .echo-logo {
+            width: 120px;
+            height: 120px;
+            border: 2px solid rgba(200, 180, 100, 0.5);
+            border-radius: 50%;
+            margin: 0 auto 40px;
+            position: relative;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+        .stage-6 .echo-logo::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 80px; height: 80px;
+            border: 2px solid rgba(0, 240, 255, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: logoSpin 3s linear infinite;
+        }
+        .stage-6 .echo-logo::after {
+            content: 'ECHO';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #c8b464;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 6px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(200, 180, 100, 0.5);
+        }
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(200, 180, 100, 0.2); }
+            50% { box-shadow: 0 0 60px rgba(200, 180, 100, 0.4), 0 0 90px rgba(0, 240, 255, 0.2); }
+        }
+        @keyframes logoSpin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .stage-6 h2 {
+            font-size: 28px;
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+        }
+        .stage-6 p {
+            color: rgba(220, 230, 240, 0.8);
+            font-size: 14px;
+            letter-spacing: 2px;
+            line-height: 2;
+        }
+        .stage-6 .restart-btn {
+            margin-top: 40px;
+            padding: 14px 36px;
+            font-size: 12px;
+            letter-spacing: 3px;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(0, 100, 200, 0.05) 100%);
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+        .stage-6 .restart-btn:hover {
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(0, 100, 200, 0.1) 100%);
             box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
             transform: translateY(-2px);
-        }
-        .btn-tech.active {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.3) 0%, rgba(0, 100, 200, 0.15) 100%);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-        }
-        .btn-gold {
-            border-color: rgba(255, 215, 0, 0.4);
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(200, 150, 0, 0.05) 100%);
-            color: #ffd700;
-        }
-        .btn-gold:hover {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(200, 150, 0, 0.1) 100%);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
         }
 
         /* Loading Screen */
@@ -151,7 +462,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            z-index: 1000;
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
         .loading.hidden { 
@@ -166,7 +477,7 @@
             border-radius: 50%;
             position: relative;
             margin-bottom: 40px;
-            animation: logoPulse 2s ease-in-out infinite;
+            animation: loadingPulse 2s ease-in-out infinite;
         }
         .loading-logo::before {
             content: '';
@@ -176,7 +487,7 @@
             border: 2px solid rgba(255, 215, 0, 0.5);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            animation: logoSpin 3s linear infinite;
+            animation: loadingSpin 3s linear infinite;
         }
         .loading-logo::after {
             content: 'ECHO';
@@ -190,11 +501,11 @@
             font-weight: 500;
             text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
         }
-        @keyframes logoPulse {
+        @keyframes loadingPulse {
             0%, 100% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.2); }
             50% { box-shadow: 0 0 40px rgba(0, 240, 255, 0.4), 0 0 60px rgba(255, 215, 0, 0.2); }
         }
-        @keyframes logoSpin {
+        @keyframes loadingSpin {
             from { transform: translate(-50%, -50%) rotate(0deg); }
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
@@ -228,38 +539,7 @@
             margin-top: 12px;
         }
 
-        /* Opening Title */
-        .opening-title {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            color: #ffd700;
-            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
-            font-size: 42px;
-            font-weight: 500;
-            letter-spacing: 8px;
-            text-align: center;
-            opacity: 0;
-            z-index: 50;
-            pointer-events: none;
-            text-shadow: 
-                0 0 20px rgba(255, 215, 0, 0.6),
-                0 0 40px rgba(255, 215, 0, 0.4),
-                0 0 60px rgba(255, 215, 0, 0.2);
-            transition: opacity 0.5s ease;
-        }
-        .opening-title.visible {
-            opacity: 1;
-            animation: titleScale 7s ease forwards;
-        }
-        @keyframes titleScale {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            14% { transform: translate(-50%, -50%) scale(1); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        /* Tooltip */
+        /* Hover Tooltip */
         .hover-tooltip {
             position: fixed;
             pointer-events: none;
@@ -305,184 +585,35 @@
             border-top: 6px solid rgba(0, 240, 255, 0.3);
         }
 
-        /* Blueprint Panel */
-        .blueprint-panel {
+        /* Cursor Trail */
+        .cursor-trail {
             position: fixed;
-            right: -400px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 360px;
-            background: rgba(10, 15, 30, 0.8);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 24px;
-            padding: 28px;
-            z-index: 100;
-            transition: right 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(20px);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                0 0 60px rgba(0, 150, 255, 0.1);
-        }
-        .blueprint-panel.visible { right: 40px; }
-        .blueprint-header {
-            color: #ffd700;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 13px;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
-        .blueprint-item {
-            margin-bottom: 16px;
-            padding: 14px 16px;
-            background: rgba(0, 240, 255, 0.05);
-            border-left: 3px solid rgba(0, 240, 255, 0.4);
-            border-radius: 0 12px 12px 0;
-        }
-        .blueprint-label {
-            color: rgba(150, 160, 170, 0.9);
-            font-size: 10px;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-        .blueprint-value {
-            color: rgba(230, 240, 250, 0.95);
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .blueprint-highlight {
-            color: #c8b464;
-            font-size: 11px;
-            margin-top: 12px;
-            padding: 8px;
-            background: rgba(200, 180, 100, 0.1);
-            border-radius: 4px;
-            animation: highlightPulse 2s ease-in-out infinite;
-        }
-        @keyframes highlightPulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
-        }
-
-        /* Warning Popup */
-        .warning-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(255, 50, 50, 0.1);
-            border: 1px solid rgba(255, 80, 80, 0.5);
-            border-radius: 20px;
-            padding: 32px 40px;
-            z-index: 200;
-            backdrop-filter: blur(20px);
-            text-align: center;
-            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.5),
-                0 0 40px rgba(255, 80, 80, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        }
-        .warning-popup.visible {
-            transform: translate(-50%, -50%) scale(1);
-            animation: warningShake 0.5s ease-in-out;
-        }
-        @keyframes warningShake {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translateX(0); }
-            20% { transform: translate(-50%, -50%) scale(1) translateX(-10px); }
-            40% { transform: translate(-50%, -50%) scale(1) translateX(10px); }
-            60% { transform: translate(-50%, -50%) scale(1) translateX(-5px); }
-            80% { transform: translate(-50%, -50%) scale(1) translateX(5px); }
-        }
-        .warning-title {
-            color: #ff5050;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            letter-spacing: 3px;
-            margin-bottom: 12px;
-            text-shadow: 0 0 20px rgba(255, 80, 80, 0.5);
-        }
-        .warning-text {
-            color: rgba(255, 200, 200, 0.9);
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        /* Workbench Hint */
-        .workbench-hint {
-            position: fixed;
-            right: 100px;
-            top: 40%;
-            color: #00f0ff;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            letter-spacing: 3px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            animation: hintBreathe 2s ease-in-out infinite;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-        }
-        .workbench-hint.visible { opacity: 1; }
-        @keyframes hintBreathe {
-            0%, 100% { text-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
-            50% { text-shadow: 0 0 20px rgba(0, 240, 255, 0.6), 0 0 30px rgba(0, 240, 255, 0.3); }
-        }
-        .workbench-hint.visible {
-            opacity: 1;
-        }
-        @keyframes hintBreathe {
-            0%, 100% { text-shadow: 0 0 10px rgba(100, 200, 255, 0.3); }
-            50% { text-shadow: 0 0 20px rgba(100, 200, 255, 0.6), 0 0 30px rgba(100, 200, 255, 0.3); }
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 240, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+            transform: translate(-50%, -50%);
         }
     </style>
 </head>
 <body>
-    <!-- 开场标题 - 镜头2 -->
-    <div class="opening-title" id="openingTitle">价值溯源：一款新药的数字旅程</div>
-    
-    <!-- 蓝图面板 - 镜头10 -->
-    <div class="blueprint-panel" id="blueprintPanel">
-        <div class="blueprint-header">全息权属蓝图</div>
-        <div class="blueprint-item">
-            <div class="blueprint-label">贡献者</div>
-            <div class="blueprint-value">公共科研联盟 (100%)</div>
-        </div>
-        <div class="blueprint-item">
-            <div class="blueprint-label">关键规则</div>
-            <div class="blueprint-value">商业衍生品须反馈1%收入</div>
-        </div>
-        <div class="blueprint-highlight">⚡ 贡献被ECHO协议永久铭记</div>
-    </div>
-    
-    <!-- 警告框 - 镜头17 -->
-    <div class="warning-popup" id="warningPopup">
-        <div class="warning-title">⚠ 规则冲突</div>
-        <div class="warning-text">违反上游'1%反馈'规则<br/>调整无效</div>
-    </div>
-    
-    <!-- 工作台提示 - 镜头13 -->
-    <div class="workbench-hint" id="workbenchHint">拖拽资产至此处</div>
-    
+    <!-- Loading Screen -->
     <div class="loading" id="loading">
-        <div class="loading-content">
-            <div class="loading-logo"></div>
-            <div class="loading-text">INITIALIZING PROTOCOL</div>
-            <div class="loading-progress">
-                <div class="loading-progress-bar" id="progressBar"></div>
-            </div>
-            <div class="loading-percentage" id="progressText">0%</div>
+        <div class="loading-logo"></div>
+        <div class="loading-text">INITIALIZING PROTOCOL</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="progressBar"></div>
         </div>
+        <div class="loading-percentage" id="progressText">0%</div>
     </div>
-    
-    <div id="canvas-container"></div>
-    
-    <!-- 光标拖尾容器 -->
+
+    <!-- Cursor Trail Container -->
     <div id="cursorTrailContainer"></div>
-    
-    <!-- 悬停提示 -->
+
+    <!-- Hover Tooltip -->
     <div class="hover-tooltip" id="hoverTooltip">
         <div class="tooltip-content">
             <div class="tooltip-title" id="tooltipTitle">MOLECULE</div>
@@ -490,28 +621,157 @@
         </div>
         <div class="tooltip-arrow"></div>
     </div>
-    
-    <div class="ui-layer">
-        <div class="timecode" id="timecode">00:00 / 08:30</div>
-        <div class="phase-label" id="phaseLabel">阶段零：开场</div>
-        <div class="subtitle" id="subtitle"></div>
-        
-        <div class="controls">
-            <button onclick="setScene(0)" id="btn-0" class="btn-tech active">开场</button>
-            <button onclick="setScene(1)" id="btn-1" class="btn-tech">阶段一</button>
-            <button onclick="setScene(2)" id="btn-2" class="btn-tech">阶段二</button>
-            <button onclick="setScene(3)" id="btn-3" class="btn-tech">阶段三</button>
-            <button onclick="setScene(4)" id="btn-4" class="btn-tech">阶段四</button>
-            <button onclick="setScene(5)" id="btn-5" class="btn-gold">失败分支</button>
-            <button onclick="setScene(6)" id="btn-6" class="btn-gold">结尾</button>
-            <button onclick="togglePlay()" id="playBtn" class="btn-tech">▶ 播放完整版</button>
-            <button onclick="setScene(5)" id="btn-5" class="btn-gold">失败分支</button>
-            <button onclick="setScene(6)" id="btn-6" class="btn-gold">结尾</button>
-            <button onclick="togglePlay()" id="playBtn" class="btn-tech">▶ 播放完整版</button>
-            <button onclick="jumpToTime(0)" class="btn-tech">|&lt;</button>
-            <button onclick="jumpToTime(90)" class="btn-tech">阶段二</button>
-            <button onclick="jumpToTime(210)" class="btn-tech">阶段四</button>
+
+    <!-- Stage 0: Opening -->
+    <div class="stage stage-0 active" id="stage0">
+        <div class="bg-3d" id="bg3d-0"></div>
+        <div class="content glass-card">
+            <h1 class="glow-gold">价值溯源</h1>
+            <p>一款新药的数字旅程</p>
+            <button class="start-btn" onclick="goToStage(1)">开始探索</button>
         </div>
+    </div>
+
+    <!-- Stage 1: Phase 1 - Base Assets -->
+    <div class="stage stage-1" id="stage1">
+        <div class="bg-3d" id="bg3d-1"></div>
+        <div class="content glass-card">
+            <h2 class="glow-gold">阶段一：基础资产</h2>
+            <p style="color: rgba(220,230,240,0.8); font-size: 13px; margin-bottom: 20px; line-height: 1.6;">
+                在ECHO协议上，每一份数据都是可追溯的资产，每一次贡献都被永久记录。
+            </p>
+            <ul class="molecule-list">
+                <li><span class="dot cyan"></span>PDB STRUCTURE - 蛋白质结构数据</li>
+                <li><span class="dot green"></span>CHEMICAL DATA - 分子化合物库</li>
+                <li><span class="dot teal"></span>GENE SEQUENCE - 基因组信息</li>
+                <li><span class="dot mint"></span>VIRTUAL SCREEN - 虚拟筛选结果</li>
+                <li><span class="dot gold"></span>NeuroBlok - 协作发现成果</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Stage 2: Phase 2 - Collaboration -->
+    <div class="stage stage-2" id="stage2">
+        <div class="bg-3d" id="bg3d-2"></div>
+        <div class="content glass-card">
+            <h2 class="glow-cyan">阶段二：首次协作</h2>
+            <p style="color: rgba(220,230,240,0.8); font-size: 13px; margin-bottom: 20px; line-height: 1.6;">
+                不同来源的资产在工作台上融合，生成新的价值。每一次协作都留下不可磨灭的印记。
+            </p>
+            <div class="flow-step">
+                <div class="flow-num glow-cyan">1</div>
+                <div class="flow-text">拖拽资产至工作台</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num glow-cyan">2</div>
+                <div class="flow-text">智能合约自动记录贡献</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num glow-cyan">3</div>
+                <div class="flow-text">生成新的协作成果</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage 3: Phase 3 - Tokenization -->
+    <div class="stage stage-3" id="stage3">
+        <div class="bg-3d" id="bg3d-3"></div>
+        <div class="content glass-card">
+            <h2 class="glow-gold">阶段三：风险融资</h2>
+            <p style="color: rgba(220,230,240,0.8); font-size: 13px; margin-bottom: 20px; line-height: 1.6;">
+                ECHO协议实现了所有权与收益权的分离。您获得推进试验的资金，却从未丢失数据的灵魂。
+            </p>
+            <div class="comparison">
+                <div class="compare-item trad">
+                    <div class="compare-title" style="color: #888;">传统融资</div>
+                    <div class="compare-value" style="color: #666;">股权稀释</div>
+                </div>
+                <div class="compare-item echo">
+                    <div class="compare-title glow-gold">ECHO融资</div>
+                    <div class="compare-value glow-gold">收益代币</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage 4: Phase 4 - Value Distribution -->
+    <div class="stage stage-4" id="stage4">
+        <div class="bg-3d" id="bg3d-4"></div>
+        <div class="content glass-card">
+            <h2 class="glow-gold">阶段四：价值分配</h2>
+            <p>当新药成功上市，价值沿链条逆流而上，回馈每一个贡献者</p>
+        </div>
+        <div class="contributors-bar">
+            <div class="contributor">
+                <div class="contrib-dot" style="background: #64c8ff; box-shadow: 0 0 15px #64c8ff;"></div>
+                <div class="contrib-name">智药科技</div>
+            </div>
+            <div class="contributor">
+                <div class="contrib-dot" style="background: #64ff96; box-shadow: 0 0 15px #64ff96;"></div>
+                <div class="contrib-name">康源医院</div>
+            </div>
+            <div class="contributor">
+                <div class="contrib-dot" style="background: #64dddd; box-shadow: 0 0 15px #64dddd;"></div>
+                <div class="contrib-name">公共联盟</div>
+            </div>
+            <div class="contributor">
+                <div class="contrib-dot" style="background: #c8b464; box-shadow: 0 0 15px #c8b464;"></div>
+                <div class="contrib-name">元生资本</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage 5: Phase 5 - Failure Case -->
+    <div class="stage stage-5" id="stage5">
+        <div class="bg-3d" id="bg3d-5"></div>
+        <div class="content glass-card">
+            <h2>隐藏分支：失败清算</h2>
+            <p>即使失败，ECHO协议也能确保公平清算，保护每一位参与者的权益</p>
+        </div>
+        <div class="liquidation-info">
+            <div class="liquid-item">
+                <div class="liquid-amount">70万</div>
+                <div class="liquid-label">公共联盟</div>
+            </div>
+            <div class="liquid-item">
+                <div class="liquid-amount">840万</div>
+                <div class="liquid-label">智药科技</div>
+            </div>
+            <div class="liquid-item">
+                <div class="liquid-amount">420万</div>
+                <div class="liquid-label">康源医院</div>
+            </div>
+            <div class="liquid-item">
+                <div class="liquid-amount">300万</div>
+                <div class="liquid-label">元生资本</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage 6: Ending -->
+    <div class="stage stage-6" id="stage6">
+        <div class="bg-3d" id="bg3d-6"></div>
+        <div class="content glass-card">
+            <div class="echo-logo"></div>
+            <h2 class="glow-gold">价值重塑</h2>
+            <p>
+                在ECHO协议构建的生态中<br>
+                每一份贡献都被铭记<br>
+                每一次创新都被传承
+            </p>
+            <button class="restart-btn" onclick="goToStage(0)">重新开始</button>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-dot active" onclick="goToStage(0)"></div>
+        <div class="progress-dot" onclick="goToStage(1)"></div>
+        <div class="progress-dot" onclick="goToStage(2)"></div>
+        <div class="progress-dot" onclick="goToStage(3)"></div>
+        <div class="progress-dot" onclick="goToStage(4)"></div>
+        <div class="progress-dot gold" onclick="goToStage(5)"></div>
+        <div class="progress-dot gold" onclick="goToStage(6)"></div>
     </div>
 
     <script type="importmap">
@@ -522,1196 +782,120 @@
         }
     }
     </script>
-    
+
     <script type="module">
         import * as THREE from 'three';
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
         import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // ==================== 场景管理 ====================
-        const scenes = ['opening', 'phase1', 'phase2', 'phase3', 'phase4', 'failure', 'ending'];
-        let currentScene = 0;
+        // ==================== Global State ====================
+        let currentStage = 0;
+        const totalStages = 7;
 
-        // ==================== 核心设置 ====================
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0a30);
-        scene.fog = new THREE.FogExp2(0x0a0a30, 0.02);
+        // ==================== Stage Management ====================
+        window.goToStage = function(index) {
+            if (index < 0 || index >= totalStages) return;
 
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 20);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.toneMapping = THREE.ReinhardToneMapping;
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-        const controls = new OrbitControls(camera, renderer.domElement);
-        // ==================== 摄像机运动系统 ====================
-        const cameraRig = {
-            target: new THREE.Vector3(0, 0, 0),
-            current: new THREE.Vector3(0, 0, 20),
-            isMoving: false,
-            moveStartTime: 0,
-            moveDuration: 0,
-            startPos: new THREE.Vector3(),
-            endPos: new THREE.Vector3(),
-            startTarget: new THREE.Vector3(),
-            endTarget: new THREE.Vector3(),
-            
-            // 缓动函数
-            easeInOutCubic: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
-            easeOutExpo: (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
-            
-            // 移动到指定位置
-            moveTo: function(pos, target, duration = 2, easing = 'easeInOutCubic') {
-                this.startPos.copy(camera.position);
-                this.endPos.copy(pos);
-                this.startTarget.copy(this.target);
-                this.endTarget.copy(target || new THREE.Vector3(0, 0, 0));
-                this.moveStartTime = performance.now() / 1000;
-                this.moveDuration = duration;
-                this.isMoving = true;
-            },
-            
-            // 推镜效果（匀速）
-            dolly: function(startDist, endDist, duration = 8) {
-                const start = new THREE.Vector3(0, 0, startDist);
-                const end = new THREE.Vector3(0, 0, endDist);
-                this.moveTo(end, new THREE.Vector3(0, 0, 0), duration, 'linear');
-            },
-            
-            // 环绕运镜
-            orbit: function(radius, height, duration = 5) {
-                const angle = (performance.now() / 1000 / duration) * Math.PI * 2;
-                const x = Math.cos(angle) * radius;
-                const z = Math.sin(angle) * radius;
-                this.moveTo(new THREE.Vector3(x, height, z), new THREE.Vector3(0, 0, 0), 0.1);
-            },
-            
-            // 更新
-            update: function() {
-                if (!this.isMoving) return;
-                
-                const now = performance.now() / 1000;
-                const elapsed = now - this.moveStartTime;
-                const progress = Math.min(elapsed / this.moveDuration, 1);
-                
-                const eased = this.easeInOutCubic(progress);
-                
-                // 插值位置
-                camera.position.lerpVectors(this.startPos, this.endPos, eased);
-                this.target.lerpVectors(this.startTarget, this.endTarget, eased);
-                camera.lookAt(this.target);
-                
-                if (progress >= 1) {
-                    this.isMoving = false;
-                }
-            },
-            
-            // 场景预设运镜
-            presets: {
-                opening: {
-                    wide: { pos: [0, 0, 30], target: [0, 0, 0] },
-                    push: { pos: [0, 0, 15], target: [0, 0, 0], duration: 8 },
-                    penetrate: { pos: [0, 0, 5], target: [0, 0, 0], duration: 0.5 }
-                },
-                phase1: {
-                    overview: { pos: [0, 10, 20], target: [0, 0, 0] },
-                    closeup: { pos: [5, 2, 8], target: [0, 0, 0] },
-                    blueprint: { pos: [-8, 0, 12], target: [-5, 0, 0] }
-                },
-                phase2: {
-                    workbench: { pos: [12, 5, 10], target: [8, -2, 0] },
-                    collision: { pos: [5, 0, 8], target: [8, -2, 0] }
-                },
-                phase3: {
-                    split: { pos: [0, 0, 20], target: [0, 0, 0] },
-                    token: { pos: [8, 0, 12], target: [6, 0, 0] }
-                },
-                phase4: {
-                    hall: { pos: [0, 15, 25], target: [0, 0, 0] },
-                    pool: { pos: [0, -5, 10], target: [0, -2, 0] },
-                    trace: { pos: [-10, 5, 15], target: [0, 0, 0] }
-                },
-                failure: {
-                    broken: { pos: [0, 5, 15], target: [0, 3, 0] },
-                    liquidation: { pos: [0, -5, 12], target: [0, -2, 0] }
-                }
-            }
-        };
-
-        // ==================== 后处理管线 ====================
-        const composer = new EffectComposer(renderer);
-        const renderPass = new RenderPass(scene, camera);
-        composer.addPass(renderPass);
-
-        const bloomPass = new UnrealBloomPass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            1.5, 0.4, 0.85
-        );
-        composer.addPass(bloomPass);
-        
-        // 景深效果（Bokeh）
-        const bokehPass = new BokehPass(scene, camera, {
-            focus: 10.0,
-            aperture: 0.005,
-            maxblur: 0.01,
-            width: window.innerWidth,
-            height: window.innerHeight
-        });
-        bokehPass.enabled = false;
-        composer.addPass(bokehPass);
-        
-        // 色调映射输出
-        const outputPass = new OutputPass();
-        composer.addPass(outputPass);
-        
-        // 后处理控制器
-        const postProcess = {
-            setBloomStrength: (s) => { bloomPass.strength = s; },
-            setFocus: (dist, apt = 0.005) => {
-                bokehPass.uniforms['focus'].value = dist;
-                bokehPass.uniforms['aperture'].value = apt;
-                bokehPass.enabled = true;
-            },
-            disableBokeh: () => { bokehPass.enabled = false; }
-        };
-
-        // ==================== 光标拖尾系统 ====================
-        const cursorTrail = {
-            trails: [],
-            maxTrails: 8,
-            container: document.getElementById('cursorTrailContainer'),
-            isActive: false,
-            
-            init: function() {
-                for (let i = 0; i < this.maxTrails; i++) {
-                    const trail = document.createElement('div');
-                    trail.className = 'cursor-trail';
-                    trail.style.opacity = (1 - i / this.maxTrails) * 0.6;
-                    trail.style.transform = 'scale(' + (1 - i * 0.1) + ')';
-                    this.container.appendChild(trail);
-                    this.trails.push({
-                        element: trail,
-                        x: 0,
-                        y: 0,
-                        delay: i * 2
-                    });
-                }
-            },
-            
-            update: function(x, y) {
-                if (!this.isActive) return;
-                
-                this.trails.forEach((trail, i) => {
-                    setTimeout(() => {
-                        trail.element.style.left = x + 'px';
-                        trail.element.style.top = y + 'px';
-                    }, trail.delay * 10);
-                });
-            },
-            
-            activate: function() {
-                this.isActive = true;
-                this.trails.forEach(t => t.element.style.display = 'block');
-            },
-            
-            deactivate: function() {
-                this.isActive = false;
-                this.trails.forEach(t => t.element.style.display = 'none');
-            }
-        };
-        
-        cursorTrail.init();
-
-        // ==================== 鼠标交互系统 ====================
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let hoveredObject = null;
-        const tooltip = document.getElementById('hoverTooltip');
-        const tooltipTitle = document.getElementById('tooltipTitle');
-        const tooltipDesc = document.getElementById('tooltipDesc');
-        
-        // 分子信息映射
-        const moleculeInfo = {
-            'PDB-001': { title: 'PDB STRUCTURE', desc: 'Protein Data Bank Entry' },
-            'CHEM-002': { title: 'CHEMICAL DATA', desc: 'Molecular Structure Data' },
-            'GENE-003': { title: 'GENE SEQUENCE', desc: 'Genomic Information Asset' },
-            'VSCREEN-004': { title: 'VIRTUAL SCREEN', desc: 'Computational Screening Data' },
-            'NeuroBlok': { title: 'NEUROBLOK', desc: 'Collaborative Drug Discovery Asset' },
-            'token': { title: 'YIELD TOKEN', desc: 'Revenue Rights Certificate' },
-            'value_core': { title: 'VALUE CORE', desc: 'Network Consensus Center' }
-        };
-        
-        function updateTooltip(obj, x, y) {
-            const info = moleculeInfo[obj.name] || moleculeInfo[obj.userData.type] || 
-                        { title: 'ASSET', desc: 'Protocol Data Unit' };
-            
-            tooltipTitle.textContent = info.title;
-            tooltipDesc.textContent = info.desc;
-            
-            tooltip.style.left = x + 'px';
-            tooltip.style.top = y + 'px';
-            tooltip.classList.add('visible');
-        }
-        
-        function hideTooltip() {
-            tooltip.classList.remove('visible');
-        }
-        
-        function onMouseMove(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            
-            // 更新光标拖尾
-            cursorTrail.update(event.clientX, event.clientY);
-            
-            // 检测悬停
-            raycaster.setFromCamera(mouse, camera);
-            
-            // 收集所有可交互对象
-            const interactables = [];
-            Object.values(sceneGroups).forEach(group => {
-                if (group.visible) {
-                    group.children.forEach(child => {
-                        if (child.userData.type || child.name === 'token' || child.name === 'value_core') {
-                            interactables.push(child);
-                        }
-                    });
-                }
+            // Hide current stage
+            document.querySelectorAll('.stage').forEach(stage => {
+                stage.classList.remove('active');
             });
-            
-            const intersects = raycaster.intersectObjects(interactables, true);
-            
-            if (intersects.length > 0) {
-                document.body.style.cursor = 'pointer';
-                const obj = intersects[0].object;
-                const parent = obj.parent;
-                
-                // 高亮效果
-                if (hoveredObject !== parent) {
-                    // 恢复之前的高亮
-                    if (hoveredObject && hoveredObject.children[0] && hoveredObject.children[0].material) {
-                        hoveredObject.children[0].material.emissiveIntensity = hoveredObject.userData.originalEmissive || 0.2;
-                    }
-                    
-                    hoveredObject = parent;
-                    
-                    // 保存原始发光强度
-                    if (hoveredObject && hoveredObject.children[0] && hoveredObject.children[0].material) {
-                        if (!hoveredObject.userData.originalEmissive) {
-                            hoveredObject.userData.originalEmissive = hoveredObject.children[0].material.emissiveIntensity;
-                        }
-                        
-                        // 增强发光
-                        hoveredObject.children[0].material.emissiveIntensity = 0.8;
-                    }
-                    
-                    // 显示提示
-                    updateTooltip(parent, event.clientX, event.clientY);
-                } else {
-                    // 更新提示位置
-                    tooltip.style.left = event.clientX + 'px';
-                    tooltip.style.top = event.clientY + 'px';
-                }
-            } else {
-                document.body.style.cursor = 'default';
-                if (hoveredObject) {
-                    if (hoveredObject.children[0] && hoveredObject.children[0].material) {
-                        hoveredObject.children[0].material.emissiveIntensity = hoveredObject.userData.originalEmissive || 0.2;
-                    }
-                    hoveredObject = null;
-                    hideTooltip();
-                }
+
+            // Show new stage
+            document.getElementById(`stage${index}`).classList.add('active');
+
+            // Update progress dots
+            document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+
+            // Update scene visibility
+            Object.values(stageScenes).forEach((scene, i) => {
+                if (scene) scene.visible = (i === index);
+            });
+
+            currentStage = index;
+
+            // Trigger camera animation for this stage
+            animateCameraForStage(index);
+        };
+
+        // ==================== Scene Setup ====================
+        const scenes = [];
+        const cameras = [];
+        const renderers = [];
+        const composers = [];
+        const stageScenes = {};
+
+        // Initialize a scene for each stage
+        for (let i = 0; i < totalStages; i++) {
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x020208);
+            if (i === 5) scene.fog = new THREE.FogExp2(0x0a1a30, 0.02);
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ReinhardToneMapping;
+
+            const container = document.getElementById(`bg3d-${i}`);
+            if (container) container.appendChild(renderer.domElement);
+
+            // Post-processing
+            const composer = new EffectComposer(renderer);
+            const renderPass = new RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            const bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                1.5, 0.4, 0.85
+            );
+            composer.addPass(bloomPass);
+
+            const outputPass = new OutputPass();
+            composer.addPass(outputPass);
+
+            scenes.push(scene);
+            cameras.push(camera);
+            renderers.push(renderer);
+            composers.push(composer);
+            stageScenes[i] = scene;
+
+            // Add lights
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(ambientLight);
+
+            const cyanLight = new THREE.PointLight(0x64c8ff, 2, 100);
+            cyanLight.position.set(10, 10, 10);
+            scene.add(cyanLight);
+
+            const goldLight = new THREE.PointLight(0xc8b464, 1.5, 80);
+            goldLight.position.set(0, 5, 10);
+            scene.add(goldLight);
+
+            if (i === 5) {
+                const blueLight = new THREE.PointLight(0x6496c8, 1.5, 100);
+                blueLight.position.set(0, 10, 10);
+                scene.add(blueLight);
             }
         }
-        
-        window.addEventListener('mousemove', onMouseMove, false);
 
-        // ==================== 精确粒子系统 ====================
-        const particleSystem = {
-            particles: [],
-            codeParticles: [],
-            trailParticles: [],
-            dataFlowParticles: [],
-            
-            // 创建代码粒子（0/1/片假名）- 镜头2要求80个
-            createCodeParticles: function(count = 80) {
-                const chars = ['0', '1', 'ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク'];
-                const group = new THREE.Group();
-                group.name = 'codeParticles';
-                
-                for (let i = 0; i < count; i++) {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 32;
-                    canvas.height = 32;
-                    const ctx = canvas.getContext('2d');
-                    ctx.font = 'bold 20px monospace';
-                    ctx.fillStyle = '#64c8ff';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(chars[Math.floor(Math.random() * chars.length)], 16, 16);
-                    
-                    const texture = new THREE.CanvasTexture(canvas);
-                    const material = new THREE.SpriteMaterial({ 
-                        map: texture, 
-                        transparent: true,
-                        opacity: 0.8,
-                        blending: THREE.AdditiveBlending
-                    });
-                    const sprite = new THREE.Sprite(material);
-                    
-                    // 从中心向外随机分布
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 5 + Math.random() * 10;
-                    sprite.position.set(
-                        Math.cos(angle) * radius,
-                        (Math.random() - 0.5) * 8,
-                        Math.sin(angle) * radius
-                    );
-                    sprite.scale.set(0.5, 0.5, 0.5);
-                    
-                    sprite.userData = {
-                        velocity: new THREE.Vector3(
-                            (Math.random() - 0.5) * 0.1,
-                            0.05 + Math.random() * 0.1,
-                            (Math.random() - 0.5) * 0.1
-                        ),
-                        life: 1.0,
-                        decay: 0.02 + Math.random() * 0.02
-                    };
-                    
-                    group.add(sprite);
-                    this.codeParticles.push(sprite);
-                }
-                
-                scene.add(group);
-                return group;
-            },
-            
-            // 创建绿色飘散粒子带轨迹残影 - 镜头4要求60个
-            createGreenTrailParticles: function(count = 60) {
-                const group = new THREE.Group();
-                group.name = 'greenTrailParticles';
-                
-                for (let i = 0; i < count; i++) {
-                    const geometry = new THREE.SphereGeometry(0.08, 8, 8);
-                    const material = new THREE.MeshBasicMaterial({
-                        color: 0x64ff96,
-                        transparent: true,
-                        opacity: 0.9,
-                        blending: THREE.AdditiveBlending
-                    });
-                    const particle = new THREE.Mesh(geometry, material);
-                    
-                    // 从中心向外爆发
-                    const angle = Math.random() * Math.PI * 2;
-                    const elevation = (Math.random() - 0.5) * Math.PI;
-                    const speed = 0.2 + Math.random() * 0.3;
-                    
-                    particle.position.set(0, 0, 0);
-                    particle.userData = {
-                        velocity: new THREE.Vector3(
-                            Math.cos(angle) * Math.cos(elevation) * speed,
-                            Math.sin(elevation) * speed,
-                            Math.sin(angle) * Math.cos(elevation) * speed
-                        ),
-                        trail: [],
-                        maxTrailLength: 10,
-                        life: 1.0,
-                        decay: 0.008
-                    };
-                    
-                    group.add(particle);
-                    this.trailParticles.push(particle);
-                }
-                
-                scene.add(group);
-                return group;
-            },
-            
-            // 创建蓝色数据流点 - 镜头3要求25个
-            createDataFlowPoints: function(count = 25) {
-                const group = new THREE.Group();
-                group.name = 'dataFlowPoints';
-                
-                for (let i = 0; i < count; i++) {
-                    const geometry = new THREE.SphereGeometry(0.05, 8, 8);
-                    const material = new THREE.MeshBasicMaterial({
-                        color: 0x64c8ff,
-                        transparent: true,
-                        opacity: 0.6,
-                        blending: THREE.AdditiveBlending
-                    });
-                    const point = new THREE.Mesh(geometry, material);
-                    
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 15 + Math.random() * 20;
-                    point.position.set(
-                        Math.cos(angle) * radius,
-                        (Math.random() - 0.5) * 20,
-                        Math.sin(angle) * radius
-                    );
-                    
-                    point.userData = {
-                        angle: angle,
-                        radius: radius,
-                        speed: 0.0005 + Math.random() * 0.001,
-                        yOffset: point.position.y,
-                        ySpeed: 0.01 + Math.random() * 0.02
-                    };
-                    
-                    group.add(point);
-                    this.dataFlowParticles.push(point);
-                }
-                
-                scene.add(group);
-                return group;
-            },
-            
-            // 创建能量涟漪 - 镜头4要求
-            createEnergyRipple: function() {
-                const geometry = new THREE.RingGeometry(0.1, 0.5, 64);
-                const material = new THREE.MeshBasicMaterial({
-                    color: 0x64c8ff,
-                    transparent: true,
-                    opacity: 0.8,
-                    side: THREE.DoubleSide,
-                    blending: THREE.AdditiveBlending
-                });
-                const ripple = new THREE.Mesh(geometry, material);
-                ripple.rotation.x = -Math.PI / 2;
-                ripple.position.set(0, 0, 0);
-                ripple.userData = {
-                    scale: 1,
-                    maxScale: 200,
-                    life: 1.0,
-                    decay: 0.015
-                };
-                
-                scene.add(ripple);
-                this.particles.push(ripple);
-                return ripple;
-            },
-            
-            // 更新所有粒子
-            update: function() {
-                // 更新代码粒子
-                this.codeParticles.forEach((p, i) => {
-                    p.position.add(p.userData.velocity);
-                    p.userData.life -= p.userData.decay;
-                    p.material.opacity = p.userData.life * 0.8;
-                    
-                    if (p.userData.life <= 0) {
-                        // 重置粒子
-                        const angle = Math.random() * Math.PI * 2;
-                        const radius = 5 + Math.random() * 10;
-                        p.position.set(
-                            Math.cos(angle) * radius,
-                            (Math.random() - 0.5) * 8,
-                            Math.sin(angle) * radius
-                        );
-                        p.userData.life = 1.0;
-                    }
-                });
-                
-                // 更新绿色轨迹粒子
-                this.trailParticles.forEach(p => {
-                    // 保存轨迹点
-                    p.userData.trail.push(p.position.clone());
-                    if (p.userData.trail.length > p.userData.maxTrailLength) {
-                        p.userData.trail.shift();
-                    }
-                    
-                    p.position.add(p.userData.velocity);
-                    p.userData.life -= p.userData.decay;
-                    p.material.opacity = p.userData.life;
-                    
-                    if (p.userData.life <= 0) {
-                        p.visible = false;
-                    }
-                });
-                
-                // 更新数据流点
-                this.dataFlowParticles.forEach(p => {
-                    p.userData.angle += p.userData.speed;
-                    p.position.x = Math.cos(p.userData.angle) * p.userData.radius;
-                    p.position.z = Math.sin(p.userData.angle) * p.userData.radius;
-                    p.position.y = p.userData.yOffset + Math.sin(Date.now() * 0.001 * p.userData.ySpeed) * 2;
-                });
-                
-                // 更新能量涟漪
-                this.particles.forEach((p, i) => {
-                    if (p.userData.maxScale) {
-                        p.userData.scale += 2;
-                        p.scale.set(p.userData.scale, p.userData.scale, p.userData.scale);
-                        p.userData.life -= p.userData.decay;
-                        p.material.opacity = p.userData.life * 0.8;
-                        
-                        if (p.userData.life <= 0) {
-                            scene.remove(p);
-                            this.particles.splice(i, 1);
-                        }
-                    }
-                });
-            },
-            
-            // 触发粒子效果
-            triggerCodeParticles: function() {
-                this.codeParticles.forEach(p => {
-                    p.userData.life = 1.0;
-                    p.visible = true;
-                });
-            },
-            
-            triggerGreenExplosion: function() {
-                this.trailParticles.forEach(p => {
-                    p.position.set(0, 0, 0);
-                    p.userData.life = 1.0;
-                    p.visible = true;
-                    
-                    const angle = Math.random() * Math.PI * 2;
-                    const elevation = (Math.random() - 0.5) * Math.PI;
-                    const speed = 0.2 + Math.random() * 0.3;
-                    p.userData.velocity.set(
-                        Math.cos(angle) * Math.cos(elevation) * speed,
-                        Math.sin(elevation) * speed,
-                        Math.sin(angle) * Math.cos(elevation) * speed
-                    );
-                });
-            }
-        };
+        // Show only stage 0 initially
+        Object.values(stageScenes).forEach((scene, i) => {
+            if (scene) scene.visible = (i === 0);
+        });
 
-        // ==================== 连接线绘制动画系统 ====================
-        const lineAnimation = {
-            // 绘制连接线 - 镜头7要求银色细线+淡蓝色数据流
-            animateLineDraw: function(lineMesh, duration = 1500) {
-                const positions = lineMesh.geometry.attributes.position.array;
-                const originalPositions = positions.slice();
-                const pointCount = positions.length / 3;
-                
-                // 隐藏所有点
-                for (let i = 0; i < positions.length; i++) {
-                    positions[i] = 0;
-                }
-                lineMesh.geometry.attributes.position.needsUpdate = true;
-                
-                const startTime = Date.now();
-                
-                function draw() {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
-                    
-                    const currentPoint = Math.floor(easeProgress * pointCount);
-                    
-                    for (let i = 0; i <= currentPoint && i < pointCount; i++) {
-                        positions[i * 3] = originalPositions[i * 3];
-                        positions[i * 3 + 1] = originalPositions[i * 3 + 1];
-                        positions[i * 3 + 2] = originalPositions[i * 3 + 2];
-                    }
-                    
-                    lineMesh.geometry.attributes.position.needsUpdate = true;
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(draw);
-                    }
-                }
-                
-                draw();
-            },
-            
-            // 触发阶段二连接线绘制
-            triggerPhase2Lines: function() {
-                sceneGroups.phase2.children.forEach(child => {
-                    if (child.name && child.name.startsWith('connection')) {
-                        this.animateLineDraw(child, 1500);
-                    }
-                });
-            }
-        };
-
-        // ==================== 阶段三：融资对比动画 ====================
-        const phase3Animation = {
-            animateTokenForge: function() {
-                const token = sceneGroups.phase3.children.find(c => c.name === 'token');
-                const ring = sceneGroups.phase3.children.find(c =>
-                    c.geometry && c.geometry.type === 'TorusGeometry'
-                );
-                if (!token) return;
-                token.position.y = -5;
-                token.material.emissiveIntensity = 0;
-                const startTime = Date.now();
-                const duration = 1500;
-                function rise() {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const ease = 1 - Math.pow(1 - progress, 3);
-                    token.position.y = -5 + ease * 3.5;
-                    token.material.emissiveIntensity = ease * 0.5;
-                    token.rotation.z = ease * Math.PI * 2;
-                    if (ring) {
-                        ring.position.y = token.position.y;
-                        ring.scale.setScalar(1 + ease * 0.5);
-                    }
-                    if (progress < 1) requestAnimationFrame(rise);
-                }
-                rise();
-            }
-        };
-
-        // ==================== 阶段四：价值流动动画 ====================
-        const phase4Animation = {
-            valueFlowParticles: [],
-            createValueFlow: function() {
-                this.valueFlowParticles.forEach(p => scene.remove(p));
-                this.valueFlowParticles = [];
-                const contributors = [
-                    { pos: new THREE.Vector3(-8, 0, 0) },
-                    { pos: new THREE.Vector3(8, 0, 0) },
-                    { pos: new THREE.Vector3(0, 0, -8) },
-                    { pos: new THREE.Vector3(0, 0, 8) }
-                ];
-                contributors.forEach((c, idx) => {
-                    for (let i = 0; i < 15; i++) {
-                        const geo = new THREE.SphereGeometry(0.06, 8, 8);
-                        const mat = new THREE.MeshBasicMaterial({
-                            color: 0xc8b464,
-                            transparent: true,
-                            opacity: 0.8,
-                            blending: THREE.AdditiveBlending
-                        });
-                        const p = new THREE.Mesh(geo, mat);
-                        p.position.set(0, -2, 0);
-                        const direction = c.pos.clone().normalize();
-                        const speed = 0.03 + Math.random() * 0.02;
-                        p.userData = {
-                            velocity: direction.multiplyScalar(speed),
-                            life: 1.0,
-                            delay: idx * 200 + i * 50,
-                            startTime: Date.now()
-                        };
-                        scene.add(p);
-                        this.valueFlowParticles.push(p);
-                    }
-                });
-            },
-            updateValueFlow: function() {
-                this.valueFlowParticles.forEach(p => {
-                    const elapsed = Date.now() - p.userData.startTime;
-                    if (elapsed < p.userData.delay) return;
-                    p.position.add(p.userData.velocity);
-                    p.userData.life -= 0.005;
-                    p.material.opacity = p.userData.life;
-                    if (p.userData.life <= 0 || p.position.length() > 12) {
-                        p.position.set(0, -2, 0);
-                        p.userData.life = 1.0;
-                    }
-                });
-            },
-            lightUpContributors: function() {
-                const contributors = sceneGroups.phase4.children.filter(c =>
-                    c.name && ['智药科技', '康源医院', '公共联盟', '元生资本'].includes(c.name)
-                );
-                contributors.forEach((node, i) => {
-                    setTimeout(() => {
-                        const startTime = Date.now();
-                        function pulse() {
-                            const elapsed = Date.now() - startTime;
-                            const progress = Math.min(elapsed / 500, 1);
-                            node.material.emissiveIntensity = 0.2 + 0.6 * Math.sin(progress * Math.PI);
-                            if (progress < 1) requestAnimationFrame(pulse);
-                            else node.material.emissiveIntensity = 0.2;
-                        }
-                        pulse();
-                    }, i * 300);
-                });
-            }
-        };
-
-        // ==================== 碰撞冲击波系统 ====================
-        const collisionEffect = {
-            // 创建冲击波 - 镜头13要求
-            createShockwave: function(position, color = 0xc8b464) {
-                const group = new THREE.Group();
-                group.position.copy(position);
-                
-                // 主冲击波环
-                const ringGeo = new THREE.RingGeometry(0.1, 0.3, 64);
-                const ringMat = new THREE.MeshBasicMaterial({
-                    color: color,
-                    transparent: true,
-                    opacity: 0.8,
-                    side: THREE.DoubleSide,
-                    blending: THREE.AdditiveBlending
-                });
-                const ring = new THREE.Mesh(ringGeo, ringMat);
-                ring.rotation.x = -Math.PI / 2;
-                group.add(ring);
-                
-                // 金色能量粒子
-                for (let i = 0; i < 30; i++) {
-                    const pGeo = new THREE.SphereGeometry(0.05 + Math.random() * 0.05, 8, 8);
-                    const pMat = new THREE.MeshBasicMaterial({
-                        color: color,
-                        transparent: true,
-                        opacity: 0.9,
-                        blending: THREE.AdditiveBlending
-                    });
-                    const particle = new THREE.Mesh(pGeo, pMat);
-                    
-                    const angle = Math.random() * Math.PI * 2;
-                    const elevation = (Math.random() - 0.5) * Math.PI * 0.5;
-                    const speed = 0.1 + Math.random() * 0.2;
-                    
-                    particle.position.set(0, 0, 0);
-                    particle.userData = {
-                        velocity: new THREE.Vector3(
-                            Math.cos(angle) * Math.cos(elevation) * speed,
-                            Math.sin(elevation) * speed,
-                            Math.sin(angle) * Math.cos(elevation) * speed
-                        ),
-                        life: 1.0,
-                        decay: 0.02 + Math.random() * 0.01
-                    };
-                    
-                    group.add(particle);
-                }
-                
-                scene.add(group);
-                
-                // 动画
-                const startTime = Date.now();
-                const duration = 1000;
-                
-                function animate() {
-                    const elapsed = Date.now() - startTime;
-                    const progress = elapsed / duration;
-                    
-                    if (progress >= 1) {
-                        scene.remove(group);
-                        return;
-                    }
-                    
-                    // 冲击波扩散
-                    const scale = 1 + progress * 20;
-                    ring.scale.set(scale, scale, scale);
-                    ring.material.opacity = 0.8 * (1 - progress);
-                    
-                    // 粒子扩散
-                    group.children.forEach((child, i) => {
-                        if (i > 0 && child.userData.velocity) { // 跳过环
-                            child.position.add(child.userData.velocity);
-                            child.userData.life -= child.userData.decay;
-                            child.material.opacity = child.userData.life;
-                        }
-                    });
-                    
-                    requestAnimationFrame(animate);
-                }
-                
-                animate();
-            }
-        };
-
-        // ==================== 阶段五：破碎清算动画 ====================
-        const phase5Animation = {
-            cracks: [],
-            liquidationParticles: [],
-            
-            // 裂开动画 - 镜头26
-            animateCrack: function() {
-                const brokenMol = sceneGroups.failure.children.find(c => 
-                    c.userData.type === 'NeuroBlok'
-                );
-                if (!brokenMol) return;
-                
-                // 创建动态裂痕
-                for (let i = 0; i < 8; i++) {
-                    const crackGeo = new THREE.BufferGeometry();
-                    const startPoint = new THREE.Vector3(
-                        (Math.random() - 0.5) * 1.5,
-                        3 + (Math.random() - 0.5) * 2,
-                        (Math.random() - 0.5) * 1.5
-                    );
-                    const endPoint = startPoint.clone().add(new THREE.Vector3(
-                        (Math.random() - 0.5) * 3,
-                        (Math.random() - 0.5) * 3,
-                        (Math.random() - 0.5) * 3
-                    ));
-                    crackGeo.setFromPoints([startPoint, endPoint]);
-                    
-                    const crackMat = new THREE.LineBasicMaterial({ 
-                        color: 0xff6464, 
-                        transparent: true, 
-                        opacity: 0,
-                        linewidth: 2
-                    });
-                    const crack = new THREE.Line(crackGeo, crackMat);
-                    crack.name = 'dynamic_crack';
-                    sceneGroups.failure.add(crack);
-                    this.cracks.push(crack);
-                    
-                    // 裂痕出现动画
-                    setTimeout(() => {
-                        const startTime = Date.now();
-                        function fadeIn() {
-                            const elapsed = Date.now() - startTime;
-                            const progress = Math.min(elapsed / 400, 1);
-                            crack.material.opacity = progress * 0.8;
-                            if (progress < 1) requestAnimationFrame(fadeIn);
-                        }
-                        fadeIn();
-                    }, i * 80);
-                }
-                
-                // 分子变暗动画
-                brokenMol.children.forEach((child, idx) => {
-                    if (child.material) {
-                        const origEmissive = child.material.emissiveIntensity;
-                        const startTime = Date.now() + idx * 50;
-                        function dim() {
-                            const elapsed = Date.now() - startTime;
-                            const progress = Math.min(elapsed / 1000, 1);
-                            child.material.emissiveIntensity = origEmissive * (1 - progress * 0.8);
-                            child.material.opacity = 0.6 + progress * 0.2;
-                            if (progress < 1) requestAnimationFrame(dim);
-                        }
-                        setTimeout(dim, idx * 50);
-                    }
-                });
-            },
-            
-            // 清算流动画 - 镜头27-28
-            animateLiquidation: function() {
-                const pool = sceneGroups.failure.children.find(c => c.name === 'liquidation_pool');
-                if (!pool) return;
-                
-                // 资金池收缩动画
-                const startTime = Date.now();
-                const origScale = pool.scale.x;
-                function shrink() {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / 2000, 1);
-                    const ease = 1 - Math.pow(1 - progress, 3);
-                    const scale = origScale * (1 - ease * 0.3);
-                    pool.scale.set(scale, 1, scale);
-                    pool.material.emissiveIntensity = 0.1 * (1 - ease * 0.5);
-                    if (progress < 1) requestAnimationFrame(shrink);
-                }
-                shrink();
-                
-                // 创建清算粒子流
-                const contributors = [
-                    { pos: new THREE.Vector3(-6, 0, 0), amount: 0.7 },
-                    { pos: new THREE.Vector3(6, 0, 0), amount: 0.84 },
-                    { pos: new THREE.Vector3(0, 0, -6), amount: 0.42 },
-                    { pos: new THREE.Vector3(0, 0, 6), amount: 0.3 }
-                ];
-                
-                contributors.forEach((c, idx) => {
-                    const particleCount = Math.floor(c.amount * 20);
-                    for (let i = 0; i < particleCount; i++) {
-                        const geo = new THREE.SphereGeometry(0.05, 6, 6);
-                        const mat = new THREE.MeshBasicMaterial({
-                            color: 0x6496c8,
-                            transparent: true,
-                            opacity: 0.7
-                        });
-                        const p = new THREE.Mesh(geo, mat);
-                        p.position.set(0, -2, 0);
-                        
-                        const direction = c.pos.clone().normalize();
-                        p.userData = {
-                            velocity: direction.multiplyScalar(0.02 + Math.random() * 0.02),
-                            delay: idx * 500 + i * 30,
-                            startTime: Date.now()
-                        };
-                        
-                        sceneGroups.failure.add(p);
-                        this.liquidationParticles.push(p);
-                    }
-                });
-            },
-            
-            // 更新清算粒子
-            updateLiquidation: function() {
-                this.liquidationParticles.forEach(p => {
-                    const elapsed = Date.now() - p.userData.startTime;
-                    if (elapsed < p.userData.delay) return;
-                    
-                    p.position.add(p.userData.velocity);
-                    
-                    // 接近目标时淡出
-                    if (p.position.length() > 5) {
-                        p.material.opacity -= 0.01;
-                    }
-                    
-                    if (p.material.opacity <= 0) {
-                        p.position.set(0, -2, 0);
-                        p.material.opacity = 0.7;
-                    }
-                });
-            },
-            
-            // 裂痕闪烁
-            updateCracks: function() {
-                this.cracks.forEach(crack => {
-                    if (crack.material.opacity > 0) {
-                        crack.material.opacity = 0.6 + Math.sin(Date.now() * 0.003) * 0.2;
-                    }
-                });
-            }
-        };
-
-        // ==================== 分子生长动画系统 ====================
-        const growthAnimation = {
-            // 弹性生长曲线
-            elasticOut: function(t) {
-                return Math.sin(-13 * (t + 1) * Math.PI / 2) * Math.pow(2, -10 * t) + 1;
-            },
-            
-            // 分子从平台生长弹出 - 镜头6要求
-            animateMoleculeGrowth: function(molecule, delay = 0) {
-                molecule.scale.set(0.3, 0.3, 0.3);
-                molecule.visible = false;
-                
-                setTimeout(() => {
-                    molecule.visible = true;
-                    const duration = 800; // 0.8秒弹性动画
-                    const startTime = Date.now();
-                    
-                    function grow() {
-                        const elapsed = Date.now() - startTime;
-                        const progress = Math.min(elapsed / duration, 1);
-                        const scale = 0.3 + 0.7 * growthAnimation.elasticOut(progress);
-                        
-                        molecule.scale.set(scale, scale, scale);
-                        
-                        // 发光脉冲效果
-                        if (molecule.children[0] && molecule.children[0].material) {
-                            molecule.children[0].material.emissiveIntensity = 
-                                0.2 + Math.sin(progress * Math.PI) * 0.6;
-                        }
-                        
-                        if (progress < 1) {
-                            requestAnimationFrame(grow);
-                        }
-                    }
-                    
-                    grow();
-                }, delay);
-            },
-            
-            // 触发阶段一分子生长
-            triggerPhase1Growth: function() {
-                const molecules = sceneGroups.phase1.children.filter(c => c.userData.type);
-                molecules.forEach((mol, i) => {
-                    this.animateMoleculeGrowth(mol, i * 200); // 间隔200ms
-                });
-            }
-        };
-        const audioSystem = {
-            ctx: null,
-            oscillators: [],
-            gainNodes: [],
-            ambientNode: null,
-            
-            // dB转gain值 - 精确音频控制
-            dbToGain: function(db) {
-                return Math.pow(10, db / 20);
-            },
-            
-            init: function() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            },
-            
-            // 环境嗡鸣音（贯穿全程）- 精确实现
-            playAmbient: function() {
-                this.init();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                const filter = this.ctx.createBiquadFilter();
-                
-                osc.connect(filter);
-                filter.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                // 50Hz正弦波，-30dB，渐入0.5秒
-                osc.frequency.value = 50;
-                osc.type = 'sine';
-                filter.type = 'lowpass';
-                filter.frequency.value = 100;
-                
-                // 从-60dB渐入到-30dB，持续0.5秒
-                const startGain = this.dbToGain(-60);
-                const targetGain = this.dbToGain(-30);
-                gain.gain.setValueAtTime(startGain, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(targetGain, this.ctx.currentTime + 0.5);
-                
-                osc.start();
-                this.oscillators.push(osc);
-                this.gainNodes.push(gain);
-                this.ambientNode = { osc, gain };
-                
-                return { osc, gain };
-            },
-            
-            // 调整环境音量 - 用于镜头5恢复-23dB
-            setAmbientVolume: function(db, duration = 0.5) {
-                if (this.ambientNode && this.ambientNode.gain) {
-                    const targetGain = this.dbToGain(db);
-                    this.ambientNode.gain.gain.linearRampToValueAtTime(
-                        targetGain, 
-                        this.ctx.currentTime + duration
-                    );
-                }
-            },
-            
-            // 400Hz带通噪音 - 镜头3沙沙生物音
-            playBioNoise: function() {
-                this.init();
-                // 创建噪音缓冲区
-                const bufferSize = this.ctx.sampleRate * 2; // 2秒
-                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                
-                const noise = this.ctx.createBufferSource();
-                noise.buffer = buffer;
-                noise.loop = true;
-                
-                // 400Hz带通滤波
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.value = 400;
-                filter.Q.value = 1;
-                
-                const gain = this.ctx.createGain();
-                gain.gain.value = this.dbToGain(-40); // 背景音量
-                
-                noise.connect(filter);
-                filter.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                noise.start();
-                return { noise, gain };
-            },
-            
-            // 文字激活音 - 1.2kHz清脆电子音
-            playTextActivate: function() {
-                this.init();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                // 1.2kHz→1.8kHz，衰减0.15秒
-                osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1800, this.ctx.currentTime + 0.05);
-                osc.type = 'sine';
-                
-                gain.gain.setValueAtTime(this.dbToGain(-20), this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
-                
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.15);
-            },
-            
-            // 穿透音效 - 80Hz低频脉冲带混响
-            playPenetration: function() {
-                this.init();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                // 80Hz→40Hz，混响效果用滤波模拟
-                osc.frequency.setValueAtTime(80, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.4);
-                osc.type = 'sawtooth';
-                
-                gain.gain.setValueAtTime(this.dbToGain(-14), this.ctx.currentTime); // -14dB
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
-                
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.4);
-            },
-            
-            // 悬停提示音
-            playHover: function() {
-                this.init();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                
-                osc.frequency.value = 2000;
-                osc.type = 'sine';
-                
-                gain.gain.setValueAtTime(this.dbToGain(-26), this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
-                
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.05);
-            },
-            
-            // 停止所有音效
-            stopAll: function() {
-                this.oscillators.forEach(osc => {
-                    try { osc.stop(); } catch(e) {}
-                });
-                this.oscillators = [];
-                this.gainNodes = [];
-            }
-        };
-        
-        // 在场景切换时触发音效
-        const originalSetScene = window.setScene;
-        window.setScene = function(index) {
-            // 播放切换音效
-            if (index === 0) audioSystem.playTextActivate();
-            if (index === 2) audioSystem.playHover();
-            
-            // 调用原函数
-            const result = originalSetScene.apply(this, arguments);
-            return result;
-        };
-        
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
-        scene.add(ambientLight);
-
-        const cyanLight = new THREE.PointLight(0x64c8ff, 2, 100);
-        cyanLight.position.set(10, 10, 10);
-        scene.add(cyanLight);
-
-        const greenLight = new THREE.PointLight(0x64ff96, 1, 50);
-        greenLight.position.set(-5, -5, 5);
-        scene.add(greenLight);
-
-        const goldLight = new THREE.PointLight(0xc8b464, 1.5, 80);
-        goldLight.position.set(0, 5, 10);
-        scene.add(goldLight);
-
-        // ==================== 着色器定义 ====================
+        // ==================== Shaders ====================
         const membraneVertexShader = `
             varying vec2 vUv;
             varying vec3 vPosition;
             varying vec3 vNormal;
             uniform float uTime;
-            
+
             void main() {
                 vUv = uv;
                 vNormal = normal;
@@ -1730,7 +914,7 @@
             varying vec3 vPosition;
             varying vec3 vNormal;
             uniform float uTime;
-            
+
             void main() {
                 vec3 baseColor = vec3(0.39, 1.0, 0.59);
                 float fresnel = pow(1.0 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
@@ -1744,71 +928,11 @@
             }
         `;
 
-        // ==================== 场景元素容器 ====================
-        const sceneGroups = {
-            opening: new THREE.Group(),
-            phase1: new THREE.Group(),
-            phase2: new THREE.Group(),
-            phase3: new THREE.Group(),
-            phase4: new THREE.Group(),
-            failure: new THREE.Group(),
-            ending: new THREE.Group()
-        };
-
-        Object.values(sceneGroups).forEach(g => {
-            g.visible = false;
-            scene.add(g);
-        });
-
-        // ==================== 开场场景：细胞膜 ====================
-        function createOpeningScene() {
-            const group = sceneGroups.opening;
-            
-            // 三层细胞膜 - 文档要求精确大小
-            // 内层：50vmax直径，中层：75vmax，外层：100vmax
-            const membraneSizes = [5, 7.5, 10]; // 对应50/75/100vmax
-            const membraneDelays = [0, -1.3, -2.6]; // 波纹延迟
-            
-            for (let i = 0; i < 3; i++) {
-                const geometry = new THREE.SphereGeometry(membraneSizes[i], 128, 128);
-                const material = new THREE.ShaderMaterial({
-                    vertexShader: membraneVertexShader,
-                    fragmentShader: membraneFragmentShader,
-                    uniforms: { 
-                        uTime: { value: membraneDelays[i] },
-                        uOpacity: { value: 0.3 - i * 0.05 }
-                    },
-                    transparent: true,
-                    side: THREE.DoubleSide,
-                    depthWrite: false
-                });
-                const membrane = new THREE.Mesh(geometry, material);
-                membrane.userData = { layer: i, originalScale: 1 };
-                membrane.name = 'membrane_' + i;
-                group.add(membrane);
-            }
-
-            // 背景粒子
-            const particleCount = 1000;
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            for (let i = 0; i < particleCount * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 50;
-            }
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const material = new THREE.PointsMaterial({
-                color: 0x64c8ff, size: 0.1, transparent: true, opacity: 0.6
-            });
-            const particles = new THREE.Points(geometry, material);
-            particles.name = 'particles';
-            group.add(particles);
-        }
-
-        // ==================== 阶段一：分子模型 ====================
+        // ==================== Molecule Creator ====================
         function createMolecule(type, color, position, scale = 1) {
             const group = new THREE.Group();
-            
-            // 核心球体
+
+            // Core
             const coreGeo = new THREE.IcosahedronGeometry(0.8 * scale, 2);
             const coreMat = new THREE.MeshPhysicalMaterial({
                 color: color,
@@ -1822,14 +946,10 @@
             const core = new THREE.Mesh(coreGeo, coreMat);
             group.add(core);
 
-            // 轨道环
+            // Rings
             const ringGeo = new THREE.TorusGeometry(1.2 * scale, 0.05 * scale, 16, 100);
-            const ringMat = new THREE.MeshBasicMaterial({ 
-                color: color, 
-                transparent: true, 
-                opacity: 0.5 
-            });
-            
+            const ringMat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.5 });
+
             for (let i = 0; i < 3; i++) {
                 const ring = new THREE.Mesh(ringGeo, ringMat);
                 ring.rotation.x = Math.PI / 2 + i * (Math.PI / 3);
@@ -1837,7 +957,7 @@
                 group.add(ring);
             }
 
-            // 卫星粒子
+            // Satellites
             const satGeo = new THREE.SphereGeometry(0.15 * scale, 16, 16);
             const satMat = new THREE.MeshBasicMaterial({ color: color });
             for (let i = 0; i < 6; i++) {
@@ -1858,10 +978,50 @@
             return group;
         }
 
-        function createPhase1Scene() {
-            const group = sceneGroups.phase1;
-            
-            // 资产仓库平台
+        // ==================== Stage 0: Opening ====================
+        function initStage0() {
+            const scene = stageScenes[0];
+
+            // Cell membranes
+            const sizes = [5, 7.5, 10];
+            const delays = [0, -1.3, -2.6];
+
+            for (let i = 0; i < 3; i++) {
+                const geometry = new THREE.SphereGeometry(sizes[i], 128, 128);
+                const material = new THREE.ShaderMaterial({
+                    vertexShader: membraneVertexShader,
+                    fragmentShader: membraneFragmentShader,
+                    uniforms: { uTime: { value: delays[i] } },
+                    transparent: true,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+                const membrane = new THREE.Mesh(geometry, material);
+                membrane.name = 'membrane_' + i;
+                scene.add(membrane);
+            }
+
+            // Background particles
+            const particleCount = 1000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 50;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const material = new THREE.PointsMaterial({ color: 0x64c8ff, size: 0.1, transparent: true, opacity: 0.6 });
+            const particles = new THREE.Points(geometry, material);
+            particles.name = 'particles';
+            scene.add(particles);
+
+            cameras[0].position.set(0, 0, 25);
+        }
+
+        // ==================== Stage 1: Phase 1 ====================
+        function initStage1() {
+            const scene = stageScenes[1];
+
+            // Platform
             const platformGeo = new THREE.CylinderGeometry(8, 8, 0.5, 64);
             const platformMat = new THREE.MeshPhysicalMaterial({
                 color: 0xc8b464,
@@ -1872,9 +1032,9 @@
             });
             const platform = new THREE.Mesh(platformGeo, platformMat);
             platform.position.y = -3;
-            group.add(platform);
+            scene.add(platform);
 
-            // 5个分子模型
+            // Molecules
             const molecules = [
                 { type: 'PDB-001', color: 0x64c8ff, pos: new THREE.Vector3(-4, 0, -2), scale: 1 },
                 { type: 'CHEM-002', color: 0x64ff96, pos: new THREE.Vector3(0, 1, 2), scale: 0.9 },
@@ -1886,46 +1046,17 @@
             molecules.forEach(m => {
                 const mol = createMolecule(m.type, m.color, m.pos, m.scale);
                 mol.name = m.type;
-                group.add(mol);
+                scene.add(mol);
             });
 
-            // 关系图谱框架（左侧）
-            const frameGeo = new THREE.BoxGeometry(0.2, 12, 8);
-            const frameMat = new THREE.MeshPhysicalMaterial({
-                color: 0xc8c8dc,
-                metalness: 0.9,
-                roughness: 0.1,
-                transparent: true,
-                opacity: 0.3
-            });
-            const frame = new THREE.Mesh(frameGeo, frameMat);
-            frame.position.set(-12, 0, 0);
-            group.add(frame);
-
-            // 图谱节点
-            const nodePositions = [
-                new THREE.Vector3(-12, 3, 0),
-                new THREE.Vector3(-12, 1, 2),
-                new THREE.Vector3(-12, -1, -2),
-                new THREE.Vector3(-12, -3, 0)
-            ];
-            
-            nodePositions.forEach((pos, i) => {
-                const nodeGeo = new THREE.SphereGeometry(0.3, 32, 32);
-                const nodeMat = new THREE.MeshBasicMaterial({ 
-                    color: [0x64c8ff, 0x64ff96, 0x64dddd, 0xc8b464][i] 
-                });
-                const node = new THREE.Mesh(nodeGeo, nodeMat);
-                node.position.copy(pos);
-                group.add(node);
-            });
+            cameras[1].position.set(0, 8, 18);
         }
 
-        // ==================== 阶段二：工作台与协作 ====================
-        function createPhase2Scene() {
-            const group = sceneGroups.phase2;
-            
-            // 工作台
+        // ==================== Stage 2: Phase 2 ====================
+        function initStage2() {
+            const scene = stageScenes[2];
+
+            // Workbench
             const workbenchGeo = new THREE.BoxGeometry(6, 0.3, 4);
             const workbenchMat = new THREE.MeshPhysicalMaterial({
                 color: 0x1a1a40,
@@ -1937,113 +1068,59 @@
             const workbench = new THREE.Mesh(workbenchGeo, workbenchMat);
             workbench.position.set(8, -2, 0);
             workbench.name = 'workbench';
-            group.add(workbench);
+            scene.add(workbench);
 
-            // 工作台发光边框
-            const edges = new THREE.EdgesGeometry(workbenchGeo);
-            const lineMat = new THREE.LineBasicMaterial({ color: 0x64c8ff, linewidth: 2 });
-            const wireframe = new THREE.LineSegments(edges, lineMat);
-            workbench.add(wireframe);
-
-            // 提示文字板
-            const textGeo = new THREE.PlaneGeometry(4, 0.8);
-            const textMat = new THREE.MeshBasicMaterial({ 
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.8
-            });
-            const textPanel = new THREE.Mesh(textGeo, textMat);
-            textPanel.position.set(0, 1, 0);
-            workbench.add(textPanel);
-
-            // 源分子（左侧）
+            // Source molecules
             const chemMol = createMolecule('CHEM', 0x64ff96, new THREE.Vector3(-6, 0, -2), 0.9);
             chemMol.name = 'source_chem';
-            chemMol.userData.draggable = true;
-            group.add(chemMol);
+            scene.add(chemMol);
 
             const geneMol = createMolecule('GENE', 0x64dddd, new THREE.Vector3(-6, 0, 2), 0.95);
             geneMol.name = 'source_gene';
-            geneMol.userData.draggable = true;
-            group.add(geneMol);
+            scene.add(geneMol);
 
-            // 关系图谱连线
-            const lineMat2 = new THREE.LineBasicMaterial({ 
-                color: 0x64c8ff, 
-                transparent: true, 
-                opacity: 0.5 
-            });
-            
-            // CHEM -> 工作台
-            const line1Points = [
-                new THREE.Vector3(-6, 0, -2),
-                new THREE.Vector3(0, 0, -1),
-                new THREE.Vector3(8, -2, 0)
-            ];
-            const line1Geo = new THREE.BufferGeometry().setFromPoints(line1Points);
-            const line1 = new THREE.Line(line1Geo, lineMat2);
-            line1.name = 'connection_chem';
-            group.add(line1);
+            // Connection lines
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x64c8ff, transparent: true, opacity: 0.5 });
 
-            // GENE -> 工作台
-            const line2Points = [
-                new THREE.Vector3(-6, 0, 2),
-                new THREE.Vector3(0, 0, 1),
-                new THREE.Vector3(8, -2, 0)
-            ];
-            const line2Geo = new THREE.BufferGeometry().setFromPoints(line2Points);
-            const line2 = new THREE.Line(line2Geo, lineMat2);
-            line2.name = 'connection_gene';
-            group.add(line2);
+            const line1Points = [new THREE.Vector3(-6, 0, -2), new THREE.Vector3(0, 0, -1), new THREE.Vector3(8, -2, 0)];
+            const line1 = new THREE.Line(new THREE.BufferGeometry().setFromPoints(line1Points), lineMat);
+            scene.add(line1);
 
-            // 数据流动画粒子
-            const flowParticleGeo = new THREE.SphereGeometry(0.1, 8, 8);
-            const flowParticleMat = new THREE.MeshBasicMaterial({ color: 0x64ff96 });
-            
-            for (let i = 0; i < 10; i++) {
-                const particle = new THREE.Mesh(flowParticleGeo, flowParticleMat);
-                particle.userData = { 
-                    progress: i / 10, 
-                    speed: 0.01 + Math.random() * 0.01,
-                    path: line1Points 
-                };
-                particle.name = 'flow_particle';
-                group.add(particle);
-            }
+            const line2Points = [new THREE.Vector3(-6, 0, 2), new THREE.Vector3(0, 0, 1), new THREE.Vector3(8, -2, 0)];
+            const line2 = new THREE.Line(new THREE.BufferGeometry().setFromPoints(line2Points), lineMat);
+            scene.add(line2);
+
+            cameras[2].position.set(10, 5, 12);
         }
 
-        // ==================== 阶段三：融资对比 ====================
-        function createPhase3Scene() {
-            const group = sceneGroups.phase3;
-            
-            // 分割线
-            const splitGeo = new THREE.BoxGeometry(0.1, 12, 0.1);
-            const splitMat = new THREE.MeshBasicMaterial({ 
-                color: 0x64c8ff,
-                transparent: true,
-                opacity: 0.6
-            });
-            const splitLine = new THREE.Mesh(splitGeo, splitMat);
-            group.add(splitLine);
+        // ==================== Stage 3: Phase 3 ====================
+        function initStage3() {
+            const scene = stageScenes[3];
 
-            // 左侧：传统融资（灰色压抑）
-            const traditionalGeo = new THREE.BoxGeometry(4, 5, 2);
-            const traditionalMat = new THREE.MeshPhysicalMaterial({
+            // Split line
+            const splitGeo = new THREE.BoxGeometry(0.1, 12, 0.1);
+            const splitMat = new THREE.MeshBasicMaterial({ color: 0x64c8ff, transparent: true, opacity: 0.6 });
+            const splitLine = new THREE.Mesh(splitGeo, splitMat);
+            scene.add(splitLine);
+
+            // Traditional (gray)
+            const tradGeo = new THREE.BoxGeometry(4, 5, 2);
+            const tradMat = new THREE.MeshPhysicalMaterial({
                 color: 0x555555,
                 metalness: 0.3,
                 roughness: 0.8,
                 transparent: true,
                 opacity: 0.6
             });
-            const traditional = new THREE.Mesh(traditionalGeo, traditionalMat);
+            const traditional = new THREE.Mesh(tradGeo, tradMat);
             traditional.position.set(-6, 0, 0);
-            group.add(traditional);
+            scene.add(traditional);
 
-            // 右侧：ECHO融资（金色明亮）
+            // ECHO side (golden)
             const vscreenMol = createMolecule('VSCREEN', 0x96ffc8, new THREE.Vector3(6, 1, 0), 1.2);
-            group.add(vscreenMol);
+            scene.add(vscreenMol);
 
-            // 收益权令牌
+            // Token
             const tokenGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 32);
             const tokenMat = new THREE.MeshPhysicalMaterial({
                 color: 0xc8b464,
@@ -2055,21 +1132,24 @@
             const token = new THREE.Mesh(tokenGeo, tokenMat);
             token.position.set(6, -1.5, 0);
             token.rotation.x = Math.PI / 2;
-            group.add(token);
+            token.name = 'token';
+            scene.add(token);
 
-            // 令牌发光环
+            // Token ring
             const ringGeo = new THREE.TorusGeometry(1, 0.05, 16, 100);
             const ringMat = new THREE.MeshBasicMaterial({ color: 0xc8b464 });
             const ring = new THREE.Mesh(ringGeo, ringMat);
             ring.position.set(6, -1.5, 0);
-            group.add(ring);
+            scene.add(ring);
+
+            cameras[3].position.set(0, 0, 20);
         }
 
-        // ==================== 阶段四：价值分配 ====================
-        function createPhase4Scene() {
-            const group = sceneGroups.phase4;
-            
-            // 中央资金池
+        // ==================== Stage 4: Phase 4 ====================
+        function initStage4() {
+            const scene = stageScenes[4];
+
+            // Central pool
             const poolGeo = new THREE.CylinderGeometry(5, 5, 1, 64);
             const poolMat = new THREE.MeshPhysicalMaterial({
                 color: 0xc8b464,
@@ -2082,9 +1162,9 @@
             });
             const pool = new THREE.Mesh(poolGeo, poolMat);
             pool.position.y = -3;
-            group.add(pool);
+            scene.add(pool);
 
-            // 波纹效果（同心圆环）
+            // Ripples
             for (let i = 0; i < 5; i++) {
                 const rippleGeo = new THREE.RingGeometry(2 + i, 2.2 + i, 64);
                 const rippleMat = new THREE.MeshBasicMaterial({
@@ -2098,14 +1178,14 @@
                 ripple.position.y = -2.4;
                 ripple.userData = { index: i, speed: 0.02 };
                 ripple.name = 'ripple';
-                group.add(ripple);
+                scene.add(ripple);
             }
 
-            // NeuroBlok分子（上方）
+            // NeuroBlok above
             const neuroMol = createMolecule('NeuroBlok', 0xc8b464, new THREE.Vector3(0, 4, 0), 1.8);
-            group.add(neuroMol);
+            scene.add(neuroMol);
 
-            // 贡献节点（四周）
+            // Contributors
             const contributors = [
                 { name: '智药科技', color: 0x64c8ff, pos: new THREE.Vector3(-8, 0, 0) },
                 { name: '康源医院', color: 0x64ff96, pos: new THREE.Vector3(8, 0, 0) },
@@ -2125,34 +1205,24 @@
                 const node = new THREE.Mesh(nodeGeo, nodeMat);
                 node.position.copy(c.pos);
                 node.name = c.name;
-                group.add(node);
+                scene.add(node);
 
-                // 连接线到资金池
                 const linePoints = [c.pos, new THREE.Vector3(0, -2, 0)];
                 const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
-                const lineMat = new THREE.LineBasicMaterial({ 
-                    color: c.color, 
-                    transparent: true, 
-                    opacity: 0.4 
-                });
+                const lineMat = new THREE.LineBasicMaterial({ color: c.color, transparent: true, opacity: 0.4 });
                 const line = new THREE.Line(lineGeo, lineMat);
-                group.add(line);
+                scene.add(line);
             });
+
+            cameras[4].position.set(0, 12, 22);
         }
 
-        // ==================== 阶段五：隐藏分支 - 失败案例 ====================
-        function createFailureScene() {
-            const group = sceneGroups.failure;
-            
-            // 冷蓝色背景效果（通过雾和灯光）
-            const blueLight = new THREE.PointLight(0x6496c8, 1.5, 100);
-            blueLight.position.set(0, 10, 10);
-            group.add(blueLight);
-            
-            // 破裂的NeuroBlok分子
+        // ==================== Stage 5: Failure ====================
+        function initStage5() {
+            const scene = stageScenes[5];
+
+            // Broken NeuroBlok
             const brokenMol = createMolecule('NeuroBlok', 0x6496c8, new THREE.Vector3(0, 3, 0), 1.5);
-            
-            // 降低亮度和添加裂痕效果
             brokenMol.children.forEach(child => {
                 if (child.material) {
                     child.material.emissiveIntensity = 0.1;
@@ -2160,36 +1230,24 @@
                     child.material.transparent = true;
                 }
             });
-            
-            // 添加裂痕线条
+
+            // Cracks
             for (let i = 0; i < 5; i++) {
                 const crackGeo = new THREE.BufferGeometry();
                 const crackPoints = [
-                    new THREE.Vector3(
-                        (Math.random() - 0.5) * 2,
-                        (Math.random() - 0.5) * 2 + 3,
-                        (Math.random() - 0.5) * 2
-                    ),
-                    new THREE.Vector3(
-                        (Math.random() - 0.5) * 3,
-                        (Math.random() - 0.5) * 3 + 3,
-                        (Math.random() - 0.5) * 3
-                    )
+                    new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2 + 3, (Math.random() - 0.5) * 2),
+                    new THREE.Vector3((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3 + 3, (Math.random() - 0.5) * 3)
                 ];
                 crackGeo.setFromPoints(crackPoints);
-                const crackMat = new THREE.LineBasicMaterial({ 
-                    color: 0xff6464, 
-                    transparent: true, 
-                    opacity: 0.6 
-                });
+                const crackMat = new THREE.LineBasicMaterial({ color: 0xff6464, transparent: true, opacity: 0.6 });
                 const crack = new THREE.Line(crackGeo, crackMat);
                 crack.name = 'crack';
-                group.add(crack);
+                scene.add(crack);
             }
-            
-            group.add(brokenMol);
 
-            // 清算资金池（冷色调）
+            scene.add(brokenMol);
+
+            // Liquidation pool
             const poolGeo = new THREE.CylinderGeometry(4, 4, 0.8, 64);
             const poolMat = new THREE.MeshPhysicalMaterial({
                 color: 0x6496c8,
@@ -2202,93 +1260,16 @@
             });
             const pool = new THREE.Mesh(poolGeo, poolMat);
             pool.position.y = -3;
-            pool.name = 'liquidation_pool';
-            group.add(pool);
+            scene.add(pool);
 
-            // 清算流向（蓝色粒子流）
-            const contributors = [
-                { name: '公共联盟', color: 0x6496c8, pos: new THREE.Vector3(-6, 0, 0), amount: '70万' },
-                { name: '智药科技', color: 0x6496c8, pos: new THREE.Vector3(6, 0, 0), amount: '840万' },
-                { name: '康源医院', color: 0x6496c8, pos: new THREE.Vector3(0, 0, -6), amount: '420万' },
-                { name: '元生资本', color: 0x6496c8, pos: new THREE.Vector3(0, 0, 6), amount: '300万' }
-            ];
-
-            contributors.forEach(c => {
-                // 节点
-                const nodeGeo = new THREE.SphereGeometry(0.6, 32, 32);
-                const nodeMat = new THREE.MeshPhysicalMaterial({
-                    color: c.color,
-                    metalness: 0.3,
-                    roughness: 0.5,
-                    emissive: c.color,
-                    emissiveIntensity: 0.15,
-                    transparent: true,
-                    opacity: 0.7
-                });
-                const node = new THREE.Mesh(nodeGeo, nodeMat);
-                node.position.copy(c.pos);
-                node.name = c.name;
-                group.add(node);
-
-                // 连接线（虚线效果用多段短线模拟）
-                const linePoints = [c.pos, new THREE.Vector3(0, -2.5, 0)];
-                const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
-                const lineMat = new THREE.LineBasicMaterial({ 
-                    color: c.color, 
-                    transparent: true, 
-                    opacity: 0.3
-                });
-                const line = new THREE.Line(lineGeo, lineMat);
-                line.name = 'liquidation_line';
-                group.add(line);
-                
-                // 缓慢流动的粒子
-                for (let i = 0; i < 5; i++) {
-                    const pGeo = new THREE.SphereGeometry(0.08, 8, 8);
-                    const pMat = new THREE.MeshBasicMaterial({ 
-                        color: 0x96c8ff,
-                        transparent: true,
-                        opacity: 0.8
-                    });
-                    const p = new THREE.Mesh(pGeo, pMat);
-                    p.userData = {
-                        progress: i / 5,
-                        speed: 0.005 + Math.random() * 0.003,
-                        path: linePoints
-                    };
-                    p.name = 'liquidation_particle';
-                    group.add(p);
-                }
-            });
-            
-            // 失败提示文字板（半透明）
-            const hintGeo = new THREE.PlaneGeometry(8, 1.5);
-            const hintMat = new THREE.MeshBasicMaterial({
-                color: 0xff6464,
-                transparent: true,
-                opacity: 0.3,
-                side: THREE.DoubleSide
-            });
-            const hint = new THREE.Mesh(hintGeo, hintMat);
-            hint.position.set(0, 6, 0);
-            hint.name = 'failure_hint';
-            group.add(hint);
+            cameras[5].position.set(0, 5, 15);
         }
 
-        // ==================== 结尾场景：价值重塑 ====================
-        function createEndingScene() {
-            const group = sceneGroups.ending;
-            
-            // 暖色背景光（金蓝平衡）
-            const warmLight = new THREE.PointLight(0xc8b464, 1, 100);
-            warmLight.position.set(0, 10, 10);
-            group.add(warmLight);
-            
-            const coolLight = new THREE.PointLight(0x64c8ff, 0.8, 100);
-            coolLight.position.set(-10, 5, 10);
-            group.add(coolLight);
-            
-            // 中央光球（价值网络核心）
+        // ==================== Stage 6: Ending ====================
+        function initStage6() {
+            const scene = stageScenes[6];
+
+            // Central core
             const coreGeo = new THREE.SphereGeometry(2, 64, 64);
             const coreMat = new THREE.MeshPhysicalMaterial({
                 color: 0xc8b464,
@@ -2301,12 +1282,12 @@
             });
             const core = new THREE.Mesh(coreGeo, coreMat);
             core.name = 'value_core';
-            group.add(core);
-            
-            // 环绕轨道
+            scene.add(core);
+
+            // Orbit rings
             for (let i = 0; i < 3; i++) {
                 const orbitGeo = new THREE.TorusGeometry(3 + i * 1.5, 0.02, 16, 100);
-                const orbitMat = new THREE.MeshBasicMaterial({ 
+                const orbitMat = new THREE.MeshBasicMaterial({
                     color: i % 2 === 0 ? 0xc8b464 : 0x64c8ff,
                     transparent: true,
                     opacity: 0.4
@@ -2315,16 +1296,16 @@
                 orbit.rotation.x = Math.PI / 2 + i * 0.3;
                 orbit.rotation.y = i * 0.5;
                 orbit.name = 'orbit_ring';
-                group.add(orbit);
+                scene.add(orbit);
             }
-            
-            // 轨道上的小粒子（代表所有资产）
+
+            // Orbit particles
             const assets = ['PDB', 'CHEM', 'GENE', 'VSCREEN', 'TOKEN'];
             assets.forEach((name, i) => {
                 const angle = (i / assets.length) * Math.PI * 2;
                 const radius = 4 + Math.random() * 2;
                 const particleGeo = new THREE.SphereGeometry(0.15, 16, 16);
-                const particleMat = new THREE.MeshBasicMaterial({ 
+                const particleMat = new THREE.MeshBasicMaterial({
                     color: [0x64c8ff, 0x64ff96, 0x64dddd, 0x96ffc8, 0xc8b464][i]
                 });
                 const particle = new THREE.Mesh(particleGeo, particleMat);
@@ -2333,571 +1314,239 @@
                     (Math.random() - 0.5) * 2,
                     Math.sin(angle) * radius
                 );
-                particle.userData = { 
-                    angle: angle, 
-                    radius: radius, 
+                particle.userData = {
+                    angle: angle,
+                    radius: radius,
                     speed: 0.2 + Math.random() * 0.3,
                     yOffset: particle.position.y
                 };
                 particle.name = 'orbit_particle';
-                group.add(particle);
+                scene.add(particle);
             });
-            
-            // ECHO文字（3D立体）
-            const echoGeo = new THREE.BoxGeometry(4, 1, 0.5);
-            const echoMat = new THREE.MeshPhysicalMaterial({
-                color: 0xc8b464,
-                metalness: 0.8,
-                roughness: 0.2,
-                emissive: 0x64c8ff,
-                emissiveIntensity: 0.2
-            });
-            const echoText = new THREE.Mesh(echoGeo, echoMat);
-            echoText.position.set(0, -5, 0);
-            echoText.name = 'echo_text';
-            group.add(echoText);
-            
-            // 底部光晕
-            const glowGeo = new THREE.CircleGeometry(6, 64);
-            const glowMat = new THREE.MeshBasicMaterial({
-                color: 0xc8b464,
-                transparent: true,
-                opacity: 0.2,
-                side: THREE.DoubleSide
-            });
-            const glow = new THREE.Mesh(glowGeo, glowMat);
-            glow.rotation.x = -Math.PI / 2;
-            glow.position.y = -6;
-            group.add(glow);
+
+            cameras[6].position.set(0, 5, 18);
         }
 
-        window.setScene = function(index) {
-            currentScene = index;
-            timeline.isPlaying = false;
-            document.getElementById('playBtn').textContent = '▶ 播放完整版';
-            narrator.stop();
-            
-            // 隐藏所有场景
-            Object.values(sceneGroups).forEach(g => g.visible = false);
-            
-            // 显示当前场景
-            sceneGroups[scenes[index]].visible = true;
-            
-            // 更新按钮状态
-            document.querySelectorAll('.controls button').forEach((btn, i) => {
-                if (i < 7) btn.classList.toggle('active', i === index);
-            });
+        // Initialize all stages
+        initStage0();
+        initStage1();
+        initStage2();
+        initStage3();
+        initStage4();
+        initStage5();
+        initStage6();
 
-            // 更新阶段标签
-            const labels = ['阶段零：开场', '阶段一：基础资产', '阶段二：首次协作', '阶段三：风险融资', '阶段四：价值分配', '隐藏分支：失败案例', '结尾：价值重塑'];
-            document.getElementById('phaseLabel').textContent = labels[index];
-
-            // 场景切换时触发摄像机运镜
-            const presets = [
-                { pos: [0, 0, 25], target: [0, 0, 0], duration: 2 },
-                { pos: [0, 8, 18], target: [0, 0, 0], duration: 2 },
-                { pos: [10, 5, 12], target: [5, 0, 0], duration: 2 },
-                { pos: [0, 0, 20], target: [0, 0, 0], duration: 2 },
-                { pos: [0, 12, 22], target: [0, 0, 0], duration: 2 },
-                { pos: [0, 5, 15], target: [0, 2, 0], duration: 2 },
-                { pos: [0, 5, 18], target: [0, 0, 0], duration: 3 }
+        // ==================== Camera Animation ====================
+        function animateCameraForStage(stageIndex) {
+            const camera = cameras[stageIndex];
+            const targetPositions = [
+                { pos: [0, 0, 25], duration: 2 },
+                { pos: [0, 8, 18], duration: 2 },
+                { pos: [10, 5, 12], duration: 2 },
+                { pos: [0, 0, 20], duration: 2 },
+                { pos: [0, 12, 22], duration: 2 },
+                { pos: [0, 5, 15], duration: 2 },
+                { pos: [0, 5, 18], duration: 3 }
             ];
-            
-            const preset = presets[index];
-            if (preset) {
-                cameraRig.moveTo(
-                    new THREE.Vector3(...preset.pos),
-                    new THREE.Vector3(...preset.target),
-                    preset.duration
-                );
-            }
-        };
 
-        // ==================== 47镜头时间线系统 ====================
-        const timeline = {
-            currentTime: 0,
-            isPlaying: false,
-            shots: [
-                { time: 0, scene: 0, action: 'fadeIn', duration: 5, subtitle: '', camera: { pos: [0, 0, 30], target: [0, 0, 0], duration: 5 } },
-                { time: 5, scene: 0, action: 'titleShow', duration: 7, subtitle: '', camera: { pos: [0, 0, 25], target: [0, 0, 0], duration: 3 } },
-                { time: 12, scene: 0, action: 'membrane', duration: 8, subtitle: '在传统模式中，药物的成功是一座孤岛。', camera: { pos: [0, 0, 18], target: [0, 0, 0], duration: 4 } },
-                { time: 20, scene: 0, action: 'penetrate', duration: 5, subtitle: '但在ECHO协议上，它是一片被清晰测绘的雨林。', camera: { pos: [0, 0, 8], target: [0, 0, 0], duration: 1 } },
-                { time: 25, scene: 0, action: 'toSandbox', duration: 5, subtitle: '每一滴雨水都知道它来自哪片云。', camera: { pos: [0, 5, 22], target: [0, 0, 0], duration: 3 } },
-                { time: 30, scene: 1, action: 'moleculesAppear', duration: 8, subtitle: '', camera: { pos: [0, 10, 20], target: [0, 0, 0], duration: 4 } },
-                { time: 44, scene: 1, action: 'hoverPDB', duration: 8, subtitle: '', camera: { pos: [-5, 3, 10], target: [-3, 0, 0], duration: 3 } },
-                { time: 59, scene: 1, action: 'blueprintShow', duration: 12, subtitle: '即使是开源数据，其贡献也被ECHO协议铭记。', camera: { pos: [-8, 0, 12], target: [-5, 0, 0], duration: 4 } },
-                { time: 90, scene: 2, action: 'workbenchAppear', duration: 8, subtitle: '', camera: { pos: [12, 8, 15], target: [8, 0, 0], duration: 4 } },
-                { time: 108, scene: 2, action: 'dragStart', duration: 12, subtitle: '', camera: { pos: [0, 5, 12], target: [0, 0, 0], duration: 3 } },
-                { time: 120, scene: 2, action: 'collision', duration: 12, subtitle: '每一次协作都生成新的资产，权属像基因一样被继承和组合。', camera: { pos: [8, 2, 10], target: [8, -2, 0], duration: 4 } },
-                { time: 150, scene: 3, action: 'splitScreen', duration: 15, subtitle: '新药研发离不开资本，但传统融资往往意味着妥协。', camera: { pos: [0, 0, 22], target: [0, 0, 0], duration: 5 } },
-                { time: 165, scene: 3, action: 'tokenGenerate', duration: 15, subtitle: '而ECHO协议实现了所有权与收益权的分离。', camera: { pos: [8, 2, 12], target: [6, 0, 0], duration: 4 } },
-                { time: 195, scene: 3, action: 'fundFlow', duration: 15, subtitle: '您获得了推进试验的资金，却从未丢失数据的灵魂。', camera: { pos: [6, 0, 10], target: [6, -1, 0], duration: 5 } },
-                { time: 210, scene: 4, action: 'valueHall', duration: 10, subtitle: '', camera: { pos: [0, 15, 28], target: [0, 0, 0], duration: 5 } },
-                { time: 228, scene: 4, action: 'distribution', duration: 15, subtitle: '当新药成功上市，价值不再是集中于终点的盛宴。', camera: { pos: [0, 8, 18], target: [0, -2, 0], duration: 5 } },
-                { time: 255, scene: 4, action: 'traceBack', duration: 18, subtitle: '而是沿链条逆流而上的回馈。', camera: { pos: [-8, 5, 15], target: [0, 0, 0], duration: 6 } },
-                { time: 315, scene: 4, action: 'upstreamReward', duration: 15, subtitle: '哪怕是十年前的一份开源数据，也能收获应有的荣光。', camera: { pos: [-12, 2, 12], target: [-8, 0, 0], duration: 5 } }
-            ]
-        };
+            const target = targetPositions[stageIndex];
+            if (!target) return;
 
-        // 旁白系统
-        const narrator = {
-            speak: function(text) {
-                if (!window.speechSynthesis) return;
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang = 'zh-CN';
-                u.rate = 0.85;
-                u.pitch = 0.75;
-                u.volume = 0.9;
-                window.speechSynthesis.speak(u);
-            },
-            stop: function() {
-                if (window.speechSynthesis) {
-                    window.speechSynthesis.cancel();
-                }
-            }
-        };
+            const startPos = camera.position.clone();
+            const endPos = new THREE.Vector3(...target.pos);
+            const startTime = performance.now();
 
-        // 时间线更新
-        function updateTimeline() {
-            if (!timeline.isPlaying) return;
-            
-            timeline.currentTime += 0.016;
-            
-            // 格式化时间显示
-            const mins = Math.floor(timeline.currentTime / 60).toString().padStart(2, '0');
-            const secs = Math.floor(timeline.currentTime % 60).toString().padStart(2, '0');
-            document.getElementById('timecode').textContent = `${mins}:${secs} / 08:30`;
-            
-            // 检查当前镜头
-            const currentShot = timeline.shots.find((s, i) => {
-                const nextShot = timeline.shots[i + 1];
-                return timeline.currentTime >= s.time && 
-                       (!nextShot || timeline.currentTime < nextShot.time);
-            });
-            
-            if (currentShot && currentShot.subtitle) {
-                showSubtitle(currentShot.subtitle);
-                // 只在字幕刚显示时播报一次
-                if (Math.abs(timeline.currentTime - currentShot.time) < 0.02) {
-                    narrator.speak(currentShot.subtitle);
+            function animate() {
+                const elapsed = performance.now() - startTime;
+                const progress = Math.min(elapsed / (target.duration * 1000), 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+
+                camera.position.lerpVectors(startPos, endPos, eased);
+                camera.lookAt(0, 0, 0);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
                 }
             }
-            
-            // 触发音效和特效
-            if (currentShot && Math.abs(timeline.currentTime - currentShot.time) < 0.02) {
-                if (currentShot.action === 'penetrate') {
-                    audioSystem.playPenetration();
-                    // 镜头4: 触发绿色粒子爆发+能量涟漪
-                    particleSystem.triggerGreenExplosion();
-                    particleSystem.createEnergyRipple();
-                } else if (currentShot.action === 'titleShow') {
-                    audioSystem.playTextActivate();
-                    // 镜头2: 触发代码粒子
-                    particleSystem.triggerCodeParticles();
-                    // 显示标题
-                    const title = document.getElementById('openingTitle');
-                    title.classList.add('visible');
-                    setTimeout(() => title.classList.remove('visible'), 7000);
-                } else if (currentShot.action === 'hoverPDB') {
-                    audioSystem.playHover();
-                } else if (currentShot.action === 'moleculesAppear') {
-                    // 镜头6: 触发分子生长动画
-                    growthAnimation.triggerPhase1Growth();
-                } else if (currentShot.action === 'dragStart') {
-                    // 镜头12-13: 触发连接线绘制
-                    lineAnimation.triggerPhase2Lines();
-                    // 激活光标拖尾
-                    cursorTrail.activate();
-                } else if (currentShot.action === 'collision') {
-                    // 镜头13: 触发碰撞冲击波
-                    collisionEffect.createShockwave(new THREE.Vector3(8, -2, 0), 0xc8b464);
-                    // 停止光标拖尾
-                    cursorTrail.deactivate();
-                } else if (currentShot.action === 'blueprintShow') {
-                    // 镜头10: 显示蓝图面板
-                    document.getElementById('blueprintPanel').classList.add('visible');
-                } else if (currentShot.action === 'workbenchAppear') {
-                    // 镜头13: 显示工作台提示
-                    document.getElementById('workbenchHint').classList.add('visible');
-                } else if (currentShot.action === 'tokenGenerate') {
-                    // 镜头17: 显示警告框 + 触发令牌铸造
-                    document.getElementById('warningPopup').classList.add('visible');
-                    const blueprintPanel = document.getElementById('blueprintPanel');
-                    const workbenchHint = document.getElementById('workbenchHint');
-                    if (blueprintPanel) blueprintPanel.classList.remove('visible');
-                    if (workbenchHint) workbenchHint.classList.remove('visible');
-                    phase3Animation.animateTokenForge();
-                } else if (currentShot.action === 'fundFlow') {
-                    // 镜头18-23: 触发价值流动
-                    phase4Animation.createValueFlow();
-                    phase4Animation.lightUpContributors();
-                } else if (currentShot.action === 'distribution') {
-                    // 镜头26: 触发破碎动画
-                    phase5Animation.animateCrack();
-                } else if (currentShot.action === 'traceBack') {
-                    // 镜头27-28: 触发清算
-                    phase5Animation.animateLiquidation();
-                }
-            }
-            
-            // 精确运镜控制
-            if (activeScene) {
-                // 镜头3: 细胞膜接近 - 匀速推镜 0.6x→1.4x，每秒10%
-                if (activeScene.action === 'membrane') {
-                    const camProgress = (timeline.currentTime - activeScene.time) / activeScene.duration;
-                    const scale = 0.6 + camProgress * 0.8; // 0.6 → 1.4
-                    sceneGroups.opening.children.forEach(child => {
-                        if (child.name && child.name.startsWith('membrane')) {
-                            child.scale.setScalar(scale);
-                        }
-                    });
-                }
-                
-                // 镜头4: 穿透 - 加速推镜 0.2秒内速度提升30%
-                if (activeScene.action === 'penetrate') {
-                    const camProgress = (timeline.currentTime - activeScene.time) / activeScene.duration;
-                    // 前0.2秒加速，后面匀速
-                    let scale;
-                    if (camProgress < 0.04) { // 0.2秒 / 5秒 = 0.04
-                        // 加速阶段
-                        const accelProgress = camProgress / 0.04;
-                        scale = 1.4 + accelProgress * 0.3 * 2.2; // 加速30%
-                    } else {
-                        // 匀速阶段
-                        scale = 1.4 + 0.3 * 2.2 + (camProgress - 0.04) * 0.8;
-                    }
-                    scale = Math.min(scale, 2.2);
-                    sceneGroups.opening.children.forEach(child => {
-                        if (child.name && child.name.startsWith('membrane')) {
-                            child.scale.setScalar(scale);
-                        }
-                    });
-                }
-            }
-            
-            // 场景自动切换
-            const activeScene = timeline.shots.find((s, i) => {
-                const nextShot = timeline.shots[i + 1];
-                return timeline.currentTime >= s.time && 
-                       (!nextShot || timeline.currentTime < nextShot.time);
-            });
-            
-            if (activeScene && activeScene.scene !== currentScene) {
-                setScene(activeScene.scene);
-            }
-            
-            // 触发摄像机运动
-            if (activeScene && activeScene.camera) {
-                const cam = activeScene.camera;
-                const startTime = activeScene.time;
-                const camProgress = (timeline.currentTime - startTime) / cam.duration;
-                
-                // 只在摄像机运动期间更新
-                if (camProgress >= 0 && camProgress <= 1 && camProgress < 0.1) {
-                    cameraRig.moveTo(
-                        new THREE.Vector3(...cam.pos),
-                        new THREE.Vector3(...cam.target),
-                        cam.duration
-                    );
-                }
-            }
-            
-            // 后期效果控制
-            if (activeScene) {
-                // 特写镜头启用景深
-                if (activeScene.action === 'hoverPDB' || activeScene.action === 'blueprintShow') {
-                    postProcess.setFocus(10, 0.01);
-                } else if (activeScene.action === 'valueHall' || activeScene.action === 'splitScreen') {
-                    postProcess.disableBokeh();
-                }
-                
-                // 高能量场景增强Bloom
-                if (activeScene.action === 'penetrate' || activeScene.action === 'collision') {
-                    postProcess.setBloomStrength(2.5);
-                } else {
-                    postProcess.setBloomStrength(1.5);
-                }
-            }
-            
-            // 时间到自动停止
-            if (timeline.currentTime >= 510) {
-                timeline.isPlaying = false;
-                document.getElementById('playBtn').textContent = '▶ 播放';
-            }
+
+            animate();
         }
 
-        window.togglePlay = function() {
-            timeline.isPlaying = !timeline.isPlaying;
-            document.getElementById('playBtn').textContent = timeline.isPlaying ? '⏸ 暂停' : '▶ 播放';
-            
-            if (!timeline.isPlaying) {
-                narrator.stop();
-            }
-        };
+        // ==================== Animation Loop ====================
+        const clock = new THREE.Clock();
 
-        window.jumpToTime = function(seconds) {
-            timeline.currentTime = seconds;
-            timeline.isPlaying = false;
-            document.getElementById('playBtn').textContent = '▶ 播放';
-            narrator.stop();
-            
-            // 找到对应场景
-            const shot = timeline.shots.find(s => seconds >= s.time && seconds < s.time + s.duration) || 
-                        timeline.shots.slice().reverse().find(s => seconds >= s.time);
-            if (shot) {
-                setScene(shot.scene);
-            }
-        };
-
-        // ==================== 动画循环 ====================
         function animate() {
             requestAnimationFrame(animate);
-            
-            // 更新时间线系统
-            updateTimeline();
-            
-            // 使用时间线的时间
-            const animTime = timeline.currentTime;
-            
-            // 更新开场场景
-            if (sceneGroups.opening.visible) {
-                sceneGroups.opening.children.forEach((child, i) => {
-                    if (child.material?.uniforms?.uTime) {
-                        child.material.uniforms.uTime.value = animTime + i * 1.3;
-                    }
-                    if (child.name === 'particles') {
-                        child.rotation.y = animTime * 0.02;
-                    }
-                });
-            }
 
-            // 更新阶段一：分子旋转
-            if (sceneGroups.phase1.visible) {
-                sceneGroups.phase1.children.forEach(child => {
-                    if (child.userData.type) {
-                        // 核心旋转
-                        child.children[0].rotation.y += 0.01;
-                        child.children[0].rotation.x += 0.005;
-                        
-                        // 轨道环旋转
-                        for (let i = 1; i <= 3; i++) {
-                            if (child.children[i]) {
-                                child.children[i].rotation.x += 0.02 * (i % 2 === 0 ? 1 : -1);
-                                child.children[i].rotation.z += 0.01;
+            const time = clock.getElapsedTime();
+
+            // Animate each visible scene
+            Object.values(stageScenes).forEach((scene, stageIndex) => {
+                if (!scene || !scene.visible) return;
+
+                // Stage 0: Opening - rotate membranes and particles
+                if (stageIndex === 0) {
+                    scene.children.forEach(child => {
+                        if (child.material?.uniforms?.uTime) {
+                            child.material.uniforms.uTime.value = time;
+                        }
+                        if (child.name === 'particles') {
+                            child.rotation.y = time * 0.02;
+                        }
+                    });
+                }
+
+                // Stage 1: Phase 1 - rotate molecules
+                if (stageIndex === 1) {
+                    scene.children.forEach(child => {
+                        if (child.userData.type) {
+                            child.children[0].rotation.y += 0.01;
+                            child.children[0].rotation.x += 0.005;
+                            for (let i = 1; i <= 3; i++) {
+                                if (child.children[i]) {
+                                    child.children[i].rotation.x += 0.02 * (i % 2 === 0 ? 1 : -1);
+                                }
+                            }
+                            for (let i = 4; i < child.children.length; i++) {
+                                const sat = child.children[i];
+                                if (sat.name === 'satellite') {
+                                    sat.userData.angle += 0.02 * sat.userData.speed;
+                                    sat.position.x = Math.cos(sat.userData.angle) * sat.userData.radius;
+                                    sat.position.z = Math.sin(sat.userData.angle) * sat.userData.radius;
+                                }
                             }
                         }
-                        
-                        // 卫星粒子公转
-                        for (let i = 4; i < child.children.length; i++) {
-                            const sat = child.children[i];
-                            if (sat.name === 'satellite') {
-                                sat.userData.angle += 0.02 * sat.userData.speed;
-                                sat.position.x = Math.cos(sat.userData.angle) * sat.userData.radius;
-                                sat.position.z = Math.sin(sat.userData.angle) * sat.userData.radius;
-                            }
+                    });
+                }
+
+                // Stage 2: Phase 2 - rotate source molecules
+                if (stageIndex === 2) {
+                    scene.children.forEach(child => {
+                        if (child.userData.type) {
+                            child.children[0].rotation.y += 0.01;
                         }
-                    }
-                });
-            }
+                    });
+                }
 
-            // 更新阶段二：数据流动画
-            if (sceneGroups.phase2.visible) {
-                sceneGroups.phase2.children.forEach(child => {
-                    if (child.name === 'flow_particle') {
-                        child.userData.progress += child.userData.speed;
-                        if (child.userData.progress > 1) child.userData.progress = 0;
-                        
-                        const path = child.userData.path;
-                        const idx = Math.floor(child.userData.progress * (path.length - 1));
-                        const nextIdx = Math.min(idx + 1, path.length - 1);
-                        const localT = (child.userData.progress * (path.length - 1)) % 1;
-                        
-                        child.position.lerpVectors(path[idx], path[nextIdx], localT);
-                    }
-                    if (child.userData.type) {
-                        child.children[0].rotation.y += 0.01;
-                    }
-                });
-            }
-
-            // 更新阶段三：令牌旋转
-            if (sceneGroups.phase3.visible) {
-                sceneGroups.phase3.children.forEach(child => {
-                    if (child.geometry?.type === 'CylinderGeometry') {
-                        child.rotation.z += 0.02;
-                    }
-                    if (child.geometry?.type === 'TorusGeometry') {
-                        child.rotation.x += 0.01;
-                        child.rotation.y += 0.01;
-                    }
-                    if (child.userData.type) {
-                        child.children[0].rotation.y += 0.01;
-                    }
-                });
-            }
-
-            // 更新阶段四：波纹扩散
-            if (sceneGroups.phase4.visible) {
-                sceneGroups.phase4.children.forEach(child => {
-                    if (child.name === 'ripple') {
-                        child.scale.addScalar(child.userData.speed);
-                        if (child.scale.x > 1.5) {
-                            child.scale.set(1, 1, 1);
+                // Stage 3: Phase 3 - rotate token
+                if (stageIndex === 3) {
+                    scene.children.forEach(child => {
+                        if (child.name === 'token') {
+                            child.rotation.z += 0.02;
                         }
-                        child.material.opacity = 0.3 - child.userData.index * 0.05 - (child.scale.x - 1) * 0.2;
-                    }
-                    if (child.userData.type) {
-                        child.children[0].rotation.y += 0.01;
-                    }
-                });
-            }
+                        if (child.geometry?.type === 'TorusGeometry') {
+                            child.rotation.x += 0.01;
+                            child.rotation.y += 0.01;
+                        }
+                        if (child.userData.type) {
+                            child.children[0].rotation.y += 0.01;
+                        }
+                    });
+                }
 
-            // 更新阶段五：失败场景
-            if (sceneGroups.failure.visible) {
-                // 裂痕闪烁
-                sceneGroups.failure.children.forEach(child => {
-                    if (child.name === 'crack') {
-                        child.material.opacity = 0.4 + Math.sin(animTime * 3) * 0.2;
-                    }
-                    if (child.name === 'liquidation_particle') {
-                        // 缓慢清算流动
-                        child.userData.progress += child.userData.speed;
-                        if (child.userData.progress > 1) child.userData.progress = 0;
-                        
-                        const path = child.userData.path;
-                        const idx = Math.floor(child.userData.progress * (path.length - 1));
-                        const nextIdx = Math.min(idx + 1, path.length - 1);
-                        const localT = (child.userData.progress * (path.length - 1)) % 1;
-                        
-                        child.position.lerpVectors(path[idx], path[nextIdx], localT);
-                    }
-                    if (child.name === 'failure_hint') {
-                        // 提示板呼吸效果
-                        child.material.opacity = 0.2 + Math.sin(animTime * 2) * 0.1;
-                    }
-                    if (child.userData.type) {
-                        // 破裂分子缓慢旋转
-                        child.children[0].rotation.y += 0.002;
-                    }
-                });
-            }
+                // Stage 4: Phase 4 - ripple effect
+                if (stageIndex === 4) {
+                    scene.children.forEach(child => {
+                        if (child.name === 'ripple') {
+                            child.scale.addScalar(child.userData.speed);
+                            if (child.scale.x > 1.5) child.scale.set(1, 1, 1);
+                            child.material.opacity = 0.3 - child.userData.index * 0.05 - (child.scale.x - 1) * 0.2;
+                        }
+                        if (child.userData.type) {
+                            child.children[0].rotation.y += 0.01;
+                        }
+                    });
+                }
 
-            // 更新结尾场景
-            if (sceneGroups.ending.visible) {
-                sceneGroups.ending.children.forEach(child => {
-                    // 中央光球脉动
-                    if (child.name === 'value_core') {
-                        const scale = 1 + Math.sin(animTime * 2) * 0.05;
-                        child.scale.set(scale, scale, scale);
-                    }
-                    // 环绕轨道旋转
-                    if (child.name === 'orbit_ring') {
-                        child.rotation.z += 0.005;
-                    }
-                    // 轨道粒子公转
-                    if (child.name === 'orbit_particle') {
-                        child.userData.angle += child.userData.speed * 0.01;
-                        child.position.x = Math.cos(child.userData.angle) * child.userData.radius;
-                        child.position.z = Math.sin(child.userData.angle) * child.userData.radius;
-                        child.position.y = child.userData.yOffset + Math.sin(animTime + child.userData.angle) * 0.3;
-                    }
-                    // ECHO文字发光
-                    if (child.name === 'echo_text') {
-                        child.material.emissiveIntensity = 0.2 + Math.sin(animTime * 3) * 0.1;
-                    }
-                });
-            }
+                // Stage 5: Failure - crack flicker
+                if (stageIndex === 5) {
+                    scene.children.forEach(child => {
+                        if (child.name === 'crack') {
+                            child.material.opacity = 0.4 + Math.sin(time * 3) * 0.2;
+                        }
+                        if (child.userData.type) {
+                            child.children[0].rotation.y += 0.002;
+                        }
+                    });
+                }
 
-            // 更新摄像机运动
-            cameraRig.update();
-            
-            // 更新粒子系统
-            particleSystem.update();
-            
-            // 更新价值流动
-            phase4Animation.updateValueFlow();
-            
-            // 更新清算动画
-            phase5Animation.updateLiquidation();
-            phase5Animation.updateCracks();
+                // Stage 6: Ending - core pulse and orbits
+                if (stageIndex === 6) {
+                    scene.children.forEach(child => {
+                        if (child.name === 'value_core') {
+                            const scale = 1 + Math.sin(time * 2) * 0.05;
+                            child.scale.set(scale, scale, scale);
+                        }
+                        if (child.name === 'orbit_ring') {
+                            child.rotation.z += 0.005;
+                        }
+                        if (child.name === 'orbit_particle') {
+                            child.userData.angle += child.userData.speed * 0.01;
+                            child.position.x = Math.cos(child.userData.angle) * child.userData.radius;
+                            child.position.z = Math.sin(child.userData.angle) * child.userData.radius;
+                            child.position.y = child.userData.yOffset + Math.sin(time + child.userData.angle) * 0.3;
+                        }
+                    });
+                }
 
-            controls.update();
-            composer.render();
+                // Render this stage
+                composers[stageIndex].render();
+            });
         }
 
-        // ==================== 初始化 ====================
-        // 模拟加载进度
+        animate();
+
+        // ==================== Loading Screen ====================
         let loadProgress = 0;
         const progressBar = document.getElementById('progressBar');
         const progressText = document.getElementById('progressText');
-        
+
         function updateLoadingProgress() {
             try {
                 loadProgress += Math.random() * 15 + 5;
                 if (loadProgress > 100) loadProgress = 100;
-                
+
                 if (progressBar) progressBar.style.width = loadProgress + '%';
                 if (progressText) progressText.textContent = Math.floor(loadProgress) + '%';
-                
+
                 if (loadProgress < 100) {
                     setTimeout(updateLoadingProgress, 100 + Math.random() * 200);
                 } else {
-                    // 加载完成，延迟隐藏
                     setTimeout(() => {
                         const loading = document.getElementById('loading');
                         if (loading) loading.classList.add('hidden');
                     }, 500);
                 }
             } catch (e) {
-                console.error('Loading progress error:', e);
-                // 出错时直接隐藏loading
                 const loading = document.getElementById('loading');
                 if (loading) loading.classList.add('hidden');
             }
         }
-        
-        // 确保DOM加载完成后再开始
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', updateLoadingProgress);
         } else {
             updateLoadingProgress();
         }
-        
-        // 备用：3秒后强制隐藏loading（防止卡住）
+
         setTimeout(() => {
             const loading = document.getElementById('loading');
             if (loading && !loading.classList.contains('hidden')) {
                 loading.classList.add('hidden');
-                console.log('Loading timeout - force hide');
             }
         }, 3000);
-        
-        createOpeningScene();
-        createPhase1Scene();
-        createPhase2Scene();
-        createPhase3Scene();
-        createPhase4Scene();
-        createFailureScene();
-        createEndingScene();
-        
-        // 创建粒子系统
-        particleSystem.createCodeParticles(80);
-        particleSystem.createDataFlowPoints(25);
-        particleSystem.createGreenTrailParticles(60);
-        
-        setScene(0);
 
-        animate();
-
-        // 窗口调整
+        // ==================== Window Resize ====================
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
+            for (let i = 0; i < totalStages; i++) {
+                cameras[i].aspect = window.innerWidth / window.innerHeight;
+                cameras[i].updateProjectionMatrix();
+                renderers[i].setSize(window.innerWidth, window.innerHeight);
+                composers[i].setSize(window.innerWidth, window.innerHeight);
+            }
         });
 
-        console.log('ECHO Protocol v2 Initialized');
+        console.log('ECHO Protocol - Page Structure Initialized');
     </script>
 </body>
 </html>
