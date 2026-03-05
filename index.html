@@ -782,7 +782,53 @@
             }
         };
 
-        // ==================== 音效系统 ====================
+        // ==================== 分子生长动画系统 ====================
+        const growthAnimation = {
+            // 弹性生长曲线
+            elasticOut: function(t) {
+                return Math.sin(-13 * (t + 1) * Math.PI / 2) * Math.pow(2, -10 * t) + 1;
+            },
+            
+            // 分子从平台生长弹出 - 镜头6要求
+            animateMoleculeGrowth: function(molecule, delay = 0) {
+                molecule.scale.set(0.3, 0.3, 0.3);
+                molecule.visible = false;
+                
+                setTimeout(() => {
+                    molecule.visible = true;
+                    const duration = 800; // 0.8秒弹性动画
+                    const startTime = Date.now();
+                    
+                    function grow() {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const scale = 0.3 + 0.7 * growthAnimation.elasticOut(progress);
+                        
+                        molecule.scale.set(scale, scale, scale);
+                        
+                        // 发光脉冲效果
+                        if (molecule.children[0] && molecule.children[0].material) {
+                            molecule.children[0].material.emissiveIntensity = 
+                                0.2 + Math.sin(progress * Math.PI) * 0.6;
+                        }
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(grow);
+                        }
+                    }
+                    
+                    grow();
+                }, delay);
+            },
+            
+            // 触发阶段一分子生长
+            triggerPhase1Growth: function() {
+                const molecules = sceneGroups.phase1.children.filter(c => c.userData.type);
+                molecules.forEach((mol, i) => {
+                    this.animateMoleculeGrowth(mol, i * 200); // 间隔200ms
+                });
+            }
+        };
         const audioSystem = {
             ctx: null,
             oscillators: [],
@@ -1683,7 +1729,7 @@
                 }
             }
             
-            // 触发音效
+            // 触发音效和特效
             if (currentShot && Math.abs(timeline.currentTime - currentShot.time) < 0.02) {
                 if (currentShot.action === 'penetrate') {
                     audioSystem.playPenetration();
@@ -1696,6 +1742,9 @@
                     particleSystem.triggerCodeParticles();
                 } else if (currentShot.action === 'hoverPDB') {
                     audioSystem.playHover();
+                } else if (currentShot.action === 'moleculesAppear') {
+                    // 镜头6: 触发分子生长动画
+                    growthAnimation.triggerPhase1Growth();
                 }
             }
             
