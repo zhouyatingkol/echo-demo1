@@ -300,7 +300,122 @@
             disableBokeh: () => { bokehPass.enabled = false; }
         };
 
-        // ==================== 灯光系统 ====================
+        // ==================== 音效系统 ====================
+        const audioSystem = {
+            ctx: null,
+            oscillators: [],
+            gainNodes: [],
+            
+            init: function() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            
+            // 环境嗡鸣音（贯穿全程）
+            playAmbient: function() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const filter = this.ctx.createBiquadFilter();
+                
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.frequency.value = 50;
+                osc.type = 'sine';
+                filter.type = 'lowpass';
+                filter.frequency.value = 100;
+                gain.gain.value = 0.02;
+                
+                osc.start();
+                this.oscillators.push(osc);
+                this.gainNodes.push(gain);
+                
+                return { osc, gain };
+            },
+            
+            // 文字激活音
+            playTextActivate: function() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1800, this.ctx.currentTime + 0.05);
+                osc.type = 'sine';
+                
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            },
+            
+            // 穿透音效
+            playPenetration: function() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.frequency.setValueAtTime(80, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.4);
+                osc.type = 'sawtooth';
+                
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.4);
+            },
+            
+            // 悬停提示音
+            playHover: function() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.frequency.value = 2000;
+                osc.type = 'sine';
+                
+                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            },
+            
+            // 停止所有音效
+            stopAll: function() {
+                this.oscillators.forEach(osc => {
+                    try { osc.stop(); } catch(e) {}
+                });
+                this.oscillators = [];
+                this.gainNodes = [];
+            }
+        };
+        
+        // 在场景切换时触发音效
+        const originalSetScene = window.setScene;
+        window.setScene = function(index) {
+            // 播放切换音效
+            if (index === 0) audioSystem.playTextActivate();
+            if (index === 2) audioSystem.playHover();
+            
+            // 调用原函数
+            const result = originalSetScene.apply(this, arguments);
+            return result;
+        };
         const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
         scene.add(ambientLight);
 
@@ -985,6 +1100,17 @@
                 // 只在字幕刚显示时播报一次
                 if (Math.abs(timeline.currentTime - currentShot.time) < 0.02) {
                     narrator.speak(currentShot.subtitle);
+                }
+            }
+            
+            // 触发音效
+            if (currentShot && Math.abs(timeline.currentTime - currentShot.time) < 0.02) {
+                if (currentShot.action === 'penetrate') {
+                    audioSystem.playPenetration();
+                } else if (currentShot.action === 'titleShow') {
+                    audioSystem.playTextActivate();
+                } else if (currentShot.action === 'hoverPDB') {
+                    audioSystem.playHover();
                 }
             }
             
