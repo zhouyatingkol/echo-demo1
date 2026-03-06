@@ -652,6 +652,11 @@
             50% { opacity: 0.8; }
         }
         
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(255,215,0,0.8)); }
+        }
+        
         .pool-hint {
             text-align: center;
             color: rgba(150,170,200,0.4);
@@ -1090,6 +1095,186 @@
             font-family: 'Orbitron', sans-serif;
         }
         
+        /* ===== 融合结果展示（Stage 2.5） ===== */
+        .fusion-result-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .fusion-showcase {
+            flex: 1;
+            background: rgba(10, 15, 30, 0.9);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .fusion-showcase::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .fusion-graph {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fusion-center {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+        
+        .fusion-center-icon {
+            font-size: 100px;
+            margin-bottom: 15px;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(255,215,0,0.8)); }
+        }
+        
+        .fusion-center-name {
+            font-size: 24px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+        
+        .fusion-center-id {
+            font-size: 14px;
+            color: rgba(150,170,200,0.7);
+        }
+        
+        .fusion-source {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .fusion-source-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid;
+            background: rgba(10,15,30,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 0 20px currentColor;
+        }
+        
+        .fusion-source-info {
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .fusion-source-id {
+            font-size: 11px;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 2px;
+        }
+        
+        .fusion-source-share {
+            font-size: 12px;
+            color: #ffd700;
+        }
+        
+        .fusion-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.6), transparent);
+            transform-origin: left center;
+            pointer-events: none;
+        }
+        
+        .fusion-line::after {
+            content: '→';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffd700;
+            font-size: 12px;
+        }
+        
+        .fusion-ownership-flow {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(10, 15, 30, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .fusion-flow-item {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .fusion-flow-item::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffd700;
+            font-size: 20px;
+        }
+        
+        .fusion-flow-item:last-child::after {
+            display: none;
+        }
+        
+        .fusion-flow-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .fusion-flow-label {
+            font-size: 12px;
+            color: rgba(150,170,200,0.7);
+            margin-bottom: 5px;
+        }
+        
+        .fusion-flow-value {
+            font-size: 16px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
         /* ===== STAGE 4: 其他页面 ===== */
         .stage-content {
             display: flex;
@@ -1315,15 +1500,74 @@
             </div>
         </div>
         
-        <!-- 融合成功弹窗 -->
+        <!-- 融合成功弹窗 - 详细权属图谱展示 -->
         <div class="modal-overlay" id="fusionSuccessModal">
-            <div class="fusion-modal">
-                <div class="modal-icon" style="font-size: 60px; margin-bottom: 20px;">✨</div>
+            <div class="fusion-modal" style="max-width: 900px; width: 95%; max-height: 95vh; overflow-y: auto;">
+                <div class="modal-icon" style="font-size: 50px; margin-bottom: 10px;">✨</div>
                 <div class="modal-title">融合成功</div>
-                <div class="modal-subtitle" style="color: rgba(150,170,200,0.7); margin-bottom: 20px;">新资产已生成</div>
-                <div class="fusion-result">NeuroBlok-v2</div>
+                <div class="modal-subtitle" style="color: rgba(150,170,200,0.7); margin-bottom: 25px;">新资产已生成 | 详细的权属关系图谱</div>
+                
+                <!-- 融合资产图谱展示 -->
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,215,0,0.2); border-radius: 20px; padding: 30px; margin-bottom: 25px; position: relative; min-height: 300px;" id="fusionGraphContainer">
+                    <!-- 中心融合资产 -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10;">
+                        <div style="font-size: 80px; margin-bottom: 10px; animation: pulse 2s infinite; filter: drop-shadow(0 0 30px rgba(255,215,0,0.6));">✨</div>
+                        <div style="font-size: 22px; color: #ffd700; font-family: Orbitron; letter-spacing: 2px;">NeuroBlok</div>
+                        <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">融合资产 v2.0</div>
+                        <div style="font-size: 14px; color: #00f0ff; margin-top: 8px;">估值: <span id="fusionValue">5.0</span> ETH</div>
+                    </div>
+                    
+                    <!-- 来源资产将通过JS动态生成 -->
+                    <div id="fusionSourcesContainer"></div>
+                    
+                    <!-- 连线SVG -->
+                    <svg id="fusionLines" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></svg>
+                </div>
+                
+                <!-- 权属流转流程 -->
+                <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(0,240,255,0.1);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">🧬</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">来源资产</div>
+                        <div style="font-size: 14px; color: #00f0ff; font-family: Orbitron;" id="sourceCount">2个</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(255,215,0,0.2);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">🔄</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">融合规则</div>
+                        <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">加权合并</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(255,215,0,0.2);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">✨</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">生成资产</div>
+                        <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">NeuroBlok</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(0,255,136,0.1);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">📝</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">权属继承</div>
+                        <div style="font-size: 14px; color: #00ff88; font-family: Orbitron;">100%</div>
+                    </div>
+                </div>
+                
+                <!-- 详细权属列表 -->
+                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: left;">
+                    <div style="font-size: 12px; color: rgba(150,170,200,0.8); margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;">权益分配明细</div>
+                    <div id="fusionDetailList" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 融合规则说明 -->
+                <div style="background: rgba(255,215,0,0.08); border-left: 3px solid #ffd700; border-radius: 0 10px 10px 0; padding: 15px; margin-bottom: 25px; text-align: left; font-size: 12px; color: rgba(220,230,240,0.9); line-height: 1.6;">
+                    <strong style="color: #ffd700;">融合规则说明：</strong><br>
+                    • 所有选中资产的权属将合并至新资产<br>
+                    • 收益权按资产类型权重自动分配<br>
+                    • 上游资产的全部规则被继承<br>
+                    • 里程碑触发时自动结算收益
+                </div>
+                
                 <div class="modal-actions">
-                    <button class="btn btn-gold" onclick="closeFusionSuccessModal()">继续协作</button>
+                    <button class="btn" onclick="closeFusionSuccessModal()" style="border-color: rgba(0,240,255,0.4); color: #00f0ff;">返回协作池</button>
+                    <button class="btn btn-gold" onclick="goToFinanceFromFusion()">进入融资决策 →</button>
                 </div>
             </div>
         </div>
@@ -2306,13 +2550,119 @@
             if (neuroBlok) {
                 neuroBlok.minted = true;
                 neuroBlok.generatedFrom = poolAssets.map(p => p.id).join('+');
+                // 计算融合后的估值
+                neuroBlok.value = poolAssets.reduce((sum, p) => sum + p.value * 0.8, 0);
             }
+            // 生成权属图谱
+            renderFusionGraph();
             document.getElementById('fusionSuccessModal').classList.add('active');
+        }
+
+        function renderFusionGraph() {
+            const container = document.getElementById('fusionSourcesContainer');
+            const svg = document.getElementById('fusionLines');
+            const detailList = document.getElementById('fusionDetailList');
+            const sourceCount = document.getElementById('sourceCount');
+            const fusionValue = document.getElementById('fusionValue');
+            
+            if (!container || !poolAssets.length) return;
+            
+            // 更新来源数量
+            if (sourceCount) sourceCount.textContent = poolAssets.length + '个';
+            
+            // 计算融合估值
+            const totalValue = poolAssets.reduce((sum, p) => sum + p.value * 0.8, 0);
+            if (fusionValue) fusionValue.textContent = totalValue.toFixed(1);
+            
+            // 清空容器
+            container.innerHTML = '';
+            svg.innerHTML = '';
+            
+            const centerX = 50; // 百分比
+            const centerY = 50; // 百分比
+            const radius = 35; // 百分比
+            
+            const totalWeight = poolAssets.reduce((s, a) => s + a.weight, 0);
+            
+            // 生成来源资产节点
+            poolAssets.forEach((asset, index) => {
+                const angle = (index / poolAssets.length) * Math.PI * 2 - Math.PI / 2;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                const share = totalWeight > 0 ? ((asset.weight / totalWeight) * 100).toFixed(0) : 0;
+                
+                // 创建节点
+                const node = document.createElement('div');
+                node.style.cssText = `
+                    position: absolute;
+                    left: ${x}%;
+                    top: ${y}%;
+                    transform: translate(-50%, -50%);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 5px;
+                    z-index: 5;
+                `;
+                node.innerHTML = `
+                    <div style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid ${asset.color}; background: rgba(10,15,30,0.95); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 20px ${asset.color}60;">
+                        ${asset.icon}
+                    </div>
+                    <div style="background: rgba(0,0,0,0.7); padding: 5px 12px; border-radius: 15px; border: 1px solid ${asset.color}40; text-align: center;">
+                        <div style="font-size: 10px; font-family: Orbitron; color: ${asset.color}; margin-bottom: 2px;">${asset.id}</div>
+                        <div style="font-size: 11px; color: #ffd700;">${share}% 权益</div>
+                    </div>
+                `;
+                container.appendChild(node);
+                
+                // 绘制连线
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', `${x}%`);
+                line.setAttribute('y1', `${y}%`);
+                line.setAttribute('x2', `${centerX}%`);
+                line.setAttribute('y2', `${centerY}%`);
+                line.setAttribute('stroke', asset.color);
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-opacity', '0.5');
+                line.setAttribute('stroke-dasharray', '5,5');
+                svg.appendChild(line);
+            });
+            
+            // 生成详细列表
+            if (detailList) {
+                detailList.innerHTML = poolAssets.map(asset => {
+                    const share = totalWeight > 0 ? ((asset.weight / totalWeight) * 100).toFixed(0) : 0;
+                    return `
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; border-left: 3px solid ${asset.color};">
+                            <div style="font-size: 24px;">${asset.icon}</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; color: rgba(220,230,240,0.9); margin-bottom: 2px;">${asset.name}</div>
+                                <div style="font-size: 11px; color: ${asset.color};">${asset.id}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">${share}%</div>
+                                <div style="font-size: 10px; color: rgba(150,170,200,0.6);">权益比例</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
         }
 
         function closeFusionSuccessModal() {
             document.getElementById('fusionSuccessModal').classList.remove('active');
             clearPool();
+        }
+
+        function goToFinanceFromFusion() {
+            document.getElementById('fusionSuccessModal').classList.remove('active');
+            // 自动选择 NeuroBlok 进入融资
+            selectedFinanceAsset = assets.find(a => a.id === 'NeuroBlok');
+            goTo(3);
+            // 如果有 NeuroBlok，自动选中
+            if (selectedFinanceAsset) {
+                setTimeout(() => selectFinanceAsset('NeuroBlok'), 300);
+            }
         }
 
         // ===== Stage 3: 融资决策功能 =====
