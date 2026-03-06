@@ -1696,12 +1696,76 @@
             <div class="nav-item" onclick="goTo(3)">融资决策</div>
             <div class="nav-item active">价值分配</div>
         </div>
-        <div class="stage-content">
-            <h2 class="stage-title" style="color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5);">价值分配网络</h2>
+        
+        <!-- 发光背景装饰 -->
+        <div style="position: absolute; top: 20%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: float 6s ease-in-out infinite;"></div>
+        <div style="position: absolute; bottom: 20%; right: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,240,255,0.12) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: float 8s ease-in-out infinite reverse;"></div>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 60%); border-radius: 50%; pointer-events: none;"></div>
+        
+        <div class="stage-content" style="position: relative; z-index: 1;">
+            <h2 class="stage-title" style="color: #ffd700; text-shadow: 0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.3);">价值分配网络</h2>
             <p class="stage-subtitle">当新药成功上市，价值沿链条逆流而上</p>
-            <div style="font-size: 18px; color: #00f0ff; font-style: italic; margin: 30px 0; text-shadow: 0 0 20px rgba(0,240,255,0.3);">"即使是十年前的一份开源数据，也能收获应有的荣光"</div>
-            <button class="btn" onclick="goTo(0)">重新开始</button>
+            
+            <!-- 价值流动可视化 -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 30px; margin: 40px 0; flex-wrap: wrap;">
+                <div style="text-align: center; padding: 25px; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 20px; box-shadow: 0 0 30px rgba(255,215,0,0.2);">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🏥</div>
+                    <div style="font-size: 14px; color: #ffd700;">新药上市</div>
+                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">100M USD</div>
+                </div>
+                
+                <div style="font-size: 30px; color: #ffd700; animation: flowArrow 1.5s infinite;">←</div>
+                
+                <div style="text-align: center; padding: 25px; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3); border-radius: 20px; box-shadow: 0 0 30px rgba(0,240,255,0.2);">
+                    <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
+                    <div style="font-size: 14px; color: #00f0ff;">NeuroBlok</div>
+                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">40M USD</div>
+                </div>
+                
+                <div style="font-size: 30px; color: #00f0ff; animation: flowArrow 1.5s infinite 0.5s;">←</div>
+                
+                <div style="text-align: center; padding: 25px; background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3); border-radius: 20px; box-shadow: 0 0 30px rgba(0,255,136,0.2);">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🧬</div>
+                    <div style="font-size: 14px; color: #00ff88;">原始资产</div>
+                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">20M USD</div>
+                </div>
+            </div>
+            
+            <div style="font-size: 20px; color: #00f0ff; font-style: italic; margin: 30px 0; text-shadow: 0 0 30px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.3); animation: glow 2s ease-in-out infinite;">"即使是十年前的一份开源数据，也能收获应有的荣光"</div>
+            
+            <!-- 贡献者展示 -->
+            <div style="display: flex; gap: 20px; justify-content: center; margin: 30px 0; flex-wrap: wrap;">
+                <div style="padding: 15px 25px; background: rgba(0,0,0,0.4); border-radius: 30px; border: 1px solid rgba(255,215,0,0.2); display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">🏆</span>
+                    <span style="color: #ffd700; font-size: 13px;">AlphaFold Team 获得 2.5M USD</span>
+                </div>
+                <div style="padding: 15px 25px; background: rgba(0,0,0,0.4); border-radius: 30px; border: 1px solid rgba(0,240,255,0.2); display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">🏆</span>
+                    <span style="color: #00f0ff; font-size: 13px;">Genome Project 获得 1.8M USD</span>
+                </div>
+                <div style="padding: 15px 25px; background: rgba(0,0,0,0.4); border-radius: 30px; border: 1px solid rgba(0,255,136,0.2); display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">🏆</span>
+                    <span style="color: #00ff88; font-size: 13px;">开源社区 获得 500K USD</span>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="goTo(0)" style="margin-top: 20px;">重新开始</button>
         </div>
+        
+        <style>
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-20px); }
+            }
+            @keyframes flowArrow {
+                0%, 100% { opacity: 1; transform: translateX(0); }
+                50% { opacity: 0.5; transform: translateX(-10px); }
+            }
+            @keyframes glow {
+                0%, 100% { text-shadow: 0 0 30px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.3); }
+                50% { text-shadow: 0 0 40px rgba(0,240,255,0.8), 0 0 80px rgba(0,240,255,0.5); }
+            }
+        </style>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
