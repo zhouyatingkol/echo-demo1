@@ -809,8 +809,8 @@
                         </div>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button class="clear-btn" id="clearBtn" onclick="clearPool()" style="padding: 12px 25px; background: transparent; border: 1px solid rgba(255, 71, 87, 0.3); color: rgba(255, 100, 100, 0.8); font-size: 12px; cursor: pointer; border-radius: 25px; transition: all 0.3s; opacity: 0; pointer-events: none; font-family: 'Orbitron', sans-serif;">清空</button>
-                        <button class="fuse-btn" id="fuseBtn" onclick="window.performFusion()" style="padding: 14px 40px; border: 2px solid rgba(255, 215, 0, 0.4); background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(200, 150, 0, 0.1)); color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 30px; transition: all 0.3s; opacity: 0.4; pointer-events: none;">✨ 开始融合</button>
+                        <button class="clear-btn" id="clearBtn" style="padding: 12px 25px; background: transparent; border: 1px solid rgba(255, 71, 87, 0.3); color: rgba(255, 100, 100, 0.8); font-size: 12px; cursor: pointer; border-radius: 25px; transition: all 0.3s; opacity: 0; pointer-events: none; font-family: 'Orbitron', sans-serif;">清空</button>
+                        <button class="fuse-btn" id="fuseBtn" style="padding: 14px 40px; border: 2px solid rgba(255, 215, 0, 0.4); background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(200, 150, 0, 0.1)); color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 30px; transition: all 0.3s; opacity: 0.4; pointer-events: none;">✨ 开始融合</button>
                     </div>
                 </div>
             </div>
@@ -1154,7 +1154,12 @@
 
         // 初始化预览场景
         function initPreviewScene() {
+            if (!isWebGLAvailable()) {
+                console.warn('WebGL not available, skipping preview scene');
+                return;
+            }
             const canvas = document.getElementById('preview-canvas');
+            if (!canvas) return;
             previewScene = new THREE.Scene();
             previewCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
             previewCamera.position.z = 6;
@@ -1174,6 +1179,7 @@
 
         function animatePreview() {
             requestAnimationFrame(animatePreview);
+            if (!previewRenderer || !previewScene || !previewCamera) return;
             if (previewMolecule) {
                 previewMolecule.rotation.y += 0.005;
                 previewMolecule.rotation.x += 0.003;
@@ -1183,7 +1189,12 @@
 
         // 初始化弹窗场景
         function initModalScene() {
+            if (!isWebGLAvailable()) {
+                console.warn('WebGL not available, skipping modal scene');
+                return;
+            }
             const canvas = document.getElementById('modal-canvas');
+            if (!canvas) return;
             modalScene = new THREE.Scene();
             modalCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
             modalCamera.position.z = 5;
@@ -1331,6 +1342,14 @@
 
         // 背景粒子
         function initBackground() {
+            if (!isWebGLAvailable()) {
+                console.warn('WebGL not available, using fallback background');
+                const canvas = document.getElementById('bg-canvas');
+                if (canvas) {
+                    canvas.style.background = 'radial-gradient(circle at center, rgba(0,240,255,0.1) 0%, #020208 50%, #020208 100%)';
+                }
+                return;
+            }
             const canvas = document.getElementById('bg-canvas');
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -1448,6 +1467,18 @@
             
             // 设置协作池放置区
             setupCollabArea();
+            
+            // 绑定融合按钮点击事件
+            const fuseBtn = document.getElementById('fuseBtn');
+            if (fuseBtn) {
+                fuseBtn.onclick = performFusion;
+            }
+            
+            // 绑定清空按钮点击事件
+            const clearBtn = document.getElementById('clearBtn');
+            if (clearBtn) {
+                clearBtn.onclick = clearPool;
+            }
         }
         
         function setupCollabArea() {
@@ -1784,6 +1815,16 @@
             }, 200);
         }
         
+        // WebGL 检测
+        function isWebGLAvailable() {
+            try {
+                const canvas = document.createElement('canvas');
+                return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            } catch (e) {
+                return false;
+            }
+        }
+        
         function initFusionResult3D() {
             const canvas = document.getElementById('fusionResultCanvas');
             if (!canvas) return;
@@ -1791,6 +1832,12 @@
             // 清理旧内容
             const ctx = canvas.getContext('2d');
             if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 检查 WebGL 支持
+            if (!isWebGLAvailable()) {
+                console.warn('WebGL not available, skipping 3D result');
+                return;
+            }
             
             try {
                 const scene = new THREE.Scene();
