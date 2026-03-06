@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO Protocol - 漂亮设计版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #020208;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        
+        .nav-dots {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+            background: rgba(0,0,0,0.4);
+            padding: 10px 18px;
+            border-radius: 25px;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(0,240,255,0.3); border: 1px solid rgba(0,240,255,0.5); cursor: pointer; }
+        .dot.active { background: #00f0ff; box-shadow: 0 0 15px rgba(0,240,255,0.6); }
+        
+        .stage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; }
+        .stage.active { display: flex; flex-direction: column; }
+        
+        /* Stage 0 - 漂亮设计 */
+        .stage-0-content { display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .glass-card {
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            padding: 80px 120px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+        .main-title { font-size: 56px; letter-spacing: 12px; margin-bottom: 25px; color: #ffd700; text-shadow: 0 0 30px rgba(255,215,0,0.6); }
+        .subtitle { font-size: 18px; color: rgba(200,220,240,0.8); margin-bottom: 45px; letter-spacing: 4px; }
+        .btn {
+            padding: 16px 45px;
+            border: 2px solid rgba(0,240,255,0.5);
+            background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,100,200,0.1));
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 0 50px rgba(0,240,255,0.4); }
+        
+        /* Stage 1 & 2 */
+        .main-layout { display: flex; flex: 1; padding: 60px 40px 100px; gap: 25px; }
+        
+        /* 漂亮侧边栏 */
+        .sidebar {
+            width: 300px;
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .sidebar-title { color: #00f0ff; font-size: 18px; letter-spacing: 3px; margin-bottom: 8px; text-shadow: 0 0 10px rgba(0,240,255,0.3); }
+        .sidebar-subtitle { color: rgba(150,170,200,0.6); font-size: 12px; margin-bottom: 20px; }
+        
+        /* 漂亮卡片 */
+        .asset-card {
+            padding: 20px;
+            margin-bottom: 12px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .asset-card:hover { border-color: rgba(0,240,255,0.5); transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+        .asset-card.selected { border-color: #00f0ff; box-shadow: 0 0 25px rgba(0,240,255,0.4); }
+        .asset-icon { font-size: 36px; margin-bottom: 10px; }
+        .asset-name { font-size: 14px; letter-spacing: 1px; }
+        
+        /* 中央预览 - 发光圆圈 */
+        .forge-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .forge-circle {
+            width: 320px; height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,240,255,0.2) 0%, rgba(10,15,30,0.9) 60%, transparent 70%);
+            border: 2px solid rgba(0,240,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            margin-bottom: 40px;
+            box-shadow: 0 0 80px rgba(0,240,255,0.2);
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 60px rgba(0,240,255,0.2); }
+            50% { box-shadow: 0 0 100px rgba(0,240,255,0.4); }
+        }
+        
+        .mint-btn {
+            padding: 18px 55px;
+            border: 2px solid rgba(0,240,255,0.5);
+            background: linear-gradient(135deg, rgba(0,240,255,0.2), rgba(0,150,200,0.1));
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            letter-spacing: 4px;
+            cursor: pointer;
+            border-radius: 35px;
+            transition: all 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .mint-btn.active { opacity: 1; pointer-events: auto; }
+        .mint-btn.active:hover { transform: translateY(-3px); box-shadow: 0 0 60px rgba(0,240,255,0.6); }
+        
+        /* 协作池 */
+        .pool-area {
+            flex: 1;
+            border: 2px dashed rgba(255,215,0,0.3);
+            border-radius: 30px;
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            position: relative;
+            min-height: 350px;
+        }
+        .pool-hint {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: rgba(150,170,200,0.5);
+        }
+        .pool-hint-icon { font-size: 70px; margin-bottom: 20px; }
+        .pool-hint-text { font-size: 24px; letter-spacing: 4px; }
+        
+        .pool-item {
+            position: absolute;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .pool-item-icon { font-size: 36px; }
+        .pool-item-id { font-size: 10px; margin-top: 4px; }
+        .pool-item-remove {
+            position: absolute;
+            top: -8px; right: -8px;
+            width: 26px; height: 26px;
+            background: #ff4757;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 3px 10px rgba(255,71,87,0.5);
+        }
+        .pool-item:hover .pool-item-remove { opacity: 1; }
+        
+        /* 控制栏 - 金色 */
+        .control-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 35px;
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+        }
+        .stats { display: flex; gap: 40px; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 28px; color: #ffd700; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 20px rgba(255,215,0,0.4); }
+        .stat-label { font-size: 11px; color: rgba(150,170,200,0.6); letter-spacing: 2px; margin-top: 6px; }
+        
+        .fuse-btn {
+            padding: 16px 45px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(200,150,0,0.1));
+            border: 2px solid rgba(255,215,0,0.5);
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            letter-spacing: 3px;
+            cursor: not-allowed;
+            border-radius: 30px;
+            opacity: 0.4;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        .fuse-btn.active {
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 0 40px rgba(255,215,0,0.3);
+        }
+        .fuse-btn.active:hover { box-shadow: 0 0 60px rgba(255,215,0,0.6); transform: translateY(-2px); }
+        
+        .clear-btn {
+            padding: 12px 25px;
+            background: transparent;
+            border: 1px solid rgba(255, 71, 87, 0.4);
+            color: rgba(255, 100, 100, 0.9);
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 25px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        .clear-btn.visible { opacity: 1; pointer-events: auto; }
+        
+        /* 弹窗 - 精美 */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(30px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal.show { display: flex; }
+        .modal-box {
+            padding: 60px 90px;
+            background: linear-gradient(135deg, rgba(10,15,30,0.98), rgba(25,30,60,0.98));
+            border: 2px solid rgba(0,240,255,0.5);
+            border-radius: 35px;
+            text-align: center;
+            box-shadow: 0 0 120px rgba(0,240,255,0.3);
+        }
+        .modal-box.fusion { border-color: rgba(255,215,0,0.5); box-shadow: 0 0 120px rgba(255,215,0,0.3); }
+        .modal-icon { font-size: 70px; margin-bottom: 25px; }
+        .modal-title { font-size: 32px; color: #00f0ff; margin-bottom: 15px; letter-spacing: 4px; }
+        .modal-box.fusion .modal-title { color: #ffd700; }
+        .modal-text { color: rgba(200,220,240,0.7); margin-bottom: 30px; font-size: 16px; }
+        .modal-result {
+            font-size: 26px;
+            color: #00f0ff;
+            padding: 15px 40px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,240,255,0.3);
+            border-radius: 15px;
+            margin-bottom: 35px;
+            display: inline-block;
+            letter-spacing: 3px;
+        }
+        .modal-box.fusion .modal-result { color: #ffd700; border-color: rgba(255,215,0,0.3); }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="nav-dots">
+        <div class="dot active" onclick="goTo(0)"></div>
+        <div class="dot" onclick="goTo(1)"></div>
+        <div class="dot" onclick="goTo(2)"></div>
+    </div>
+    
+    <!-- Stage 0 -->
+    <div class="stage active" id="stage0">
+        <div class="stage-0-content">
+            <div class="glass-card">
+                <div class="main-title">ECHO</div>
+                <div class="subtitle">科学数据资产化协作平台</div>
+                <button class="btn" onclick="goTo(1)">开始体验</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stage 1 -->
+    <div class="stage" id="stage1">
+        <div class="main-layout">
+            <div class="sidebar">
+                <div class="sidebar-title">⬡ 数据资产库</div>
+                <div class="sidebar-subtitle">选择要铸造的数据资产</div>
+                <div id="assetList"></div>
+            </div>
+            
+            <div class="forge-area">
+                <div class="forge-circle" id="preview">⬡</div>
+                <button class="mint-btn" id="mintBtn" onclick="doMint()">⚡ 铸造资产</button>
+            </div>
+            
+            <div class="sidebar" style="border-color:rgba(255,215,0,0.2)">
+                <div class="sidebar-title" style="color:#ffd700">⬡ 铸造配置</div>
+                <div style="margin-top:20px;">
+                    <div style="margin-bottom:20px;">
+                        <div style="font-size:11px;color:rgba(150,170,200,0.6);margin-bottom:10px;">资产名称</div>
+                        <input type="text" value="NeuroData-001" style="width:100%;padding:12px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stage 2 -->
+    <div class="stage" id="stage2">
+        <div class="main-layout">
+            <div class="sidebar" style="border-color:rgba(255,215,0,0.2)">
+                <div class="sidebar-title" style="color:#ffd700">⬡ 已铸造资产</div>
+                <div class="sidebar-subtitle">点击资产添加到协作池</div>
+                <div id="mintedList"></div>
+            </div>
+            
+            <div style="flex:1;display:flex;flex-direction:column;">
+                <div class="pool-area" id="poolArea">
+                    <div class="pool-hint" id="poolHint">
+                        <div class="pool-hint-icon">⬡</div>
+                        <div class="pool-hint-text">协作池</div>
+                    </div>
+                </div>
+                
+                <div class="control-bar">
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-value" id="count">0</div>
+                            <div class="stat-label">已选资产</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="power">0</div>
+                            <div class="stat-label">融合力</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:15px;">
+                        <button class="clear-btn" id="clearBtn" onclick="clearPool()">清空</button>
+                        <button class="fuse-btn" id="fuseBtn" onclick="doFusion()">✨ 开始融合</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 弹窗 -->
+    <div class="modal" id="modal">
+        <div class="modal-box" id="modalBox">
+            <div class="modal-icon">🎉</div>
+            <div class="modal-title">铸造成功</div>
+            <div class="modal-text">资产已创建</div>
+            <div class="modal-result" id="modalResult">---</div>
+            <button class="btn" onclick="closeModal()">确定</button>
+        </div>
+    </div>
+
+    <script>
+        const assets = [
+            { id: 'PDB-001', name: '蛋白质结构', icon: '🧬', color: '#00f0ff', weight: 1.2 },
+            { id: 'CHEM-002', name: '化合物库', icon: '⚗️', color: '#00ff88', weight: 1.0 },
+            { id: 'GENE-003', name: '基因序列', icon: '🧪', color: '#0088ff', weight: 1.5 },
+            { id: 'SCREEN-004', name: '虚拟筛选', icon: '💻', color: '#88ffcc', weight: 0.8 },
+            { id: 'ASSAY-005', name: '实验数据', icon: '📊', color: '#a29bfe', weight: 1.3 }
+        ];
+        
+        let selected = null;
+        let minted = [];
+        let pool = [];
+        
+        // 背景
+        function initBg() {
+            const c = document.getElementById('bg-canvas');
+            const x = c.getContext('2d');
+            c.width = innerWidth; c.height = innerHeight;
+            const p = Array(80).fill(0).map(() => ({
+                x: Math.random() * c.width, y: Math.random() * c.height,
+                vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5, s: Math.random() * 2
+            }));
+            function loop() {
+                x.fillStyle = 'rgba(2,2,8,0.1)'; x.fillRect(0,0,c.width,c.height);
+                x.fillStyle = 'rgba(0,240,255,0.5)';
+                p.forEach(o => { o.x += o.vx; o.y += o.vy; if(o.x<0||o.x>c.width)o.vx*=-1; if(o.y<0||o.y>c.height)o.vy*=-1; x.beginPath(); x.arc(o.x,o.y,o.s,0,7); x.fill(); });
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+        
+        function init() {
+            initBg();
+            const list = document.getElementById('assetList');
+            assets.forEach(a => {
+                const d = document.createElement('div');
+                d.className = 'asset-card';
+                d.innerHTML = `<div class="asset-icon">${a.icon}</div><div class="asset-name">${a.name}</div>`;
+                d.onclick = () => select(a, d);
+                list.appendChild(d);
+            });
+        }
+        
+        function select(a, d) {
+            document.querySelectorAll('.asset-card').forEach(c => c.classList.remove('selected'));
+            d.classList.add('selected');
+            selected = a;
+            const p = document.getElementById('preview');
+            p.textContent = a.icon;
+            p.style.color = a.color;
+            p.style.borderColor = a.color;
+            p.style.boxShadow = `0 0 80px ${a.color}40`;
+            document.getElementById('mintBtn').classList.add('active');
+        }
+        
+        function doMint() {
+            if (!selected) return;
+            minted.push(selected);
+            showModal('铸造成功', '资产已创建', selected.id, false);
+            updateMintedList();
+        }
+        
+        function updateMintedList() {
+            const list = document.getElementById('mintedList');
+            list.innerHTML = '';
+            minted.forEach(a => {
+                const d = document.createElement('div');
+                d.className = 'asset-card';
+                d.style.borderColor = a.color + '40';
+                d.innerHTML = `<div class="asset-icon" style="color:${a.color}">${a.icon}</div><div class="asset-name">${a.name}</div>`;
+                d.onclick = () => addToPool(a);
+                list.appendChild(d);
+            });
+        }
+        
+        function addToPool(a) {
+            if (pool.find(p => p.id === a.id)) return;
+            pool.push(a);
+            document.getElementById('poolHint').style.display = 'none';
+            
+            const el = document.createElement('div');
+            el.className = 'pool-item';
+            el.style.borderColor = a.color;
+            el.style.color = a.color;
+            el.style.left = (60 + Math.random() * 300) + 'px';
+            el.style.top = (60 + Math.random() * 150) + 'px';
+            el.innerHTML = `
+                <div class="pool-item-icon">${a.icon}</div>
+                <div class="pool-item-id">${a.id}</div>
+                <div class="pool-item-remove" onclick="removeFromPool('${a.id}',this)">×</div>
+            `;
+            document.getElementById('poolArea').appendChild(el);
+            updateStats();
+        }
+        
+        function removeFromPool(id, btn) {
+            pool = pool.filter(p => p.id !== id);
+            btn.parentElement.remove();
+            if (pool.length === 0) document.getElementById('poolHint').style.display = 'block';
+            updateStats();
+        }
+        
+        function clearPool() {
+            pool = [];
+            document.querySelectorAll('.pool-item').forEach(el => el.remove());
+            document.getElementById('poolHint').style.display = 'block';
+            updateStats();
+        }
+        
+        function updateStats() {
+            document.getElementById('count').textContent = pool.length;
+            const power = pool.reduce((s, p) => s + p.weight, 0);
+            document.getElementById('power').textContent = power.toFixed(1);
+            
+            document.getElementById('fuseBtn').classList.toggle('active', pool.length >= 2);
+            document.getElementById('clearBtn').classList.toggle('visible', pool.length > 0);
+        }
+        
+        function doFusion() {
+            if (pool.length < 2) return;
+            showModal('融合成功', '新资产已生成', 'NeuroBlok-v2', true);
+        }
+        
+        function showModal(t, txt, res, isFusion) {
+            const m = document.getElementById('modal');
+            const b = document.getElementById('modalBox');
+            b.className = isFusion ? 'modal-box fusion' : 'modal-box';
+            b.innerHTML = `
+                <div class="modal-icon">${isFusion ? '✨' : '🎉'}</div>
+                <div class="modal-title">${t}</div>
+                <div class="modal-text">${txt}</div>
+                <div class="modal-result">${res}</div>
+                <button class="btn" onclick="closeModal()">${isFusion ? '继续协作' : '确定'}</button>
+            `;
+            m.classList.add('show');
+        }
+        
+        function closeModal() { document.getElementById('modal').classList.remove('show'); }
+        
+        function goTo(n) {
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            document.getElementById('stage' + n).classList.add('active');
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === n));
+            if (n === 2) updateMintedList();
+        }
+        
+        init();
+    </script>
+</body>
+</html>
