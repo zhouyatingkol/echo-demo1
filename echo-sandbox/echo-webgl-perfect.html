@@ -1980,6 +1980,18 @@
             try { initBackground(); } catch(e) { console.warn('initBackground failed:', e); }
             try { initPreviewScene(); } catch(e) { console.warn('initPreviewScene failed:', e); }
             try { generateAssetCards(); } catch(e) { console.warn('generateAssetCards failed:', e); }
+            
+            // 如果当前在 Stage 2，初始化融合页面
+            if (currentStage === 2) {
+                try { initFusionPage(); } catch(e) { console.warn('initFusionPage failed:', e); }
+            }
+            
+            // 绑定 Stage 2 按钮事件（无论是否显示，都先绑定）
+            const fuseBtn = document.getElementById('fuseBtn');
+            if (fuseBtn) fuseBtn.onclick = performFusion;
+            const clearBtn = document.getElementById('clearBtn');
+            if (clearBtn) clearBtn.onclick = clearPool;
+            
             try {
                 gsap.from('.asset-library', { x: -50, opacity: 0, duration: 0.8, delay: 0.2 });
                 gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
