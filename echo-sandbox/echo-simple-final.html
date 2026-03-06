@@ -282,6 +282,7 @@
         <div class="main-layout">
             <div class="sidebar">
                 <div class="sidebar-title" style="color:#ffd700">已铸造资产</div>
+                <div style="font-size:11px;color:rgba(150,170,200,0.6);margin-bottom:10px;">点击资产添加到协作池</div>
                 <div id="mintedList"></div>
             </div>
             
@@ -378,9 +379,8 @@
             minted.forEach(a => {
                 const item = document.createElement('div');
                 item.className = 'asset-card';
-                item.draggable = true;
                 item.innerHTML = `<div class="asset-icon">${a.icon}</div><div class="asset-name">${a.name}</div>`;
-                item.ondragstart = (e) => { dragItem = a; };
+                item.onclick = () => addToPool(a);
                 list.appendChild(item);
             });
         }
