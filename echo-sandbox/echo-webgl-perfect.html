@@ -1572,11 +1572,19 @@
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120%; height: 120%; border-radius: 50%; background: radial-gradient(circle, #${colorHex} 0%, transparent 70%); opacity: 0.2; animation: glowPulse 2s ease-in-out infinite;"></div>
                 <canvas id="pool-canvas-${poolAsset.id}" width="70" height="70" style="position: relative; z-index: 2;"></canvas>
                 <div style="font-size: 10px; font-family: Orbitron, sans-serif; font-weight: 600; position: relative; z-index: 3; margin-top: 2px;">${asset.id}</div>
-                <div style="position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; background: linear-gradient(135deg, #ff4757, #ff6b81); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; opacity: 0; transform: scale(0.5); transition: all 0.3s; cursor: pointer; box-shadow: 0 3px 10px rgba(255, 71, 87, 0.4); z-index: 10;"
-                    onclick="removeAssetFromPool('${poolAsset.id}', event)">×</div>
+                <div class="pool-asset-remove" data-pool-id="${poolAsset.id}" style="position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; background: linear-gradient(135deg, #ff4757, #ff6b81); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; opacity: 0; transform: scale(0.5); transition: all 0.3s; cursor: pointer; box-shadow: 0 3px 10px rgba(255, 71, 87, 0.4); z-index: 10;">×</div>
             `;
             
             area.appendChild(el);
+            
+            // 绑定移除按钮事件
+            const removeBtn = el.querySelector('.pool-asset-remove');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeAssetFromPool(poolAsset.id);
+                });
+            }
             
             // 初始化3D分子
             setTimeout(() => {
@@ -1614,16 +1622,22 @@
             
             // Hover显示删除按钮
             el.addEventListener('mouseenter', () => {
-                el.querySelector('[onclick^="removeAssetFromPool"]').style.opacity = '1';
-                el.querySelector('[onclick^="removeAssetFromPool"]').style.transform = 'scale(1)';
+                const removeBtn = el.querySelector('.pool-asset-remove');
+                if (removeBtn) {
+                    removeBtn.style.opacity = '1';
+                    removeBtn.style.transform = 'scale(1)';
+                }
                 el.style.transform = 'scale(1.15)';
                 el.style.zIndex = '20';
                 el.style.boxShadow = `0 0 40px #${colorHex}`;
             });
             
             el.addEventListener('mouseleave', () => {
-                el.querySelector('[onclick^="removeAssetFromPool"]').style.opacity = '0';
-                el.querySelector('[onclick^="removeAssetFromPool"]').style.transform = 'scale(0.5)';
+                const removeBtn = el.querySelector('.pool-asset-remove');
+                if (removeBtn) {
+                    removeBtn.style.opacity = '0';
+                    removeBtn.style.transform = 'scale(0.5)';
+                }
                 el.style.transform = 'scale(1)';
                 el.style.zIndex = '1';
                 el.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.4)';
@@ -1639,9 +1653,7 @@
             updatePoolUI();
         }
         
-        function removeAssetFromPool(poolId, event) {
-            if (event) event.stopPropagation();
-            
+        function removeAssetFromPool(poolId) {
             const index = poolAssets.findIndex(a => a.id === poolId);
             if (index === -1) return;
             
