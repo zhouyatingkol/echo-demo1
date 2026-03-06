@@ -258,7 +258,7 @@
             position: relative;
         }
         .preview-container {
-            width: 400px; height: 400px;
+            width: 420px; height: 420px;
             position: relative;
             display: flex;
             align-items: center;
@@ -282,8 +282,8 @@
         @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
         
         #preview-canvas {
-            width: 350px !important;
-            height: 350px !important;
+            width: 380px !important;
+            height: 380px !important;
             z-index: 10;
         }
         .preview-info {
@@ -1312,11 +1312,11 @@
         function initPreviewScene() {
             const canvas = document.getElementById('preview-canvas');
             previewScene = new THREE.Scene();
-            previewCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-            previewCamera.position.z = 5.5;
+            previewCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+            previewCamera.position.z = 7;
             previewRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-            previewRenderer.setSize(350, 350);
-            previewScene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            previewRenderer.setSize(380, 380);
+            previewScene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const pl = new THREE.PointLight(0x00f0ff, 1.5, 100);
             pl.position.set(8, 8, 8);
             previewScene.add(pl);
@@ -1446,7 +1446,7 @@
             document.querySelector(`[data-id="${asset.id}"]`).classList.add('selected');
             
             if (previewMolecule) previewScene.remove(previewMolecule);
-            previewMolecule = createMolecule(asset.type, asset.colorHex, 1.3);
+            previewMolecule = createMolecule(asset.type, asset.colorHex, 1.0);
             previewScene.add(previewMolecule);
             
             document.getElementById('previewId').textContent = asset.id;
@@ -1619,14 +1619,33 @@
             el.style.color = a.color;
             el.style.borderColor = a.color;
             
-            // 随机位置但不要太靠边
-            const angle = (poolCounter - 1) * (Math.PI * 2 / 8) + Math.random() * 0.5;
-            const radius = 80 + Math.random() * 60;
+            // 优化布局：圆形分布
             const centerX = poolContent.offsetWidth / 2 - 50;
             const centerY = poolContent.offsetHeight / 2 - 50;
+            let x, y;
             
-            el.style.left = (centerX + Math.cos(angle) * radius) + 'px';
-            el.style.top = (centerY + Math.sin(angle) * radius) + 'px';
+            if (poolAssets.length === 1) {
+                // 第一个放在上方
+                x = centerX;
+                y = centerY - 100;
+            } else if (poolAssets.length === 2) {
+                // 第二个放在右下方
+                x = centerX + 87;
+                y = centerY + 50;
+            } else if (poolAssets.length === 3) {
+                // 第三个放在左下方
+                x = centerX - 87;
+                y = centerY + 50;
+            } else {
+                // 更多资产时均匀分布
+                const angle = ((poolAssets.length - 1) / 6) * Math.PI * 2 - Math.PI / 2;
+                const radius = 110;
+                x = centerX + Math.cos(angle) * radius;
+                y = centerY + Math.sin(angle) * radius;
+            }
+            
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
             
             el.innerHTML = `
                 <div class="pool-asset-icon">${a.icon}</div>
