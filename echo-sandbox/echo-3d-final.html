@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO Protocol - 完整3D版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #020208; color: #fff; font-family: 'Orbitron', 'Noto Sans SC', sans-serif; overflow: hidden; height: 100vh; }
+        
+        .stage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 1; }
+        .stage.active { display: block; }
+        
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        
+        .nav-dots { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 100; background: rgba(0,0,0,0.4); padding: 10px 18px; border-radius: 25px; border: 1px solid rgba(0,240,255,0.1); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(0,240,255,0.2); border: 1px solid rgba(0,240,255,0.3); cursor: pointer; transition: all 0.3s; }
+        .dot:hover { background: rgba(0,240,255,0.4); }
+        .dot.active { background: #00f0ff; box-shadow: 0 0 15px rgba(0,240,255,0.6); }
+        
+        .stage-0-content { display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .glass-card { background: rgba(10, 15, 30, 0.85); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 24px; backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+        .stage-0-content .glass-card { padding: 70px 100px; text-align: center; border-color: rgba(255,215,0,0.2); }
+        .main-title { font-size: 48px; letter-spacing: 10px; margin-bottom: 20px; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.6); }
+        .subtitle { font-size: 16px; color: rgba(200,220,240,0.8); margin-bottom: 40px; letter-spacing: 3px; }
+        .btn { padding: 14px 36px; border: 1px solid rgba(0,240,255,0.4); background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(0,100,200,0.05)); color: #00f0ff; font-family: 'Orbitron', sans-serif; font-size: 13px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; border-radius: 12px; }
+        .btn:hover { box-shadow: 0 0 30px rgba(0,240,255,0.4); }
+        .btn-gold { border-color: rgba(255,215,0,0.4); color: #ffd700; background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(200,150,0,0.05)); }
+        .btn-gold:hover { box-shadow: 0 0 30px rgba(255,215,0,0.4); }
+        
+        .main-container { position: relative; z-index: 1; height: 100vh; display: flex; padding: 80px 20px 20px; gap: 20px; }
+        
+        .top-nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; z-index: 100; background: rgba(10, 15, 30, 0.8); backdrop-filter: blur(10px); padding: 12px 30px; border-radius: 30px; border: 1px solid rgba(0, 240, 255, 0.2); }
+        .nav-item { font-size: 12px; color: rgba(150, 170, 200, 0.7); letter-spacing: 2px; cursor: pointer; transition: all 0.3s; }
+        .nav-item:hover, .nav-item.active { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        
+        .asset-library { width: 380px; background: rgba(10, 15, 30, 0.85); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 24px; backdrop-filter: blur(20px); padding: 25px; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+        .library-header { margin-bottom: 20px; }
+        .library-title { color: #00f0ff; font-size: 18px; letter-spacing: 3px; text-shadow: 0 0 15px rgba(0, 240, 255, 0.4); margin-bottom: 8px; }
+        .library-subtitle { color: rgba(150, 170, 200, 0.7); font-size: 12px; }
+        .asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; overflow-y: auto; }
+        
+        .asset-card { background: rgba(0, 0, 0, 0.4); border: 2px solid; border-radius: 16px; padding: 15px; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; }
+        .asset-card:hover { transform: scale(1.08) translateY(-5px); z-index: 10; }
+        .asset-card.minted { border-color: #ffd700 !important; box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+        .asset-card.minted::after { content: '✓ 已铸造'; position: absolute; top: 8px; right: 8px; font-size: 9px; color: #ffd700; background: rgba(255, 215, 0, 0.15); padding: 3px 8px; border-radius: 10px; border: 1px solid rgba(255, 215, 0, 0.3); }
+        .asset-card .asset-icon { font-size: 40px; margin-bottom: 8px; }
+        .asset-card .asset-id { font-family: 'Orbitron', sans-serif; font-size: 12px; letter-spacing: 1px; margin-bottom: 4px; }
+        .asset-card .asset-name { font-size: 11px; color: rgba(200, 220, 240, 0.8); text-align: center; }
+        
+        .preview-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .preview-container { width: 400px; height: 400px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .platform-rings { position: absolute; width: 100%; height: 100%; }
+        .platform-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 2px solid; border-radius: 50%; animation: rotate 10s linear infinite; }
+        .platform-ring:nth-child(1) { width: 100%; height: 100%; border-color: rgba(0, 240, 255, 0.3); border-style: dashed; }
+        .platform-ring:nth-child(2) { width: 75%; height: 75%; border-color: rgba(0, 240, 255, 0.2); animation-duration: 7s; animation-direction: reverse; }
+        .platform-ring:nth-child(3) { width: 50%; height: 50%; border-color: rgba(0, 240, 255, 0.4); animation-duration: 5s; }
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        
+        #preview-canvas { width: 300px !important; height: 300px !important; z-index: 10; border-radius: 20px; }
+        .preview-info { text-align: center; margin-top: 30px; }
+        .preview-id { font-family: 'Orbitron', sans-serif; font-size: 28px; letter-spacing: 4px; margin-bottom: 10px; color: #00f0ff; text-shadow: 0 0 20px rgba(0,240,255,0.5); }
+        .preview-type { font-size: 14px; color: rgba(200, 220, 240, 0.8); margin-bottom: 20px; }
+        .mint-btn { padding: 16px 50px; border: 2px solid #00f0ff; background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 100, 200, 0.1) 100%); color: #00f0ff; font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 3px; cursor: pointer; transition: all 0.3s; border-radius: 12px; opacity: 0.4; pointer-events: none; }
+        .mint-btn.active { opacity: 1; pointer-events: auto; }
+        .mint-btn.active:hover { background: linear-gradient(135deg, rgba(0, 240, 255, 0.3) 0%, rgba(0, 100, 200, 0.2) 100%); box-shadow: 0 0 40px rgba(0, 240, 255, 0.5); transform: translateY(-2px); }
+        
+        .ownership-panel { width: 320px; background: rgba(10, 15, 30, 0.85); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 24px; backdrop-filter: blur(20px); padding: 25px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+        .panel-title { color: #ffd700; font-size: 16px; letter-spacing: 3px; text-align: center; text-shadow: 0 0 15px rgba(255, 215, 0, 0.3); margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 215, 0, 0.2); }
+        .ownership-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .section-label { font-size: 10px; color: rgba(150, 170, 200, 0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+        .section-value { font-size: 16px; font-weight: 500; color: #fff; margin-bottom: 8px; }
+        .contributor-list { display: flex; flex-direction: column; gap: 10px; }
+        .contributor-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; border-left: 3px solid #ffd700; }
+        .contributor-name { font-size: 13px; color: rgba(220, 230, 240, 0.9); }
+        .contributor-share { font-size: 12px; color: #ffd700; font-family: 'Orbitron', sans-serif; }
+        .rule-box { padding: 15px; background: rgba(255, 215, 0, 0.08); border-left: 3px solid #ffd700; border-radius: 0 10px 10px 0; font-size: 12px; color: rgba(220, 230, 240, 0.9); line-height: 1.6; }
+        .empty-state { text-align: center; padding: 40px 20px; color: rgba(150, 170, 200, 0.6); }
+        .empty-icon { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
+        
+        .fuse-btn { padding: 14px 40px; border: 2px solid rgba(255, 215, 0, 0.4); background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(200, 150, 0, 0.1)); color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 2px; cursor: not-allowed; border-radius: 30px; transition: all 0.3s; opacity: 0.4; pointer-events: none; }
+        .fuse-btn.active { opacity: 1; cursor: pointer; pointer-events: auto; box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); border-color: rgba(255, 215, 0, 0.8); }
+        .fuse-btn.active:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(255, 215, 0, 0.8); }
+        .clear-btn { padding: 12px 25px; background: transparent; border: 1px solid rgba(255, 71, 87, 0.3); color: rgba(255, 100, 100, 0.8); font-size: 12px; cursor: pointer; border-radius: 25px; transition: all 0.3s; opacity: 0; pointer-events: none; }
+        .clear-btn.visible { opacity: 1; pointer-events: auto; }
+        
+        .collab-area { flex: 1; position: relative; border: 2px dashed rgba(255, 215, 0, 0.3); border-radius: 30px; background: rgba(0, 0, 0, 0.2); margin-bottom: 20px; overflow: hidden; transition: all 0.3s; min-height: 400px; }
+        .collab-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; transition: opacity 0.3s; }
+        
+        .pool-asset { position: absolute; width: 100px; height: 100px; border-radius: 50%; border: 2px solid; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; animation: dropIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        @keyframes dropIn { from { opacity: 0; transform: scale(0) rotate(-180deg); } 60% { transform: scale(1.1) rotate(10deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+        .pool-asset-icon { font-size: 36px; margin-bottom: 4px; }
+        .pool-asset-id { font-size: 10px; font-family: 'Orbitron', sans-serif; font-weight: 600; }
+        .pool-asset-remove { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; background: linear-gradient(135deg, #ff4757, #ff6b81); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; opacity: 0; transform: scale(0.5); transition: all 0.3s; cursor: pointer; box-shadow: 0 3px 10px rgba(255, 71, 87, 0.4); z-index: 10; }
+        .pool-asset:hover .pool-asset-remove { opacity: 1; transform: scale(1); }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .success-card { background: linear-gradient(135deg, rgba(10, 15, 30, 0.98), rgba(20, 25, 50, 0.98)); border: 2px solid rgba(0,240,255,0.4); border-radius: 40px; padding: 60px 90px; text-align: center; box-shadow: 0 0 100px rgba(0,240,255,0.2); animation: cardAppear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .success-card.fusion { border-color: rgba(255,215,0,0.4); box-shadow: 0 0 100px rgba(255,215,0,0.2); }
+        @keyframes cardAppear { from { opacity: 0; transform: scale(0.5) translateY(50px); } }
+        .success-icon { font-size: 80px; margin-bottom: 25px; animation: bounce 1s ease infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .success-title { font-size: 36px; color: #00f0ff; font-family: 'Orbitron', sans-serif; letter-spacing: 6px; margin-bottom: 12px; text-shadow: 0 0 30px rgba(0,240,255,0.5); }
+        .success-card.fusion .success-title { color: #ffd700; text-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+        .success-subtitle { font-size: 15px; color: rgba(200, 220, 240, 0.7); margin-bottom: 40px; }
+        .asset-result { padding: 20px 30px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0,240,255,0.2); border-radius: 16px; margin-bottom: 30px; }
+        .asset-id-display { font-size: 28px; color: #00f0ff; font-family: 'Orbitron', sans-serif; margin-bottom: 8px; }
+        .modal-actions { display: flex; gap: 20px; justify-content: center; }
+        
+        .stage-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 40px; }
+        .stage-title { font-size: 32px; letter-spacing: 4px; margin-bottom: 10px; }
+        .stage-subtitle { color: rgba(200,220,240,0.6); font-size: 14px; margin-bottom: 40px; }
+        
+        .stats-panel { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .stat-label { font-size: 11px; color: rgba(150, 170, 200, 0.8); }
+        .stat-value { font-size: 13px; color: #00f0ff; font-family: 'Orbitron', sans-serif; }
+        
+        .assets-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .fusion-pool { flex: 1; display: flex; flex-direction: column; }
+        .control-bar { display: flex; justify-content: space-between; align-items: center; padding: 18px 28px; background: rgba(10, 15, 30, 0.9); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 20px; }
+        .pool-stats { display: flex; gap: 30px; }
+        .stat { text-align: center; position: relative; }
+        .stat-value { font-size: 28px; color: #ffd700; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+        .stat-label { font-size: 10px; color: rgba(150, 170, 200, 0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+        
+        /* 资产卡片颜色主题 */
+        .asset-card[data-type="protein"] { border-color: rgba(0, 240, 255, 0.5); }
+        .asset-card[data-type="protein"] .asset-id { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .asset-card[data-type="compound"] { border-color: rgba(0, 255, 136, 0.5); }
+        .asset-card[data-type="compound"] .asset-id { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+        .asset-card[data-type="gene"] { border-color: rgba(0, 136, 255, 0.5); }
+        .asset-card[data-type="gene"] .asset-id { color: #0088ff; text-shadow: 0 0 10px rgba(0, 136, 255, 0.5); }
+        .asset-card[data-type="screening"] { border-color: rgba(136, 255, 204, 0.5); }
+        .asset-card[data-type="screening"] .asset-id { color: #88ffcc; text-shadow: 0 0 10px rgba(136, 255, 204, 0.5); }
+        .asset-card[data-type="assay"] { border-color: rgba(162, 155, 254, 0.5); }
+        .asset-card[data-type="assay"] .asset-id { color: #a29bfe; text-shadow: 0 0 10px rgba(162, 155, 254, 0.5); }
+        .asset-card[data-type="clinical"] { border-color: rgba(255, 165, 0, 0.5); }
+        .asset-card[data-type="clinical"] .asset-id { color: #ffa500; text-shadow: 0 0 10px rgba(255, 165, 0, 0.5); }
+        .asset-card[data-type="patent"] { border-color: rgba(255, 105, 180, 0.5); }
+        .asset-card[data-type="patent"] .asset-id { color: #ff69b4; text-shadow: 0 0 10px rgba(255, 105, 180, 0.5); }
+        .asset-card[data-type="paper"] { border-color: rgba(255, 165, 2, 0.5); }
+        .asset-card[data-type="paper"] .asset-id { color: #ffa502; text-shadow: 0 0 10px rgba(255, 165, 2, 0.5); }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="nav-dots">
+        <div class="dot active" onclick="window.goTo(0)"></div>
+        <div class="dot" onclick="window.goTo(1)"></div>
+        <div class="dot" onclick="window.goTo(2)"></div>
+        <div class="dot" onclick="window.goTo(3)"></div>
+        <div class="dot" onclick="window.goTo(4)"></div>
+    </div>
+
+    <!-- Stage 0 -->
+    <div class="stage active" id="stage0">
+        <div class="stage-0-content">
+            <div class="glass-card">
+                <h1 class="main-title">ECHO PROTOCOL</h1>
+                <div class="subtitle">价值溯源：一款新药的数字旅程</div>
+                <button class="btn btn-gold" onclick="window.goTo(1)">开始探索</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage 1 -->
+    <div class="stage" id="stage1">
+        <div class="top-nav">
+            <div class="nav-item" onclick="window.goTo(0)">开场</div>
+            <div class="nav-item active">资产铸造</div>
+            <div class="nav-item" onclick="window.goTo(2)">协作衍生</div>
+            <div class="nav-item" onclick="window.goTo(3)">融资决策</div>
+            <div class="nav-item" onclick="window.goTo(4)">价值分配</div>
+        </div>
+        
+        <div class="main-container">
+            <div class="asset-library">
+                <div class="library-header">
+                    <div class="library-title">⬡ 资产分子库</div>
+                    <div class="library-subtitle">点击卡片进行铸造</div>
+                </div>
+                <div class="asset-grid" id="assetGrid"></div>
+                <div class="stats-panel">
+                    <div class="stat-row"><span class="stat-label">总资产</span><span class="stat-value" id="totalAssets">8</span></div>
+                    <div class="stat-row"><span class="stat-label">已铸造</span><span class="stat-value" id="mintedCount">0</span></div>
+                </div>
+            </div>
+            
+            <div class="preview-area">
+                <div class="preview-container">
+                    <div class="platform-rings"><div class="platform-ring"></div><div class="platform-ring"></div><div class="platform-ring"></div></div>
+                    <canvas id="preview-canvas"></canvas>
+                </div>
+                <div class="preview-info">
+                    <div class="preview-id" id="previewId">ECHO PROTOCOL</div>
+                    <div class="preview-type" id="previewType">选择一个资产分子进行铸造</div>
+                    <button class="mint-btn" id="mainMintBtn" onclick="window.confirmMint()">请先选择资产</button>
+                </div>
+            </div>
+            
+            <div class="ownership-panel" id="ownershipPanel">
+                <div class="panel-title">⬡ 权属蓝图</div>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">⬡</div>
+                    <div class="empty-text">选择左侧资产查看详细权属信息</div>
+                </div>
+                <div id="ownershipContent" style="display: none;">
+                    <div class="ownership-section">
+                        <div class="section-label">资产标识</div>
+                        <div class="section-value" id="panelAssetName"></div>
+                    </div>
+                    <div class="ownership-section">
+                        <div class="section-label">主要贡献者</div>
+                        <div class="contributor-list" id="contributorList"></div>
+                    </div>
+                    <div class="ownership-section">
+                        <div class="section-label">分配规则</div>
+                        <div class="rule-box" id="ruleBox"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-overlay" id="mintSuccessModal">
+            <div class="success-card">
+                <div class="success-icon">🎉</div>
+                <div class="success-title">铸造成功</div>
+                <div class="success-subtitle">您的数据资产已上链</div>
+                <div class="asset-result"><div class="asset-id-display" id="successAssetId">---</div></div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="window.closeMintModal()">继续铸造</button>
+                    <button class="btn btn-gold" onclick="window.goTo(2)">进入协作衍生 →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage 2 -->
+    <div class="stage" id="stage2">
+        <div class="top-nav">
+            <div class="nav-item" onclick="window.goTo(0)">开场</div>
+            <div class="nav-item" onclick="window.goTo(1)">资产铸造</div>
+            <div class="nav-item active">协作衍生</div>
+            <div class="nav-item" onclick="window.goTo(3)">融资决策</div>
+            <div class="nav-item" onclick="window.goTo(4)">价值分配</div>
+        </div>
+        
+        <div class="main-container">
+            <div class="asset-library" style="width: 280px;">
+                <div class="library-header">
+                    <div class="library-title">⬡ 已铸造资产</div>
+                    <div class="library-subtitle">点击添加到协作池</div>
+                </div>
+                <div class="assets-list" id="fusionAssetList"></div>
+            </div>
+            
+            <div class="fusion-pool">
+                <div class="collab-area" id="collabArea">
+                    <div class="collab-hint" id="collabHint">
+                        <div style="font-size: 80px; margin-bottom: 20px; opacity: 0.2;">⬡</div>
+                        <div style="font-size: 24px; color: rgba(150, 170, 200, 0.6); margin-bottom: 10px; letter-spacing: 3px;">协作池</div>
+                        <div style="font-size: 13px; color: rgba(150, 170, 200, 0.4);">点击左侧资产添加到此处</div>
+                    </div>
+                </div>
+                
+                <div class="control-bar">
+                    <div class="pool-stats">
+                        <div class="stat"><div class="stat-value" id="assetCount">0</div><div class="stat-label">已选资产</div></div>
+                        <div class="stat"><div class="stat-value" id="fusionPower">0</div><div class="stat-label">融合力</div></div>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="clear-btn" id="clearBtn" onclick="window.clearPool()">清空</button>
+                        <button class="fuse-btn" id="fuseBtn" onclick="window.doFusion()">✨ 开始融合</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ownership-panel">
+                <div class="panel-title">⬡ 融合权属</div>
+                <div class="empty-state">
+                    <div class="empty-icon">⬡</div>
+                    <div>添加资产到协作池</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-overlay" id="fusionSuccessModal">
+            <div class="success-card fusion">
+                <div class="success-icon">✨</div>
+                <div class="success-title">融合成功</div>
+                <div class="success-subtitle">新资产 NeuroBlok 已生成</div>
+                <div class="asset-result" style="border-color: rgba(255,215,0,0.2);"><div class="asset-id-display" style="color: #ffd700;">NeuroBlok-v2</div></div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="window.closeFusionModal()">继续协作</button>
+                    <button class="btn btn-gold" onclick="window.goTo(3)">进入融资决策 →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage 3 & 4 -->
+    <div class="stage" id="stage3">
+        <div class="top-nav">
+            <div class="nav-item" onclick="window.goTo(0)">开场</div>
+            <div class="nav-item" onclick="window.goTo(1)">资产铸造</div>
+            <div class="nav-item" onclick="window.goTo(2)">协作衍生</div>
+            <div class="nav-item active">融资决策</div>
+            <div class="nav-item" onclick="window.goTo(4)">价值分配</div>
+        </div>
+        <div class="stage-content">
+            <h2 class="stage-title" style="color: #00f0ff; text-shadow: 0 0 20px rgba(0,240,255,0.5);">风险融资抉择</h2>
+            <p class="stage-subtitle">所有权与收益权分离，数据灵魂永不丢失</p>
+            <button class="btn" onclick="window.goTo(4)">进入价值分配网络 →</button>
+        </div>
+    </div>
+
+    <div class="stage" id="stage4">
+        <div class="top-nav">
+            <div class="nav-item" onclick="window.goTo(0)">开场</div>
+            <div class="nav-item" onclick="window.goTo(1)">资产铸造</div>
+            <div class="nav-item" onclick="window.goTo(2)">协作衍生</div>
+            <div class="nav-item" onclick="window.goTo(3)">融资决策</div>
+            <div class="nav-item active">价值分配</div>
+        </div>
+        <div class="stage-content">
+            <h2 class="stage-title" style="color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5);">价值分配网络</h2>
+            <p class="stage-subtitle">当新药成功上市，价值沿链条逆流而上</p>
+            <button class="btn" onclick="window.goTo(0)">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== 全局数据 ==========
+        window.assets = [
+            { id: 'PDB-001', name: '蛋白质结构', icon: '🧬', color: '#00f0ff', type: 'protein', weight: 1.2, minted: false,
+              contributors: [{name: 'AlphaFold Team', share: '45%'}, {name: 'Dr. Zhang Lab', share: '35%'}, {name: 'Open Data Fund', share: '20%'}],
+              rules: '商业应用需署名原始贡献者\n衍生作品自动继承50%收益权\n开源使用无需授权费用' },
+            { id: 'CHEM-002', name: '化合物库', icon: '⚗️', color: '#00ff88', type: 'compound', weight: 1.0, minted: false,
+              contributors: [{name: 'ChemCorp Inc.', share: '60%'}, {name: 'University Lab', share: '30%'}, {name: 'Community', share: '10%'}],
+              rules: '商业使用需支付1%营收作为反馈金\n二次开发需共享改进数据\n专利引用自动触发收益分配' },
+            { id: 'GENE-003', name: '基因序列', icon: '🧪', color: '#0088ff', type: 'gene', weight: 1.5, minted: false,
+              contributors: [{name: 'Genome Project', share: '50%'}, {name: 'MIT Lab', share: '30%'}, {name: 'Public', share: '20%'}],
+              rules: '开源使用免费，商业应用需获得授权\n数据使用需遵守伦理委员会规定\n商业转化收益的20%用于罕见病研究' },
+            { id: 'VSCREEN-004', name: '虚拟筛选', icon: '💻', color: '#88ffcc', type: 'screening', weight: 0.8, minted: false,
+              contributors: [{name: 'AI Pharma', share: '70%'}, {name: 'Cloud Compute', share: '30%'}],
+              rules: '按使用量计费，收益自动分配给贡献方\n算法改进需开源贡献\n阳性结果触发自动通知' },
+            { id: 'ASSAY-005', name: '实验数据', icon: '📊', color: '#a29bfe', type: 'assay', weight: 1.3, minted: false,
+              contributors: [{name: 'BioLab Co.', share: '80%'}, {name: 'Researchers', share: '20%'}],
+              rules: '原始数据不可篡改\n实验方法需完整披露\n重复实验优先使用相同设备' },
+            { id: 'CLINICAL-006', name: '临床数据', icon: '🏥', color: '#ffa502', type: 'clinical', weight: 2.0, minted: false,
+              contributors: [{name: 'Hospital Network', share: '40%'}, {name: 'Patient Consent', share: '35%'}, {name: 'Ethics Board', share: '25%'}],
+              rules: '患者隐私受零知识证明保护\n负面结果同等重要并奖励\n数据使用需伦理委员会批准' },
+            { id: 'PATENT-007', name: '专利信息', icon: '📜', color: '#ff69b4', type: 'patent', weight: 1.8, minted: false,
+              contributors: [{name: 'Inventor Team', share: '50%'}, {name: 'Institution', share: '35%'}, {name: 'Legal DAO', share: '15%'}],
+              rules: '专利到期自动转为开放许可\n侵权诉讼收益按比例分配\n许可费用按引用次数递减' },
+            { id: 'PAPER-008', name: '论文数据', icon: '📄', color: '#ffa502', type: 'paper', weight: 1.0, minted: false,
+              contributors: [{name: 'Author Team', share: '60%'}, {name: 'Journal DAO', share: '25%'}, {name: 'Peer Reviewers', share: '15%'}],
+              rules: '引用即产生微支付\n数据复用需引用原始论文\n开放获取版本收益归作者' }
+        ];
+        
+        window.selectedAsset = null;
+        window.poolAssets = [];
+        window.assetCounter = 0;
+        
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            initBackground();
+            initAssetGrid();
+        });
+        
+        // ========== 背景 ==========
+        function initBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2
+                });
+            }
+            
+            function animate() {
+                ctx.fillStyle = 'rgba(2, 2, 8, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(0, 240, 255, 0.5)';
+                particles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+        
+        // ========== Stage 1 ==========
+        function initAssetGrid() {
+            const grid = document.getElementById('assetGrid');
+            grid.innerHTML = '';
+            
+            window.assets.forEach((asset, index) => {
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.setAttribute('data-type', asset.type);
+                if (asset.minted) card.classList.add('minted');
+                card.style.animationDelay = (index * 0.1) + 's';
+                card.innerHTML = `
+                    <div class="asset-icon">${asset.icon}</div>
+                    <div class="asset-id">${asset.id}</div>
+                    <div class="asset-name">${asset.name}</div>
+                `;
+                card.onclick = function() { selectAsset(asset, card); };
+                grid.appendChild(card);
+            });
+        }
+        
+        function selectAsset(asset, card) {
+            if (asset.minted) return;
+            
+            document.querySelectorAll('.asset-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            window.selectedAsset = asset;
+            
+            // 3D预览
+            initPreview3D(asset);
+            
+            document.getElementById('previewId').textContent = asset.id;
+            document.getElementById('previewId').style.color = asset.color;
+            document.getElementById('previewType').textContent = asset.name + ' · 点击铸造按钮进行上链';
+            
+            const btn = document.getElementById('mainMintBtn');
+            btn.textContent = '⚡ 铸造资产';
+            btn.classList.add('active');
+            
+            // 权属面板
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('ownershipContent').style.display = 'block';
+            document.getElementById('panelAssetName').textContent = asset.name;
+            
+            const list = document.getElementById('contributorList');
+            list.innerHTML = asset.contributors.map(c => `
+                <div class="contributor-item"><span class="contributor-name">${c.name}</span><span class="contributor-share">${c.share}</span></div>
+            `).join('');
+            
+            document.getElementById('ruleBox').innerHTML = asset.rules.replace(/\n/g, '<br>');
+        }
+        
+        function initPreview3D(asset) {
+            try {
+                const canvas = document.getElementById('preview-canvas');
+                if (!canvas) return;
+                
+                // 清理旧场景
+                while (canvas.firstChild) canvas.removeChild(canvas.firstChild);
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                camera.position.z = 5;
+                
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                renderer.setSize(300, 300);
+                
+                const color = parseInt(asset.color.replace('#', '0x'));
+                const group = new THREE.Group();
+                
+                // 创建分子结构
+                for (let i = 0; i < 12; i++) {
+                    const sphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.3, 16, 16),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.3 })
+                    );
+                    const angle = i * 0.5;
+                    sphere.position.set(Math.cos(angle) * 1.5, (i - 6) * 0.3, Math.sin(angle) * 1.5);
+                    group.add(sphere);
+                }
+                
+                scene.add(group);
+                scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+                const light = new THREE.PointLight(color, 2, 100);
+                light.position.set(5, 5, 5);
+                scene.add(light);
+                
+                function animate() {
+                    requestAnimationFrame(animate);
+                    group.rotation.y += 0.01;
+                    group.rotation.x += 0.005;
+                    renderer.render(scene, camera);
+                }
+                animate();
+            } catch(e) {
+                console.log('WebGL preview failed, using fallback');
+                const canvas = document.getElementById('preview-canvas');
+                canvas.innerHTML = `<div style="font-size: 100px; color: ${asset.color}; text-shadow: 0 0 60px ${asset.color};">${asset.icon}</div>`;
+            }
+        }
+        
+        window.confirmMint = function() {
+            if (!window.selectedAsset || window.selectedAsset.minted) return;
+            
+            window.selectedAsset.minted = true;
+            document.getElementById('successAssetId').textContent = window.selectedAsset.id;
+            document.getElementById('mintSuccessModal').classList.add('active');
+            
+            const mintedCount = window.assets.filter(a => a.minted).length;
+            document.getElementById('mintedCount').textContent = mintedCount;
+            
+            initAssetGrid();
+        };
+        
+        window.closeMintModal = function() {
+            document.getElementById('mintSuccessModal').classList.remove('active');
+        };
+        
+        // ========== Stage 2 ==========
+        function initFusionPage() {
+            const list = document.getElementById('fusionAssetList');
+            list.innerHTML = '';
+            
+            const minted = window.assets.filter(a => a.minted);
+            
+            if (minted.length === 0) {
+                list.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(150,170,200,0.5)">请先铸造资产</div>';
+                return;
+            }
+            
+            minted.forEach((asset, index) => {
+                const item = document.createElement('div');
+                item.className = 'fusion-asset-item';
+                item.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s;';
+                item.innerHTML = `
+                    <div style="width: 45px; height: 45px; border-radius: 10px; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; font-size: 20px; color: ${asset.color}; border: 1px solid ${asset.color}40;">${asset.icon}</div>
+                    <div style="flex: 1;"><div style="font-size: 13px; color: #fff; margin-bottom: 2px;">${asset.name}</div><div style="font-size: 10px; font-family: Orbitron, sans-serif; color: ${asset.color};">${asset.id}</div></div>
+                `;
+                item.onclick = function() { addToPool(asset); };
+                list.appendChild(item);
+            });
+        }
+        
+        function addToPool(asset) {
+            if (window.poolAssets.find(p => p.id === asset.id)) return;
+            
+            window.poolAssets.push(asset);
+            window.assetCounter++;
+            
+            document.getElementById('collabHint').style.opacity = '0';
+            
+            const el = document.createElement('div');
+            el.className = 'pool-asset';
+            el.id = 'pool-asset-' + window.assetCounter;
+            el.style.left = (60 + Math.random() * 300) + 'px';
+            el.style.top = (60 + Math.random() * 150) + 'px';
+            el.style.color = asset.color;
+            el.style.borderColor = asset.color;
+            el.innerHTML = `
+                <div class="pool-asset-icon">${asset.icon}</div>
+                <div class="pool-asset-id">${asset.id}</div>
+                <div class="pool-asset-type">${asset.weight}x</div>
+                <div class="pool-asset-remove" onclick="window.removeFromPool('${asset.id}', 'pool-asset-${window.assetCounter}')">×</div>
+            `;
+            document.getElementById('collabArea').appendChild(el);
+            
+            updatePoolStats();
+        }
+        
+        window.removeFromPool = function(assetId, elementId) {
+            window.poolAssets = window.poolAssets.filter(p => p.id !== assetId);
+            const el = document.getElementById(elementId);
+            if (el) el.remove();
+            
+            if (window.poolAssets.length === 0) {
+                document.getElementById('collabHint').style.opacity = '1';
+            }
+            
+            updatePoolStats();
+        };
+        
+        window.clearPool = function() {
+            window.poolAssets = [];
+            document.querySelectorAll('.pool-asset').forEach(el => el.remove());
+            document.getElementById('collabHint').style.opacity = '1';
+            updatePoolStats();
+        };
+        
+        function updatePoolStats() {
+            document.getElementById('assetCount').textContent = window.poolAssets.length;
+            const power = window.poolAssets.reduce((sum, a) => sum + a.weight, 0);
+            document.getElementById('fusionPower').textContent = power.toFixed(1);
+            
+            document.getElementById('fuseBtn').classList.toggle('active', window.poolAssets.length >= 2);
+            document.getElementById('clearBtn').classList.toggle('visible', window.poolAssets.length > 0);
+        }
+        
+        window.doFusion = function() {
+            if (window.poolAssets.length < 2) return;
+            document.getElementById('fusionSuccessModal').classList.add('active');
+        };
+        
+        window.closeFusionModal = function() {
+            document.getElementById('fusionSuccessModal').classList.remove('active');
+        };
+        
+        // ========== 导航 ==========
+        window.goTo = function(index) {
+            if (index < 0 || index > 4) return;
+            
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            document.getElementById('stage' + index).classList.add('active');
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+            
+            if (index === 2) {
+                initFusionPage();
+            }
+        };
+    </script>
+</body>
+</html>
