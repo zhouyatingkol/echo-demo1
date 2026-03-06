@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO Protocol - Stage 2 | 协作衍生</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #020208;
+            color: #fff;
+            font-family: 'Orbitron', 'Noto+Sans+SC', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* 3D背景 */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+            background: rgba(10, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        .nav-item {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #00f0ff;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        
+        /* 主容器 */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            padding: 80px 30px 30px;
+            gap: 25px;
+        }
+        
+        /* 左侧面板 */
+        .side-panel {
+            width: 300px;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .panel-header { margin-bottom: 20px; }
+        .panel-title {
+            color: #00f0ff;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            margin-bottom: 6px;
+        }
+        .panel-subtitle {
+            color: rgba(150, 170, 200, 0.6);
+            font-size: 11px;
+        }
+        
+        /* 资产网格 */
+        .asset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .asset-grid::-webkit-scrollbar { width: 4px; }
+        .asset-grid::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .asset-grid::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.3); border-radius: 2px; }
+        
+        /* 资产卡片 */
+        .asset-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid;
+            border-radius: 16px;
+            padding: 12px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            position: relative;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .asset-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+        }
+        .asset-card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        .mol-canvas-container {
+            width: 60px; height: 60px;
+            position: relative;
+            margin-bottom: 6px;
+        }
+        .asset-id {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .asset-name {
+            font-size: 9px;
+            color: rgba(200, 220, 240, 0.7);
+            text-align: center;
+        }
+        
+        /* 颜色主题 */
+        .asset-card[data-id="PDB-001"] { border-color: rgba(0, 240, 255, 0.5); }
+        .asset-card[data-id="PDB-001"] .asset-id { color: #00f0ff; }
+        .asset-card[data-id="CHEM-002"] { border-color: rgba(0, 255, 136, 0.5); }
+        .asset-card[data-id="CHEM-002"] .asset-id { color: #00ff88; }
+        .asset-card[data-id="GENE-003"] { border-color: rgba(0, 136, 255, 0.5); }
+        .asset-card[data-id="GENE-003"] .asset-id { color: #0088ff; }
+        .asset-card[data-id="VSCREEN-004"] { border-color: rgba(136, 255, 204, 0.5); }
+        .asset-card[data-id="VSCREEN-004"] .asset-id { color: #88ffcc; }
+        .asset-card[data-id="ASSAY-005"] { border-color: rgba(162, 155, 254, 0.5); }
+        .asset-card[data-id="ASSAY-005"] .asset-id { color: #a29bfe; }
+        .asset-card[data-id="CLINICAL-006"] { border-color: rgba(255, 165, 0, 0.5); }
+        .asset-card[data-id="CLINICAL-006"] .asset-id { color: #ffa500; }
+        .asset-card[data-id="PATENT-007"] { border-color: rgba(255, 105, 180, 0.5); }
+        .asset-card[data-id="PATENT-007"] .asset-id { color: #ff69b4; }
+        
+        /* 中央协作工作台 */
+        .fusion-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* 环形轨道 */
+        .orbit-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+        }
+        
+        .orbit-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px dashed rgba(0, 240, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.5s ease;
+        }
+        .orbit-ring.active {
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+            animation: ringPulse 2s infinite;
+        }
+        @keyframes ringPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.4); }
+        }
+        
+        .orbit-ring.outer { width: 450px; height: 450px; }
+        .orbit-ring.middle { width: 350px; height: 350px; border-style: solid; border-color: rgba(0, 240, 255, 0.15); }
+        .orbit-ring.inner { width: 250px; height: 250px; border-color: rgba(0, 240, 255, 0.3); }
+        
+        /* 放置槽位 - 环形分布 */
+        .orbit-slot {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px dashed rgba(0, 240, 255, 0.3);
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .orbit-slot:hover, .orbit-slot.drag-over {
+            border-color: #00f0ff;
+            border-style: solid;
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+        .orbit-slot.filled {
+            border-color: #ffd700;
+            border-style: solid;
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+            animation: slotGlow 2s infinite;
+        }
+        @keyframes slotGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.5); }
+        }
+        
+        /* 中心融合核心 */
+        .fusion-core {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            transition: all 0.5s ease;
+        }
+        .fusion-core.active {
+            border-color: #ffd700;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            animation: corePulse 1.5s infinite;
+        }
+        @keyframes corePulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+        .fusion-core-text {
+            font-size: 12px;
+            color: #ffd700;
+            text-align: center;
+        }
+        
+        /* 工作台标题 */
+        .workbench-title {
+            position: absolute;
+            bottom: 80px;
+            text-align: center;
+        }
+        .workbench-title h2 {
+            font-size: 20px;
+            color: #00f0ff;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            margin-bottom: 8px;
+        }
+        .workbench-title p {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+        }
+        
+        /* 融合按钮 */
+        .fuse-btn {
+            padding: 14px 40px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(200, 150, 0, 0.1));
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .fuse-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+            animation: btnPulse 2s infinite;
+        }
+        .fuse-btn.active:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(200, 150, 0, 0.2));
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+        }
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+        }
+        
+        /* 融合动画 */
+        .fusion-animation {
+            display: none;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .fusion-animation.active {
+            display: block;
+        }
+        .fusion-particles {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* 成功结果展示 */
+        .success-result {
+            display: none;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+        .success-result.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .result-card {
+            background: rgba(10, 15, 30, 0.9);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 24px;
+            padding: 40px 60px;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+        
+        .result-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .result-title {
+            font-size: 28px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        .result-subtitle {
+            font-size: 14px;
+            color: rgba(200, 220, 240, 0.8);
+            margin-bottom: 30px;
+        }
+        .result-canvas-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 25px;
+            position: relative;
+        }
+        
+        /* 右侧面板 - 权属展示 */
+        .ownership-panel {
+            width: 320px;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .ownership-title {
+            color: #ffd700;
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        .ownership-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .section-label {
+            font-size: 10px;
+            color: rgba(150, 170, 200, 0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .contributor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .contributor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 3px solid #ffd700;
+        }
+        .contributor-name {
+            font-size: 12px;
+            color: rgba(220, 230, 240, 0.9);
+        }
+        .contributor-share {
+            font-size: 11px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(150, 170, 200, 0.5);
+        }
+        .empty-icon { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <!-- 3D背景 -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <div class="nav-item">资产铸造</div>
+        <div class="nav-item active">协作衍生</div>
+        <div class="nav-item">融资决策</div>
+    </div>
+    
+    <div class="main-container">
+        <!-- 左侧：可拖拽资产 -->
+        <div class="side-panel">
+            <div class="panel-header">
+                <div class="panel-title">⬡ 已铸造资产</div>
+                <div class="panel-subtitle">拖拽到环形轨道进行融合</div>
+            </div>
+            <div class="asset-grid" id="assetGrid">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 中央：环形协作工作台 -->
+        <div class="fusion-center" id="fusionCenter">
+            <!-- 工作台界面 -->
+            <div class="orbit-container" id="workbench">
+                <!-- 轨道环 -->
+                <div class="orbit-ring outer"></div>
+                <div class="orbit-ring middle"></div>
+                <div class="orbit-ring inner"></div>
+                
+                <!-- 放置槽位（环形分布） -->
+                <div id="orbitSlots"></div>
+                
+                <!-- 中心融合核心 -->
+                <div class="fusion-core" id="fusionCore">
+                    <div class="fusion-core-text">融合核心</div>
+                </div>
+            </div>
+            
+            <!-- 工作台标题 -->
+            <div class="workbench-title" id="workbenchTitle">
+                <h2>协作工作台</h2>
+                <p>拖拽 2-6 个资产到环形轨道</p>
+            </div>
+            
+            <!-- 融合按钮 -->
+            <button class="fuse-btn" id="fuseBtn" onclick="performFusion()">✨ 开始融合</button>
+            
+            <!-- 成功结果 -->
+            <div class="success-result" id="successResult">
+                <div class="result-card">
+                    <div class="result-icon">🎉</div>
+                    <div class="result-title">NeuroBlok</div>
+                    <div class="result-subtitle">融合成功！新资产已生成</div>
+                    <div class="result-canvas-container">
+                        <canvas id="result-canvas" width="200" height="200"></canvas>
+                    </div>
+                    <button class="fuse-btn active" onclick="resetFusion()" style="margin-right: 15px;">再次融合</button>
+                    <button class="fuse-btn active" onclick="goToNext()">继续 →</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：权属面板 -->
+        <div class="ownership-panel" id="ownershipPanel">
+            <div class="ownership-title">⬡ 融合权属</div>
+            
+            <div id="emptyState">
+                <div class="empty-state">
+                    <div class="empty-icon">⬡</div>
+                    <div>拖拽资产到工作台</div>
+                    <div style="font-size: 11px; margin-top: 8px; color: rgba(150,170,200,0.5);">查看融合后权属分配</div>
+                </div>
+            </div>
+            
+            <div id="ownershipContent" style="display: none;">
+                <div class="ownership-section">
+                    <div class="section-label">融合资产</div>
+                    <div class="contributor-list" id="sourceAssetsList"></div>
+                </div>
+                
+                <div class="ownership-section">
+                    <div class="section-label">新资产权属分配</div>
+                    <div class="contributor-list" id="fusedOwnershipList"></div>
+                </div>
+                
+                <div class="ownership-section" style="border-bottom: none;">
+                    <div class="section-label">继承规则</div>
+                    <div style="font-size: 12px; color: rgba(220, 230, 240, 0.8); line-height: 1.6; padding: 12px; background: rgba(255, 215, 0, 0.05); border-radius: 10px; border-left: 3px solid #ffd700;">
+                        自动继承所有上游资产规则<br>
+                        收益按贡献比例智能分配<br>
+                        里程碑触发即时结算
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // 资产数据（模拟从Stage 1继承的已铸造资产）
+        const assets = [
+            { id: 'PDB-001', name: '蛋白质结构', color: 0x00f0ff, type: 'protein', minted: true },
+            { id: 'CHEM-002', name: '化合物库', color: 0x00ff88, type: 'compound', minted: true },
+            { id: 'GENE-003', name: '基因序列', color: 0x0088ff, type: 'gene', minted: true },
+            { id: 'VSCREEN-004', name: '虚拟筛选', color: 0x88ffcc, type: 'screening', minted: true },
+            { id: 'ASSAY-005', name: '实验数据', color: 0xa29bfe, type: 'assay', minted: true },
+        ];
+        
+        let draggedAsset = null;
+        let placedAssets = []; // 可放置多个资产
+        const MAX_SLOTS = 6;
+        
+        // 初始化
+        window.addEventListener('load', () => {
+            initBackground();
+            initAssetGrid();
+            initOrbitSlots();
+        });
+        
+        // 3D分子生成器
+        function createMolecule(type, color, scale = 1) {
+            const group = new THREE.Group();
+            
+            switch(type) {
+                case 'protein':
+                    for (let i = 0; i < 20; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.3 * scale, 16, 16),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.3 })
+                        );
+                        const angle = i * 0.5;
+                        const y = (i - 10) * 0.3;
+                        sphere.position.set(Math.cos(angle) * 1.5 * scale, y * scale, Math.sin(angle) * 1.5 * scale);
+                        group.add(sphere);
+                    }
+                    break;
+                case 'compound':
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i / 6) * Math.PI * 2;
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.4 * scale, 16, 16),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.3 })
+                        );
+                        sphere.position.set(Math.cos(angle) * 1.2 * scale, 0, Math.sin(angle) * 1.2 * scale);
+                        group.add(sphere);
+                    }
+                    break;
+                case 'gene':
+                    for (let i = 0; i < 30; i++) {
+                        const t = i * 0.3;
+                        const y = (i - 15) * 0.2;
+                        const sphere1 = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.25 * scale, 12, 12),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.3 })
+                        );
+                        sphere1.position.set(Math.cos(t) * scale, y * scale, Math.sin(t) * scale);
+                        group.add(sphere1);
+                    }
+                    break;
+                case 'screening':
+                    for (let i = 0; i < 15; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.15 * scale, 8, 8),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.4 })
+                        );
+                        sphere.position.set((Math.random() - 0.5) * 3 * scale, (Math.random() - 0.5) * 3 * scale, (Math.random() - 0.5) * 3 * scale);
+                        group.add(sphere);
+                    }
+                    break;
+                case 'assay':
+                    for (let i = 0; i < 8; i++) {
+                        const bar = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.3 * scale, (0.5 + Math.random() * 1.5) * scale, 0.3 * scale),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                        );
+                        bar.position.set((i - 3.5) * 0.5 * scale, 0, 0);
+                        group.add(bar);
+                    }
+                    break;
+            }
+            return group;
+        }
+        
+        // 初始化左侧资产网格
+        function initAssetGrid() {
+            const grid = document.getElementById('assetGrid');
+            assets.forEach(asset => {
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.draggable = true;
+                card.dataset.id = asset.id;
+                card.innerHTML = `
+                    <div class="mol-canvas-container">
+                        <canvas id="asset-canvas-${asset.id}" width="60" height="60"></canvas>
+                    </div>
+                    <div class="asset-id">${asset.id}</div>
+                    <div class="asset-name">${asset.name}</div>
+                `;
+                
+                card.addEventListener('dragstart', (e) => {
+                    draggedAsset = asset;
+                    card.classList.add('dragging');
+                });
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                    draggedAsset = null;
+                });
+                
+                grid.appendChild(card);
+                
+                // 3D预览
+                setTimeout(() => {
+                    const canvas = document.getElementById(`asset-canvas-${asset.id}`);
+                    const scene = new THREE.Scene();
+                    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                    camera.position.z = 4;
+                    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                    renderer.setSize(60, 60);
+                    
+                    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                    const light = new THREE.PointLight(asset.color, 1, 100);
+                    light.position.set(5, 5, 5);
+                    scene.add(light);
+                    
+                    const molecule = createMolecule(asset.type, asset.color, 0.5);
+                    scene.add(molecule);
+                    
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        molecule.rotation.y += 0.02;
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                }, 100);
+            });
+        }
+        
+        // 初始化环形轨道槽位
+        function initOrbitSlots() {
+            const container = document.getElementById('orbitSlots');
+            const radius = 180; // 轨道半径
+            
+            for (let i = 0; i < MAX_SLOTS; i++) {
+                const angle = (i / MAX_SLOTS) * Math.PI * 2 - Math.PI / 2;
+                const x = Math.cos(angle) * radius + 250 - 40; // 250是容器中心，40是槽宽的一半
+                const y = Math.sin(angle) * radius + 250 - 40;
+                
+                const slot = document.createElement('div');
+                slot.className = 'orbit-slot';
+                slot.id = `slot-${i}`;
+                slot.style.left = `${x}px`;
+                slot.style.top = `${y}px`;
+                slot.innerHTML = `<span style="color: rgba(150,170,200,0.3); font-size: 12px;">${i + 1}</span>`;
+                
+                // 拖拽事件
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (!placedAssets.find(a => a.slotIndex === i)) {
+                        slot.classList.add('drag-over');
+                    }
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    if (draggedAsset && !placedAssets.find(a => a.asset.id === draggedAsset.id)) {
+                        placeAsset(i, draggedAsset);
+                    }
+                });
+                
+                // 点击移除
+                slot.addEventListener('click', () => {
+                    const placed = placedAssets.find(a => a.slotIndex === i);
+                    if (placed) removeAsset(i);
+                });
+                
+                container.appendChild(slot);
+            }
+        }
+        
+        // 放置资产
+        function placeAsset(slotIndex, asset) {
+            placedAssets.push({ slotIndex, asset });
+            const slot = document.getElementById(`slot-${slotIndex}`);
+            
+            slot.classList.add('filled');
+            slot.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 28px;">⬡</div>
+                    <div style="font-size: 10px; color: #${asset.color.toString(16).padStart(6, '0')}; font-family: Orbitron; margin-top: 2px;">${asset.id}</div>
+                </div>
+            `;
+            
+            updateWorkbench();
+        }
+        
+        // 移除资产
+        function removeAsset(slotIndex) {
+            placedAssets = placedAssets.filter(a => a.slotIndex !== slotIndex);
+            const slot = document.getElementById(`slot-${slotIndex}`);
+            
+            slot.classList.remove('filled');
+            slot.innerHTML = `<span style="color: rgba(150,170,200,0.3); font-size: 12px;">${slotIndex + 1}</span>`;
+            
+            updateWorkbench();
+        }
+        
+        // 更新工作台状态
+        function updateWorkbench() {
+            const btn = document.getElementById('fuseBtn');
+            const core = document.getElementById('fusionCore');
+            const rings = document.querySelectorAll('.orbit-ring');
+            
+            if (placedAssets.length >= 2) {
+                btn.classList.add('active');
+                core.classList.add('active');
+                rings.forEach(r => r.classList.add('active'));
+            } else {
+                btn.classList.remove('active');
+                core.classList.remove('active');
+                rings.forEach(r => r.classList.remove('active'));
+            }
+            
+            // 更新右侧面板
+            updateOwnershipPanel();
+        }
+        
+        // 更新权属面板
+        function updateOwnershipPanel() {
+            const emptyState = document.getElementById('emptyState');
+            const content = document.getElementById('ownershipContent');
+            const sourceList = document.getElementById('sourceAssetsList');
+            const fusedList = document.getElementById('fusedOwnershipList');
+            
+            if (placedAssets.length === 0) {
+                emptyState.style.display = 'block';
+                content.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            content.style.display = 'block';
+            
+            // 来源资产
+            sourceList.innerHTML = placedAssets.map(({ asset }) => `
+                <div class="contributor-item">
+                    <span class="contributor-name">${asset.name}</span>
+                    <span class="contributor-share">${asset.id}</span>
+                </div>
+            `).join('');
+            
+            // 权属分配（平均分配）
+            const share = Math.floor(100 / placedAssets.length);
+            fusedList.innerHTML = placedAssets.map(({ asset }) => `
+                <div class="contributor-item">
+                    <span class="contributor-name">${asset.id} 贡献</span>
+                    <span class="contributor-share">${share}%</span>
+                </div>
+            `).join('');
+        }
+        
+        // 执行融合
+        function performFusion() {
+            if (placedAssets.length < 2) return;
+            
+            // 隐藏工作台，显示结果
+            document.getElementById('workbench').style.display = 'none';
+            document.getElementById('workbenchTitle').style.display = 'none';
+            document.getElementById('fuseBtn').style.display = 'none';
+            document.getElementById('successResult').classList.add('active');
+            
+            // 初始化结果3D
+            setTimeout(() => {
+                const canvas = document.getElementById('result-canvas');
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                camera.position.z = 5;
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                renderer.setSize(200, 200);
+                
+                scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                const light = new THREE.PointLight(0xffd700, 1.5, 100);
+                light.position.set(5, 5, 5);
+                scene.add(light);
+                
+                const molecule = createMolecule('compound', 0xffd700, 1.2);
+                scene.add(molecule);
+                
+                function animate() {
+                    requestAnimationFrame(animate);
+                    molecule.rotation.y += 0.01;
+                    molecule.rotation.x += 0.005;
+                    renderer.render(scene, camera);
+                }
+                animate();
+            }, 100);
+        }
+        
+        // 重置融合
+        function resetFusion() {
+            placedAssets = [];
+            
+            // 重置所有槽位
+            for (let i = 0; i < MAX_SLOTS; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                slot.classList.remove('filled');
+                slot.innerHTML = `<span style="color: rgba(150,170,200,0.3); font-size: 12px;">${i + 1}</span>`;
+            }
+            
+            // 显示工作台
+            document.getElementById('workbench').style.display = 'block';
+            document.getElementById('workbenchTitle').style.display = 'block';
+            document.getElementById('fuseBtn').style.display = 'block';
+            document.getElementById('fuseBtn').classList.remove('active');
+            document.getElementById('successResult').classList.remove('active');
+            
+            updateWorkbench();
+        }
+        
+        function goToNext() {
+            alert('进入融资决策页面');
+        }
+        
+        // 背景粒子
+        function initBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            for (let i = 0; i < 1500; i++) {
+                vertices.push(
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 50
+                );
+            }
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.15,
+                color: 0x00f0ff,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            camera.position.z = 30;
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                particles.rotation.y += 0.0003;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>

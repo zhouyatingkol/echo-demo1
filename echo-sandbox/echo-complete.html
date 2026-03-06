@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO Protocol - 完整版 | 铸造 + 协作衍生</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #020208;
+            color: #fff;
+            font-family: 'Orbitron', 'Noto+Sans+SC', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+            background: rgba(10, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        .nav-item {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #00f0ff;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        .nav-item.completed::after {
+            content: '✓';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff88;
+            font-size: 10px;
+        }
+        
+        /* 主容器 */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            padding: 80px 25px 30px;
+            gap: 25px;
+        }
+        
+        /* ===== STAGE 1: 铸造页面 ===== */
+        .stage-1 {
+            display: contents;
+        }
+        
+        /* 左侧：数据选择 */
+        .data-panel {
+            width: 320px;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s ease;
+        }
+        .data-panel.collapsed {
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .panel-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        .panel-title {
+            color: #00f0ff;
+            font-size: 18px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+        .panel-subtitle {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.6);
+            margin-top: 6px;
+        }
+        
+        .data-sources {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .data-sources::-webkit-scrollbar { width: 4px; }
+        
+        .source-category {
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease backwards;
+        }
+        .source-category:nth-child(1) { animation-delay: 0.1s; }
+        .source-category:nth-child(2) { animation-delay: 0.2s; }
+        .source-category:nth-child(3) { animation-delay: 0.3s; }
+        .source-category:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+            letter-spacing: 2px;
+        }
+        .category-icon { font-size: 16px; }
+        
+        .source-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .source-item:hover {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: rgba(0, 240, 255, 0.3);
+            transform: translateX(5px);
+        }
+        .source-item.selected {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: rgba(0, 240, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        }
+        .source-check {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .source-item.selected .source-check {
+            background: #00f0ff;
+            border-color: #00f0ff;
+            color: #000;
+        }
+        .source-name { flex: 1; font-size: 12px; }
+        .source-tag {
+            font-size: 9px;
+            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: rgba(150, 170, 200, 0.8);
+        }
+        
+        /* 中央：3D铸造台 */
+        .forge-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .forge-center.expanded {
+            display: none;
+        }
+        
+        .forge-platform {
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, rgba(10, 15, 30, 0.9) 60%, transparent 70%);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .forge-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px dashed rgba(0, 240, 255, 0.3);
+        }
+        .forge-ring:nth-child(1) { width: 80%; height: 80%; animation: rotate 20s linear infinite; }
+        .forge-ring:nth-child(2) { width: 60%; height: 60%; animation: rotate-reverse 15s linear infinite; }
+        .forge-ring:nth-child(3) { width: 40%; height: 40%; animation: rotate 10s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotate-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        
+        .forge-canvas {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+        }
+        
+        .mint-btn {
+            margin-top: 30px;
+            padding: 16px 50px;
+            border: 2px solid rgba(0, 240, 255, 0.4);
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(0, 150, 200, 0.1));
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .mint-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+            animation: btnGlow 2s infinite;
+        }
+        .mint-btn.active:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px rgba(0, 240, 255, 0.5);
+        }
+        @keyframes btnGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 240, 255, 0.6); }
+        }
+        
+        /* 右侧：权属配置 */
+        .config-panel {
+            width: 320px;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 24px;
+            transition: all 0.5s ease;
+        }
+        .config-panel.collapsed {
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .config-panel .panel-header { border-color: rgba(255, 215, 0, 0.2); }
+        .config-panel .panel-title {
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .config-section {
+            margin-bottom: 24px;
+            animation: fadeInUp 0.5s ease backwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+        }
+        
+        .section-title {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .input-field:focus {
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .slider-value {
+            min-width: 50px;
+            text-align: right;
+            font-size: 18px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px; height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .option-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .option-btn {
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: rgba(200, 220, 240, 0.8);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .option-btn.selected {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: rgba(255, 215, 0, 0.5);
+            color: #ffd700;
+        }
+        
+        /* ===== STAGE 2: 协作衍生页面 ===== */
+        .stage-2 {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: stageFadeIn 0.6s ease;
+        }
+        .stage-2.active {
+            display: flex;
+            gap: 25px;
+        }
+        @keyframes stageFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+        }
+        
+        /* 左侧已铸造资产 */
+        .assets-sidebar {
+            width: 280px;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-title {
+            color: #00f0ff;
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .sidebar-subtitle {
+            color: rgba(150, 170, 200, 0.6);
+            font-size: 11px;
+        }
+        .assets-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .assets-list::-webkit-scrollbar { width: 4px; }
+        
+        .asset-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: grab;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideIn 0.5s ease backwards;
+        }
+        .asset-item:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: rgba(0, 240, 255, 0.3);
+            transform: translateX(8px) scale(1.02);
+        }
+        .asset-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        .asset-preview {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+        .asset-info { flex: 1; }
+        .asset-name {
+            font-size: 13px;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .asset-id {
+            font-size: 10px;
+            font-family: 'Orbitron', sans-serif;
+            opacity: 0.7;
+        }
+        .asset-type {
+            font-size: 9px;
+            color: rgba(150, 170, 200, 0.6);
+            text-transform: uppercase;
+        }
+        
+        /* 中央协作池 */
+        .fusion-pool {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .collab-area {
+            flex: 1;
+            position: relative;
+            border: 2px dashed rgba(255, 215, 0, 0.3);
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .collab-area.drag-over {
+            border-color: rgba(255, 215, 0, 0.6);
+            background: rgba(255, 215, 0, 0.08);
+            box-shadow: inset 0 0 80px rgba(255, 215, 0, 0.15);
+        }
+        .collab-area.has-assets {
+            border-style: solid;
+            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+        }
+        
+        .collab-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .collab-hint.hidden { opacity: 0; }
+        .collab-hint-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.2;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .collab-hint-text {
+            font-size: 24px;
+            color: rgba(150, 170, 200, 0.6);
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+        .collab-hint-sub {
+            font-size: 13px;
+            color: rgba(150, 170, 200, 0.4);
+            line-height: 1.6;
+        }
+        
+        /* 池中的资产 */
+        .pool-asset {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: dropIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        @keyframes dropIn {
+            0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+            60% { transform: scale(1.1) rotate(10deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        .pool-asset:hover {
+            transform: scale(1.15);
+            z-index: 20;
+            box-shadow: 0 0 40px currentColor;
+        }
+        .pool-asset::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 50%;
+            border: 2px dashed currentColor;
+            opacity: 0.3;
+            animation: rotate 10s linear infinite;
+        }
+        .pool-asset-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%; height: 120%;
+            border-radius: 50%;
+            background: radial-gradient(circle, currentColor 0%, transparent 70%);
+            opacity: 0.2;
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.3; transform: translate(-50%, -50%) scale(1.1); }
+        }
+        .pool-asset-icon {
+            font-size: 36px;
+            margin-bottom: 4px;
+            animation: iconFloat 2s ease-in-out infinite;
+        }
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .pool-asset-id {
+            font-size: 11px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+        }
+        .pool-asset-type {
+            font-size: 8px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+        .pool-asset-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(255, 71, 87, 0.4);
+        }
+        .pool-asset:hover .pool-asset-remove {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* 能量线 */
+        .energy-line {
+            position: absolute;
+            height: 3px;
+            transform-origin: left center;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 215, 0, 0.8) 20%, 
+                rgba(0, 240, 255, 0.8) 50%,
+                rgba(255, 215, 0, 0.8) 80%,
+                transparent 100%
+            );
+            border-radius: 2px;
+            animation: energyFlow 2s linear infinite;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        @keyframes energyFlow {
+            0% { background-position: -200% 0; opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { background-position: 200% 0; opacity: 0.4; }
+        }
+        
+        /* 控制栏 */
+        .control-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 28px;
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+        }
+        .pool-stats {
+            display: flex;
+            gap: 30px;
+        }
+        .stat {
+            text-align: center;
+            position: relative;
+        }
+        .stat::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .stat:last-child::after { display: none; }
+        .stat-value {
+            font-size: 28px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s;
+        }
+        .stat-value.changed {
+            animation: numberPop 0.4s ease;
+        }
+        @keyframes numberPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); color: #fff; }
+            100% { transform: scale(1); }
+        }
+        .stat-label {
+            font-size: 10px;
+            color: rgba(150, 170, 200, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        
+        .fuse-btn {
+            padding: 14px 40px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(200, 150, 0, 0.1));
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .fuse-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+            animation: btnGlow 2s infinite;
+        }
+        .fuse-btn.active:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+        }
+        @keyframes btnGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
+        }
+        
+        .clear-btn {
+            padding: 12px 25px;
+            background: transparent;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            color: rgba(255, 100, 100, 0.8);
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .clear-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .clear-btn:hover {
+            border-color: rgba(255, 71, 87, 0.6);
+            color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+        
+        /* 右侧权属面板 */
+        .ownership-panel {
+            width: 300px;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-title {
+            color: #ffd700;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        .ownership-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeInUp 0.5s ease backwards;
+        }
+        .section-title {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .asset-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .asset-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid;
+            transition: all 0.3s;
+            animation: tagIn 0.4s ease backwards;
+        }
+        @keyframes tagIn {
+            from { opacity: 0; transform: scale(0.8); }
+        }
+        
+        .share-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .share-icon { font-size: 16px; margin-right: 10px; }
+        .share-name {
+            font-size: 13px;
+            color: rgba(220, 230, 240, 0.9);
+            display: flex;
+            align-items: center;
+        }
+        .share-value {
+            font-size: 14px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .rule-box {
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(0, 240, 255, 0.05));
+            border-left: 3px solid #ffd700;
+            border-radius: 0 12px 12px 0;
+            font-size: 12px;
+            color: rgba(220, 230, 240, 0.85);
+            line-height: 1.8;
+        }
+        .rule-box li {
+            margin-bottom: 6px;
+            list-style: none;
+            padding-left: 15px;
+            position: relative;
+        }
+        .rule-box li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #ffd700;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(150, 170, 200, 0.5);
+        }
+        .empty-icon { 
+            font-size: 50px; 
+            margin-bottom: 20px; 
+            opacity: 0.3;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* 成功弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .success-card {
+            background: linear-gradient(135deg, rgba(10, 15, 30, 0.98), rgba(20, 25, 50, 0.98));
+            border: 2px solid rgba(0, 240, 255, 0.4);
+            border-radius: 40px;
+            padding: 50px 70px;
+            text-align: center;
+            box-shadow: 0 0 100px rgba(0, 240, 255, 0.2);
+            animation: cardAppear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .success-card.stage2 {
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 100px rgba(255, 215, 0, 0.2);
+        }
+        .success-card.stage2 .success-title {
+            color: #ffd700;
+        }
+        .success-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 240, 255, 0.1), transparent 30%);
+            animation: rotate 8s linear infinite;
+        }
+        .success-card.stage2::before {
+            background: conic-gradient(from 0deg, transparent, rgba(255, 215, 0, 0.1), transparent 30%);
+        }
+        @keyframes cardAppear {
+            from { opacity: 0; transform: scale(0.5) translateY(50px); }
+        }
+        .success-content {
+            position: relative;
+            z-index: 1;
+        }
+        .success-icon {
+            font-size: 70px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .success-title {
+            font-size: 32px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+        .success-subtitle {
+            font-size: 14px;
+            color: rgba(200, 220, 240, 0.7);
+            margin-bottom: 30px;
+        }
+        .asset-result {
+            padding: 20px 30px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        .stage2 .asset-result {
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+        .asset-id-display {
+            font-size: 28px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+        }
+        .stage2 .asset-id-display {
+            color: #ffd700;
+        }
+        .result-preview {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+            animation: resultFloat 3s ease-in-out infinite;
+        }
+        @keyframes resultFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-cyan {
+            border-color: rgba(0, 240, 255, 0.5);
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(0, 150, 200, 0.1));
+            color: #00f0ff;
+        }
+        .btn-gold {
+            border-color: rgba(255, 215, 0, 0.5);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(200, 150, 0, 0.1));
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="top-nav">
+        <div class="nav-item active" id="nav-stage1">资产铸造</div>
+        <div class="nav-item" id="nav-stage2">协作衍生</div>
+        <div class="nav-item">融资决策</div>
+    </div>
+    
+    <div class="main-container">
+        <!-- ===== STAGE 1: 铸造 ===== -->
+        <div class="stage-1" id="stage1">
+            <!-- 左侧数据面板 -->
+            <div class="data-panel" id="dataPanel">
+                <div class="panel-header">
+                    <div class="panel-title">⬡ 数据源</div>
+                    <div class="panel-subtitle">选择要上链的数据</div>
+                </div>
+                <div class="data-sources" id="dataSources">
+                    <div class="source-category">
+                        <div class="category-header"><span class="category-icon">🧬</span> 生物信息</div>
+                        <div class="source-item" data-id="protein" onclick="toggleSource(this)">
+                            <div class="source-check">✓</div><div class="source-name">蛋白质结构</div><div class="source-tag">PDB</div>
+                        </div>
+                        <div class="source-item" data-id="gene" onclick="toggleSource(this)">
+                            <div class="source-check">✓</div><div class="source-name">基因序列</div><div class="source-tag">NGS</div>
+                        </div>
+                    </div>
+                    <div class="source-category">
+                        <div class="category-header"><span class="category-icon">⚗️</span> 化学数据</div>
+                        <div class="source-item" data-id="compound" onclick="toggleSource(this)">
+                            <div class="source-check">✓</div><div class="source-name">化合物库</div><div class="source-tag">Mol</div>
+                        </div>
+                        <div class="source-item" data-id="assay" onclick="toggleSource(this)">
+                            <div class="source-check">✓</div><div class="source-name">实验数据</div><div class="source-tag">Bio</div>
+                        </div>
+                    </div>
+                    <div class="source-category">
+                        <div class="category-header"><span class="category-icon">💻</span> 计算数据</div>
+                        <div class="source-item" data-id="screening" onclick="toggleSource(this)">
+                            <div class="source-check">✓</div><div class="source-name">虚拟筛选</div><div class="source-tag">AI</div>
+                        </div>
+                        <div class="source-item" data-id="simulation" onclick="toggleSource(this)">
+                            <div class="source-check">✓</div><div class="source-name">分子模拟</div><div class="source-tag">MD</div>
+                        </div>
+                    </div>
+                    <div class="source-category">
+                        <div class="category-header"><span class="category-icon">📄</span> 文档资料</div>
+                        <div class="source-item" data-id="patent" onclick="toggleSource(this)">
+                            <div class="source-check">✓</div><div class="source-name">专利信息</div><div class="source-tag">IP</div>
+                        </div>
+                        <div class="source-item" data-id="paper" onclick="toggleSource(this)">
+                            <div class="source-check">✓</div><div class="source-name">论文数据</div><div class="source-tag">DOI</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 中央铸造台 -->
+            <div class="forge-center" id="forgeCenter">
+                <div class="forge-platform">
+                    <div class="forge-ring"></div>
+                    <div class="forge-ring"></div>
+                    <div class="forge-ring"></div>
+                    <canvas id="forgeCanvas" class="forge-canvas"></canvas>
+                </div>
+                <button class="mint-btn" id="mintBtn" onclick="performMint()">⚡ 开始铸造</button>
+            </div>
+            
+            <!-- 右侧配置面板 -->
+            <div class="config-panel" id="configPanel">
+                <div class="panel-header">
+                    <div class="panel-title">⬡ 权属配置</div>
+                    <div class="panel-subtitle">设置资产参数</div>
+                </div>
+                <div class="config-section">
+                    <div class="section-title">资产名称</div>
+                    <input type="text" class="input-field" placeholder="输入资产名称..." value="PDB Dataset 001">
+                </div>
+                <div class="config-section">
+                    <div class="section-title">开放程度</div>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="50" id="openSlider" oninput="updateSlider(this.value)">
+                        <div class="slider-value" id="sliderValue">50%</div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <div class="section-title">收益分配</div>
+                    <div class="option-group">
+                        <div class="option-btn selected" onclick="selectOption(this)">研究者 70%</div>
+                        <div class="option-btn" onclick="selectOption(this)">团队 50/50</div>
+                        <div class="option-btn" onclick="selectOption(this)">自定义</div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <div class="section-title">授权许可</div>
+                    <div class="option-group">
+                        <div class="option-btn selected" onclick="selectOption(this)">CC-BY</div>
+                        <div class="option-btn" onclick="selectOption(this)">CC-BY-SA</div>
+                        <div class="option-btn" onclick="selectOption(this)">私有</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ===== STAGE 2: 协作衍生 ===== -->
+        <div class="stage-2" id="stage2">
+            <!-- 左侧已铸造资产 -->
+            <div class="assets-sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">⬡ 已铸造资产</div>
+                    <div class="sidebar-subtitle">拖拽资产到协作池</div>
+                </div>
+                <div class="assets-list" id="assetsList">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 中央协作池 -->
+            <div class="fusion-pool">
+                <div class="collab-area" id="collabArea">
+                    <div class="collab-hint" id="collabHint">
+                        <div class="collab-hint-icon">⬡</div>
+                        <div class="collab-hint-text">协作池</div>
+                        <div class="collab-hint-sub">从左侧拖拽资产到此处<br>可组合任意数量的资产</div>
+                    </div>
+                </div>
+                
+                <div class="control-bar">
+                    <div class="pool-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="assetCount">0</div>
+                            <div class="stat-label">已选资产</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="totalShare">100%</div>
+                            <div class="stat-label">总权益</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="fusionPower">0</div>
+                            <div class="stat-label">融合力</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="clear-btn" id="clearBtn" onclick="clearPool()">清空</button>
+                        <button class="fuse-btn" id="fuseBtn" onclick="performFusion()">✨ 开始融合</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧权属面板 -->
+            <div class="ownership-panel">
+                <div class="panel-header">
+                    <div class="panel-title">⬡ 融合权属</div>
+                </div>
+                <div class="ownership-content" id="ownershipContent">
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">⬡</div>
+                        <div>拖拽资产到协作池</div>
+                        <div style="font-size: 11px; margin-top: 10px; opacity: 0.6;">查看融合权属分配</div>
+                    </div>
+                    <div id="ownershipDetails" style="display: none;">
+                        <div class="section">
+                            <div class="section-title">已选资产</div>
+                            <div class="asset-tags" id="selectedAssets"></div>
+                        </div>
+                        <div class="section">
+                            <div class="section-title">权益分配</div>
+                            <div id="shareDistribution"></div>
+                        </div>
+                        <div class="section" style="border-bottom: none;">
+                            <div class="section-title">融合规则</div>
+                            <ul class="rule-box">
+                                <li>所有选中资产的权属将合并</li>
+                                <li>收益按资产类型权重自动分配</li>
+                                <li>继承上游资产全部规则</li>
+                                <li>里程碑触发即时结算</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 铸造成功弹窗 -->
+    <div class="modal-overlay" id="mintModal">
+        <div class="success-card">
+            <div class="success-content">
+                <div class="success-icon">🎉</div>
+                <div class="success-title">铸造成功</div>
+                <div class="success-subtitle">您的数据资产已上链</div>
+                <div class="asset-result">
+                    <div class="asset-id-display" id="mintResultId">PDB-001</div>
+                    <div style="color: rgba(150,170,200,0.7); font-size: 13px;">蛋白质结构数据 · 完全开放</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeMintModal()">继续铸造</button>
+                    <button class="btn btn-cyan" onclick="goToStage2()">进入协作衍生 →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 融合成功弹窗 -->
+    <div class="modal-overlay" id="fusionModal">
+        <div class="success-card stage2">
+            <div class="success-content">
+                <div class="success-icon">✨</div>
+                <div class="success-title">融合成功</div>
+                <div class="success-subtitle">新资产 NeuroBlok 已生成</div>
+                <div class="result-preview">
+                    <canvas id="result3d" width="170" height="170"></canvas>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeFusionModal()">继续协作</button>
+                    <button class="btn btn-gold" onclick="goToStage3()">进入融资决策 →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ========== STAGE 1 数据 ==========
+        let selectedSources = new Set();
+        let mintedAssets = [];
+        
+        // 资产模板数据
+        const assetTemplates = {
+            protein: { name: '蛋白质结构', icon: '🧬', color: '#00f0ff', weight: 1.2 },
+            gene: { name: '基因序列', icon: '🧪', color: '#0088ff', weight: 1.5 },
+            compound: { name: '化合物库', icon: '⚗️', color: '#00ff88', weight: 1.0 },
+            assay: { name: '实验数据', icon: '📊', color: '#a29bfe', weight: 1.3 },
+            screening: { name: '虚拟筛选', icon: '💻', color: '#88ffcc', weight: 0.8 },
+            simulation: { name: '分子模拟', icon: '🔬', color: '#74b9ff', weight: 1.1 },
+            patent: { name: '专利信息', icon: '📜', color: '#ff69b4', weight: 1.8 },
+            paper: { name: '论文数据', icon: '📄', color: '#ffa502', weight: 1.0 }
+        };
+        
+        // ========== STAGE 2 数据 ==========
+        let draggedAsset = null;
+        let poolAssets = [];
+        let assetCounter = 0;
+        
+        // ========== 初始化 ==========
+        window.onload = () => {
+            initBackground();
+            initForge();
+            initCollabArea();
+        };
+        
+        // ========== STAGE 1 功能 ==========
+        function toggleSource(el) {
+            const id = el.dataset.id;
+            if (selectedSources.has(id)) {
+                selectedSources.delete(id);
+                el.classList.remove('selected');
+            } else {
+                selectedSources.add(id);
+                el.classList.add('selected');
+            }
+            updateMintBtn();
+        }
+        
+        function updateMintBtn() {
+            const btn = document.getElementById('mintBtn');
+            if (selectedSources.size > 0) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+        
+        function updateSlider(val) {
+            document.getElementById('sliderValue').textContent = val + '%';
+        }
+        
+        function selectOption(el) {
+            el.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function performMint() {
+            if (selectedSources.size === 0) return;
+            
+            // 生成资产
+            selectedSources.forEach(sourceId => {
+                const template = assetTemplates[sourceId];
+                const assetId = sourceId.toUpperCase() + '-' + String(mintedAssets.length + 1).padStart(3, '0');
+                mintedAssets.push({
+                    id: assetId,
+                    ...template,
+                    sourceId: sourceId
+                });
+            });
+            
+            // 显示第一个铸造结果
+            const firstAsset = mintedAssets[mintedAssets.length - selectedSources.size];
+            document.getElementById('mintResultId').textContent = firstAsset.id;
+            document.getElementById('mintModal').classList.add('active');
+            
+            // 更新资产列表
+            updateAssetsList();
+        }
+        
+        function closeMintModal() {
+            document.getElementById('mintModal').classList.remove('active');
+        }
+        
+        function goToStage2() {
+            // 隐藏铸造面板，显示协作面板
+            document.getElementById('stage1').style.display = 'none';
+            document.getElementById('stage2').classList.add('active');
+            
+            // 更新导航
+            document.getElementById('nav-stage1').classList.remove('active');
+            document.getElementById('nav-stage1').classList.add('completed');
+            document.getElementById('nav-stage2').classList.add('active');
+            
+            closeMintModal();
+        }
+        
+        // ========== STAGE 2 功能 ==========
+        function updateAssetsList() {
+            const list = document.getElementById('assetsList');
+            list.innerHTML = '';
+            
+            mintedAssets.forEach((asset, index) => {
+                const item = document.createElement('div');
+                item.className = 'asset-item';
+                item.style.animationDelay = `${index * 0.1}s`;
+                item.draggable = true;
+                item.dataset.id = asset.id;
+                item.innerHTML = `
+                    <div class="asset-preview" style="color: ${asset.color}; border: 1px solid ${asset.color}40;">${asset.icon}</div>
+                    <div class="asset-info">
+                        <div class="asset-name">${asset.name}</div>
+                        <div class="asset-id" style="color: ${asset.color};">${asset.id}</div>
+                        <div class="asset-type">权重: ${asset.weight}x</div>
+                    </div>
+                `;
+                
+                item.addEventListener('dragstart', () => {
+                    draggedAsset = asset;
+                    item.classList.add('dragging');
+                });
+                
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                    draggedAsset = null;
+                });
+                
+                list.appendChild(item);
+            });
+        }
+        
+        function initCollabArea() {
+            const area = document.getElementById('collabArea');
+            
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('drag-over');
+            });
+            
+            area.addEventListener('dragleave', () => {
+                area.classList.remove('drag-over');
+            });
+            
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('drag-over');
+                
+                if (draggedAsset) {
+                    const rect = area.getBoundingClientRect();
+                    const padding = 60;
+                    const x = padding + Math.random() * (rect.width - padding * 2 - 100);
+                    const y = padding + Math.random() * (rect.height - padding * 2 - 100);
+                    addAssetToPool(draggedAsset, x, y);
+                }
+            });
+        }
+        
+        function addAssetToPool(asset, x, y) {
+            if (poolAssets.find(a => a.assetData.id === asset.id)) return;
+            
+            const poolAsset = {
+                id: `pool-${assetCounter++}`,
+                assetData: asset,
+                x, y
+            };
+            poolAssets.push(poolAsset);
+            
+            const el = document.createElement('div');
+            el.className = 'pool-asset';
+            el.id = poolAsset.id;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            el.style.color = asset.color;
+            el.innerHTML = `
+                <div class="pool-asset-glow"></div>
+                <div class="pool-asset-icon">${asset.icon}</div>
+                <div class="pool-asset-id">${asset.id}</div>
+                <div class="pool-asset-type">${asset.weight}x</div>
+                <div class="pool-asset-remove" onclick="removeAssetFromPool('${poolAsset.id}')">×</div>
+            `;
+            
+            document.getElementById('collabArea').appendChild(el);
+            document.getElementById('collabHint').classList.add('hidden');
+            document.getElementById('collabArea').classList.add('has-assets');
+            
+            drawConnections();
+            updateUI();
+        }
+        
+        function removeAssetFromPool(poolId) {
+            const index = poolAssets.findIndex(a => a.id === poolId);
+            if (index === -1) return;
+            
+            poolAssets.splice(index, 1);
+            document.getElementById(poolId)?.remove();
+            
+            document.querySelectorAll('.energy-line').forEach(l => l.remove());
+            if (poolAssets.length > 1) drawConnections();
+            
+            if (poolAssets.length === 0) {
+                document.getElementById('collabHint').classList.remove('hidden');
+                document.getElementById('collabArea').classList.remove('has-assets');
+            }
+            
+            updateUI();
+        }
+        
+        function drawConnections() {
+            document.querySelectorAll('.energy-line').forEach(l => l.remove());
+            
+            if (poolAssets.length < 2) return;
+            
+            const area = document.getElementById('collabArea');
+            const centerX = area.offsetWidth / 2;
+            const centerY = area.offsetHeight / 2;
+            
+            poolAssets.forEach(({ x, y }) => {
+                const line = document.createElement('div');
+                line.className = 'energy-line';
+                const x1 = x + 50;
+                const y1 = y + 50;
+                const length = Math.sqrt((centerX - x1) ** 2 + (centerY - y1) ** 2);
+                const angle = Math.atan2(centerY - y1, centerX - x1) * 180 / Math.PI;
+                
+                line.style.width = `${length}px`;
+                line.style.left = `${x1}px`;
+                line.style.top = `${y1}px`;
+                line.style.transform = `rotate(${angle}deg)`;
+                area.appendChild(line);
+            });
+        }
+        
+        function clearPool() {
+            poolAssets = [];
+            document.querySelectorAll('.pool-asset').forEach(el => el.remove());
+            document.querySelectorAll('.energy-line').forEach(l => l.remove());
+            document.getElementById('collabHint').classList.remove('hidden');
+            document.getElementById('collabArea').classList.remove('has-assets');
+            updateUI();
+        }
+        
+        function updateUI() {
+            const count = poolAssets.length;
+            const countEl = document.getElementById('assetCount');
+            countEl.textContent = count;
+            countEl.classList.add('changed');
+            setTimeout(() => countEl.classList.remove('changed'), 400);
+            
+            const power = poolAssets.reduce((sum, { assetData }) => sum + assetData.weight, 0);
+            document.getElementById('fusionPower').textContent = power.toFixed(1);
+            
+            const fuseBtn = document.getElementById('fuseBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            
+            if (count >= 2) {
+                fuseBtn.classList.add('active');
+            } else {
+                fuseBtn.classList.remove('active');
+            }
+            
+            clearBtn.classList.toggle('visible', count > 0);
+            
+            updateOwnershipPanel();
+        }
+        
+        function updateOwnershipPanel() {
+            const emptyState = document.getElementById('emptyState');
+            const details = document.getElementById('ownershipDetails');
+            
+            if (poolAssets.length === 0) {
+                emptyState.style.display = 'block';
+                details.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            details.style.display = 'block';
+            
+            const tagsContainer = document.getElementById('selectedAssets');
+            tagsContainer.innerHTML = poolAssets.map(({ assetData }, i) => `
+                <span class="asset-tag" style="border-color: ${assetData.color}40; animation-delay: ${i * 0.1}s;">
+                    <span class="asset-tag-icon">${assetData.icon}</span>
+                    <span class="asset-tag-id" style="color: ${assetData.color};">${assetData.id}</span>
+                </span>
+            `).join('');
+            
+            const totalWeight = poolAssets.reduce((sum, { assetData }) => sum + assetData.weight, 0);
+            const shareContainer = document.getElementById('shareDistribution');
+            
+            shareContainer.innerHTML = poolAssets.map(({ assetData }) => {
+                const share = ((assetData.weight / totalWeight) * 100).toFixed(1);
+                return `
+                    <div class="share-item">
+                        <div class="share-name">
+                            <span class="share-icon">${assetData.icon}</span>
+                            ${assetData.name}
+                        </div>
+                        <div class="share-value">${share}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function performFusion() {
+            if (poolAssets.length < 2) return;
+            document.getElementById('fusionModal').classList.add('active');
+            
+            setTimeout(() => {
+                const canvas = document.getElementById('result3d');
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                camera.position.z = 5;
+                
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                renderer.setSize(170, 170);
+                
+                scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                const light = new THREE.PointLight(0xffd700, 2, 100);
+                light.position.set(5, 5, 5);
+                scene.add(light);
+                
+                const group = new THREE.Group();
+                const core = new THREE.Mesh(
+                    new THREE.IcosahedronGeometry(0.8, 1),
+                    new THREE.MeshPhongMaterial({ 
+                        color: 0xffd700, 
+                        emissive: 0xffd700, 
+                        emissiveIntensity: 0.4,
+                        wireframe: true
+                    })
+                );
+                group.add(core);
+                
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const sphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.15, 8, 8),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffd700, 
+                            emissive: 0xffd700, 
+                            emissiveIntensity: 0.6 
+                        })
+                    );
+                    sphere.position.set(Math.cos(angle) * 1.5, Math.sin(angle) * 1.5, 0);
+                    group.add(sphere);
+                }
+                
+                scene.add(group);
+                
+                function animate() {
+                    requestAnimationFrame(animate);
+                    group.rotation.y += 0.015;
+                    group.rotation.x += 0.008;
+                    core.scale.setScalar(1 + Math.sin(Date.now() * 0.002) * 0.1);
+                    renderer.render(scene, camera);
+                }
+                animate();
+            }, 100);
+        }
+        
+        function closeFusionModal() {
+            document.getElementById('fusionModal').classList.remove('active');
+        }
+        
+        function goToStage3() {
+            alert('进入融资决策阶段！');
+        }
+        
+        // ========== 3D 背景 ==========
+        function initBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            for (let i = 0; i < 2000; i++) {
+                vertices.push(
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 50
+                );
+            }
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.15,
+                color: 0x00f0ff,
+                transparent: true,
+                opacity: 0.5,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            camera.position.z = 30;
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                particles.rotation.y += 0.0003;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+        
+        // ========== 3D 铸造台 ==========
+        function initForge() {
+            const canvas = document.getElementById('forgeCanvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 5;
+            
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(300, 300);
+            
+            const geometry = new THREE.IcosahedronGeometry(1.2, 1);
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x00f0ff,
+                emissive: 0x00f0ff,
+                emissiveIntensity: 0.3,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.8
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            const light = new THREE.PointLight(0x00f0ff, 2, 100);
+            light.position.set(5, 5, 5);
+            scene.add(light);
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.y += 0.005;
+                mesh.rotation.x += 0.003;
+                mesh.scale.setScalar(1 + Math.sin(Date.now() * 0.001) * 0.1);
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
