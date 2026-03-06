@@ -609,6 +609,33 @@
         }
         .success-icon { font-size: 80px; color: #ffd700; text-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
         
+        /* 融合按钮样式 */
+        .fuse-btn {
+            padding: 14px 40px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(200, 150, 0, 0.1));
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: not-allowed;
+            border-radius: 30px;
+            transition: all 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .fuse-btn.active {
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            border-color: rgba(255, 215, 0, 0.8);
+        }
+        .fuse-btn.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
+        }
+        
         /* ===== STAGE 2-4: 其他页面 ===== */
         .stage-content {
             display: flex;
@@ -810,7 +837,7 @@
                     </div>
                     <div style="display: flex; gap: 12px;">
                         <button class="clear-btn" id="clearBtn" style="padding: 12px 25px; background: transparent; border: 1px solid rgba(255, 71, 87, 0.3); color: rgba(255, 100, 100, 0.8); font-size: 12px; cursor: pointer; border-radius: 25px; transition: all 0.3s; opacity: 0; pointer-events: none; font-family: 'Orbitron', sans-serif;">清空</button>
-                        <button class="fuse-btn" id="fuseBtn" style="padding: 14px 40px; border: 2px solid rgba(255, 215, 0, 0.4); background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(200, 150, 0, 0.1)); color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 30px; transition: all 0.3s; opacity: 0.4; pointer-events: none;">✨ 开始融合</button>
+                        <button class="fuse-btn" id="fuseBtn">✨ 开始融合</button>
                     </div>
                 </div>
             </div>
@@ -1728,17 +1755,9 @@
             const clearBtn = document.getElementById('clearBtn');
             
             if (count >= 2) {
-                fuseBtn.style.opacity = '1';
-                fuseBtn.style.cursor = 'pointer';
-                fuseBtn.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.6)';
-                fuseBtn.style.borderColor = 'rgba(255, 215, 0, 0.8)';
-                fuseBtn.style.pointerEvents = 'auto';
+                fuseBtn.classList.add('active');
             } else {
-                fuseBtn.style.opacity = '0.4';
-                fuseBtn.style.cursor = 'not-allowed';
-                fuseBtn.style.boxShadow = 'none';
-                fuseBtn.style.borderColor = 'rgba(255, 215, 0, 0.4)';
-                fuseBtn.style.pointerEvents = 'none';
+                fuseBtn.classList.remove('active');
             }
             
             if (count > 0) {
