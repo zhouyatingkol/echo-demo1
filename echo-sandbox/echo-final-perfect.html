@@ -474,6 +474,10 @@
         .asset-card[data-id="PATENT-007"]:hover { box-shadow: 0 15px 40px rgba(255, 105, 180, 0.4); }
         .asset-card[data-id="PATENT-007"] .asset-id { color: #ff69b4; text-shadow: 0 0 10px rgba(255, 105, 180, 0.5); }
         
+        .asset-card[data-id="PAPER-008"] { border-color: rgba(255, 107, 107, 0.5); }
+        .asset-card[data-id="PAPER-008"]:hover { box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4); }
+        .asset-card[data-id="PAPER-008"] .asset-id { color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
+        
         .asset-card[data-id="NeuroBlok"] { border-color: rgba(255, 215, 0, 0.6); }
         .asset-card[data-id="NeuroBlok"]:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.5); }
         .asset-card[data-id="NeuroBlok"] .asset-id { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
@@ -641,10 +645,34 @@
         }
         .dist-item {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 12px;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 3px solid;
+        }
+        .dist-icon { font-size: 20px; }
+        .dist-info { flex: 1; }
+        .dist-name { font-size: 12px; color: rgba(200,220,240,0.9); margin-bottom: 4px; }
+        .dist-bar-bg {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .dist-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        .dist-share {
+            font-size: 14px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            min-width: 45px;
+            text-align: right;
         }
         
         /* 拖拽提示 */
@@ -821,7 +849,7 @@
                 <div class="stats-panel">
                     <div class="stat-row">
                         <span class="stat-label">总资产</span>
-                        <span class="stat-value" id="totalAssets">7</span>
+                        <span class="stat-value" id="totalAssets">8</span>
                     </div>
                     <div class="stat-row">
                         <span class="stat-label">已铸造</span>
@@ -1070,6 +1098,10 @@
               contributors: [{name: 'Inventor Team', share: '50%'}, {name: 'Institution', share: '35%'}, {name: 'Legal DAO', share: '15%'}],
               rules: '专利到期自动转为开放许可<br>侵权诉讼收益按比例分配<br>许可费用按引用次数递减',
               created: '2024.01.25' },
+            { id: 'PAPER-008', name: '论文数据', icon: '📄', color: '#ff6b6b', colorHex: 0xff6b6b, type: 'paper', weight: 1.0, minted: false,
+              contributors: [{name: 'Author Team', share: '60%'}, {name: 'Journal DAO', share: '25%'}, {name: 'Peer Reviewers', share: '15%'}],
+              rules: '引用即产生微支付<br>数据复用需引用原始论文<br>开放获取版本收益归作者',
+              created: '2024.02.28' },
             { id: 'NeuroBlok', name: '协作成果', icon: '✨', color: '#ffd700', colorHex: 0xffd700, type: 'collaboration', weight: 2.5, minted: false,
               contributors: [{name: 'NeuroDAO', share: '40%'}, {name: 'Core Contributors', share: '35%'}, {name: 'Community Treasury', share: '25%'}],
               rules: '重大决策需DAO投票<br>代码贡献与治理权重挂钩<br>新成员加入需现有成员背书',
@@ -1270,6 +1302,52 @@
                         docGroup.add(line);
                     }
                     group.add(docGroup);
+                    break;
+                    
+                case 'paper':
+                    // 论文 - 卷轴/书本形状
+                    const paperGroup = new THREE.Group();
+                    // 左页
+                    const leftPage = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.9 * scale, 2.0 * scale, 0.1 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                    );
+                    leftPage.position.set(-0.5 * scale, 0, 0);
+                    leftPage.rotation.z = 0.1;
+                    paperGroup.add(leftPage);
+                    // 右页
+                    const rightPage = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.9 * scale, 2.0 * scale, 0.1 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                    );
+                    rightPage.position.set(0.5 * scale, 0, 0);
+                    rightPage.rotation.z = -0.1;
+                    paperGroup.add(rightPage);
+                    // 书脊
+                    const spine = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.2 * scale, 2.0 * scale, 0.15 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.4 })
+                    );
+                    paperGroup.add(spine);
+                    // 线条
+                    for (let i = 0; i < 3; i++) {
+                        const lineL = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.6 * scale, 0.06 * scale, 0.05 * scale),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 })
+                        );
+                        lineL.position.set(-0.5 * scale, 0.5 - i * 0.4, 0.08 * scale);
+                        lineL.rotation.z = 0.1;
+                        paperGroup.add(lineL);
+                        
+                        const lineR = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.6 * scale, 0.06 * scale, 0.05 * scale),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 })
+                        );
+                        lineR.position.set(0.5 * scale, 0.5 - i * 0.4, 0.08 * scale);
+                        lineR.rotation.z = -0.1;
+                        paperGroup.add(lineR);
+                    }
+                    group.add(paperGroup);
                     break;
                     
                 case 'collaboration':
@@ -1526,7 +1604,7 @@
         function updateProgress() {
             const minted = assets.filter(a => a.minted).length;
             document.getElementById('mintedCount').textContent = minted;
-            document.getElementById('progressFill').style.width = `${(minted / 7) * 100}%`;
+            document.getElementById('progressFill').style.width = `${(minted / 8) * 100}%`;
         }
 
         // ===== 协作衍生功能 =====
@@ -1639,7 +1717,7 @@
             } else {
                 // 更多资产时均匀分布
                 const angle = ((poolAssets.length - 1) / 6) * Math.PI * 2 - Math.PI / 2;
-                const radius = 110;
+                const radius = 140;
                 x = centerX + Math.cos(angle) * radius;
                 y = centerY + Math.sin(angle) * radius;
             }
@@ -1758,7 +1836,9 @@
                 tagsEl.innerHTML = '<div style="color: rgba(150,170,200,0.5); font-size: 12px; padding: 10px 0;">暂无选中资产</div>';
             } else {
                 tagsEl.innerHTML = poolAssets.map(a => 
-                    `<span class="tag-item" style="border-color:${a.color}40;color:${a.color};">${a.id}</span>`
+                    `<span class="tag-item" style="border-color:${a.color}60;color:${a.color};background:rgba(0,0,0,0.3);">
+                        <span style="margin-right:6px;">${a.icon}</span>${a.id}
+                    </span>`
                 ).join('');
             }
             
@@ -1767,11 +1847,17 @@
                 shareList.innerHTML = '';
             } else {
                 shareList.innerHTML = poolAssets.map(a => {
-                    const share = totalWeight > 0 ? ((a.weight / totalWeight) * 100).toFixed(0) : 0;
+                    const share = totalWeight > 0 ? ((a.weight / totalWeight) * 100) : 0;
                     return `
-                        <div class="dist-item">
-                            <span style="color:rgba(200,220,240,0.8);">${a.name}</span>
-                            <span style="color:#ffd700;">${share}%</span>
+                        <div class="dist-item" style="border-color:${a.color};">
+                            <div class="dist-icon">${a.icon}</div>
+                            <div class="dist-info">
+                                <div class="dist-name">${a.name}</div>
+                                <div class="dist-bar-bg">
+                                    <div class="dist-bar-fill" style="width:${share}%;background:${a.color};"></div>
+                                </div>
+                            </div>
+                            <div class="dist-share">${share.toFixed(0)}%</div>
                         </div>
                     `;
                 }).join('');
