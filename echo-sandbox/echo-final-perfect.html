@@ -3390,15 +3390,19 @@ function initValue3D() {
     const canvas = document.getElementById('value3dCanvas');
     if (!canvas) return;
     
+    // 获取画布尺寸（使用窗口大小作为后备）
+    const width = canvas.clientWidth || window.innerWidth;
+    const height = canvas.clientHeight || window.innerHeight;
+    
     valueScene = new THREE.Scene();
     valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
     
-    valueCamera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    valueCamera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
     valueCamera.position.set(0, 40, 90);
     valueCamera.lookAt(0, -10, 0);
     
     valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-    valueRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    valueRenderer.setSize(width, height);
     valueRenderer.setPixelRatio(window.devicePixelRatio);
     
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
