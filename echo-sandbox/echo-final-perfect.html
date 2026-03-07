@@ -3899,7 +3899,13 @@ function createGlowingSphere(scale, color) {
             emissiveIntensity: 0.4 
         })
     );
-}    
+}
+
+// 流动连线
+function createFlowLine(start, end, color, isMain) {
+    const points = [start, end];
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    
     // 主线
     const line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ 
         color, transparent: true, opacity: isMain ? 0.6 : 0.4 
