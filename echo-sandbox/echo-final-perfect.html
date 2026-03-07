@@ -68,7 +68,7 @@
             height: 100vh;
         }
         .glass-card {
-            background: rgba(10, 15, 30, 0.85);
+            background: rgba(10, 15, 30, 0.35);
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 24px;
             backdrop-filter: blur(20px);
@@ -138,7 +138,7 @@
             display: flex;
             gap: 30px;
             z-index: 100;
-            background: rgba(10, 15, 30, 0.8);
+            background: rgba(10, 15, 30, 0.3);
             backdrop-filter: blur(10px);
             padding: 12px 30px;
             border-radius: 30px;
@@ -156,7 +156,7 @@
         /* 左侧资产库 */
         .asset-library {
             width: 380px;
-            background: rgba(10, 15, 30, 0.6);
+            background: rgba(10, 15, 30, 0.25);
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 24px;
             backdrop-filter: blur(20px);
@@ -361,7 +361,7 @@
         /* 右侧权属面板 */
         .ownership-panel {
             width: 320px;
-            background: rgba(10, 15, 30, 0.6);
+            background: rgba(10, 15, 30, 0.25);
             border: 1px solid rgba(255, 215, 0, 0.3);
             border-radius: 24px;
             backdrop-filter: blur(20px);
@@ -669,7 +669,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 30px;
-            background: rgba(10, 15, 30, 0.9);
+            background: rgba(10, 15, 30, 0.35);
             border: 1px solid rgba(255, 215, 0, 0.2);
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -794,7 +794,7 @@
         }
         .modal-overlay.active { display: flex; opacity: 1; }
         .mint-modal, .fusion-modal {
-            background: rgba(10, 15, 30, 0.95);
+            background: rgba(10, 15, 30, 0.4);
             border: 1px solid rgba(0, 240, 255, 0.3);
             border-radius: 24px;
             padding: 40px;
@@ -878,7 +878,7 @@
         
         .finance-config {
             flex: 1;
-            background: rgba(10, 15, 30, 0.6);
+            background: rgba(10, 15, 30, 0.25);
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 24px;
             padding: 30px;
@@ -1022,7 +1022,7 @@
             display: flex;
             gap: 20px;
             padding: 20px;
-            background: rgba(10, 15, 30, 0.6);
+            background: rgba(10, 15, 30, 0.25);
             border-radius: 16px;
             border: 1px solid rgba(255, 215, 0, 0.1);
         }
@@ -1103,7 +1103,7 @@
         
         .fusion-showcase {
             flex: 1;
-            background: rgba(10, 15, 30, 0.9);
+            background: rgba(10, 15, 30, 0.35);
             border: 2px solid rgba(255, 215, 0, 0.3);
             border-radius: 24px;
             padding: 30px;
@@ -1228,7 +1228,7 @@
             display: flex;
             gap: 20px;
             padding: 20px;
-            background: rgba(10, 15, 30, 0.6);
+            background: rgba(10, 15, 30, 0.25);
             border-radius: 16px;
             border: 1px solid rgba(255, 215, 0, 0.1);
         }
@@ -1793,7 +1793,7 @@
             
             .value-tooltip {
                 position: absolute;
-                background: rgba(10, 15, 30, 0.95);
+                background: rgba(10, 15, 30, 0.4);
                 border: 1px solid rgba(255, 215, 0, 0.3);
                 border-radius: 12px;
                 padding: 15px 20px;
@@ -1860,7 +1860,7 @@
                 right: 40px;
                 top: 20px;
                 width: 340px;
-                background: rgba(10, 15, 30, 0.9);
+                background: rgba(10, 15, 30, 0.35);
                 border: 1px solid rgba(255, 215, 0, 0.2);
                 border-radius: 20px;
                 padding: 25px;
@@ -3447,19 +3447,19 @@ function buildValueNetwork() {
     
     const nodesData = [];
     
-    // ========== 中心：新药上市（最大最亮）==========
+    // ========== 顶层：新药上市（最终成果，高高在上）==========
     nodesData.push({
         id: 'root',
         icon: '💊',
         label: '新药上市',
         value: totalRevenue,
         color: 0xffd700,
-        position: new THREE.Vector3(0, 0, 0),
+        position: new THREE.Vector3(0, 25, 0),  // 最高
         asset: null,
-        size: 6  // 更大
+        size: 7  // 最大
     });
     
-    // ========== 内环：NeuroBlok（如有融合）==========
+    // ========== 中层：NeuroBlok（融合平台，承上启下）==========
     if (hasFusion) {
         nodesData.push({
             id: 'neuroblok',
@@ -3468,20 +3468,23 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(0, 0, -12),  // 在中心后方
+            position: new THREE.Vector3(0, 8, 0),  // 中间，作为桥梁
             asset: neuroBlok,
-            size: 4  // 较大
+            size: 5
         });
     }
     
-    // ========== 外环：分子资产（环绕分布）==========
+    // ========== 底层：分子资产（基础层，半圆形排列）==========
     const count = displayAssets.length;
-    const outerRadius = 28;  // 外环半径
+    const bottomRadius = 32;
+    const arcAngle = Math.PI;  // 180度半圆
+    const startAngle = -Math.PI / 2;  // 从正前方开始
     
     displayAssets.forEach((asset, i) => {
-        const angle = (i / Math.max(count, 1)) * Math.PI * 2;
-        const x = Math.cos(angle) * outerRadius;
-        const z = Math.sin(angle) * outerRadius;
+        // 在半圆上均匀分布
+        const angle = startAngle + (i / Math.max(count - 1, 1)) * arcAngle;
+        const x = Math.cos(angle) * bottomRadius;
+        const z = Math.sin(angle) * bottomRadius * 0.5;  // 稍微压扁，更有层次感
         
         let revenue;
         const isSource = sourceAssetIds.includes(asset.id);
@@ -3497,9 +3500,10 @@ function buildValueNetwork() {
             label: asset.name,
             value: revenue,
             color: asset.colorHex,
-            position: new THREE.Vector3(x, 0, z),
+            position: new THREE.Vector3(x, -15, z),  // 底层
             asset: asset,
-            size: 3  // 较大的分子
+            size: 3.5,
+            isSource: isSource
         });
     });
     
@@ -3508,43 +3512,43 @@ function buildValueNetwork() {
         const group = new THREE.Group();
         group.position.copy(nodeData.position);
         
-        // 创建3D分子模型 - 更大的比例
+        // 创建3D分子模型
         let moleculeGroup;
         if (nodeData.id === 'root') {
-            moleculeGroup = createBigDrugCapsule(nodeData.size * 0.6);  // 更大
+            moleculeGroup = createBigDrugCapsule(nodeData.size * 0.5);
         } else if (nodeData.id === 'neuroblok') {
-            moleculeGroup = createBigStar(nodeData.size * 0.6, nodeData.color);  // 更大
+            moleculeGroup = createBigStar(nodeData.size * 0.5, nodeData.color);
         } else if (nodeData.asset) {
-            moleculeGroup = createBigMolecule(nodeData.asset.type, nodeData.color, 1.8);  // 更大
+            moleculeGroup = createBigMolecule(nodeData.asset.type, nodeData.color, 1.5);
         } else {
-            moleculeGroup = createBigMolecule('compound', nodeData.color, 1.8);  // 更大
+            moleculeGroup = createBigMolecule('compound', nodeData.color, 1.5);
         }
         
-        // 内敛的发光层 - 比模型略大一点点
+        // 内敛的发光层
         const innerGlow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 1.1, 32, 32),  // 更小
+            new THREE.SphereGeometry(nodeData.size * 1.15, 32, 32),
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.25,  // 更淡
+                opacity: 0.3,
                 blending: THREE.AdditiveBlending
             })
         );
         group.add(innerGlow);
         
         const outerGlow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 1.4, 32, 32),  // 更小
+            new THREE.SphereGeometry(nodeData.size * 1.5, 32, 32),
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.12,  // 更淡
+                opacity: 0.15,
                 blending: THREE.AdditiveBlending
             })
         );
         group.add(outerGlow);
         
         // 添加强点光源
-        const light = new THREE.PointLight(nodeData.color, 2, 40);
+        const light = new THREE.PointLight(nodeData.color, 1.5, 35);
         group.add(light);
         
         // 添加模型
@@ -3555,15 +3559,18 @@ function buildValueNetwork() {
         valueNodes.push({ mesh: group, data: nodeData });
     });
     
-    // 创建连线
+    // 创建连线 - 清晰的价值流动路径
     if (hasFusion) {
+        // NeuroBlok 向上贡献给新药（粗线，主路径）
         createValueConnection('neuroblok', 'root', 0x00f0ff, true);
     }
     
     displayAssets.forEach(asset => {
         if (hasFusion && sourceAssetIds.includes(asset.id)) {
+            // 源资产先汇聚到 NeuroBlok
             createValueConnection(asset.id, 'neuroblok', asset.colorHex, false);
         } else {
+            // 其他资产直接向上贡献给新药
             createValueConnection(asset.id, 'root', asset.colorHex, false);
         }
     });
