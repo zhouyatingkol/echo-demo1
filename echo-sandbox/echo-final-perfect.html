@@ -2291,32 +2291,44 @@
                     break;
                     
                 case 'patent':
-                    const heartShape = new THREE.Shape();
-                    heartShape.moveTo(0, 0);
-                    heartShape.bezierCurveTo(0, -0.5, -1, -1, -1.5, 0);
-                    heartShape.bezierCurveTo(-2, 1, -1, 2, 0, 3);
-                    heartShape.bezierCurveTo(1, 2, 2, 1, 1.5, 0);
-                    heartShape.bezierCurveTo(1, -1, 0, -0.5, 0, 0);
-                    const extrudeSettings = { depth: 0.5, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1 };
-                    const heartGeo = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
-                    const heart = new THREE.Mesh(
-                        heartGeo,
-                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.3, shininess: 80 })
-                    );
-                    heart.scale.set(scale * 0.45, scale * 0.45, scale * 0.45);
-                    heart.position.set(0, -0.6, 0);
-                    heart.rotation.z = Math.PI;
-                    group.add(heart);
-                    break;
-                    
-                case 'patent':
-                    // 专利 - 文档形状
+                    // 专利 - 文档形状 + 心形徽章
                     const docGroup = new THREE.Group();
                     const doc = new THREE.Mesh(
                         new THREE.BoxGeometry(1.8 * scale, 2.2 * scale, 0.15 * scale),
                         new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
                     );
                     docGroup.add(doc);
+                    
+                    // 专利章 - 心形
+                    const patentHeartShape = new THREE.Shape();
+                    patentHeartShape.moveTo(0, 0);
+                    patentHeartShape.bezierCurveTo(0, -0.5, -1, -1, -1.5, 0);
+                    patentHeartShape.bezierCurveTo(-2, 1, -1, 2, 0, 3);
+                    patentHeartShape.bezierCurveTo(1, 2, 2, 1, 1.5, 0);
+                    patentHeartShape.bezierCurveTo(1, -1, 0, -0.5, 0, 0);
+                    const patentExtrudeSettings = { depth: 0.3 * scale, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.05 * scale, bevelThickness: 0.05 * scale };
+                    const patentHeartGeo = new THREE.ExtrudeGeometry(patentHeartShape, patentExtrudeSettings);
+                    const patentHeart = new THREE.Mesh(
+                        patentHeartGeo,
+                        new THREE.MeshPhongMaterial({ color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 0.4, shininess: 100 })
+                    );
+                    patentHeart.scale.set(scale * 0.25, scale * 0.25, scale * 0.25);
+                    patentHeart.position.set(0.4 * scale, 0.3 * scale, 0.1 * scale);
+                    patentHeart.rotation.z = Math.PI;
+                    docGroup.add(patentHeart);
+                    
+                    // 线条装饰
+                    for (let i = 0; i < 4; i++) {
+                        const line = new THREE.Mesh(
+                            new THREE.BoxGeometry(1.2 * scale, 0.08 * scale, 0.02 * scale),
+                            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })
+                        );
+                        line.position.set(0, 0.5 * scale - i * 0.35 * scale, 0.08 * scale);
+                        docGroup.add(line);
+                    }
+                    
+                    group.add(docGroup);
+                    break;
                     // 添加文字线条效果
                     for (let i = 0; i < 4; i++) {
                         const line = new THREE.Mesh(
