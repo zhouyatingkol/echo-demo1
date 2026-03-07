@@ -3428,6 +3428,7 @@ function initValue3D() {
 }
 
 function buildValueNetwork() {
+    // 清除旧节点
     valueNodes.forEach(n => valueScene.remove(n.mesh));
     valueConnections.forEach(c => valueScene.remove(c.line));
     valueParticles.forEach(p => valueScene.remove(p.mesh));
@@ -3444,28 +3445,29 @@ function buildValueNetwork() {
     
     const nodesData = [];
     
+    // 中心 - 新药上市（像太阳一样在高处）
     nodesData.push({
         id: 'root',
         icon: '💊',
         label: '新药上市',
         value: totalRevenue,
         color: 0xffd700,
-        position: new THREE.Vector3(0, 0, 0),
+        position: new THREE.Vector3(0, 15, 0),
         asset: null,
-        size: 3
+        size: 5
     });
     
-    // 所有已铸造资产围绕中心在同一平面分布 - 大气布局
-    const allMinted = mintedAssets.filter(a => a.id !== 'NeuroBlok');
-    const count = allMinted.length;
-    const radius = 28; // 更加大气的半径
+    // 第一层轨道 - 主要资产（半径25，高度变化形成层次感）
+    const layer1Assets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
+    const layer1Radius = 28;
     
-    allMinted.forEach((asset, i) => {
-        const angle = (i / Math.max(count, 1)) * Math.PI * 2;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
+    layer1Assets.forEach((asset, i) => {
+        const angle = (i / Math.max(layer1Assets.length, 1)) * Math.PI * 2;
+        const heightOffset = Math.sin(i * 0.8) * 5;
+        const x = Math.cos(angle) * layer1Radius;
+        const z = Math.sin(angle) * layer1Radius;
+        const y = -5 + heightOffset;
         
-        // 计算收益
         let revenue;
         if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
             const sources = neuroBlok.generatedFrom.split('+');
@@ -3481,13 +3483,13 @@ function buildValueNetwork() {
             name: asset.name,
             value: revenue,
             color: asset.colorHex,
-            position: new THREE.Vector3(x, 0, z),
+            position: new THREE.Vector3(x, y, z),
             asset: asset,
-            size: 2
+            size: 2.8
         });
     });
     
-    // NeuroBlok放在中心和新药之间（同一平面）
+    // NeuroBlok在内外层之间
     if (hasFusion) {
         nodesData.push({
             id: 'neuroblok',
@@ -3496,81 +3498,189 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(0, 0, -14),
+            position: new THREE.Vector3(0, 5, -12),
             asset: neuroBlok,
-            size: 2.5
+            size: 4
         });
     }
     
-    nodesData.forEach(nodeData => {
-        // 使用分子模型而不是球体
-        let moleculeGroup;
+    // 创建3D节点 - 高级材质
+    nodesData.forEach((nodeData, index) => {
+        const group = new THREE.Group();
+        
+        // 核心球体 - 使用物理材质
+        const coreGeometry = new THREE.SphereGeometry(nodeData.size, 64, 64);
+        const coreMaterial = new THREE.MeshPhysicalMaterial({
+            color: nodeData.color,
+            emissive: nodeData.color,
+            emissiveIntensity: nodeData.id === 'root' ? 1.0 : 0.5,
+            metalness: 0.8,
+            roughness: 0.15,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1
+        });
+        const core = new THREE.Mesh(coreGeometry, coreMaterial);
+        group.add(core);
+        
+        // 内层辉光
+        const innerGlow = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 1.5, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.4,
+                blending: THREE.AdditiveBlending
+            })
+        );
+        group.add(innerGlow);
+        
+        // 外层大气辉光
+        const outerGlow = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 2.5, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.15,
+                blending: THREE.AdditiveBlending
+            })
+        );
+        group.add(outerGlow);
+        
+        // 根节点特殊光晕
         if (nodeData.id === 'root') {
-            // 根节点 - 新药上市，用胶囊模型
-            moleculeGroup = createMolecule('drug', nodeData.color, 1.5);
-        } else if (nodeData.id === 'neuroblok') {
-            // 融合资产 - 用协作融合形态
-            moleculeGroup = createMolecule('collaboration', nodeData.color, 1.0);
-        } else if (nodeData.asset) {
-            // 原始资产 - 用对应的分子形态
-            moleculeGroup = createMolecule(nodeData.asset.type, nodeData.color, 0.8);
-        } else {
-            moleculeGroup = createMolecule('compound', nodeData.color, 0.8);
+            const halo = new THREE.Mesh(
+                new THREE.SphereGeometry(nodeData.size * 5, 32, 32),
+                new THREE.MeshBasicMaterial({
+                    color: 0xffaa00,
+                    transparent: true,
+                    opacity: 0.06,
+                    blending: THREE.AdditiveBlending
+                })
+            );
+            group.add(halo);
         }
         
-        moleculeGroup.position.copy(nodeData.position);
-        moleculeGroup.userData = nodeData;
+        // 强光源
+        const light = new THREE.PointLight(nodeData.color, nodeData.id === 'root' ? 3 : 1.5, 80);
+        light.position.set(0, 0, 0);
+        group.add(light);
         
-        // 增强发光效果 - 双层辉光
-        const glowGeometry = new THREE.SphereGeometry(nodeData.size * 2.5, 32, 32);
-        const glowMaterial = new THREE.MeshBasicMaterial({
-            color: nodeData.color,
-            transparent: true,
-            opacity: 0.25
-        });
-        const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-        glowMesh.userData = { isGlowEffect: true };
-        moleculeGroup.add(glowMesh);
+        group.position.copy(nodeData.position);
+        group.userData = nodeData;
         
-        // 外层辉光 - 大气效果
-        const outerGlowGeometry = new THREE.SphereGeometry(nodeData.size * 4, 32, 32);
-        const outerGlowMaterial = new THREE.MeshBasicMaterial({
-            color: nodeData.color,
-            transparent: true,
-            opacity: 0.08
-        });
-        const outerGlowMesh = new THREE.Mesh(outerGlowGeometry, outerGlowMaterial);
-        outerGlowMesh.userData = { isGlowEffect: true };
-        moleculeGroup.add(outerGlowMesh);
-        
-        // 增强点光源 - 照亮范围更大
-        const nodeLight = new THREE.PointLight(nodeData.color, 1.5, 50);
-        nodeLight.position.set(0, 0, 0);
-        moleculeGroup.add(nodeLight);
-        
-        valueScene.add(moleculeGroup);
-        valueNodes.push({ mesh: moleculeGroup, data: nodeData });
+        valueScene.add(group);
+        valueNodes.push({ mesh: group, data: nodeData });
     });
     
-    // 创建连线 - 中心到所有资产
-    allMinted.forEach(asset => {
-        createValueConnection('root', asset.id, asset.colorHex);
+    // 创建价值流动光束
+    layer1Assets.forEach(asset => {
+        createValueBeam('root', asset.id, asset.colorHex);
     });
     
-    // NeuroBlok的连线
     if (hasFusion) {
-        createValueConnection('root', 'neuroblok', 0xffd700);
+        createValueBeam('root', 'neuroblok', 0xffd700);
         const sources = neuroBlok.generatedFrom ? neuroBlok.generatedFrom.split('+') : [];
         sources.forEach(sourceId => {
-            createValueConnection('neuroblok', sourceId, 0x00f0ff);
+            createValueBeam('neuroblok', sourceId, 0x00f0ff);
         });
     }
     
-    createValueParticles();
+    createAmbientParticles();
     
     if (nodesData.length > 0) {
         showValueNodeDetail(nodesData[0]);
     }
+}
+
+// 创建价值流动光束
+function createValueBeam(fromId, toId, color) {
+    const fromNode = valueNodes.find(n => n.data.id === fromId);
+    const toNode = valueNodes.find(n => n.data.id === toId);
+    if (!fromNode || !toNode) return;
+    
+    const start = fromNode.data.position;
+    const end = toNode.data.position;
+    const distance = start.distanceTo(end);
+    
+    const direction = new THREE.Vector3().subVectors(end, start).normalize();
+    const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+    
+    // 主光束
+    const beamGeometry = new THREE.CylinderGeometry(0.12, 0.2, distance, 8, 1, true);
+    const beamMaterial = new THREE.MeshBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.5,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide
+    });
+    
+    const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+    beam.position.copy(midPoint);
+    beam.lookAt(end);
+    beam.rotateX(Math.PI / 2);
+    
+    valueScene.add(beam);
+    valueConnections.push({ mesh: beam, from: fromNode, to: toNode });
+    
+    // 流动粒子
+    const particleCount = 10;
+    for (let i = 0; i < particleCount; i++) {
+        const particleGeometry = new THREE.SphereGeometry(0.35, 16, 16);
+        const particleMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            emissive: color,
+            emissiveIntensity: 2
+        });
+        const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+        
+        valueParticles.push({
+            mesh: particle,
+            from: start,
+            to: end,
+            progress: i / particleCount,
+            speed: 0.002 + Math.random() * 0.002
+        });
+        
+        valueScene.add(particle);
+    }
+}
+
+// 环境粒子
+function createAmbientParticles() {
+    const particleCount = 300;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    
+    for (let i = 0; i < particleCount; i++) {
+        const r = 35 + Math.random() * 25;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI;
+        
+        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.6;
+        positions[i * 3 + 2] = r * Math.cos(phi);
+        
+        const isGold = Math.random() > 0.5;
+        colors[i * 3] = isGold ? 1 : 0;
+        colors[i * 3 + 1] = isGold ? 0.85 : 0.9;
+        colors[i * 3 + 2] = isGold ? 0.2 : 1;
+    }
+    
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    const material = new THREE.PointsMaterial({
+        size: 0.4,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending
+    });
+    
+    const particles = new THREE.Points(geometry, material);
+    valueScene.add(particles);
 }
 
 function createValueConnection(fromId, toId, color) {
