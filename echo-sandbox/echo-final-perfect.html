@@ -2053,13 +2053,7 @@
             const material = new THREE.MeshPhongMaterial({ 
                 color: color, 
                 emissive: color, 
-                emissiveIntensity: 0.5, 
-                shininess: 100 
-            });
-            const brightMaterial = new THREE.MeshPhongMaterial({ 
-                color: color, 
-                emissive: color, 
-                emissiveIntensity: 0.8, 
+                emissiveIntensity: 0.3, 
                 shininess: 100 
             });
             
@@ -3416,7 +3410,7 @@ function initValue3D() {
     valueScene.fog = new THREE.FogExp2(0x050510, 0.012);
     
     valueCamera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-    valueCamera.position.set(0, 5, 70);
+    valueCamera.position.set(0, 20, 60);
     valueCamera.lookAt(0, 0, 0);
     
     valueRenderer.setSize(width, height);
@@ -3459,27 +3453,21 @@ function buildValueNetwork() {
     const totalRevenue = 100;
     const neuroBlokRevenue = hasFusion ? totalRevenue * 0.4 : 0;
     
-    // 如果没有铸造资产，显示所有资产作为演示
-    let baseAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
-    if (baseAssets.length === 0) {
-        baseAssets = assets.filter(a => a.id !== 'NeuroBlok');
-    }
-    
     const nodesData = [];
     
-    // ========== 顶部：新药上市 ==========
+    // 中心新药节点 - 更大更醒目
     nodesData.push({
         id: 'root',
         icon: '💊',
         label: '新药上市',
         value: totalRevenue,
         color: 0xffd700,
-        position: new THREE.Vector3(0, 18, 0),
+        position: new THREE.Vector3(0, 0, 0),
         asset: null,
         size: 4
     });
     
-    // ========== 中部：NeuroBlok ==========
+    // NeuroBlok 位置（内环）
     if (hasFusion) {
         nodesData.push({
             id: 'neuroblok',
@@ -3488,20 +3476,25 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(0, 0, 0),
+            position: new THREE.Vector3(0, 0, -15),
             asset: neuroBlok,
             size: 3
         });
     }
     
-    // ========== 底部：分子资产 ==========
+    // 分子资产（外环环形分布）
+    // 如果没有铸造任何资产，显示所有资产作为演示
+    let baseAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
+    if (baseAssets.length === 0) {
+        baseAssets = assets.filter(a => a.id !== 'NeuroBlok');
+    }
     const count = baseAssets.length;
-    const bottomRadius = 30;
+    const radius = 35;
     
     baseAssets.forEach((asset, i) => {
-        const angle = (i / Math.max(count, 1)) * Math.PI * 2;
-        const x = Math.cos(angle) * bottomRadius;
-        const z = Math.sin(angle) * bottomRadius;
+        const angle = (i / Math.max(count, 1)) * Math.PI * 2 - Math.PI / 2;
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
         
         let revenue;
         if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
@@ -3518,11 +3511,6 @@ function buildValueNetwork() {
             name: asset.name,
             value: revenue,
             color: asset.colorHex,
-            position: new THREE.Vector3(x, -18, z),
-            asset: asset,
-            size: 2.2
-        });
-    });
             position: new THREE.Vector3(x, 0, z),
             asset: asset,
             size: 2.2
@@ -3546,20 +3534,34 @@ function buildValueNetwork() {
         }
         group.add(molecule);
         
-        // 发光层
-        const glow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 2.5, 32, 32),
+        // 多层发光效果 - 内层
+        const glowInner = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 1.2, 32, 32),
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.2
+                opacity: 0.3
             })
         );
-        group.add(glow);
+        glowInner.userData = { isGlow: true, layer: 1 };
+        group.add(glowInner);
         
-        // 光源
-        const light = new THREE.PointLight(nodeData.color, 1, 30);
-        group.add(light);
+        // 多层发光效果 - 外层
+        const glowOuter = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 2, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.1
+            })
+        );
+        glowOuter.userData = { isGlow: true, layer: 2 };
+        group.add(glowOuter);
+        
+        // 节点点光源 - 照亮周围
+        const nodeLight = new THREE.PointLight(nodeData.color, 1.5, 25);
+        nodeLight.position.set(0, 0, 0);
+        group.add(nodeLight);
         
         // 位置和数据
         group.position.copy(nodeData.position);
@@ -3569,22 +3571,19 @@ function buildValueNetwork() {
         valueNodes.push({ mesh: group, data: nodeData });
     });
     
-    // 创建连线 - 正确的价值流动逻辑
-    // 1. 首先连接 NeuroBlok 到新药（如果存在）
-    if (hasFusion) {
-        createValueConnection('neuroblok', 'root', 0x00f0ff);
-    }
-    
-    // 2. 连接资产到 NeuroBlok 或新药
+    // 创建连线
     baseAssets.forEach(asset => {
         if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
-            // 源资产 -> NeuroBlok
-            createValueConnection(asset.id, 'neuroblok', asset.colorHex);
+            createValueConnection('neuroblok', asset.id, 0x00f0ff);
+            createValueConnection('root', 'neuroblok', 0xffd700);
         } else {
-            // 其他资产 -> 新药
-            createValueConnection(asset.id, 'root', asset.colorHex);
+            createValueConnection('root', asset.id, asset.colorHex);
         }
     });
+    
+    if (hasFusion && !neuroBlok.generatedFrom) {
+        createValueConnection('root', 'neuroblok', 0xffd700);
+    }
     
     // 创建流动粒子
     createValueParticles();
