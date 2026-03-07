@@ -3390,38 +3390,27 @@ function initValue3D() {
     const canvas = document.getElementById('value3dCanvas');
     if (!canvas) return;
     
-    // 获取画布尺寸（使用窗口大小作为后备）
     const width = canvas.clientWidth || window.innerWidth;
     const height = canvas.clientHeight || window.innerHeight;
     
     valueScene = new THREE.Scene();
-    valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
+    valueScene.fog = new THREE.FogExp2(0x050510, 0.012);
     
-    valueCamera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-    valueCamera.position.set(0, 40, 90);
-    valueCamera.lookAt(0, -10, 0);
+    valueCamera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+    valueCamera.position.set(0, 20, 60);
+    valueCamera.lookAt(0, 0, 0);
     
     valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
     valueRenderer.setSize(width, height);
-    valueRenderer.setPixelRatio(window.devicePixelRatio);
+    valueRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    valueScene.add(ambientLight);
+    // 环境光
+    valueScene.add(new THREE.AmbientLight(0xffffff, 0.3));
     
-    // 主光源 - 金色
-    const pointLight = new THREE.PointLight(0xffd700, 2, 150);
-    pointLight.position.set(20, 40, 20);
-    valueScene.add(pointLight);
-    
-    // 辅助光源 - 青色
-    const pointLight2 = new THREE.PointLight(0x00f0ff, 1.5, 150);
-    pointLight2.position.set(-20, 30, -20);
-    valueScene.add(pointLight2);
-    
-    // 底部光源 - 增加层次
-    const pointLight3 = new THREE.PointLight(0xff69b4, 1, 100);
-    pointLight3.position.set(0, -30, 0);
-    valueScene.add(pointLight3);
+    // 全局主光源
+    const mainLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    mainLight.position.set(10, 20, 10);
+    valueScene.add(mainLight);
     
     buildValueNetwork();
     
@@ -3434,90 +3423,160 @@ function initValue3D() {
 }
 
 function buildValueNetwork() {
-    // 清除所有旧对象
-    while(valueScene.children.length > 0){ 
-        valueScene.remove(valueScene.children[0]); 
+    // 清除旧对象
+    while(valueScene.children.length > 0) {
+        valueScene.remove(valueScene.children[0]);
     }
     valueNodes = [];
     valueConnections = [];
     valueParticles = [];
     
-    // 重新添加灯光
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-    valueScene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xffd700, 1, 200);
-    pointLight.position.set(0, 50, 50);
-    valueScene.add(pointLight);
+    // 重新添加环境光
+    valueScene.add(new THREE.AmbientLight(0xffffff, 0.2));
     
     const mintedAssets = assets.filter(a => a.minted);
     const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
     const hasFusion = neuroBlok && neuroBlok.minted;
     
-    console.log('=== Stage 4 Debug ===');
-    console.log('Minted assets count:', mintedAssets.length);
-    console.log('Minted assets:', mintedAssets.map(a => a.id));
-    console.log('Has fusion:', hasFusion);
-    
     const totalRevenue = 100;
+    const neuroBlokRevenue = hasFusion ? totalRevenue * 0.4 : 0;
     
-    // 1. 创建中心新药节点
-    const rootNode = createValueNode({
+    const nodesData = [];
+    
+    // 中心新药节点 - 更大更醒目
+    nodesData.push({
         id: 'root',
         icon: '💊',
         label: '新药上市',
         value: totalRevenue,
         color: 0xffd700,
-        position: [0, 0, 0],
-        scale: 5,
-        type: 'drug'
+        position: new THREE.Vector3(0, 0, 0),
+        asset: null,
+        size: 4
     });
-    valueScene.add(rootNode);
-    valueNodes.push({ mesh: rootNode, data: { id: 'root', asset: null } });
-    console.log('Created root node (新药)');
     
-    // 2. 如果有融合，创建 NeuroBlok
-    let neuroBlokNode = null;
+    // NeuroBlok 位置（内环）
     if (hasFusion) {
-        neuroBlokNode = createValueNode({
+        nodesData.push({
             id: 'neuroblok',
             icon: '✨',
             label: 'NeuroBlok',
             name: neuroBlok.name,
-            value: totalRevenue * 0.4,
+            value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: [0, 0, -30],
-            scale: 4,
-            type: 'collaboration',
-            asset: neuroBlok
+            position: new THREE.Vector3(0, 0, -15),
+            asset: neuroBlok,
+            size: 3
         });
-        valueScene.add(neuroBlokNode);
-        valueNodes.push({ mesh: neuroBlokNode, data: { id: 'neuroblok', asset: neuroBlok } });
-        
-        // 连接新药 -> NeuroBlok
-        createValueLine([0,0,0], [0,0,-30], 0x00f0ff);
     }
     
-    // 3. 创建分子资产节点 - 环形分布
+    // 分子资产（外环环形分布）
     const baseAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
     const count = baseAssets.length;
-    const radius = 50;
+    const radius = 35;
     
     baseAssets.forEach((asset, i) => {
-        const angle = (i / Math.max(count, 1)) * Math.PI * 2;
+        const angle = (i / Math.max(count, 1)) * Math.PI * 2 - Math.PI / 2;
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         
-        let revenue = (asset.value / 20) * totalRevenue * 0.6;
+        let revenue;
         if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
             const sources = neuroBlok.generatedFrom.split('+');
-            revenue = (totalRevenue * 0.4 / sources.length) * 0.5;
+            revenue = (neuroBlokRevenue / sources.length) * 0.5;
+        } else {
+            revenue = (asset.value / 20) * (totalRevenue - neuroBlokRevenue) * 0.8;
         }
         
-        const node = createValueNode({
+        nodesData.push({
             id: asset.id,
             icon: asset.icon,
             label: asset.id,
             name: asset.name,
+            value: revenue,
+            color: asset.colorHex,
+            position: new THREE.Vector3(x, 0, z),
+            asset: asset,
+            size: 2.2
+        });
+    });
+    
+    // 创建节点
+    nodesData.forEach((nodeData, index) => {
+        const group = new THREE.Group();
+        
+        // 分子模型
+        let molecule;
+        if (nodeData.id === 'root') {
+            molecule = createMolecule('drug', nodeData.color, 1.2);
+        } else if (nodeData.id === 'neuroblok') {
+            molecule = createMolecule('collaboration', nodeData.color, 0.9);
+        } else if (nodeData.asset) {
+            molecule = createMolecule(nodeData.asset.type, nodeData.color, 0.7);
+        } else {
+            molecule = createMolecule('compound', nodeData.color, 0.7);
+        }
+        group.add(molecule);
+        
+        // 多层发光效果 - 内层
+        const glowInner = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 1.2, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.3
+            })
+        );
+        glowInner.userData = { isGlow: true, layer: 1 };
+        group.add(glowInner);
+        
+        // 多层发光效果 - 外层
+        const glowOuter = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 2, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.1
+            })
+        );
+        glowOuter.userData = { isGlow: true, layer: 2 };
+        group.add(glowOuter);
+        
+        // 节点点光源 - 照亮周围
+        const nodeLight = new THREE.PointLight(nodeData.color, 1.5, 25);
+        nodeLight.position.set(0, 0, 0);
+        group.add(nodeLight);
+        
+        // 位置和数据
+        group.position.copy(nodeData.position);
+        group.userData = { ...nodeData, originalScale: 1, index };
+        
+        valueScene.add(group);
+        valueNodes.push({ mesh: group, data: nodeData });
+    });
+    
+    // 创建连线
+    baseAssets.forEach(asset => {
+        if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
+            createValueConnection('neuroblok', asset.id, 0x00f0ff);
+            createValueConnection('root', 'neuroblok', 0xffd700);
+        } else {
+            createValueConnection('root', asset.id, asset.colorHex);
+        }
+    });
+    
+    if (hasFusion && !neuroBlok.generatedFrom) {
+        createValueConnection('root', 'neuroblok', 0xffd700);
+    }
+    
+    // 创建流动粒子
+    createValueParticles();
+    
+    // 显示第一个节点详情
+    if (nodesData.length > 0) {
+        showNodeDetail(nodesData[0]);
+    }
+}
             value: revenue,
             color: asset.colorHex,
             position: [x, 0, z],
@@ -4052,26 +4111,46 @@ function animateValue3D() {
     
     if (!valueRenderer || !valueScene || !valueCamera) return;
     
+    const time = Date.now() * 0.001;
+    
     // 自动缓慢旋转场景
     if (!isDragging) {
-        valueScene.rotation.y += 0.0004;
+        valueScene.rotation.y += 0.0003;
     }
     
     // 平滑拖拽
     valueScene.rotation.x += (targetRotationX - valueScene.rotation.x) * 0.05;
     valueScene.rotation.y += (targetRotationY - valueScene.rotation.y) * 0.05;
     
-    // 粒子流动
+    // 粒子流动 - 沿连线移动
     valueParticles.forEach(p => {
-        p.t += p.speed;
-        if (p.t > 1) p.t = 0;
-        p.mesh.position.copy(p.curve.getPoint(p.t));
+        p.progress += p.speed;
+        if (p.progress > 1) p.progress = 0;
+        
+        const pos = new THREE.Vector3().lerpVectors(p.from, p.to, p.progress);
+        p.mesh.position.copy(pos);
     });
     
-    // 分子自转 - 明显可见
-    valueNodes.forEach(node => {
-        node.mesh.rotation.y += 0.008;
-        node.mesh.rotation.z += 0.003;
+    // 分子自转 + 脉冲缩放动画
+    valueNodes.forEach((node, i) => {
+        // 自转
+        node.mesh.rotation.y += 0.006;
+        node.mesh.rotation.x += 0.002;
+        
+        // 脉冲缩放 - 每个节点有不同的相位
+        const pulse = 1 + Math.sin(time * 2 + i * 0.5) * 0.08;
+        node.mesh.scale.setScalar(pulse);
+        
+        // 发光层呼吸效果
+        node.mesh.children.forEach(child => {
+            if (child.userData && child.userData.isGlow) {
+                if (child.userData.layer === 1) {
+                    child.scale.setScalar(1 + Math.sin(time * 3 + i) * 0.1);
+                } else if (child.userData.layer === 2) {
+                    child.scale.setScalar(1 + Math.sin(time * 2 + i * 0.7) * 0.15);
+                }
+            }
+        });
     });
     
     valueRenderer.render(valueScene, valueCamera);
