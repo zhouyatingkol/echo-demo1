@@ -2195,6 +2195,102 @@
                     
                 case 'clinical':
                     // 临床数据 - 心形结构
+                    const heartShape = [];
+                    for (let i = 0; i <= 20; i++) {
+                        const t = (i / 20) * Math.PI * 2;
+                        const x = 16 * Math.pow(Math.sin(t), 3);
+                        const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                        heartShape.push(new THREE.Vector3(x * 0.06 * scale, y * 0.06 * scale, 0));
+                    }
+                    for (let i = 0; i < heartShape.length - 1; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.15 * scale, 12, 12),
+                            material
+                        );
+                        sphere.position.copy(heartShape[i]);
+                        group.add(sphere);
+                        
+                        const line = new THREE.Line(
+                            new THREE.BufferGeometry().setFromPoints([heartShape[i], heartShape[i + 1]]),
+                            new THREE.LineBasicMaterial({ color: color, opacity: 0.5 })
+                        );
+                        group.add(line);
+                    }
+                    break;
+                    
+                case 'drug':
+                    // 新药 - 胶囊形状 + 分子环绕
+                    // 胶囊主体
+                    const capsuleGroup = new THREE.Group();
+                    
+                    // 上半球
+                    const topSphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6 * scale, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffd700, 
+                            emissive: 0xffaa00, 
+                            emissiveIntensity: 0.3,
+                            shininess: 120
+                        })
+                    );
+                    topSphere.position.y = 0.6 * scale;
+                    capsuleGroup.add(topSphere);
+                    
+                    // 下半球
+                    const bottomSphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6 * scale, 32, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffffff, 
+                            emissive: 0xdddddd, 
+                            emissiveIntensity: 0.2,
+                            shininess: 120
+                        })
+                    );
+                    bottomSphere.position.y = -0.6 * scale;
+                    capsuleGroup.add(bottomSphere);
+                    
+                    // 中间圆柱
+                    const cylinder = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.6 * scale, 0.6 * scale, 1.2 * scale, 32),
+                        [
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0xffffff, 
+                                emissive: 0xdddddd, 
+                                emissiveIntensity: 0.2 
+                            }),
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0xffd700, 
+                                emissive: 0xffaa00, 
+                                emissiveIntensity: 0.3 
+                            })
+                        ]
+                    );
+                    capsuleGroup.add(cylinder);
+                    
+                    // 环绕的小分子
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (i / 12) * Math.PI * 2;
+                        const orbitRadius = 1.3 * scale;
+                        const smallSphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.12 * scale, 12, 12),
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0x00f0ff, 
+                                emissive: 0x00f0ff, 
+                                emissiveIntensity: 0.5 
+                            })
+                        );
+                        smallSphere.position.set(
+                            Math.cos(angle) * orbitRadius,
+                            Math.sin(i * 0.5) * 0.5 * scale,
+                            Math.sin(angle) * orbitRadius
+                        );
+                        capsuleGroup.add(smallSphere);
+                    }
+                    
+                    group.add(capsuleGroup);
+                    break;
+                    
+                case 'patent':
                     const heartShape = new THREE.Shape();
                     heartShape.moveTo(0, 0);
                     heartShape.bezierCurveTo(0, -0.5, -1, -1, -1.5, 0);
@@ -3407,8 +3503,8 @@ function buildValueNetwork() {
         // 使用分子模型而不是球体
         let moleculeGroup;
         if (nodeData.id === 'root') {
-            // 根节点 - 新药上市，用特殊的金色球体
-            moleculeGroup = createMolecule('protein', nodeData.color, 1.2);
+            // 根节点 - 新药上市，用胶囊模型
+            moleculeGroup = createMolecule('drug', nodeData.color, 1.5);
         } else if (nodeData.id === 'neuroblok') {
             // 融合资产 - 用协作融合形态
             moleculeGroup = createMolecule('collaboration', nodeData.color, 1.0);
@@ -3423,14 +3519,20 @@ function buildValueNetwork() {
         moleculeGroup.userData = nodeData;
         
         // 添加发光效果
-        const glowGeometry = new THREE.SphereGeometry(nodeData.size * 1.2, 32, 32);
+        const glowGeometry = new THREE.SphereGeometry(nodeData.size * 1.5, 32, 32);
         const glowMaterial = new THREE.MeshBasicMaterial({
             color: nodeData.color,
             transparent: true,
-            opacity: 0.1
+            opacity: 0.15
         });
         const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+        glowMesh.userData = { isGlowEffect: true };
         moleculeGroup.add(glowMesh);
+        
+        // 添加点光源
+        const nodeLight = new THREE.PointLight(nodeData.color, 0.5, 15);
+        nodeLight.position.set(0, 0, 0);
+        moleculeGroup.add(nodeLight);
         
         valueScene.add(moleculeGroup);
         valueNodes.push({ mesh: moleculeGroup, data: nodeData });
