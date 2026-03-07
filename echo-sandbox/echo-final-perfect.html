@@ -3467,13 +3467,13 @@ function buildValueNetwork() {
     const capsule = createDrugCapsule(2.5);
     drugGroup.add(capsule);
     
-    // 强烈发光
-    drugGroup.add(createGlowSphere(5, 0xffd700, 0.4));
-    drugGroup.add(createGlowSphere(8, 0xffd700, 0.2));
-    drugGroup.add(createGlowSphere(12, 0xffd700, 0.1));
+    // 强烈发光 - 霓虹灯效果
+    drugGroup.add(createGlowDisc(8, 0xffd700, 0.4));
+    drugGroup.add(createGlowDisc(12, 0xffd700, 0.2));
+    drugGroup.add(createGlowDisc(16, 0xffaa00, 0.1));
     
     // 点光源
-    drugGroup.add(new THREE.PointLight(0xffd700, 3, 50));
+    drugGroup.add(new THREE.PointLight(0xffd700, 4, 60));
     
     drugGroup.userData = {
         id: 'root',
@@ -3496,12 +3496,13 @@ function buildValueNetwork() {
         const starSphere = createStarSphere(2, 0x00f0ff);
         nbGroup.add(starSphere);
         
-        // 发光
-        nbGroup.add(createGlowSphere(4, 0x00f0ff, 0.35));
-        nbGroup.add(createGlowSphere(7, 0x00f0ff, 0.15));
+        // 发光 - 霓虹灯效果
+        nbGroup.add(createGlowDisc(5, 0x00f0ff, 0.45));
+        nbGroup.add(createGlowDisc(8, 0x00f0ff, 0.25));
+        nbGroup.add(createGlowDisc(12, 0x00aaff, 0.12));
         
         // 点光源
-        nbGroup.add(new THREE.PointLight(0x00f0ff, 2, 35));
+        nbGroup.add(new THREE.PointLight(0x00f0ff, 3, 40));
         
         nbGroup.userData = {
             id: 'neuroblok',
@@ -3547,12 +3548,12 @@ function buildValueNetwork() {
         }
         group.add(shape);
         
-        // 发光
-        group.add(createGlowSphere(2.5, asset.colorHex, 0.3));
-        group.add(createGlowSphere(4, asset.colorHex, 0.15));
+        // 发光 - 霓虹灯效果
+        group.add(createGlowDisc(3.5, asset.colorHex, 0.4));
+        group.add(createGlowDisc(5.5, asset.colorHex, 0.2));
         
         // 点光源
-        group.add(new THREE.PointLight(asset.colorHex, 1.2, 20));
+        group.add(new THREE.PointLight(asset.colorHex, 2, 25));
         
         // 计算收益
         let revenue;
@@ -3594,8 +3595,28 @@ function buildValueNetwork() {
 function createGlowSphere(radius, color, opacity) {
     return new THREE.Mesh(
         new THREE.SphereGeometry(radius, 32, 32),
-        new THREE.MeshBasicMaterial({ color, transparent: true, opacity })
+        new THREE.MeshBasicMaterial({ 
+            color, 
+            transparent: true, 
+            opacity,
+            blending: THREE.AdditiveBlending
+        })
     );
+}
+
+// 创建扁平的发光盘（像图片中的大光晕）
+function createGlowDisc(radius, color, opacity) {
+    const geometry = new THREE.CircleGeometry(radius, 32);
+    const material = new THREE.MeshBasicMaterial({ 
+        color, 
+        transparent: true, 
+        opacity,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide
+    });
+    const disc = new THREE.Mesh(geometry, material);
+    disc.rotation.x = Math.PI / 2;
+    return disc;
 }
 
 // 新药胶囊
