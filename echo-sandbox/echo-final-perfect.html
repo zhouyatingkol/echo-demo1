@@ -3444,7 +3444,7 @@ function buildValueNetwork() {
     valueParticles = [];
     
     // 环境光
-    valueScene.add(new THREE.AmbientLight(0xffffff, 0.25));
+    valueScene.add(new THREE.AmbientLight(0xffffff, 0.15));
     
     const mintedAssets = assets.filter(a => a.minted);
     const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
@@ -3459,23 +3459,19 @@ function buildValueNetwork() {
         displayAssets = assets.filter(a => a.id !== 'NeuroBlok');
     }
     
-    // ========== 顶部：新药上市（最大最亮）==========
+    // ========== 顶部：新药上市（最终成果）==========
     const drugGroup = new THREE.Group();
-    drugGroup.position.set(0, 18, 0);
+    drugGroup.position.set(0, 20, 0);
     
-    // 3D模型单独分组（用于旋转）
-    const drugModel = new THREE.Group();
-    const capsule = createDrugCapsule(2.5);
-    drugModel.add(capsule);
+    // 3D模型 - 发光胶囊
+    const drugModel = createGlowingCapsule(2.2, 0xffd700);
     drugGroup.add(drugModel);
     
-    // 发光圆盘（不随模型旋转）
-    drugGroup.add(createGlowDisc(8, 0xffd700, 0.4));
-    drugGroup.add(createGlowDisc(12, 0xffd700, 0.2));
-    drugGroup.add(createGlowDisc(16, 0xffaa00, 0.1));
+    // 轻微光晕（很淡）
+    drugGroup.add(createGlowDisc(6, 0xffd700, 0.15));
     
     // 点光源
-    drugGroup.add(new THREE.PointLight(0xffd700, 4, 60));
+    drugGroup.add(new THREE.PointLight(0xffd700, 2, 40));
     
     drugGroup.userData = {
         id: 'root',
@@ -3484,30 +3480,26 @@ function buildValueNetwork() {
         value: totalRevenue,
         color: 0xffd700,
         asset: null,
-        model: drugModel  // 保存模型引用用于旋转
+        model: drugModel
     };
     valueScene.add(drugGroup);
     valueNodes.push({ mesh: drugGroup, data: drugGroup.userData });
     
-    // ========== 中部：NeuroBlok（协作成果）==========
+    // ========== 中部：NeuroBlok（融合成果）==========
     let nbGroup = null;
     if (hasFusion) {
         nbGroup = new THREE.Group();
         nbGroup.position.set(0, 0, 0);
         
-        // 3D模型单独分组
-        const nbModel = new THREE.Group();
-        const starSphere = createStarSphere(2, 0x00f0ff);
-        nbModel.add(starSphere);
+        // 3D模型 - 发光星形
+        const nbModel = createGlowingStar(1.8, 0x00f0ff);
         nbGroup.add(nbModel);
         
-        // 发光圆盘（不随模型旋转）
-        nbGroup.add(createGlowDisc(5, 0x00f0ff, 0.45));
-        nbGroup.add(createGlowDisc(8, 0x00f0ff, 0.25));
-        nbGroup.add(createGlowDisc(12, 0x00aaff, 0.12));
+        // 轻微光晕
+        nbGroup.add(createGlowDisc(4, 0x00f0ff, 0.15));
         
         // 点光源
-        nbGroup.add(new THREE.PointLight(0x00f0ff, 3, 40));
+        nbGroup.add(new THREE.PointLight(0x00f0ff, 1.5, 30));
         
         nbGroup.userData = {
             id: 'neuroblok',
@@ -3521,14 +3513,20 @@ function buildValueNetwork() {
         valueScene.add(nbGroup);
         valueNodes.push({ mesh: nbGroup, data: nbGroup.userData });
         
-        // 连线：新药 -> NeuroBlok
-        createFlowLine(new THREE.Vector3(0, 18, 0), new THREE.Vector3(0, 0, 0), 0xffd700, true);
+        // 连线：NeuroBlok -> 新药（融合成果贡献给新药）
+        createFlowLine(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 20, 0), 0x00f0ff, true);
     }
     
-    // ========== 底部：分子资产（环形排列）==========
+    // ========== 底部：分子资产（原始贡献者）==========
     const count = displayAssets.length;
-    const bottomRadius = 28;
-    const bottomY = -18;
+    const bottomRadius = 30;
+    const bottomY = -20;
+    
+    // 找出哪些是 NeuroBlok 的源资产
+    let sourceAssetIds = [];
+    if (hasFusion && neuroBlok.generatedFrom) {
+        sourceAssetIds = neuroBlok.generatedFrom.split('+');
+    }
     
     displayAssets.forEach((asset, i) => {
         const angle = (i / Math.max(count, 1)) * Math.PI * 2;
@@ -3537,6 +3535,73 @@ function buildValueNetwork() {
         const pos = new THREE.Vector3(x, bottomY, z);
         
         const group = new THREE.Group();
+        group.position.copy(pos);
+        
+        // 根据类型创建发光3D形状
+        let model;
+        switch(asset.type) {
+            case 'protein': model = createGlowingHelix(1, asset.colorHex); break;
+            case 'compound': model = createGlowingHexagon(1, asset.colorHex); break;
+            case 'gene': model = createGlowingDNA(1, asset.colorHex); break;
+            case 'screening': model = createGlowingGrid(1, asset.colorHex); break;
+            case 'assay': model = createGlowingChart(1, asset.colorHex); break;
+            case 'clinical': model = createGlowingCross(1, asset.colorHex); break;
+            case 'patent': model = createGlowingDocument(1, asset.colorHex); break;
+            case 'paper': model = createGlowingPaper(1, asset.colorHex); break;
+            default: model = createGlowingSphere(0.8, asset.colorHex);
+        }
+        group.add(model);
+        
+        // 轻微光晕
+        group.add(createGlowDisc(3, asset.colorHex, 0.12));
+        
+        // 点光源
+        group.add(new THREE.PointLight(asset.colorHex, 1, 20));
+        
+        // 计算收益
+        let revenue;
+        const isSource = sourceAssetIds.includes(asset.id);
+        if (hasFusion && isSource) {
+            // 源资产获得 NeuroBlok 收益的一部分
+            revenue = (neuroBlokRevenue / sourceAssetIds.length) * 0.6;
+        } else {
+            // 其他资产直接贡献给新药
+            revenue = (asset.value / 20) * (totalRevenue - neuroBlokRevenue) * 0.5;
+        }
+        
+        group.userData = {
+            id: asset.id,
+            icon: asset.icon,
+            label: asset.name,
+            value: revenue,
+            color: asset.colorHex,
+            asset: asset,
+            model: model
+        };
+        
+        valueScene.add(group);
+        valueNodes.push({ mesh: group, data: group.userData });
+        
+        // 连线逻辑：
+        if (hasFusion && nbGroup) {
+            if (isSource) {
+                // 源资产 -> NeuroBlok
+                createFlowLine(pos, new THREE.Vector3(0, 0, 0), asset.colorHex, false);
+            } else {
+                // 其他资产直接 -> 新药
+                createFlowLine(pos, new THREE.Vector3(0, 20, 0), asset.colorHex, false);
+            }
+        } else {
+            // 没有融合时，所有资产直接 -> 新药
+            createFlowLine(pos, new THREE.Vector3(0, 20, 0), asset.colorHex, false);
+        }
+    });
+    
+    // 显示第一个节点详情
+    if (valueNodes.length > 0) {
+        showNodeDetail(valueNodes[0].data);
+    }
+}
         group.position.copy(pos);
         
         // 3D模型单独分组（用于旋转）
@@ -3631,85 +3696,110 @@ function createGlowDisc(radius, color, opacity) {
 }
 
 // 新药胶囊
-function createDrugCapsule(scale) {
+// ========== 发光3D形状函数（分子本身发光）==========
+
+// 发光胶囊（新药）
+function createGlowingCapsule(scale, color) {
     const group = new THREE.Group();
-    const matTop = new THREE.MeshPhongMaterial({ 
-        color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 0.5, shininess: 100 
-    });
-    const matBot = new THREE.MeshPhongMaterial({ 
-        color: 0xffffff, emissive: 0xeeeeee, emissiveIntensity: 0.2, shininess: 100 
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.6,
+        shininess: 100 
     });
     
-    const top = new THREE.Mesh(new THREE.SphereGeometry(1 * scale, 32, 16, 0, Math.PI*2, 0, Math.PI/2), matTop);
+    const top = new THREE.Mesh(new THREE.SphereGeometry(1 * scale, 32, 16, 0, Math.PI*2, 0, Math.PI/2), mat);
     top.position.y = 1 * scale;
-    const bot = new THREE.Mesh(new THREE.SphereGeometry(1 * scale, 32, 16, 0, Math.PI*2, Math.PI/2, Math.PI/2), matBot);
+    
+    const botMat = new THREE.MeshPhongMaterial({ 
+        color: 0xffffff, 
+        emissive: color, 
+        emissiveIntensity: 0.3,
+        shininess: 100 
+    });
+    const bot = new THREE.Mesh(new THREE.SphereGeometry(1 * scale, 32, 16, 0, Math.PI*2, Math.PI/2, Math.PI/2), botMat);
     bot.position.y = -1 * scale;
-    const mid = new THREE.Mesh(new THREE.CylinderGeometry(1 * scale, 1 * scale, 2 * scale, 32), matTop);
+    
+    const mid = new THREE.Mesh(new THREE.CylinderGeometry(1 * scale, 1 * scale, 2 * scale, 32), mat);
     
     group.add(top, bot, mid);
     return group;
 }
 
-// 星形球体（NeuroBlok）
-function createStarSphere(scale, color) {
+// 发光星形（NeuroBlok）
+function createGlowingStar(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.4 });
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.5 
+    });
     
-    // 中心球
-    group.add(new THREE.Mesh(new THREE.SphereGeometry(0.8 * scale, 16, 16), mat));
+    group.add(new THREE.Mesh(new THREE.SphereGeometry(0.7 * scale, 16, 16), mat));
     
-    // 周围小球
-    for (let i = 0; i < 8; i++) {
-        const angle = (i / 8) * Math.PI * 2;
-        const r = 1.5 * scale;
-        const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.25 * scale, 12, 12), mat);
-        sphere.position.set(Math.cos(angle) * r, Math.sin(angle * 2) * 0.3 * scale, Math.sin(angle) * r);
+    for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * Math.PI * 2;
+        const r = 1.3 * scale;
+        const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.2 * scale, 12, 12), mat);
+        sphere.position.set(Math.cos(angle) * r, 0, Math.sin(angle) * r);
         group.add(sphere);
     }
     return group;
 }
 
-// 蛋白质螺旋
-function createHelixShape(scale, color) {
+// 发光螺旋（蛋白质）
+function createGlowingHelix(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.4 
+    });
     
-    for (let i = 0; i < 10; i++) {
-        const t = i / 10;
+    for (let i = 0; i < 8; i++) {
+        const t = i / 8;
         const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.2 * scale, 12, 12), mat);
         sphere.position.set(
-            Math.cos(t * Math.PI * 3) * 0.5 * scale,
+            Math.cos(t * Math.PI * 3) * 0.6 * scale,
             (t - 0.5) * 2 * scale,
-            Math.sin(t * Math.PI * 3) * 0.5 * scale
+            Math.sin(t * Math.PI * 3) * 0.6 * scale
         );
         group.add(sphere);
     }
     return group;
 }
 
-// 化合物六边形
-function createHexagonShape(scale, color) {
+// 发光六边形（化合物）
+function createGlowingHexagon(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.4 
+    });
     
     for (let i = 0; i < 6; i++) {
         const angle = (i / 6) * Math.PI * 2;
-        const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.25 * scale, 12, 12), mat);
+        const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.2 * scale, 12, 12), mat);
         sphere.position.set(Math.cos(angle) * 0.7 * scale, 0, Math.sin(angle) * 0.7 * scale);
         group.add(sphere);
     }
-    group.add(new THREE.Mesh(new THREE.SphereGeometry(0.35 * scale, 12, 12), mat));
+    group.add(new THREE.Mesh(new THREE.SphereGeometry(0.25 * scale, 12, 12), mat));
     return group;
 }
 
-// DNA双螺旋
-function createDNAShape(scale, color) {
+// 发光DNA（基因）
+function createGlowingDNA(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.4 
+    });
     
-    for (let i = 0; i < 8; i++) {
-        const t = i / 8;
-        const y = (t - 0.5) * 2 * scale;
+    for (let i = 0; i < 6; i++) {
+        const t = i / 6;
+        const y = (t - 0.5) * 1.8 * scale;
         const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.15 * scale, 12, 12), mat);
         s1.position.set(Math.cos(t * Math.PI * 3) * 0.4 * scale, y, Math.sin(t * Math.PI * 3) * 0.4 * scale);
         const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.15 * scale, 12, 12), mat);
@@ -3719,91 +3809,97 @@ function createDNAShape(scale, color) {
     return group;
 }
 
-// 虚拟筛选网格
-function createGridShape(scale, color) {
+// 发光网格（虚拟筛选）
+function createGlowingGrid(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.4 
+    });
     
     for (let x = 0; x < 3; x++) {
         for (let y = 0; y < 3; y++) {
-            const dot = new THREE.Mesh(new THREE.SphereGeometry(0.15 * scale, 8, 8), mat);
-            dot.position.set((x - 1) * 0.5 * scale, (y - 1) * 0.5 * scale, 0);
+            const dot = new THREE.Mesh(new THREE.SphereGeometry(0.12 * scale, 8, 8), mat);
+            dot.position.set((x - 1) * 0.4 * scale, (y - 1) * 0.4 * scale, 0);
             group.add(dot);
         }
     }
     return group;
 }
 
-// 实验数据图表
-function createChartShape(scale, color) {
+// 发光图表（实验数据）
+function createGlowingChart(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
-    
-    const base = new THREE.Mesh(new THREE.BoxGeometry(1.2 * scale, 0.15 * scale, 0.8 * scale), mat);
-    group.add(base);
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.4 
+    });
     
     [0.5, 0.8, 0.6, 0.9].forEach((h, i) => {
-        const bar = new THREE.Mesh(new THREE.BoxGeometry(0.2 * scale, h * scale, 0.2 * scale), mat);
-        bar.position.set((i - 1.5) * 0.25 * scale, h * scale / 2 + 0.075 * scale, 0);
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(0.15 * scale, h * scale, 0.15 * scale), mat);
+        bar.position.set((i - 1.5) * 0.2 * scale, h * scale / 2, 0);
         group.add(bar);
     });
     return group;
 }
 
-// 临床医疗十字
-function createMedicalShape(scale, color) {
+// 发光十字（临床数据）
+function createGlowingCross(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.4 
+    });
     
-    const v = new THREE.Mesh(new THREE.BoxGeometry(0.35 * scale, 1.5 * scale, 0.35 * scale), mat);
-    const h = new THREE.Mesh(new THREE.BoxGeometry(1.2 * scale, 0.35 * scale, 0.35 * scale), mat);
+    const v = new THREE.Mesh(new THREE.BoxGeometry(0.25 * scale, 1.2 * scale, 0.25 * scale), mat);
+    const h = new THREE.Mesh(new THREE.BoxGeometry(1 * scale, 0.25 * scale, 0.25 * scale), mat);
     group.add(v, h);
     return group;
 }
 
-// 专利文档
-function createPatentShape(scale, color) {
+// 发光文档（专利）
+function createGlowingDocument(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.4 
+    });
     
-    const page = new THREE.Mesh(new THREE.BoxGeometry(1 * scale, 1.3 * scale, 0.08 * scale), mat);
+    const page = new THREE.Mesh(new THREE.BoxGeometry(0.8 * scale, 1.1 * scale, 0.06 * scale), mat);
     group.add(page);
-    
-    for (let i = 0; i < 3; i++) {
-        const line = new THREE.Mesh(
-            new THREE.BoxGeometry(0.7 * scale, 0.06 * scale, 0.02 * scale),
-            new THREE.MeshBasicMaterial({ color: 0xffffff })
-        );
-        line.position.set(0, (0.3 - i * 0.25) * scale, 0.05 * scale);
-        group.add(line);
-    }
     return group;
 }
 
-// 论文卷轴
-function createPaperShape(scale, color) {
+// 发光卷轴（论文）
+function createGlowingPaper(scale, color) {
     const group = new THREE.Group();
-    const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: color, 
+        emissive: color, 
+        emissiveIntensity: 0.4 
+    });
     
-    const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.35 * scale, 0.35 * scale, 1.5 * scale, 16), mat);
+    const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.3 * scale, 0.3 * scale, 1.2 * scale, 16), mat);
     roll.rotation.z = Math.PI / 2;
     group.add(roll);
     return group;
 }
 
-// 默认球体
-function createSphereShape(scale, color) {
+// 发光球体（默认）
+function createGlowingSphere(scale, color) {
     return new THREE.Mesh(
-        new THREE.SphereGeometry(0.6 * scale, 16, 16),
-        new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.3 })
+        new THREE.SphereGeometry(0.5 * scale, 16, 16),
+        new THREE.MeshPhongMaterial({ 
+            color: color, 
+            emissive: color, 
+            emissiveIntensity: 0.4 
+        })
     );
-}
-
-// 流动连线
-function createFlowLine(start, end, color, isMain) {
-    const points = [start, end];
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    
+}    
     // 主线
     const line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ 
         color, transparent: true, opacity: isMain ? 0.6 : 0.4 
