@@ -3386,6 +3386,13 @@ let isDragging = false;
 let mouseX = 0, mouseY = 0;
 let targetRotationX = 0, targetRotationY = 0;
 
+// ===== Stage 4: 价值分配网络 - 修复版 =====
+let valueScene, valueCamera, valueRenderer;
+let valueNodes = [], valueConnections = [], valueParticles = [];
+let isDragging = false;
+let mouseX = 0, mouseY = 0;
+let targetRotationX = 0, targetRotationY = 0;
+
 function initValue3D() {
     const canvas = document.getElementById('value3dCanvas');
     if (!canvas) {
@@ -3427,9 +3434,9 @@ function buildValueNetwork() {
     valueConnections = [];
     valueParticles = [];
     
-    // 获取已铸造资产 - 使用全局 assets 数组
-    const mintedAssets = window.assets ? window.assets.filter(a => a.minted) : [];
-    const neuroBlok = window.assets ? window.assets.find(a => a.id === 'NeuroBlok') : null;
+    // 获取已铸造资产 - 直接使用全局 assets 数组
+    const mintedAssets = typeof assets !== 'undefined' ? assets.filter(a => a.minted) : [];
+    const neuroBlok = typeof assets !== 'undefined' ? assets.find(a => a.id === 'NeuroBlok') : null;
     const hasFusion = neuroBlok && neuroBlok.minted;
     
     console.log('Stage 4 - Minted count:', mintedAssets.length);
@@ -3579,6 +3586,59 @@ function animateValue3D() {
 }
 
 function onValueMouseDown(event) {
+    isDragging = true;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+    
+    const rect = valueRenderer.domElement.getBoundingClientRect();
+    const mouse = new THREE.Vector2(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1
+    );
+    
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, valueCamera);
+    
+    const intersects = raycaster.intersectObjects(valueScene.children, true);
+    
+    if (intersects.length > 0) {
+        let target = intersects[0].object;
+        while (target.parent && target.parent.type !== 'Scene') {
+            if (target.userData && target.userData.id) break;
+            target = target.parent;
+        }
+        if (target.userData && target.userData.id) {
+            showValueNodeDetail(target.userData);
+        }
+    }
+}
+
+function onValueMouseMove(event) {
+    if (!isDragging) return;
+    targetRotationY += (event.clientX - mouseX) * 0.01;
+    targetRotationX += (event.clientY - mouseY) * 0.01;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+}
+
+function onValueMouseUp() {
+    isDragging = false;
+}
+
+function onValueWheel(event) {
+    event.preventDefault();
+    valueCamera.position.z += event.deltaY * 0.1;
+    valueCamera.position.z = Math.max(30, Math.min(150, valueCamera.position.z));
+}
+
+function renderValueNetwork() {
+    console.log('renderValueNetwork called');
+    if (!valueScene) {
+        initValue3D();
+    } else {
+        buildValueNetwork();
+    }
+}function onValueMouseDown(event) {
     isDragging = true;
     mouseX = event.clientX;
     mouseY = event.clientY;
