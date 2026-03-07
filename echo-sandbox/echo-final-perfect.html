@@ -3621,10 +3621,12 @@ function createGlowDisc(radius, color, opacity) {
         transparent: true, 
         opacity,
         blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        depthWrite: false  // 不写入深度缓冲，避免遮挡问题
     });
     const disc = new THREE.Mesh(geometry, material);
-    disc.rotation.x = Math.PI / 2;
+    disc.rotation.x = -Math.PI / 2;  // 水平放置（面向Y轴上方）
+    disc.userData = { isGlowDisc: true };  // 标记为发光盘
     return disc;
 }
 
@@ -4355,6 +4357,13 @@ function animateValue3D() {
             model.rotation.y += 0.008;
             model.rotation.x += 0.003;
         }
+        
+        // 发光圆盘始终面向相机（不旋转）
+        node.mesh.children.forEach(child => {
+            if (child.userData && child.userData.isGlowDisc) {
+                child.lookAt(valueCamera.position);
+            }
+        });
         
         // 整个节点轻微脉冲缩放
         const pulse = 1 + Math.sin(time * 1.5 + i * 0.5) * 0.03;
