@@ -1687,7 +1687,7 @@
         </div>
     </div>
 
-    <!-- STAGE 4: 价值分配 -->
+    <!-- STAGE 4: 价值分配网络 -->
     <div class="stage" id="stage4">
         <div class="top-nav">
             <div class="nav-item" onclick="goTo(0)">开场</div>
@@ -1697,262 +1697,282 @@
             <div class="nav-item active">价值分配</div>
         </div>
         
-        <!-- 发光背景装饰 -->
-        <div style="position: absolute; top: 20%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: float 6s ease-in-out infinite;"></div>
-        <div style="position: absolute; bottom: 20%; right: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,240,255,0.12) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: float 8s ease-in-out infinite reverse;"></div>
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 60%); border-radius: 50%; pointer-events: none;"></div>
-        
-        <div class="main-container" style="margin-top: 90px; height: calc(100vh - 110px);">
-            <!-- 左侧：资产收益列表 -->
-            <div class="asset-library">
-                <div class="library-header">
-                    <div class="library-title">⬡ 资产收益明细</div>
-                    <div class="library-subtitle">点击资产查看详细分配</div>
-                </div>
-                <div class="asset-grid" id="valueAssetGrid"></div>
-                <div class="stats-panel">
-                    <div class="stat-row">
-                        <span class="stat-label">已铸造资产</span>
-                        <span class="stat-value" id="valueAssetCount">0</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label">总收益池</span>
-                        <span class="stat-value" style="color: #ffd700;" id="totalRevenue">100M USD</span>
-                    </div>
-                </div>
+        <div class="value-network-container">
+            <div class="network-header">
+                <div class="network-title">⬡ 价值溯源网络</div>
+                <div class="network-subtitle">当新药成功上市，价值沿分子链条精准分配</div>
             </div>
             
-            <!-- 中央：价值流动可视化 -->
-            <div class="value-flow-center">
-                <div class="flow-header">
-                    <div class="flow-title">⬡ 价值流动网络</div>
-                    <div class="flow-subtitle">当新药成功上市，价值沿链条逆流而上</div>
-                </div>
-                
-                <div class="flow-visualization" id="flowVisualization">
-                    <!-- 价值流动节点 -->
-                    <div class="flow-node" id="finalNode" style="top: 10%; left: 50%; transform: translateX(-50%);">
-                        <div class="flow-node-icon">🏥</div>
-                        <div class="flow-node-label">新药上市</div>
-                        <div class="flow-node-value">100M USD</div>
-                    </div>
-                    
-                    <div class="flow-node" id="fusionNode" style="top: 40%; left: 50%; transform: translateX(-50%);">
-                        <div class="flow-node-icon">✨</div>
-                        <div class="flow-node-label">NeuroBlok</div>
-                        <div class="flow-node-value">40M USD</div>
-                    </div>
-                    
-                    <div class="flow-arrows">
-                        <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" id="flowSvg">
-                            <!-- 连线将由JS生成 -->
-                        </svg>
-                    </div>
-                </div>
-                
-                <!-- 核心引用 -->
-                <div class="flow-quote">"即使是十年前的一份开源数据，也能收获应有的荣光"</div>
-                
-                <!-- 里程碑时间轴 -->
-                <div class="milestone-timeline">
-                    <div class="milestone-item active">
-                        <div class="milestone-dot"></div>
-                        <div class="milestone-label">资产铸造</div>
-                    </div>
-                    <div class="milestone-item active">
-                        <div class="milestone-dot"></div>
-                        <div class="milestone-label">协作衍生</div>
-                    </div>
-                    <div class="milestone-item active">
-                        <div class="milestone-dot"></div>
-                        <div class="milestone-label">融资决策</div>
-                    </div>
-                    <div class="milestone-item active">
-                        <div class="milestone-dot gold"></div>
-                        <div class="milestone-label">价值分配</div>
-                    </div>
-                </div>
+            <!-- 总价值显示 -->
+            <div class="total-value-display">
+                <div class="value-label">新药上市总收益</div>
+                <div class="value-amount" id="totalRevenueDisplay">100,000,000 USD</div>
+                <div class="value-flow-hint">↓ 价值向下流动至每个分子贡献者</div>
             </div>
             
-            <!-- 右侧：贡献者收益详情 -->
-            <div class="ownership-panel" id="valueDetailPanel">
-                <div class="panel-title">⬡ 贡献者收益详情</div>
-                <div id="valueDetailContent">
-                    <div class="empty-state">
-                        <div class="empty-icon">⬡</div>
-                        <div class="empty-text">选择左侧资产查看贡献者收益分配</div>
-                    </div>
+            <!-- 价值网络可视化区域 -->
+            <div class="network-visualization" id="networkViz">
+                <svg id="networkSvg" width="100%" height="100%">
+                    <defs>
+                        <!-- 渐变定义 -->
+                        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#ffaa00;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="cyanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0088ff;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <!-- 连线将由JS生成 -->
+                </svg>
+                
+                <!-- 节点容器 -->
+                <div id="networkNodes" class="network-nodes"></div>
+            </div>
+            
+            <!-- 选中节点详情面板 -->
+            <div class="node-detail-panel" id="nodeDetailPanel">
+                <div class="detail-header">
+                    <div class="detail-icon" id="detailIcon">💰</div>
+                    <div class="detail-title" id="detailTitle">收益分配详情</div>
+                </div>
+                <div class="detail-content" id="detailContent">
+                    <div class="detail-empty">点击网络节点查看详细收益分配</div>
                 </div>
             </div>
         </div>
         
         <style>
-            .value-flow-center {
-                flex: 1;
+            .value-network-container {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 display: flex;
                 flex-direction: column;
-                gap: 20px;
-            }
-            
-            .flow-header {
-                text-align: center;
-                padding: 20px 0;
-                border-bottom: 1px solid rgba(255, 215, 0, 0.1);
-            }
-            
-            .flow-title {
-                color: #ffd700;
-                font-size: 20px;
-                letter-spacing: 3px;
-                text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-                margin-bottom: 8px;
-            }
-            
-            .flow-subtitle {
-                color: rgba(150, 170, 200, 0.7);
-                font-size: 12px;
-            }
-            
-            .flow-visualization {
-                flex: 1;
-                background: rgba(10, 15, 30, 0.6);
-                border: 1px solid rgba(255, 215, 0, 0.2);
-                border-radius: 24px;
-                position: relative;
+                padding: 20px 40px 80px;
                 overflow: hidden;
-                min-height: 250px;
             }
             
-            .flow-node {
-                position: absolute;
+            .network-header {
                 text-align: center;
-                padding: 15px 25px;
-                background: rgba(0, 0, 0, 0.4);
-                border: 1px solid;
-                border-radius: 16px;
-                backdrop-filter: blur(10px);
-                z-index: 10;
-                transition: all 0.3s ease;
-                cursor: pointer;
+                margin-bottom: 15px;
             }
             
-            .flow-node:hover {
-                transform: translateX(-50%) scale(1.05);
-            }
-            
-            #finalNode {
-                border-color: rgba(255, 215, 0, 0.4);
-                box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
-            }
-            
-            #fusionNode {
-                border-color: rgba(0, 240, 255, 0.4);
-                box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
-            }
-            
-            .flow-node-icon {
-                font-size: 32px;
+            .network-title {
+                font-size: 24px;
+                color: #ffd700;
+                font-family: 'Orbitron', sans-serif;
+                letter-spacing: 3px;
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
                 margin-bottom: 8px;
             }
             
-            .flow-node-label {
+            .network-subtitle {
                 font-size: 13px;
-                color: rgba(220, 230, 240, 0.9);
-                margin-bottom: 4px;
+                color: rgba(150, 170, 200, 0.8);
             }
             
-            .flow-node-value {
-                font-size: 14px;
-                font-family: 'Orbitron', sans-serif;
-                color: #ffd700;
-            }
-            
-            .flow-quote {
+            .total-value-display {
                 text-align: center;
-                font-size: 16px;
-                color: #00f0ff;
-                font-style: italic;
-                padding: 20px;
-                text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
-                background: rgba(0, 240, 255, 0.05);
-                border-radius: 12px;
-                border-left: 3px solid rgba(0, 240, 255, 0.3);
+                padding: 15px;
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                border-radius: 16px;
+                margin-bottom: 15px;
             }
             
-            .milestone-timeline {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                padding: 20px;
+            .value-label {
+                font-size: 11px;
+                color: rgba(150, 170, 200, 0.8);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-bottom: 5px;
+            }
+            
+            .value-amount {
+                font-size: 32px;
+                color: #ffd700;
+                font-family: 'Orbitron', sans-serif;
+                text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            }
+            
+            .value-flow-hint {
+                font-size: 11px;
+                color: rgba(0, 240, 255, 0.8);
+                margin-top: 5px;
+            }
+            
+            .network-visualization {
+                flex: 1;
+                position: relative;
                 background: rgba(10, 15, 30, 0.4);
-                border-radius: 12px;
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 215, 0, 0.15);
+                border-radius: 20px;
+                overflow: hidden;
             }
             
-            .milestone-item {
+            .network-nodes {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            
+            .network-node {
+                position: absolute;
+                transform: translate(-50%, -50%);
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 8px;
-                opacity: 0.5;
-                transition: all 0.3s;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                z-index: 10;
             }
             
-            .milestone-item.active {
-                opacity: 1;
+            .network-node:hover {
+                transform: translate(-50%, -50%) scale(1.1);
             }
             
-            .milestone-dot {
-                width: 12px;
-                height: 12px;
+            .node-circle {
+                width: 70px;
+                height: 70px;
                 border-radius: 50%;
-                background: rgba(150, 170, 200, 0.5);
-                box-shadow: 0 0 10px rgba(150, 170, 200, 0.3);
-            }
-            
-            .milestone-dot.gold {
-                background: #ffd700;
-                box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-                animation: pulse-gold 2s infinite;
-            }
-            
-            @keyframes pulse-gold {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.2); }
-            }
-            
-            .milestone-label {
-                font-size: 11px;
-                color: rgba(200, 220, 240, 0.8);
-            }
-            
-            .contributor-item {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 12px 15px;
-                background: rgba(0, 0, 0, 0.3);
-                border-radius: 12px;
-                margin-bottom: 10px;
-                border-left: 3px solid;
-                transition: all 0.3s;
-            }
-            
-            .contributor-item:hover {
-                background: rgba(0, 0, 0, 0.5);
-                transform: translateX(5px);
-            }
-            
-            .contributor-avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: rgba(255, 215, 0, 0.1);
-                border: 1px solid rgba(255, 215, 0, 0.3);
+                border: 2px solid;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 18px;
+                font-size: 28px;
+                background: rgba(10, 15, 30, 0.95);
+                box-shadow: 0 0 30px currentColor;
+                transition: all 0.3s ease;
+            }
+            
+            .network-node:hover .node-circle {
+                box-shadow: 0 0 50px currentColor;
+            }
+            
+            .node-label {
+                margin-top: 8px;
+                font-size: 11px;
+                font-family: 'Orbitron', sans-serif;
+                text-align: center;
+                white-space: nowrap;
+            }
+            
+            .node-value {
+                font-size: 12px;
+                color: #ffd700;
+                margin-top: 3px;
+                font-family: 'Orbitron', sans-serif;
+            }
+            
+            .flow-particle {
+                fill: #ffd700;
+                filter: url(#glow);
+            }
+            
+            .node-detail-panel {
+                position: fixed;
+                right: 40px;
+                top: 150px;
+                width: 320px;
+                background: rgba(10, 15, 30, 0.9);
+                border: 1px solid rgba(255, 215, 0, 0.2);
+                border-radius: 16px;
+                padding: 20px;
+                backdrop-filter: blur(20px);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                max-height: calc(100vh - 250px);
+                overflow-y: auto;
+            }
+            
+            .detail-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 15px;
+            }
+            
+            .detail-icon {
+                font-size: 32px;
+            }
+            
+            .detail-title {
+                font-size: 16px;
+                color: #ffd700;
+                font-family: 'Orbitron', sans-serif;
+            }
+            
+            .detail-empty {
+                text-align: center;
+                padding: 30px;
+                color: rgba(150, 170, 200, 0.6);
+                font-size: 13px;
+            }
+            
+            .detail-asset-info {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 20px;
+                padding: 15px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 12px;
+            }
+            
+            .detail-asset-icon {
+                font-size: 36px;
+            }
+            
+            .detail-asset-name {
+                font-size: 14px;
+                margin-bottom: 2px;
+            }
+            
+            .detail-asset-id {
+                font-size: 11px;
+                color: rgba(150, 170, 200, 0.6);
+            }
+            
+            .contributors-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .contributor-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 10px;
+                border-left: 3px solid;
+            }
+            
+            .contributor-avatar {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                background: rgba(255, 215, 0, 0.1);
+                border: 1px solid rgba(255, 215, 0, 0.3);
             }
             
             .contributor-info {
@@ -1960,43 +1980,30 @@
             }
             
             .contributor-name {
-                font-size: 13px;
+                font-size: 12px;
                 color: rgba(220, 230, 240, 0.9);
                 margin-bottom: 2px;
             }
             
             .contributor-share {
-                font-size: 11px;
-                color: rgba(150, 170, 200, 0.7);
+                font-size: 10px;
+                color: rgba(150, 170, 200, 0.6);
             }
             
-            .contributor-reward {
-                font-size: 14px;
+            .contributor-amount {
+                font-size: 13px;
                 font-family: 'Orbitron', sans-serif;
                 color: #ffd700;
-                text-align: right;
             }
             
-            .total-reward-box {
-                margin-top: 20px;
-                padding: 15px;
-                background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
-                border: 1px solid rgba(255, 215, 0, 0.3);
-                border-radius: 12px;
-                text-align: center;
+            @keyframes flowAnimation {
+                0% { stroke-dashoffset: 100; }
+                100% { stroke-dashoffset: 0; }
             }
             
-            .total-reward-label {
-                font-size: 11px;
-                color: rgba(150, 170, 200, 0.8);
-                margin-bottom: 5px;
-            }
-            
-            .total-reward-value {
-                font-size: 24px;
-                font-family: 'Orbitron', sans-serif;
-                color: #ffd700;
-                text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            .flow-line {
+                stroke-dasharray: 5, 5;
+                animation: flowAnimation 2s linear infinite;
             }
         </style>
     </div>
@@ -3271,153 +3278,236 @@
                 setTimeout(() => animateCards(), 500);
             }
             if (index === 4) {
-                renderValueGrid();
-                setTimeout(() => {
-                    animateCards();
-                    drawFlowLines();
-                }, 500);
+                renderValueNetwork();
             }
         }
 
-        // ===== Stage 4: 价值分配功能 =====
-        let selectedValueAsset = null;
+        // ===== Stage 4: 价值网络可视化 =====
+        function renderValueNetwork() {
+            const nodesContainer = document.getElementById('networkNodes');
+            const svg = document.getElementById('networkSvg');
+            if (!nodesContainer || !svg) return;
+            
+            nodesContainer.innerHTML = '';
+            
+            // 获取已铸造资产
+            const mintedAssets = assets.filter(a => a.minted);
+            const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
+            const hasFusion = neuroBlok && neuroBlok.minted;
+            
+            // 计算总收益
+            const totalRevenue = 100000000; // 1亿美元
+            const neuroBlokRevenue = hasFusion ? totalRevenue * 0.4 : 0;
+            const assetRevenue = totalRevenue - neuroBlokRevenue;
+            
+            // 更新总收益显示
+            document.getElementById('totalRevenueDisplay').textContent = 
+                totalRevenue.toLocaleString() + ' USD';
+            
+            const nodes = [];
+            const lines = [];
+            
+            // 顶层节点 - 新药上市
+            nodes.push({
+                id: 'root',
+                icon: '🏥',
+                label: '新药上市',
+                value: totalRevenue,
+                color: '#ffd700',
+                x: 50, y: 15,
+                level: 0
+            });
+            
+            // 如果有融合资产，添加 NeuroBlok 层
+            if (hasFusion) {
+                nodes.push({
+                    id: 'neuroblok',
+                    icon: '✨',
+                    label: 'NeuroBlok',
+                    value: neuroBlokRevenue,
+                    color: '#00f0ff',
+                    x: 50, y: 40,
+                    level: 1
+                });
+                
+                lines.push({ from: 'root', to: 'neuroblok', value: neuroBlokRevenue });
+                
+                // 添加 NeuroBlok 的来源资产
+                const sources = neuroBlok.generatedFrom ? neuroBlok.generatedFrom.split('+') : [];
+                const sourceCount = sources.length || 2;
+                
+                sources.forEach((sourceId, i) => {
+                    const sourceAsset = assets.find(a => a.id === sourceId);
+                    if (sourceAsset) {
+                        const share = 1 / sourceCount;
+                        const revenue = neuroBlokRevenue * share * 0.5; // 50% 给来源资产
+                        
+                        nodes.push({
+                            id: sourceId,
+                            icon: sourceAsset.icon,
+                            label: sourceId,
+                            value: revenue,
+                            color: sourceAsset.color,
+                            x: 30 + (i * 40 / (sourceCount - 1 || 1)), y: 65,
+                            level: 2,
+                            asset: sourceAsset
+                        });
+                        
+                        lines.push({ from: 'neuroblok', to: sourceId, value: revenue });
+                    }
+                });
+            }
+            
+            // 添加其他原始资产（如果没有通过 NeuroBlok）
+            mintedAssets.forEach((asset, i) => {
+                if (asset.id === 'NeuroBlok') return;
+                if (nodes.find(n => n.id === asset.id)) return; // 已添加过
+                
+                const revenue = (asset.value / 20) * assetRevenue; // 按价值比例分配
+                const otherCount = mintedAssets.filter(a => a.id !== 'NeuroBlok' && !nodes.find(n => n.id === a.id)).length;
+                const index = mintedAssets.filter(a => a.id !== 'NeuroBlok' && a.id !== asset.id && !nodes.find(n => n.id === a.id)).length;
+                
+                nodes.push({
+                    id: asset.id,
+                    icon: asset.icon,
+                    label: asset.id,
+                    value: revenue,
+                    color: asset.color,
+                    x: 20 + (index * 60 / (otherCount - 1 || 1)), y: 65,
+                    level: hasFusion ? 3 : 1,
+                    asset: asset
+                });
+                
+                lines.push({ 
+                    from: hasFusion ? 'root' : 'root', 
+                    to: asset.id, 
+                    value: revenue 
+                });
+            });
+            
+            // 绘制连线
+            lines.forEach(line => {
+                const fromNode = nodes.find(n => n.id === line.from);
+                const toNode = nodes.find(n => n.id === line.to);
+                if (!fromNode || !toNode) return;
+                
+                const lineEl = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                lineEl.setAttribute('x1', fromNode.x + '%');
+                lineEl.setAttribute('y1', fromNode.y + '%');
+                lineEl.setAttribute('x2', toNode.x + '%');
+                lineEl.setAttribute('y2', toNode.y + '%');
+                lineEl.setAttribute('stroke', toNode.color);
+                lineEl.setAttribute('stroke-width', Math.max(1, line.value / 5000000));
+                lineEl.setAttribute('stroke-opacity', '0.4');
+                lineEl.classList.add('flow-line');
+                svg.appendChild(lineEl);
+                
+                // 添加流动粒子
+                const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                particle.setAttribute('r', '3');
+                particle.classList.add('flow-particle');
+                
+                const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+                animate.setAttribute('dur', (2 + Math.random()) + 's');
+                animate.setAttribute('repeatCount', 'indefinite');
+                animate.setAttribute('path', `M${fromNode.x},${fromNode.y} L${toNode.x},${toNode.y}`);
+                
+                particle.appendChild(animate);
+                svg.appendChild(particle);
+            });
+            
+            // 绘制节点
+            nodes.forEach(node => {
+                const nodeEl = document.createElement('div');
+                nodeEl.className = 'network-node';
+                nodeEl.style.left = node.x + '%';
+                nodeEl.style.top = node.y + '%';
+                nodeEl.innerHTML = `
+                    <div class="node-circle" style="color: ${node.color}; border-color: ${node.color}60;">
+                        ${node.icon}
+                    </div>
+                    <div class="node-label" style="color: ${node.color};">${node.label}</div>
+                    <div class="node-value">${(node.value / 1000000).toFixed(1)}M</div>
+                `;
+                
+                if (node.asset) {
+                    nodeEl.addEventListener('click', () => showNodeDetail(node));
+                }
+                
+                nodesContainer.appendChild(nodeEl);
+            });
+            
+            // 默认显示根节点详情
+            showNodeDetail(nodes[0]);
+        }
         
-        function renderValueGrid() {
-            const grid = document.getElementById('valueAssetGrid');
-            const minted = assets.filter(a => a.minted);
+        function showNodeDetail(node) {
+            const panel = document.getElementById('nodeDetailPanel');
+            const content = document.getElementById('detailContent');
+            const icon = document.getElementById('detailIcon');
+            const title = document.getElementById('detailTitle');
             
-            document.getElementById('valueAssetCount').textContent = minted.length;
+            icon.textContent = node.icon;
+            icon.style.color = node.color;
+            title.textContent = node.label;
+            title.style.color = node.color;
             
-            // 计算总收益（模拟）
-            const totalRevenue = minted.reduce((sum, a) => sum + (a.value * 10), 0);
-            document.getElementById('totalRevenue').textContent = totalRevenue.toFixed(1) + 'M USD';
-            
-            if (minted.length === 0) {
-                grid.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(150,170,200,0.5)">请先铸造资产</div>';
-                return;
-            }
-            
-            grid.innerHTML = minted.map(asset => {
-                const revenue = (asset.value * 10).toFixed(1);
-                return `
-                <div class="asset-card" data-id="${asset.id}" style="border-color:${asset.color}50;cursor:pointer;" onclick="selectValueAsset('${asset.id}')">
-                    <div class="mol-canvas-container" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:${asset.color};">${asset.icon}</div>
-                    <div class="asset-id" style="color:${asset.color};text-shadow:0 0 10px ${asset.color}80;">${asset.id}</div>
-                    <div class="asset-name">${asset.name}</div>
-                    <div style="font-size:10px;color:#ffd700;margin-top:4px;">${revenue}M USD</div>
-                </div>
-            `;
-            }).join('');
-        }
-
-        function selectValueAsset(id) {
-            const a = assets.find(x => x.id === id);
-            if (!a) return;
-            selectedValueAsset = a;
-            
-            document.querySelectorAll('#valueAssetGrid .asset-card').forEach(c => c.classList.remove('selected'));
-            document.querySelector(`#valueAssetGrid [data-id="${id}"]`).classList.add('selected');
-            
-            // 计算收益
-            const revenue = (a.value * 10).toFixed(1);
-            
-            // 生成贡献者详情
-            const content = document.getElementById('valueDetailContent');
-            let contributorsHtml = '';
-            
-            if (a.contributors && a.contributors.length > 0) {
-                contributorsHtml = a.contributors.map((c, i) => {
+            if (node.asset && node.asset.contributors) {
+                const contributorsHtml = node.asset.contributors.map((c, i) => {
                     const share = parseInt(c.share);
-                    const reward = ((revenue * share) / 100).toFixed(1);
-                    const colors = ['#ffd700', '#00f0ff', '#00ff88', '#ff69b4', '#ffa502'];
-                    const color = colors[i % colors.length];
+                    const amount = (node.value * share / 100);
+                    const colors = ['#ffd700', '#00f0ff', '#00ff88', '#ff69b4'];
                     
                     return `
-                        <div class="contributor-item" style="border-color: ${color}60;">
-                            <div class="contributor-avatar" style="border-color: ${color}40; color: ${color};">
+                        <div class="contributor-row" style="border-color: ${colors[i % colors.length]};">
+                            <div class="contributor-avatar" style="border-color: ${colors[i % colors.length]}60; color: ${colors[i % colors.length]};">
                                 ${c.name.charAt(0)}
                             </div>
                             <div class="contributor-info">
                                 <div class="contributor-name">${c.name}</div>
-                                <div class="contributor-share">权益占比 ${c.share}</div>
+                                <div class="contributor-share">权益 ${c.share}</div>
                             </div>
-                            <div class="contributor-reward">${reward}M</div>
+                            <div class="contributor-amount">$${(amount / 1000000).toFixed(2)}M</div>
                         </div>
                     `;
                 }).join('');
-            }
-            
-            content.innerHTML = `
-                <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">选中资产</div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 30px;">${a.icon}</span>
+                
+                content.innerHTML = `
+                    <div class="detail-asset-info">
+                        <div class="detail-asset-icon" style="color: ${node.color};">${node.icon}</div>
                         <div>
-                            <div style="font-size: 16px; color: ${a.color}; font-family: 'Orbitron';">${a.name}</div>
-                            <div style="font-size: 11px; color: rgba(150,170,200,0.6);">${a.id}</div>
+                            <div class="detail-asset-name" style="color: ${node.color};">${node.asset.name}</div>
+                            <div class="detail-asset-id">${node.id}</div>
                         </div>
                     </div>
-                </div>
-                
-                <div style="font-size: 12px; color: rgba(150,170,200,0.8); margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;">
-                    贡献者收益分配
-                </div>
-                
-                ${contributorsHtml}
-                
-                <div class="total-reward-box">
-                    <div class="total-reward-label">该资产总收益</div>
-                    <div class="total-reward-value">${revenue}M USD</div>
-                </div>
-            `;
-        }
-
-        function drawFlowLines() {
-            const svg = document.getElementById('flowSvg');
-            if (!svg) return;
-            
-            svg.innerHTML = '';
-            
-            // 绘制从原始资产到融合资产的连线（如果 NeuroBlok 存在）
-            const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
-            if (neuroBlok && neuroBlok.minted) {
-                // 绘制来源资产节点
-                const sources = neuroBlok.generatedFrom ? neuroBlok.generatedFrom.split('+') : [];
-                const container = document.getElementById('flowVisualization');
-                
-                sources.forEach((sourceId, index) => {
-                    const sourceAsset = assets.find(a => a.id === sourceId);
-                    if (sourceAsset) {
-                        // 计算位置（底部扇形分布）
-                        const angle = Math.PI + (index / (sources.length - 1 || 1)) * Math.PI;
-                        const radius = 25;
-                        const x = 50 + Math.cos(angle) * radius;
-                        const y = 85 + Math.sin(angle) * 10;
-                        
-                        // 创建节点
-                        const node = document.createElement('div');
-                        node.className = 'flow-node';
-                        node.style.cssText = `left: ${x}%; top: ${y}%; transform: translate(-50%, -50%); border-color: ${sourceAsset.color}40;`;
-                        node.innerHTML = `
-                            <div class="flow-node-icon" style="color: ${sourceAsset.color};">${sourceAsset.icon}</div>
-                            <div class="flow-node-label">${sourceAsset.id}</div>
-                            <div class="flow-node-value" style="color: ${sourceAsset.color};">${(sourceAsset.value).toFixed(1)} ETH</div>
-                        `;
-                        container.appendChild(node);
-                        
-                        // 绘制连线到 NeuroBlok
-                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                        line.setAttribute('x1', `${x}%`);
-                        line.setAttribute('y1', `${y}%`);
-                        line.setAttribute('x2', '50%');
-                        line.setAttribute('y2', '40%');
-                        line.setAttribute('stroke', sourceAsset.color);
-                        line.setAttribute('stroke-width', '2');
-                        line.setAttribute('stroke-opacity', '0.4');
-                        line.setAttribute('stroke-dasharray', '5,3');
-                        svg.appendChild(line);
-                    }
-                });
+                    <div style="font-size: 11px; color: rgba(150,170,200,0.8); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                        贡献者收益明细
+                    </div>
+                    <div class="contributors-list">
+                        ${contributorsHtml}
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px; color: rgba(150,170,200,0.8);">该资产总收益</span>
+                            <span style="font-size: 18px; color: #ffd700; font-family: 'Orbitron';">$${(node.value / 1000000).toFixed(2)}M</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 30px;">
+                        <div style="font-size: 48px; margin-bottom: 15px; color: ${node.color};">${node.icon}</div>
+                        <div style="font-size: 18px; color: ${node.color}; margin-bottom: 10px;">${node.label}</div>
+                        <div style="font-size: 24px; color: #ffd700; font-family: 'Orbitron'; margin-bottom: 20px;">
+                            $${(node.value / 1000000).toFixed(1)}M
+                        </div>
+                        <div style="font-size: 12px; color: rgba(150,170,200,0.7); line-height: 1.6;">
+                            新药成功上市带来的总收益<br>
+                            价值沿分子链条向下流动<br>
+                            精准分配至每个贡献者
+                        </div>
+                    </div>
+                `;
             }
         }
 
