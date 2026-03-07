@@ -3459,7 +3459,7 @@ function buildValueNetwork() {
         size: 8  // 最大
     });
     
-    // ========== 中层：NeuroBlok（网络枢纽）==========
+    // ========== 中层：NeuroBlok（融合平台，靠近中心）==========
     if (hasFusion) {
         nodesData.push({
             id: 'neuroblok',
@@ -3468,7 +3468,7 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(-15, -8, 0),  // 左侧
+            position: new THREE.Vector3(0, -2, 8),  // 靠近中心前方
             asset: neuroBlok,
             size: 5
         });
@@ -3749,6 +3749,60 @@ function createBigMolecule(type, color, scale) {
                 s2.position.set(Math.cos(t * Math.PI * 3 + Math.PI) * 0.8 * scale, y, Math.sin(t * Math.PI * 3 + Math.PI) * 0.8 * scale);
                 group.add(s1, s2);
             }
+            break;
+            
+        case 'screening':
+            // 3x3网格
+            for (let x = 0; x < 3; x++) {
+                for (let z = 0; z < 3; z++) {
+                    const dot = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.2 * scale, 8, 8),
+                        mat
+                    );
+                    dot.position.set((x - 1) * 0.6 * scale, 0, (z - 1) * 0.6 * scale);
+                    group.add(dot);
+                }
+            }
+            break;
+            
+        case 'assay':
+            // 柱状图形状
+            const base = new THREE.Mesh(new THREE.BoxGeometry(1.2 * scale, 0.15 * scale, 0.8 * scale), mat);
+            group.add(base);
+            [0.4, 0.7, 0.5, 0.9].forEach((h, i) => {
+                const bar = new THREE.Mesh(new THREE.BoxGeometry(0.2 * scale, h * scale, 0.2 * scale), mat);
+                bar.position.set((i - 1.5) * 0.25 * scale, h * scale / 2 + 0.075 * scale, 0);
+                group.add(bar);
+            });
+            break;
+            
+        case 'clinical':
+            // 十字形
+            const v = new THREE.Mesh(new THREE.BoxGeometry(0.3 * scale, 1.2 * scale, 0.3 * scale), mat);
+            const h = new THREE.Mesh(new THREE.BoxGeometry(1.2 * scale, 0.3 * scale, 0.3 * scale), mat);
+            group.add(v, h);
+            break;
+            
+        case 'patent':
+            // 文档形状
+            const page = new THREE.Mesh(new THREE.BoxGeometry(0.9 * scale, 1.2 * scale, 0.08 * scale), mat);
+            group.add(page);
+            // 添加几条线代表文字
+            for (let i = 0; i < 3; i++) {
+                const line = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.6 * scale, 0.06 * scale, 0.02 * scale),
+                    new THREE.MeshBasicMaterial({ color: 0xffffff })
+                );
+                line.position.set(0, (0.3 - i * 0.25) * scale, 0.05 * scale);
+                group.add(line);
+            }
+            break;
+            
+        case 'paper':
+            // 卷轴形状
+            const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.35 * scale, 0.35 * scale, 1.3 * scale, 16), mat);
+            roll.rotation.z = Math.PI / 2;
+            group.add(roll);
             break;
             
         default:
