@@ -68,7 +68,7 @@
             height: 100vh;
         }
         .glass-card {
-            background: rgba(10, 15, 30, 0.35);
+            background: rgba(10, 15, 30, 0.15);
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 24px;
             backdrop-filter: blur(20px);
@@ -138,7 +138,7 @@
             display: flex;
             gap: 30px;
             z-index: 100;
-            background: rgba(10, 15, 30, 0.3);
+            background: rgba(10, 15, 30, 0.15);
             backdrop-filter: blur(10px);
             padding: 12px 30px;
             border-radius: 30px;
@@ -156,7 +156,7 @@
         /* 左侧资产库 */
         .asset-library {
             width: 380px;
-            background: rgba(10, 15, 30, 0.25);
+            background: rgba(10, 15, 30, 0.15);
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 24px;
             backdrop-filter: blur(20px);
@@ -361,7 +361,7 @@
         /* 右侧权属面板 */
         .ownership-panel {
             width: 320px;
-            background: rgba(10, 15, 30, 0.25);
+            background: rgba(10, 15, 30, 0.15);
             border: 1px solid rgba(255, 215, 0, 0.3);
             border-radius: 24px;
             backdrop-filter: blur(20px);
@@ -669,7 +669,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 30px;
-            background: rgba(10, 15, 30, 0.35);
+            background: rgba(10, 15, 30, 0.15);
             border: 1px solid rgba(255, 215, 0, 0.2);
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -794,7 +794,7 @@
         }
         .modal-overlay.active { display: flex; opacity: 1; }
         .mint-modal, .fusion-modal {
-            background: rgba(10, 15, 30, 0.4);
+            background: rgba(10, 15, 30, 0.15);
             border: 1px solid rgba(0, 240, 255, 0.3);
             border-radius: 24px;
             padding: 40px;
@@ -878,7 +878,7 @@
         
         .finance-config {
             flex: 1;
-            background: rgba(10, 15, 30, 0.25);
+            background: rgba(10, 15, 30, 0.15);
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 24px;
             padding: 30px;
@@ -1022,7 +1022,7 @@
             display: flex;
             gap: 20px;
             padding: 20px;
-            background: rgba(10, 15, 30, 0.25);
+            background: rgba(10, 15, 30, 0.15);
             border-radius: 16px;
             border: 1px solid rgba(255, 215, 0, 0.1);
         }
@@ -1103,7 +1103,7 @@
         
         .fusion-showcase {
             flex: 1;
-            background: rgba(10, 15, 30, 0.35);
+            background: rgba(10, 15, 30, 0.15);
             border: 2px solid rgba(255, 215, 0, 0.3);
             border-radius: 24px;
             padding: 30px;
@@ -1228,7 +1228,7 @@
             display: flex;
             gap: 20px;
             padding: 20px;
-            background: rgba(10, 15, 30, 0.25);
+            background: rgba(10, 15, 30, 0.15);
             border-radius: 16px;
             border: 1px solid rgba(255, 215, 0, 0.1);
         }
@@ -1793,7 +1793,7 @@
             
             .value-tooltip {
                 position: absolute;
-                background: rgba(10, 15, 30, 0.4);
+                background: rgba(10, 15, 30, 0.15);
                 border: 1px solid rgba(255, 215, 0, 0.3);
                 border-radius: 12px;
                 padding: 15px 20px;
@@ -1860,7 +1860,7 @@
                 right: 40px;
                 top: 20px;
                 width: 340px;
-                background: rgba(10, 15, 30, 0.35);
+                background: rgba(10, 15, 30, 0.15);
                 border: 1px solid rgba(255, 215, 0, 0.2);
                 border-radius: 20px;
                 padding: 25px;
@@ -3528,7 +3528,7 @@ function buildValueNetwork() {
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.2,  // 很淡
+                opacity: 0.12,  // 很淡
                 blending: THREE.AdditiveBlending
             })
         );
@@ -3539,7 +3539,7 @@ function buildValueNetwork() {
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.08,  // 很淡
+                opacity: 0.05,  // 很淡
                 blending: THREE.AdditiveBlending
             })
         );
@@ -3582,13 +3582,12 @@ function buildValueNetwork() {
         }
     });
     
-    // 资产之间也互相连接（网络化）
+    // 资产之间少量连接（避免太乱）
     for (let i = 0; i < displayAssets.length; i++) {
-        for (let j = i + 1; j < displayAssets.length; j++) {
-            // 相邻资产互相连接
-            if (j === i + 1 || (i === 0 && j === displayAssets.length - 1)) {
-                createValueConnection(displayAssets[i].id, displayAssets[j].id, 0x444444, false);
-            }
+        // 只连接相邻的2对，保持简洁
+        if (i < 2) {
+            const j = (i + 1) % displayAssets.length;
+            createValueConnection(displayAssets[i].id, displayAssets[j].id, 0x333333, false);
         }
     }
     
@@ -3607,7 +3606,7 @@ function createBigDrugCapsule(scale) {
     const goldMat = new THREE.MeshPhongMaterial({
         color: 0xffd700,
         emissive: 0xffaa00,
-        emissiveIntensity: 0.8,  // 很亮
+        emissiveIntensity: 1.0,  // 很亮
         shininess: 120
     });
     
@@ -3702,7 +3701,7 @@ function createBigMolecule(type, color, scale) {
     const mat = new THREE.MeshPhongMaterial({
         color: color,
         emissive: color,
-        emissiveIntensity: 0.6,
+        emissiveIntensity: 0.85,
         shininess: 100
     });
     
