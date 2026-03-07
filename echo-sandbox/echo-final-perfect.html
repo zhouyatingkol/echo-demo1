@@ -4297,15 +4297,16 @@ function renderValueNetwork() {
 }
         
         function showNodeDetail(node) {
-            const panel = document.getElementById('nodeDetailPanel');
-            const content = document.getElementById('detailContent');
-            const icon = document.getElementById('detailIcon');
-            const title = document.getElementById('detailTitle');
+            const icon = document.getElementById('detail3dIcon');
+            const title = document.getElementById('detail3dTitle');
+            const content = document.getElementById('detail3dContent');
+            
+            if (!icon || !title || !content) return;
             
             icon.textContent = node.icon;
-            icon.style.color = node.color;
+            icon.style.color = '#' + node.color.toString(16).padStart(6, '0');
             title.textContent = node.label;
-            title.style.color = node.color;
+            title.style.color = '#' + node.color.toString(16).padStart(6, '0');
             
             if (node.asset && node.asset.contributors) {
                 const contributorsHtml = node.asset.contributors.map((c, i) => {
