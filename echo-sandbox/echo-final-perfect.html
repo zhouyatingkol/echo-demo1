@@ -3392,7 +3392,7 @@ function initValue3D() {
     valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
     
     valueCamera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    valueCamera.position.set(0, 40, 120);
+    valueCamera.position.set(0, 25, 70);
     valueCamera.lookAt(0, 0, 0);
     
     valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
@@ -3454,7 +3454,7 @@ function buildValueNetwork() {
         color: 0xffd700,
         position: new THREE.Vector3(0, 0, 0),
         asset: null,
-        scale: 4,
+        scale: 6,
         layer: 'center'
     });
     
@@ -3469,7 +3469,7 @@ function buildValueNetwork() {
             color: 0x00f0ff,
             position: new THREE.Vector3(0, 0, -35),
             asset: neuroBlok,
-            scale: 3,
+            scale: 5,
             layer: 'inner'
         });
     }
@@ -3508,7 +3508,7 @@ function buildValueNetwork() {
             color: asset.colorHex,
             position: new THREE.Vector3(x, y, z),
             asset: asset,
-            scale: isSource ? 2.2 : 2.5,
+            scale: isSource ? 3.5 : 4,
             layer: isSource ? 'inner' : 'outer',
             isSource: isSource
         });
