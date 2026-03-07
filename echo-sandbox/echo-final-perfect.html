@@ -3392,7 +3392,7 @@ function initValue3D() {
     valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
     
     valueCamera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    valueCamera.position.set(0, 35, 90);
+    valueCamera.position.set(0, 40, 120);
     valueCamera.lookAt(0, 0, 0);
     
     valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
@@ -3467,17 +3467,17 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(0, 0, -20),
+            position: new THREE.Vector3(0, 0, -35),
             asset: neuroBlok,
             scale: 3,
             layer: 'inner'
         });
     }
     
-    // 分子资产 - 外环网络分布
+    // 分子资产 - 外环网络分布 - 加大间距
     const baseAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
-    const outerRadius = 55;
-    const innerRadius = 28;
+    const outerRadius = 80; // 加大外环
+    const innerRadius = 40; // 加大内环
     
     baseAssets.forEach((asset, i) => {
         const angle = (i / Math.max(baseAssets.length, 1)) * Math.PI * 2;
@@ -3485,7 +3485,8 @@ function buildValueNetwork() {
         // 如果是 NeuroBlok 的来源，放内环；其他放外环
         const isSource = hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id);
         const r = isSource ? innerRadius : outerRadius;
-        const y = isSource ? (Math.random() - 0.5) * 15 : (Math.random() - 0.5) * 25;
+        // 减少高度变化，更扁平
+        const y = isSource ? (Math.random() - 0.5) * 10 : (Math.random() - 0.5) * 20;
         
         const x = Math.cos(angle) * r;
         const z = Math.sin(angle) * r;
@@ -3614,12 +3615,12 @@ function createNetworkAmbient() {
     const geometry = new THREE.BufferGeometry();
     const positions = [];
     for (let i = 0; i < 100; i++) {
-        const r = 80 + Math.random() * 40;
+        const r = 120 + Math.random() * 60;
         const theta = Math.random() * Math.PI * 2;
         const phi = (Math.random() - 0.5) * Math.PI;
         positions.push(
             r * Math.cos(theta) * Math.cos(phi),
-            r * Math.sin(phi),
+            r * Math.sin(phi) * 0.5,
             r * Math.sin(theta) * Math.cos(phi)
         );
     }
