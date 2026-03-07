@@ -3379,35 +3379,45 @@
             }
         }
 
-// ===== Stage 4: 价值分配网络 - 修复版 =====
+        // ===== Stage 4: 3D 价值网络可视化 =====
 let valueScene, valueCamera, valueRenderer;
 let valueNodes = [], valueConnections = [], valueParticles = [];
 let isDragging = false;
 let mouseX = 0, mouseY = 0;
 let targetRotationX = 0, targetRotationY = 0;
 
-// ===== Stage 4: 价值分配网络 - 修复版 =====
 function initValue3D() {
     const canvas = document.getElementById('value3dCanvas');
-    if (!canvas) {
-        console.error('Canvas not found!');
-        return;
-    }
+    if (!canvas) return;
     
     valueScene = new THREE.Scene();
-    valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.01);
+    valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
     
     valueCamera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    valueCamera.position.set(0, 35, 85);
+    valueCamera.position.set(0, 40, 90);
+    valueCamera.lookAt(0, -10, 0);
     
     valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
     valueRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    valueRenderer.setPixelRatio(window.devicePixelRatio);
     
-    // 灯光
-    valueScene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const pl = new THREE.PointLight(0xffd700, 1.5, 200);
-    pl.position.set(0, 50, 50);
-    valueScene.add(pl);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    valueScene.add(ambientLight);
+    
+    // 主光源 - 金色
+    const pointLight = new THREE.PointLight(0xffd700, 2, 150);
+    pointLight.position.set(20, 40, 20);
+    valueScene.add(pointLight);
+    
+    // 辅助光源 - 青色
+    const pointLight2 = new THREE.PointLight(0x00f0ff, 1.5, 150);
+    pointLight2.position.set(-20, 30, -20);
+    valueScene.add(pointLight2);
+    
+    // 底部光源 - 增加层次
+    const pointLight3 = new THREE.PointLight(0xff69b4, 1, 100);
+    pointLight3.position.set(0, -30, 0);
+    valueScene.add(pointLight3);
     
     buildValueNetwork();
     
@@ -3420,71 +3430,76 @@ function initValue3D() {
 }
 
 function buildValueNetwork() {
-    // 清除
-    valueNodes.forEach(n => valueScene.remove(n.mesh));
-    valueConnections.forEach(c => valueScene.remove(c.line));
-    valueParticles.forEach(p => valueScene.remove(p.mesh));
+    // 清除所有旧对象
+    while(valueScene.children.length > 0){ 
+        valueScene.remove(valueScene.children[0]); 
+    }
     valueNodes = [];
     valueConnections = [];
     valueParticles = [];
     
-    // 获取已铸造资产 - 直接使用全局 assets 数组
-    const mintedAssets = typeof assets !== 'undefined' ? assets.filter(a => a.minted) : [];
-    const neuroBlok = typeof assets !== 'undefined' ? assets.find(a => a.id === 'NeuroBlok') : null;
+    // 重新添加灯光
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    valueScene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffd700, 1, 200);
+    pointLight.position.set(0, 50, 50);
+    valueScene.add(pointLight);
+    
+    const mintedAssets = assets.filter(a => a.minted);
+    const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
     const hasFusion = neuroBlok && neuroBlok.minted;
     
-    console.log('Stage 4 - Minted count:', mintedAssets.length);
-    console.log('Stage 4 - Assets:', mintedAssets.map(a => a.id));
-    
-    // 如果没有铸造资产，只显示新药和提示
-    if (mintedAssets.length === 0) {
-        console.warn('No minted assets found! Showing root only.');
-        
-        // 仍然显示新药
-        createValueNode('root', '💊', '新药上市', totalRevenue, 0xffd700, 0, 0, 0, 5, 'drug', null);
-        
-        // 添加提示文字
-        const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'rgba(0,0,0,0)';
-        ctx.fillRect(0, 0, 512, 128);
-        ctx.font = 'bold 32px Arial';
-        ctx.fillStyle = '#ff6b6b';
-        ctx.textAlign = 'center';
-        ctx.fillText('请先铸造资产', 256, 70);
-        
-        const tex = new THREE.CanvasTexture(canvas);
-        const spriteMat = new THREE.SpriteMaterial({ map: tex });
-        const sprite = new THREE.Sprite(spriteMat);
-        sprite.position.set(0, 8, 0);
-        sprite.scale.set(15, 4, 1);
-        valueScene.add(sprite);
-        
-        if (valueNodes.length > 0) {
-            showValueNodeDetail(valueNodes[0].mesh.userData);
-        }
-        return;
-    }
+    console.log('=== Stage 4 Debug ===');
+    console.log('Minted assets count:', mintedAssets.length);
+    console.log('Minted assets:', mintedAssets.map(a => a.id));
+    console.log('Has fusion:', hasFusion);
     
     const totalRevenue = 100;
     
-    // 中心新药
-    createValueNode('root', '💊', '新药上市', totalRevenue, 0xffd700, 0, 0, 0, 5, 'drug', null);
+    // 1. 创建中心新药节点
+    const rootNode = createValueNode({
+        id: 'root',
+        icon: '💊',
+        label: '新药上市',
+        value: totalRevenue,
+        color: 0xffd700,
+        position: [0, 0, 0],
+        scale: 5,
+        type: 'drug'
+    });
+    valueScene.add(rootNode);
+    valueNodes.push({ mesh: rootNode, data: { id: 'root', asset: null } });
+    console.log('Created root node (新药)');
     
-    // NeuroBlok
+    // 2. 如果有融合，创建 NeuroBlok
+    let neuroBlokNode = null;
     if (hasFusion) {
-        createValueNode('neuroblok', '✨', 'NeuroBlok', totalRevenue * 0.4, 0x00f0ff, 0, 0, -20, 3.5, 'collaboration', neuroBlok);
-        createValueConnection(0, 0, 0, 0, 0, -20, 0x00f0ff);
+        neuroBlokNode = createValueNode({
+            id: 'neuroblok',
+            icon: '✨',
+            label: 'NeuroBlok',
+            name: neuroBlok.name,
+            value: totalRevenue * 0.4,
+            color: 0x00f0ff,
+            position: [0, 0, -30],
+            scale: 4,
+            type: 'collaboration',
+            asset: neuroBlok
+        });
+        valueScene.add(neuroBlokNode);
+        valueNodes.push({ mesh: neuroBlokNode, data: { id: 'neuroblok', asset: neuroBlok } });
+        
+        // 连接新药 -> NeuroBlok
+        createValueLine([0,0,0], [0,0,-30], 0x00f0ff);
     }
     
-    // 分子资产 - 环形分布
+    // 3. 创建分子资产节点 - 环形分布
     const baseAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
-    const radius = 40;
+    const count = baseAssets.length;
+    const radius = 50;
     
     baseAssets.forEach((asset, i) => {
-        const angle = (i / Math.max(baseAssets.length, 1)) * Math.PI * 2;
+        const angle = (i / Math.max(count, 1)) * Math.PI * 2;
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         
@@ -3494,94 +3509,565 @@ function buildValueNetwork() {
             revenue = (totalRevenue * 0.4 / sources.length) * 0.5;
         }
         
-        createValueNode(asset.id, asset.icon, asset.name, revenue, asset.colorHex, x, 0, z, 2.5, asset.type, asset);
+        const node = createValueNode({
+            id: asset.id,
+            icon: asset.icon,
+            label: asset.id,
+            name: asset.name,
+            value: revenue,
+            color: asset.colorHex,
+            position: [x, 0, z],
+            scale: 3,
+            type: asset.type,
+            asset: asset
+        });
+        
+        valueScene.add(node);
+        valueNodes.push({ mesh: node, data: { id: asset.id, asset: asset } });
+        console.log('Created node:', asset.id, 'at position:', x, 0, z);
         
         // 连线
         if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
-            createValueConnection(x, 0, z, 0, 0, -20, asset.colorHex);
+            createValueLine([x,0,z], [0,0,-30], asset.colorHex);
         } else {
-            createValueConnection(x, 0, z, 0, 0, 0, asset.colorHex);
+            createValueLine([x,0,z], [0,0,0], asset.colorHex);
         }
     });
     
-    // 显示第一个详情
+    // 默认显示第一个详情
     if (valueNodes.length > 0) {
         showValueNodeDetail(valueNodes[0].mesh.userData);
     }
 }
 
-function createValueNode(id, icon, name, value, color, x, y, z, scale, type, asset) {
+// 创建节点
+function createValueNode(props) {
     const group = new THREE.Group();
     
     // 分子模型
     let molecule;
-    try {
-        if (type === 'drug') {
-            molecule = createMolecule('drug', color, scale);
-        } else if (type === 'collaboration') {
-            molecule = createMolecule('collaboration', color, scale);
-        } else {
-            molecule = createMolecule(type || 'compound', color, scale);
-        }
-    } catch (e) {
-        console.error('Error creating molecule:', e);
-        // 备用：简单球体
-        molecule = new THREE.Mesh(
-            new THREE.SphereGeometry(scale, 32, 32),
-            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.3 })
-        );
+    if (props.type === 'drug') {
+        molecule = createMolecule('drug', props.color, props.scale);
+    } else if (props.type === 'collaboration') {
+        molecule = createMolecule('collaboration', props.color, props.scale);
+    } else {
+        molecule = createMolecule(props.type || 'compound', props.color, props.scale);
     }
     group.add(molecule);
     
     // 光晕
     const glow = new THREE.Mesh(
-        new THREE.SphereGeometry(scale * 3, 32, 32),
-        new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.12 })
+        new THREE.SphereGeometry(props.scale * 3, 32, 32),
+        new THREE.MeshBasicMaterial({
+            color: props.color,
+            transparent: true,
+            opacity: 0.15
+        })
     );
     group.add(glow);
     
     // 光源
-    const light = new THREE.PointLight(color, 0.6, 30);
+    const light = new THREE.PointLight(props.color, 0.8, 40);
     group.add(light);
     
-    group.position.set(x, y, z);
-    group.userData = { id, icon, name, value, color, asset };
+    // 位置
+    group.position.set(...props.position);
+    group.userData = props;
     
-    valueScene.add(group);
-    valueNodes.push({ mesh: group, data: { id, asset } });
-    console.log('Created node:', id, 'at', x, y, z);
+    return group;
 }
 
-function createValueConnection(x1, y1, z1, x2, y2, z2, color) {
+// 创建连线
+function createValueLine(start, end, color) {
     const geometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(x1, y1, z1),
-        new THREE.Vector3(x2, y2, z2)
+        new THREE.Vector3(...start),
+        new THREE.Vector3(...end)
     ]);
-    const material = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.4 });
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.4
+    });
     const line = new THREE.Line(geometry, material);
     valueScene.add(line);
     valueConnections.push(line);
+    
+    // 流动粒子
+    for (let i = 0; i < 2; i++) {
+        const p = new THREE.Mesh(
+            new THREE.SphereGeometry(0.4, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffffff })
+        );
+        valueScene.add(p);
+        valueParticles.push({
+            mesh: p,
+            from: new THREE.Vector3(...start),
+            to: new THREE.Vector3(...end),
+            t: i * 0.5,
+            speed: 0.005
+        });
+    }
+}
+
+function createNetworkConnection(fromId, toId, color) {
+    const fromNode = valueNodes.find(n => n.data.id === fromId);
+    const toNode = valueNodes.find(n => n.data.id === toId);
+    if (!fromNode || !toNode) return;
+    
+    const start = fromNode.data.position;
+    const end = toNode.data.position;
+    
+    // 直线连接
+    const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.5,
+        linewidth: 3
+    });
+    
+    const line = new THREE.Line(geometry, material);
+    valueScene.add(line);
+    valueConnections.push({ line, from: fromNode, to: toNode });
+    
+    // 流动光点
+    for (let i = 0; i < 3; i++) {
+        const p = new THREE.Mesh(
+            new THREE.SphereGeometry(0.5, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 })
+        );
+        valueScene.add(p);
+        valueParticles.push({
+            mesh: p,
+            from: start,
+            to: end,
+            t: i / 3,
+            speed: 0.0005
+        });
+    }
+}
+
+function createNetworkAmbient() {
+    const geometry = new THREE.BufferGeometry();
+    const positions = [];
+    for (let i = 0; i < 100; i++) {
+        const r = 120 + Math.random() * 60;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = (Math.random() - 0.5) * Math.PI;
+        positions.push(
+            r * Math.cos(theta) * Math.cos(phi),
+            r * Math.sin(phi) * 0.5,
+            r * Math.sin(theta) * Math.cos(phi)
+        );
+    }
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    valueScene.add(new THREE.Points(geometry, new THREE.PointsMaterial({
+        size: 0.6, color: 0xffffff, transparent: true, opacity: 0.2
+    })));
+}
+
+function createFanConnection(fromId, toId, color) {
+    const fromNode = valueNodes.find(n => n.data.id === fromId);
+    const toNode = valueNodes.find(n => n.data.id === toId);
+    if (!fromNode || !toNode) return;
+    
+    const start = fromNode.data.position;
+    const end = toNode.data.position;
+    
+    // 优雅的弧线
+    const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+    mid.y += 8;
+    
+    const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+    const points = curve.getPoints(50);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.4
+    });
+    
+    const line = new THREE.Line(geometry, material);
+    valueScene.add(line);
+    valueConnections.push({ line, from: fromNode, to: toNode });
+    
+    // 光点
+    for (let i = 0; i < 4; i++) {
+        const p = new THREE.Mesh(
+            new THREE.SphereGeometry(0.6, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 })
+        );
+        valueScene.add(p);
+        valueParticles.push({ mesh: p, curve: curve, t: i / 4, speed: 0.0003 });
+    }
+}
+
+function createFanAmbient() {
+    const geometry = new THREE.BufferGeometry();
+    const positions = [];
+    for (let i = 0; i < 80; i++) {
+        positions.push(
+            (Math.random() - 0.5) * 150,
+            (Math.random() - 0.5) * 100,
+            (Math.random() - 0.5) * 80
+        );
+    }
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    valueScene.add(new THREE.Points(geometry, new THREE.PointsMaterial({
+        size: 0.7, color: 0xffffff, transparent: true, opacity: 0.25
+    })));
+}
+
+function createTreeConnection(fromId, toId, color) {
+    const fromNode = valueNodes.find(n => n.data.id === fromId);
+    const toNode = valueNodes.find(n => n.data.id === toId);
+    if (!fromNode || !toNode) return;
+    
+    const start = fromNode.data.position;
+    const end = toNode.data.position;
+    
+    // 垂直向上汇聚的曲线
+    const midY = (start.y + end.y) / 2;
+    const control = new THREE.Vector3(
+        start.x * 0.3 + end.x * 0.7,
+        midY,
+        start.z * 0.3 + end.z * 0.7
+    );
+    
+    const curve = new THREE.QuadraticBezierCurve3(start, control, end);
+    const points = curve.getPoints(60);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.35
+    });
+    
+    const line = new THREE.Line(geometry, material);
+    valueScene.add(line);
+    valueConnections.push({ line, from: fromNode, to: toNode });
+    
+    // 缓慢上升的光点
+    for (let i = 0; i < 3; i++) {
+        const particle = new THREE.Mesh(
+            new THREE.SphereGeometry(0.5, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 })
+        );
+        valueScene.add(particle);
+        
+        valueParticles.push({
+            mesh: particle,
+            curve: curve,
+            t: i / 3,
+            speed: 0.0002 + i * 0.00005
+        });
+    }
+}
+
+// 环境
+function createTreeAmbient() {
+    // 背景星星
+    const count = 100;
+    const geometry = new THREE.BufferGeometry();
+    const positions = [];
+    
+    for (let i = 0; i < count; i++) {
+        const r = 100 + Math.random() * 50;
+        const theta = Math.random() * Math.PI * 2;
+        const y = (Math.random() - 0.5) * 120;
+        
+        positions.push(
+            r * Math.cos(theta),
+            y,
+            r * Math.sin(theta)
+        );
+    }
+    
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    
+    const material = new THREE.PointsMaterial({
+        size: 0.8,
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.3
+    });
+    
+    valueScene.add(new THREE.Points(geometry, material));
+}
+
+function createElegantConnection(fromId, toId, color) {
+    const fromNode = valueNodes.find(n => n.data.id === fromId);
+    const toNode = valueNodes.find(n => n.data.id === toId);
+    if (!fromNode || !toNode) return;
+    
+    const start = fromNode.data.position;
+    const end = toNode.data.position;
+    
+    // 贝塞尔曲线，优雅的弧线
+    const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+    midPoint.y += 8; // 向上拱起
+    
+    const curve = new THREE.QuadraticBezierCurve3(start, midPoint, end);
+    const points = curve.getPoints(50);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    
+    // 主线条
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.4,
+        linewidth: 2
+    });
+    
+    const line = new THREE.Line(geometry, material);
+    valueScene.add(line);
+    valueConnections.push({ line, from: fromNode, to: toNode });
+    
+    // 静态光点沿着线
+    const particleCount = 5;
+    for (let i = 0; i < particleCount; i++) {
+        const t = i / particleCount;
+        const pos = curve.getPoint(t);
+        
+        const particle = new THREE.Mesh(
+            new THREE.SphereGeometry(0.4, 16, 16),
+            new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.9
+            })
+        );
+        particle.position.copy(pos);
+        valueScene.add(particle);
+        
+        valueParticles.push({
+            mesh: particle,
+            curve: curve,
+            t: t,
+            speed: 0.0003
+        });
+    }
+}
+
+// 静态环境
+function createStaticAmbient() {
+    // 远处静态星星
+    const particleCount = 150;
+    const geometry = new THREE.BufferGeometry();
+    const positions = [];
+    
+    for (let i = 0; i < particleCount; i++) {
+        const r = 80 + Math.random() * 40;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI;
+        
+        positions.push(
+            r * Math.sin(phi) * Math.cos(theta),
+            r * Math.sin(phi) * Math.sin(theta) * 0.5,
+            r * Math.cos(phi)
+        );
+    }
+    
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    
+    const material = new THREE.PointsMaterial({
+        size: 0.6,
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.4
+    });
+    
+    const particles = new THREE.Points(geometry, material);
+    valueScene.add(particles);
+}
+
+function createValueBeam(fromId, toId, color) {
+    const fromNode = valueNodes.find(n => n.data.id === fromId);
+    const toNode = valueNodes.find(n => n.data.id === toId);
+    if (!fromNode || !toNode) return;
+    
+    const start = fromNode.data.position;
+    const end = toNode.data.position;
+    const distance = start.distanceTo(end);
+    
+    const direction = new THREE.Vector3().subVectors(end, start).normalize();
+    const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+    
+    // 主光束
+    const beamGeometry = new THREE.CylinderGeometry(0.12, 0.2, distance, 8, 1, true);
+    const beamMaterial = new THREE.MeshBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.5,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide
+    });
+    
+    const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+    beam.position.copy(midPoint);
+    beam.lookAt(end);
+    beam.rotateX(Math.PI / 2);
+    
+    valueScene.add(beam);
+    valueConnections.push({ mesh: beam, from: fromNode, to: toNode });
+    
+    // 流动粒子
+    const particleCount = 10;
+    for (let i = 0; i < particleCount; i++) {
+        const particleGeometry = new THREE.SphereGeometry(0.35, 16, 16);
+        const particleMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            emissive: color,
+            emissiveIntensity: 2
+        });
+        const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+        
+        valueParticles.push({
+            mesh: particle,
+            from: start,
+            to: end,
+            progress: i / particleCount,
+            speed: 0.002 + Math.random() * 0.002
+        });
+        
+        valueScene.add(particle);
+    }
+}
+
+// 环境粒子
+function createAmbientParticles() {
+    const particleCount = 300;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    
+    for (let i = 0; i < particleCount; i++) {
+        const r = 35 + Math.random() * 25;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI;
+        
+        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.6;
+        positions[i * 3 + 2] = r * Math.cos(phi);
+        
+        const isGold = Math.random() > 0.5;
+        colors[i * 3] = isGold ? 1 : 0;
+        colors[i * 3 + 1] = isGold ? 0.85 : 0.9;
+        colors[i * 3 + 2] = isGold ? 0.2 : 1;
+    }
+    
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    const material = new THREE.PointsMaterial({
+        size: 0.4,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending
+    });
+    
+    const particles = new THREE.Points(geometry, material);
+    valueScene.add(particles);
+}
+
+function createValueConnection(fromId, toId, color) {
+    const fromNode = valueNodes.find(n => n.data.id === fromId);
+    const toNode = valueNodes.find(n => n.data.id === toId);
+    if (!fromNode || !toNode) return;
+    
+    // 主连线 - 更粗更亮
+    const points = [fromNode.data.position, toNode.data.position];
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.6,
+        linewidth: 3
+    });
+    
+    const line = new THREE.Line(geometry, material);
+    valueScene.add(line);
+    valueConnections.push({ line, from: fromNode, to: toNode });
+    
+    // 添加发光外圈 - 价值流动效果
+    const glowCurve = new THREE.Line(
+        geometry.clone(),
+        new THREE.LineBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.15,
+            linewidth: 8
+        })
+    );
+    glowCurve.userData = { isGlowEffect: true };
+    valueScene.add(glowCurve);
+}
+
+function createValueParticles() {
+    valueConnections.forEach(conn => {
+        // 增加粒子数量
+        for (let i = 0; i < 6; i++) {
+            // 更大的粒子
+            const geometry = new THREE.SphereGeometry(0.25, 12, 12);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xffd700,
+                transparent: true,
+                opacity: 1.0
+            });
+            const particle = new THREE.Mesh(geometry, material);
+            
+            // 添加粒子发光
+            const particleGlow = new THREE.Mesh(
+                new THREE.SphereGeometry(0.5, 12, 12),
+                new THREE.MeshBasicMaterial({
+                    color: 0xffd700,
+                    transparent: true,
+                    opacity: 0.3
+                })
+            );
+            particle.add(particleGlow);
+            
+            valueScene.add(particle);
+            
+            valueParticles.push({
+                mesh: particle,
+                from: conn.from.data.position,
+                to: conn.to.data.position,
+                progress: i / 6,
+                speed: 0.01 + Math.random() * 0.005
+            });
+        }
+    });
 }
 
 function animateValue3D() {
     requestAnimationFrame(animateValue3D);
+    
     if (!valueRenderer || !valueScene || !valueCamera) return;
     
+    // 自动缓慢旋转场景
     if (!isDragging) {
-        valueScene.rotation.y += 0.0005;
+        valueScene.rotation.y += 0.0004;
     }
     
+    // 平滑拖拽
     valueScene.rotation.x += (targetRotationX - valueScene.rotation.x) * 0.05;
     valueScene.rotation.y += (targetRotationY - valueScene.rotation.y) * 0.05;
     
+    // 粒子流动
     valueParticles.forEach(p => {
         p.t += p.speed;
         if (p.t > 1) p.t = 0;
-        p.mesh.position.lerpVectors(p.from, p.to, p.t);
+        p.mesh.position.copy(p.curve.getPoint(p.t));
     });
     
+    // 分子自转 - 明显可见
     valueNodes.forEach(node => {
-        node.mesh.rotation.y += 0.005;
+        node.mesh.rotation.y += 0.008;
+        node.mesh.rotation.z += 0.003;
     });
     
     valueRenderer.render(valueScene, valueCamera);
@@ -3601,9 +4087,11 @@ function onValueMouseDown(event) {
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, valueCamera);
     
+    // 对 Group 进行射线检测
     const intersects = raycaster.intersectObjects(valueScene.children, true);
     
     if (intersects.length > 0) {
+        // 找到最顶层的 Group
         let target = intersects[0].object;
         while (target.parent && target.parent.type !== 'Scene') {
             if (target.userData && target.userData.id) break;
@@ -3616,9 +4104,43 @@ function onValueMouseDown(event) {
 }
 
 function onValueMouseMove(event) {
-    if (!isDragging) return;
-    targetRotationY += (event.clientX - mouseX) * 0.01;
-    targetRotationX += (event.clientY - mouseY) * 0.01;
+    if (!isDragging) {
+        const rect = valueRenderer.domElement.getBoundingClientRect();
+        const mouse = new THREE.Vector2(
+            ((event.clientX - rect.left) / rect.width) * 2 - 1,
+            -((event.clientY - rect.top) / rect.height) * 2 + 1
+        );
+        
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, valueCamera);
+        
+        // 对 Group 进行射线检测
+        const intersects = raycaster.intersectObjects(valueScene.children, true);
+        let isHovering = false;
+        
+        if (intersects.length > 0) {
+            let target = intersects[0].object;
+            while (target.parent && target.parent.type !== 'Scene') {
+                if (target.userData && target.userData.id) {
+                    isHovering = true;
+                    break;
+                }
+                target = target.parent;
+            }
+        }
+        
+        const canvas = document.getElementById('value3dCanvas');
+        canvas.style.cursor = isHovering ? 'pointer' : 'grab';
+        return;
+    }
+    
+    const deltaX = event.clientX - mouseX;
+    const deltaY = event.clientY - mouseY;
+    
+    targetRotationY += deltaX * 0.008;
+    targetRotationX += deltaY * 0.008;
+    targetRotationX = Math.max(-0.5, Math.min(0.5, targetRotationX));
+    
     mouseX = event.clientX;
     mouseY = event.clientY;
 }
@@ -3629,86 +4151,166 @@ function onValueMouseUp() {
 
 function onValueWheel(event) {
     event.preventDefault();
-    valueCamera.position.z += event.deltaY * 0.1;
-    valueCamera.position.z = Math.max(30, Math.min(150, valueCamera.position.z));
+    valueCamera.position.z += event.deltaY * 0.05;
+    valueCamera.position.z = Math.max(15, Math.min(60, valueCamera.position.z));
+}
+
+function showValueNodeDetail(nodeData) {
+    const icon = document.getElementById('detail3dIcon');
+    const title = document.getElementById('detail3dTitle');
+    const content = document.getElementById('detail3dContent');
+    
+    if (!icon || !title || !content) return;
+    
+    const colorHex = '#' + nodeData.color.toString(16).padStart(6, '0');
+    
+    icon.textContent = nodeData.icon;
+    icon.style.color = colorHex;
+    title.textContent = nodeData.label;
+    title.style.color = colorHex;
+    
+    if (nodeData.asset && nodeData.asset.contributors) {
+        const contributorsHtml = nodeData.asset.contributors.map((c, i) => {
+            const share = parseInt(c.share);
+            const amount = (nodeData.value * share / 100);
+            const colors = ['#ffd700', '#00f0ff', '#00ff88', '#ff69b4'];
+            
+            return `
+                <div class="contributor-3d-row" style="border-color: ${colors[i % colors.length]};">
+                    <div class="contributor-3d-avatar" style="border-color: ${colors[i % colors.length]}60; color: ${colors[i % colors.length]};">
+                        ${c.name.charAt(0)}
+                    </div>
+                    <div class="contributor-3d-info">
+                        <div class="contributor-3d-name">${c.name}</div>
+                        <div class="contributor-3d-share">权益 ${c.share}</div>
+                    </div>
+                    <div class="contributor-3d-amount">$${amount.toFixed(2)}M</div>
+                </div>
+            `;
+        }).join('');
+        
+        content.innerHTML = `
+            <div style="margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px;">
+                <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">资产名称</div>
+                <div style="font-size: 16px; color: ${colorHex};">${nodeData.name || nodeData.asset.name}</div>
+            </div>
+            <div style="font-size: 11px; color: rgba(150,170,200,0.8); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                贡献者收益分配
+            </div>
+            ${contributorsHtml}
+            <div class="detail-3d-total">
+                <span class="detail-3d-total-label">该资产总收益</span>
+                <span class="detail-3d-total-value">$${nodeData.value.toFixed(2)}M</span>
+            </div>
+        `;
+    } else {
+        content.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <div style="font-size: 60px; margin-bottom: 20px; color: ${colorHex};">${nodeData.icon}</div>
+                <div style="font-size: 22px; color: ${colorHex}; margin-bottom: 15px;">${nodeData.label}</div>
+                <div style="font-size: 32px; color: #ffd700; font-family: Orbitron; margin-bottom: 20px;">$${nodeData.value.toFixed(1)}M</div>
+                <div style="font-size: 13px; color: rgba(150,170,200,0.7); line-height: 1.6;">
+                    新药成功上市带来的总收益<br>
+                    价值沿分子链条向下流动<br>
+                    精准分配至每个贡献者
+                </div>
+            </div>
+        `;
+    }
 }
 
 function renderValueNetwork() {
-    console.log('renderValueNetwork called');
     if (!valueScene) {
         initValue3D();
     } else {
         buildValueNetwork();
     }
-}function onValueMouseDown(event) {
-    isDragging = true;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    
-    const rect = valueRenderer.domElement.getBoundingClientRect();
-    const mouse = new THREE.Vector2(
-        ((event.clientX - rect.left) / rect.width) * 2 - 1,
-        -((event.clientY - rect.top) / rect.height) * 2 + 1
-    );
-    
-    const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(mouse, valueCamera);
-    
-    const intersects = raycaster.intersectObjects(valueScene.children, true);
-    
-    if (intersects.length > 0) {
-        let target = intersects[0].object;
-        while (target.parent && target.parent.type !== 'Scene') {
-            if (target.userData && target.userData.id) break;
-            target = target.parent;
+}
+        
+        function showNodeDetail(node) {
+            const panel = document.getElementById('nodeDetailPanel');
+            const content = document.getElementById('detailContent');
+            const icon = document.getElementById('detailIcon');
+            const title = document.getElementById('detailTitle');
+            
+            icon.textContent = node.icon;
+            icon.style.color = node.color;
+            title.textContent = node.label;
+            title.style.color = node.color;
+            
+            if (node.asset && node.asset.contributors) {
+                const contributorsHtml = node.asset.contributors.map((c, i) => {
+                    const share = parseInt(c.share);
+                    const amount = (node.value * share / 100);
+                    const colors = ['#ffd700', '#00f0ff', '#00ff88', '#ff69b4'];
+                    
+                    return `
+                        <div class="contributor-row" style="border-color: ${colors[i % colors.length]};">
+                            <div class="contributor-avatar" style="border-color: ${colors[i % colors.length]}60; color: ${colors[i % colors.length]};">
+                                ${c.name.charAt(0)}
+                            </div>
+                            <div class="contributor-info">
+                                <div class="contributor-name">${c.name}</div>
+                                <div class="contributor-share">权益 ${c.share}</div>
+                            </div>
+                            <div class="contributor-amount">$${(amount / 1000000).toFixed(2)}M</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                content.innerHTML = `
+                    <div class="detail-asset-info">
+                        <div class="detail-asset-icon" style="color: ${node.color};">${node.icon}</div>
+                        <div>
+                            <div class="detail-asset-name" style="color: ${node.color};">${node.asset.name}</div>
+                            <div class="detail-asset-id">${node.id}</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 11px; color: rgba(150,170,200,0.8); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                        贡献者收益明细
+                    </div>
+                    <div class="contributors-list">
+                        ${contributorsHtml}
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px; color: rgba(150,170,200,0.8);">该资产总收益</span>
+                            <span style="font-size: 18px; color: #ffd700; font-family: 'Orbitron';">$${(node.value / 1000000).toFixed(2)}M</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 30px;">
+                        <div style="font-size: 48px; margin-bottom: 15px; color: ${node.color};">${node.icon}</div>
+                        <div style="font-size: 18px; color: ${node.color}; margin-bottom: 10px;">${node.label}</div>
+                        <div style="font-size: 24px; color: #ffd700; font-family: 'Orbitron'; margin-bottom: 20px;">
+                            $${(node.value / 1000000).toFixed(1)}M
+                        </div>
+                        <div style="font-size: 12px; color: rgba(150,170,200,0.7); line-height: 1.6;">
+                            新药成功上市带来的总收益<br>
+                            价值沿分子链条向下流动<br>
+                            精准分配至每个贡献者
+                        </div>
+                    </div>
+                `;
+            }
         }
-        if (target.userData && target.userData.id) {
-            showValueNodeDetail(target.userData);
-        }
-    }
-}
 
-function onValueMouseMove(event) {
-    if (!isDragging) return;
-    targetRotationY += (event.clientX - mouseX) * 0.01;
-    targetRotationX += (event.clientY - mouseY) * 0.01;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-}
+        // 初始化
+        window.addEventListener('load', () => {
+            initBackground();
+            initPreviewScene();
+            generateAssetCards();
+            gsap.from('.asset-library', { x: -50, opacity: 0, duration: 0.8, delay: 0.2 });
+            gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
+            gsap.from('.preview-area', { y: 30, opacity: 0, duration: 0.8, delay: 0.4 });
+        });
 
-function onValueMouseUp() {
-    isDragging = false;
-}
-
-function onValueWheel(event) {
-    event.preventDefault();
-    valueCamera.position.z += event.deltaY * 0.1;
-    valueCamera.position.z = Math.max(30, Math.min(150, valueCamera.position.z));
-}
-
-function renderValueNetwork() {
-    console.log('renderValueNetwork called');
-    if (!valueScene) {
-        initValue3D();
-    } else {
-        buildValueNetwork();
-    }
-}
-
-// 初始化
-window.addEventListener('load', () => {
-    initBackground();
-    initPreviewScene();
-    generateAssetCards();
-    gsap.from('.asset-library', { x: -50, opacity: 0, duration: 0.8, delay: 0.2 });
-    gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
-    gsap.from('.preview-area', { y: 30, opacity: 0, duration: 0.8, delay: 0.4 });
-});
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') goTo(currentStage + 1);
-    if (e.key === 'ArrowLeft') goTo(currentStage - 1);
-});
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') goTo(currentStage + 1);
+            if (e.key === 'ArrowLeft') goTo(currentStage - 1);
+        });
     </script>
 </body>
 </html>
