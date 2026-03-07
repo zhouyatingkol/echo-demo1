@@ -3508,36 +3508,36 @@ function buildValueNetwork() {
         const group = new THREE.Group();
         group.position.copy(nodeData.position);
         
-        // 创建3D分子模型
+        // 创建3D分子模型 - 更大的比例
         let moleculeGroup;
         if (nodeData.id === 'root') {
-            moleculeGroup = createBigDrugCapsule(nodeData.size / 2.5);
+            moleculeGroup = createBigDrugCapsule(nodeData.size * 0.6);  // 更大
         } else if (nodeData.id === 'neuroblok') {
-            moleculeGroup = createBigStar(nodeData.size / 2.5, nodeData.color);
+            moleculeGroup = createBigStar(nodeData.size * 0.6, nodeData.color);  // 更大
         } else if (nodeData.asset) {
-            moleculeGroup = createBigMolecule(nodeData.asset.type, nodeData.color, 1.2);
+            moleculeGroup = createBigMolecule(nodeData.asset.type, nodeData.color, 1.8);  // 更大
         } else {
-            moleculeGroup = createBigMolecule('compound', nodeData.color, 1.2);
+            moleculeGroup = createBigMolecule('compound', nodeData.color, 1.8);  // 更大
         }
         
-        // 添加明亮的发光层（多层）
+        // 内敛的发光层 - 比模型略大一点点
         const innerGlow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 1.3, 32, 32),
+            new THREE.SphereGeometry(nodeData.size * 1.1, 32, 32),  // 更小
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.4,
+                opacity: 0.25,  // 更淡
                 blending: THREE.AdditiveBlending
             })
         );
         group.add(innerGlow);
         
         const outerGlow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 2, 32, 32),
+            new THREE.SphereGeometry(nodeData.size * 1.4, 32, 32),  // 更小
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.2,
+                opacity: 0.12,  // 更淡
                 blending: THREE.AdditiveBlending
             })
         );
