@@ -3693,20 +3693,22 @@ function renderValueNetwork() {
     } else {
         buildValueNetwork();
     }
-}        // 初始化
-        window.addEventListener('load', () => {
-            initBackground();
-            initPreviewScene();
-            generateAssetCards();
-            gsap.from('.asset-library', { x: -50, opacity: 0, duration: 0.8, delay: 0.2 });
-            gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
-            gsap.from('.preview-area', { y: 30, opacity: 0, duration: 0.8, delay: 0.4 });
-        });
+}
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') goTo(currentStage + 1);
-            if (e.key === 'ArrowLeft') goTo(currentStage - 1);
-        });
+// 初始化
+window.addEventListener('load', () => {
+    initBackground();
+    initPreviewScene();
+    generateAssetCards();
+    gsap.from('.asset-library', { x: -50, opacity: 0, duration: 0.8, delay: 0.2 });
+    gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
+    gsap.from('.preview-area', { y: 30, opacity: 0, duration: 0.8, delay: 0.4 });
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') goTo(currentStage + 1);
+    if (e.key === 'ArrowLeft') goTo(currentStage - 1);
+});
     </script>
 </body>
 </html>
