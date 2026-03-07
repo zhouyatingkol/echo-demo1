@@ -3447,6 +3447,11 @@ function buildValueNetwork() {
     const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
     const hasFusion = neuroBlok && neuroBlok.minted;
     
+    console.log('=== Stage 4 Debug ===');
+    console.log('Minted assets count:', mintedAssets.length);
+    console.log('Minted assets:', mintedAssets.map(a => a.id));
+    console.log('Has fusion:', hasFusion);
+    
     const totalRevenue = 100;
     
     // 1. 创建中心新药节点
@@ -3462,6 +3467,7 @@ function buildValueNetwork() {
     });
     valueScene.add(rootNode);
     valueNodes.push({ mesh: rootNode, data: { id: 'root', asset: null } });
+    console.log('Created root node (新药)');
     
     // 2. 如果有融合，创建 NeuroBlok
     let neuroBlokNode = null;
@@ -3516,6 +3522,7 @@ function buildValueNetwork() {
         
         valueScene.add(node);
         valueNodes.push({ mesh: node, data: { id: asset.id, asset: asset } });
+        console.log('Created node:', asset.id, 'at position:', x, 0, z);
         
         // 连线
         if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
