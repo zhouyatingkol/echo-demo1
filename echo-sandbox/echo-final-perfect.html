@@ -3389,26 +3389,33 @@ function initValue3D() {
     if (!canvas) return;
     
     valueScene = new THREE.Scene();
-    valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.015);
+    valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
     
     valueCamera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    valueCamera.position.set(0, 12, 45);
+    valueCamera.position.set(0, 25, 70);
     valueCamera.lookAt(0, 0, 0);
     
     valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
     valueRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
     valueRenderer.setPixelRatio(window.devicePixelRatio);
     
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     valueScene.add(ambientLight);
     
-    const pointLight = new THREE.PointLight(0xffd700, 1.2, 100);
-    pointLight.position.set(10, 20, 10);
+    // 主光源 - 金色
+    const pointLight = new THREE.PointLight(0xffd700, 2, 150);
+    pointLight.position.set(20, 40, 20);
     valueScene.add(pointLight);
     
-    const pointLight2 = new THREE.PointLight(0x00f0ff, 0.8, 100);
-    pointLight2.position.set(-10, 10, -10);
+    // 辅助光源 - 青色
+    const pointLight2 = new THREE.PointLight(0x00f0ff, 1.5, 150);
+    pointLight2.position.set(-20, 30, -20);
     valueScene.add(pointLight2);
+    
+    // 底部光源 - 增加层次
+    const pointLight3 = new THREE.PointLight(0xff69b4, 1, 100);
+    pointLight3.position.set(0, -30, 0);
+    valueScene.add(pointLight3);
     
     buildValueNetwork();
     
@@ -3448,10 +3455,10 @@ function buildValueNetwork() {
         size: 3
     });
     
-    // 所有已铸造资产围绕中心在同一平面分布
+    // 所有已铸造资产围绕中心在同一平面分布 - 大气布局
     const allMinted = mintedAssets.filter(a => a.id !== 'NeuroBlok');
     const count = allMinted.length;
-    const radius = 18; // 增加半径，更加展开
+    const radius = 28; // 更加大气的半径
     
     allMinted.forEach((asset, i) => {
         const angle = (i / Math.max(count, 1)) * Math.PI * 2;
@@ -3489,7 +3496,7 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(0, 0, -8),
+            position: new THREE.Vector3(0, 0, -14),
             asset: neuroBlok,
             size: 2.5
         });
@@ -3514,19 +3521,30 @@ function buildValueNetwork() {
         moleculeGroup.position.copy(nodeData.position);
         moleculeGroup.userData = nodeData;
         
-        // 添加发光效果
-        const glowGeometry = new THREE.SphereGeometry(nodeData.size * 1.5, 32, 32);
+        // 增强发光效果 - 双层辉光
+        const glowGeometry = new THREE.SphereGeometry(nodeData.size * 2.5, 32, 32);
         const glowMaterial = new THREE.MeshBasicMaterial({
             color: nodeData.color,
             transparent: true,
-            opacity: 0.15
+            opacity: 0.25
         });
         const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
         glowMesh.userData = { isGlowEffect: true };
         moleculeGroup.add(glowMesh);
         
-        // 添加点光源
-        const nodeLight = new THREE.PointLight(nodeData.color, 0.5, 15);
+        // 外层辉光 - 大气效果
+        const outerGlowGeometry = new THREE.SphereGeometry(nodeData.size * 4, 32, 32);
+        const outerGlowMaterial = new THREE.MeshBasicMaterial({
+            color: nodeData.color,
+            transparent: true,
+            opacity: 0.08
+        });
+        const outerGlowMesh = new THREE.Mesh(outerGlowGeometry, outerGlowMaterial);
+        outerGlowMesh.userData = { isGlowEffect: true };
+        moleculeGroup.add(outerGlowMesh);
+        
+        // 增强点光源 - 照亮范围更大
+        const nodeLight = new THREE.PointLight(nodeData.color, 1.5, 50);
         nodeLight.position.set(0, 0, 0);
         moleculeGroup.add(nodeLight);
         
@@ -3560,37 +3578,66 @@ function createValueConnection(fromId, toId, color) {
     const toNode = valueNodes.find(n => n.data.id === toId);
     if (!fromNode || !toNode) return;
     
+    // 主连线 - 更粗更亮
     const points = [fromNode.data.position, toNode.data.position];
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     const material = new THREE.LineBasicMaterial({
         color: color,
         transparent: true,
-        opacity: 0.3
+        opacity: 0.6,
+        linewidth: 3
     });
     
     const line = new THREE.Line(geometry, material);
     valueScene.add(line);
     valueConnections.push({ line, from: fromNode, to: toNode });
+    
+    // 添加发光外圈 - 价值流动效果
+    const glowCurve = new THREE.Line(
+        geometry.clone(),
+        new THREE.LineBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.15,
+            linewidth: 8
+        })
+    );
+    glowCurve.userData = { isGlowEffect: true };
+    valueScene.add(glowCurve);
 }
 
 function createValueParticles() {
     valueConnections.forEach(conn => {
-        for (let i = 0; i < 4; i++) {
-            const geometry = new THREE.SphereGeometry(0.12, 8, 8);
+        // 增加粒子数量
+        for (let i = 0; i < 6; i++) {
+            // 更大的粒子
+            const geometry = new THREE.SphereGeometry(0.25, 12, 12);
             const material = new THREE.MeshBasicMaterial({
                 color: 0xffd700,
                 transparent: true,
-                opacity: 0.9
+                opacity: 1.0
             });
             const particle = new THREE.Mesh(geometry, material);
+            
+            // 添加粒子发光
+            const particleGlow = new THREE.Mesh(
+                new THREE.SphereGeometry(0.5, 12, 12),
+                new THREE.MeshBasicMaterial({
+                    color: 0xffd700,
+                    transparent: true,
+                    opacity: 0.3
+                })
+            );
+            particle.add(particleGlow);
+            
             valueScene.add(particle);
             
             valueParticles.push({
                 mesh: particle,
                 from: conn.from.data.position,
                 to: conn.to.data.position,
-                progress: i / 4,
-                speed: 0.008 + Math.random() * 0.004
+                progress: i / 6,
+                speed: 0.01 + Math.random() * 0.005
             });
         }
     });
