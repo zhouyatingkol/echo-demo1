@@ -3577,31 +3577,6 @@ function buildValueNetwork() {
         showNodeDetail(nodesData[0]);
     }
 }
-            value: revenue,
-            color: asset.colorHex,
-            position: [x, 0, z],
-            scale: 3,
-            type: asset.type,
-            asset: asset
-        });
-        
-        valueScene.add(node);
-        valueNodes.push({ mesh: node, data: { id: asset.id, asset: asset } });
-        console.log('Created node:', asset.id, 'at position:', x, 0, z);
-        
-        // 连线
-        if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
-            createValueLine([x,0,z], [0,0,-30], asset.colorHex);
-        } else {
-            createValueLine([x,0,z], [0,0,0], asset.colorHex);
-        }
-    });
-    
-    // 默认显示第一个详情
-    if (valueNodes.length > 0) {
-        showValueNodeDetail(valueNodes[0].mesh.userData);
-    }
-}
 
 // 创建节点
 function createValueNode(props) {
