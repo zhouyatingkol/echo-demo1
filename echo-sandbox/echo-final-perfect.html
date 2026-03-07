@@ -1702,68 +1702,301 @@
         <div style="position: absolute; bottom: 20%; right: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,240,255,0.12) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: float 8s ease-in-out infinite reverse;"></div>
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 60%); border-radius: 50%; pointer-events: none;"></div>
         
-        <div class="stage-content" style="position: relative; z-index: 1;">
-            <h2 class="stage-title" style="color: #ffd700; text-shadow: 0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,215,0,0.3);">价值分配网络</h2>
-            <p class="stage-subtitle">当新药成功上市，价值沿链条逆流而上</p>
-            
-            <!-- 价值流动可视化 -->
-            <div style="display: flex; align-items: center; justify-content: center; gap: 30px; margin: 40px 0; flex-wrap: wrap;">
-                <div style="text-align: center; padding: 25px; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 20px; box-shadow: 0 0 30px rgba(255,215,0,0.2);">
-                    <div style="font-size: 40px; margin-bottom: 10px;">🏥</div>
-                    <div style="font-size: 14px; color: #ffd700;">新药上市</div>
-                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">100M USD</div>
+        <div class="main-container" style="margin-top: 90px; height: calc(100vh - 110px);">
+            <!-- 左侧：资产收益列表 -->
+            <div class="asset-library">
+                <div class="library-header">
+                    <div class="library-title">⬡ 资产收益明细</div>
+                    <div class="library-subtitle">点击资产查看详细分配</div>
                 </div>
-                
-                <div style="font-size: 30px; color: #ffd700; animation: flowArrow 1.5s infinite;">←</div>
-                
-                <div style="text-align: center; padding: 25px; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3); border-radius: 20px; box-shadow: 0 0 30px rgba(0,240,255,0.2);">
-                    <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
-                    <div style="font-size: 14px; color: #00f0ff;">NeuroBlok</div>
-                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">40M USD</div>
-                </div>
-                
-                <div style="font-size: 30px; color: #00f0ff; animation: flowArrow 1.5s infinite 0.5s;">←</div>
-                
-                <div style="text-align: center; padding: 25px; background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3); border-radius: 20px; box-shadow: 0 0 30px rgba(0,255,136,0.2);">
-                    <div style="font-size: 40px; margin-bottom: 10px;">🧬</div>
-                    <div style="font-size: 14px; color: #00ff88;">原始资产</div>
-                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">20M USD</div>
+                <div class="asset-grid" id="valueAssetGrid"></div>
+                <div class="stats-panel">
+                    <div class="stat-row">
+                        <span class="stat-label">已铸造资产</span>
+                        <span class="stat-value" id="valueAssetCount">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">总收益池</span>
+                        <span class="stat-value" style="color: #ffd700;" id="totalRevenue">100M USD</span>
+                    </div>
                 </div>
             </div>
             
-            <div style="font-size: 20px; color: #00f0ff; font-style: italic; margin: 30px 0; text-shadow: 0 0 30px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.3); animation: glow 2s ease-in-out infinite;">"即使是十年前的一份开源数据，也能收获应有的荣光"</div>
-            
-            <!-- 贡献者展示 -->
-            <div style="display: flex; gap: 20px; justify-content: center; margin: 30px 0; flex-wrap: wrap;">
-                <div style="padding: 15px 25px; background: rgba(0,0,0,0.2); border-radius: 30px; border: 1px solid rgba(255,215,0,0.2); display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 20px;">🏆</span>
-                    <span style="color: #ffd700; font-size: 13px;">AlphaFold Team 获得 2.5M USD</span>
+            <!-- 中央：价值流动可视化 -->
+            <div class="value-flow-center">
+                <div class="flow-header">
+                    <div class="flow-title">⬡ 价值流动网络</div>
+                    <div class="flow-subtitle">当新药成功上市，价值沿链条逆流而上</div>
                 </div>
-                <div style="padding: 15px 25px; background: rgba(0,0,0,0.2); border-radius: 30px; border: 1px solid rgba(0,240,255,0.2); display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 20px;">🏆</span>
-                    <span style="color: #00f0ff; font-size: 13px;">Genome Project 获得 1.8M USD</span>
+                
+                <div class="flow-visualization" id="flowVisualization">
+                    <!-- 价值流动节点 -->
+                    <div class="flow-node" id="finalNode" style="top: 10%; left: 50%; transform: translateX(-50%);">
+                        <div class="flow-node-icon">🏥</div>
+                        <div class="flow-node-label">新药上市</div>
+                        <div class="flow-node-value">100M USD</div>
+                    </div>
+                    
+                    <div class="flow-node" id="fusionNode" style="top: 40%; left: 50%; transform: translateX(-50%);">
+                        <div class="flow-node-icon">✨</div>
+                        <div class="flow-node-label">NeuroBlok</div>
+                        <div class="flow-node-value">40M USD</div>
+                    </div>
+                    
+                    <div class="flow-arrows">
+                        <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" id="flowSvg">
+                            <!-- 连线将由JS生成 -->
+                        </svg>
+                    </div>
                 </div>
-                <div style="padding: 15px 25px; background: rgba(0,0,0,0.2); border-radius: 30px; border: 1px solid rgba(0,255,136,0.2); display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 20px;">🏆</span>
-                    <span style="color: #00ff88; font-size: 13px;">开源社区 获得 500K USD</span>
+                
+                <!-- 核心引用 -->
+                <div class="flow-quote">"即使是十年前的一份开源数据，也能收获应有的荣光"</div>
+                
+                <!-- 里程碑时间轴 -->
+                <div class="milestone-timeline">
+                    <div class="milestone-item active">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-label">资产铸造</div>
+                    </div>
+                    <div class="milestone-item active">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-label">协作衍生</div>
+                    </div>
+                    <div class="milestone-item active">
+                        <div class="milestone-dot"></div>
+                        <div class="milestone-label">融资决策</div>
+                    </div>
+                    <div class="milestone-item active">
+                        <div class="milestone-dot gold"></div>
+                        <div class="milestone-label">价值分配</div>
+                    </div>
                 </div>
             </div>
             
-            <button class="btn" onclick="goTo(0)" style="margin-top: 20px;">重新开始</button>
+            <!-- 右侧：贡献者收益详情 -->
+            <div class="ownership-panel" id="valueDetailPanel">
+                <div class="panel-title">⬡ 贡献者收益详情</div>
+                <div id="valueDetailContent">
+                    <div class="empty-state">
+                        <div class="empty-icon">⬡</div>
+                        <div class="empty-text">选择左侧资产查看贡献者收益分配</div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <style>
-            @keyframes float {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-20px); }
+            .value-flow-center {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
             }
-            @keyframes flowArrow {
-                0%, 100% { opacity: 1; transform: translateX(0); }
-                50% { opacity: 0.5; transform: translateX(-10px); }
+            
+            .flow-header {
+                text-align: center;
+                padding: 20px 0;
+                border-bottom: 1px solid rgba(255, 215, 0, 0.1);
             }
-            @keyframes glow {
-                0%, 100% { text-shadow: 0 0 30px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.3); }
-                50% { text-shadow: 0 0 40px rgba(0,240,255,0.8), 0 0 80px rgba(0,240,255,0.5); }
+            
+            .flow-title {
+                color: #ffd700;
+                font-size: 20px;
+                letter-spacing: 3px;
+                text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+                margin-bottom: 8px;
+            }
+            
+            .flow-subtitle {
+                color: rgba(150, 170, 200, 0.7);
+                font-size: 12px;
+            }
+            
+            .flow-visualization {
+                flex: 1;
+                background: rgba(10, 15, 30, 0.6);
+                border: 1px solid rgba(255, 215, 0, 0.2);
+                border-radius: 24px;
+                position: relative;
+                overflow: hidden;
+                min-height: 250px;
+            }
+            
+            .flow-node {
+                position: absolute;
+                text-align: center;
+                padding: 15px 25px;
+                background: rgba(0, 0, 0, 0.4);
+                border: 1px solid;
+                border-radius: 16px;
+                backdrop-filter: blur(10px);
+                z-index: 10;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+            
+            .flow-node:hover {
+                transform: translateX(-50%) scale(1.05);
+            }
+            
+            #finalNode {
+                border-color: rgba(255, 215, 0, 0.4);
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+            }
+            
+            #fusionNode {
+                border-color: rgba(0, 240, 255, 0.4);
+                box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+            }
+            
+            .flow-node-icon {
+                font-size: 32px;
+                margin-bottom: 8px;
+            }
+            
+            .flow-node-label {
+                font-size: 13px;
+                color: rgba(220, 230, 240, 0.9);
+                margin-bottom: 4px;
+            }
+            
+            .flow-node-value {
+                font-size: 14px;
+                font-family: 'Orbitron', sans-serif;
+                color: #ffd700;
+            }
+            
+            .flow-quote {
+                text-align: center;
+                font-size: 16px;
+                color: #00f0ff;
+                font-style: italic;
+                padding: 20px;
+                text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+                background: rgba(0, 240, 255, 0.05);
+                border-radius: 12px;
+                border-left: 3px solid rgba(0, 240, 255, 0.3);
+            }
+            
+            .milestone-timeline {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                padding: 20px;
+                background: rgba(10, 15, 30, 0.4);
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .milestone-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                opacity: 0.5;
+                transition: all 0.3s;
+            }
+            
+            .milestone-item.active {
+                opacity: 1;
+            }
+            
+            .milestone-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: rgba(150, 170, 200, 0.5);
+                box-shadow: 0 0 10px rgba(150, 170, 200, 0.3);
+            }
+            
+            .milestone-dot.gold {
+                background: #ffd700;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+                animation: pulse-gold 2s infinite;
+            }
+            
+            @keyframes pulse-gold {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.2); }
+            }
+            
+            .milestone-label {
+                font-size: 11px;
+                color: rgba(200, 220, 240, 0.8);
+            }
+            
+            .contributor-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 15px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 12px;
+                margin-bottom: 10px;
+                border-left: 3px solid;
+                transition: all 0.3s;
+            }
+            
+            .contributor-item:hover {
+                background: rgba(0, 0, 0, 0.5);
+                transform: translateX(5px);
+            }
+            
+            .contributor-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: rgba(255, 215, 0, 0.1);
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+            }
+            
+            .contributor-info {
+                flex: 1;
+            }
+            
+            .contributor-name {
+                font-size: 13px;
+                color: rgba(220, 230, 240, 0.9);
+                margin-bottom: 2px;
+            }
+            
+            .contributor-share {
+                font-size: 11px;
+                color: rgba(150, 170, 200, 0.7);
+            }
+            
+            .contributor-reward {
+                font-size: 14px;
+                font-family: 'Orbitron', sans-serif;
+                color: #ffd700;
+                text-align: right;
+            }
+            
+            .total-reward-box {
+                margin-top: 20px;
+                padding: 15px;
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                border-radius: 12px;
+                text-align: center;
+            }
+            
+            .total-reward-label {
+                font-size: 11px;
+                color: rgba(150, 170, 200, 0.8);
+                margin-bottom: 5px;
+            }
+            
+            .total-reward-value {
+                font-size: 24px;
+                font-family: 'Orbitron', sans-serif;
+                color: #ffd700;
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
             }
         </style>
     </div>
@@ -3036,6 +3269,155 @@
             if (index === 3) {
                 renderFinanceGrid();
                 setTimeout(() => animateCards(), 500);
+            }
+            if (index === 4) {
+                renderValueGrid();
+                setTimeout(() => {
+                    animateCards();
+                    drawFlowLines();
+                }, 500);
+            }
+        }
+
+        // ===== Stage 4: 价值分配功能 =====
+        let selectedValueAsset = null;
+        
+        function renderValueGrid() {
+            const grid = document.getElementById('valueAssetGrid');
+            const minted = assets.filter(a => a.minted);
+            
+            document.getElementById('valueAssetCount').textContent = minted.length;
+            
+            // 计算总收益（模拟）
+            const totalRevenue = minted.reduce((sum, a) => sum + (a.value * 10), 0);
+            document.getElementById('totalRevenue').textContent = totalRevenue.toFixed(1) + 'M USD';
+            
+            if (minted.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(150,170,200,0.5)">请先铸造资产</div>';
+                return;
+            }
+            
+            grid.innerHTML = minted.map(asset => {
+                const revenue = (asset.value * 10).toFixed(1);
+                return `
+                <div class="asset-card" data-id="${asset.id}" style="border-color:${asset.color}50;cursor:pointer;" onclick="selectValueAsset('${asset.id}')">
+                    <div class="mol-canvas-container" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:${asset.color};">${asset.icon}</div>
+                    <div class="asset-id" style="color:${asset.color};text-shadow:0 0 10px ${asset.color}80;">${asset.id}</div>
+                    <div class="asset-name">${asset.name}</div>
+                    <div style="font-size:10px;color:#ffd700;margin-top:4px;">${revenue}M USD</div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function selectValueAsset(id) {
+            const a = assets.find(x => x.id === id);
+            if (!a) return;
+            selectedValueAsset = a;
+            
+            document.querySelectorAll('#valueAssetGrid .asset-card').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`#valueAssetGrid [data-id="${id}"]`).classList.add('selected');
+            
+            // 计算收益
+            const revenue = (a.value * 10).toFixed(1);
+            
+            // 生成贡献者详情
+            const content = document.getElementById('valueDetailContent');
+            let contributorsHtml = '';
+            
+            if (a.contributors && a.contributors.length > 0) {
+                contributorsHtml = a.contributors.map((c, i) => {
+                    const share = parseInt(c.share);
+                    const reward = ((revenue * share) / 100).toFixed(1);
+                    const colors = ['#ffd700', '#00f0ff', '#00ff88', '#ff69b4', '#ffa502'];
+                    const color = colors[i % colors.length];
+                    
+                    return `
+                        <div class="contributor-item" style="border-color: ${color}60;">
+                            <div class="contributor-avatar" style="border-color: ${color}40; color: ${color};">
+                                ${c.name.charAt(0)}
+                            </div>
+                            <div class="contributor-info">
+                                <div class="contributor-name">${c.name}</div>
+                                <div class="contributor-share">权益占比 ${c.share}</div>
+                            </div>
+                            <div class="contributor-reward">${reward}M</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            content.innerHTML = `
+                <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">选中资产</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 30px;">${a.icon}</span>
+                        <div>
+                            <div style="font-size: 16px; color: ${a.color}; font-family: 'Orbitron';">${a.name}</div>
+                            <div style="font-size: 11px; color: rgba(150,170,200,0.6);">${a.id}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="font-size: 12px; color: rgba(150,170,200,0.8); margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;">
+                    贡献者收益分配
+                </div>
+                
+                ${contributorsHtml}
+                
+                <div class="total-reward-box">
+                    <div class="total-reward-label">该资产总收益</div>
+                    <div class="total-reward-value">${revenue}M USD</div>
+                </div>
+            `;
+        }
+
+        function drawFlowLines() {
+            const svg = document.getElementById('flowSvg');
+            if (!svg) return;
+            
+            svg.innerHTML = '';
+            
+            // 绘制从原始资产到融合资产的连线（如果 NeuroBlok 存在）
+            const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
+            if (neuroBlok && neuroBlok.minted) {
+                // 绘制来源资产节点
+                const sources = neuroBlok.generatedFrom ? neuroBlok.generatedFrom.split('+') : [];
+                const container = document.getElementById('flowVisualization');
+                
+                sources.forEach((sourceId, index) => {
+                    const sourceAsset = assets.find(a => a.id === sourceId);
+                    if (sourceAsset) {
+                        // 计算位置（底部扇形分布）
+                        const angle = Math.PI + (index / (sources.length - 1 || 1)) * Math.PI;
+                        const radius = 25;
+                        const x = 50 + Math.cos(angle) * radius;
+                        const y = 85 + Math.sin(angle) * 10;
+                        
+                        // 创建节点
+                        const node = document.createElement('div');
+                        node.className = 'flow-node';
+                        node.style.cssText = `left: ${x}%; top: ${y}%; transform: translate(-50%, -50%); border-color: ${sourceAsset.color}40;`;
+                        node.innerHTML = `
+                            <div class="flow-node-icon" style="color: ${sourceAsset.color};">${sourceAsset.icon}</div>
+                            <div class="flow-node-label">${sourceAsset.id}</div>
+                            <div class="flow-node-value" style="color: ${sourceAsset.color};">${(sourceAsset.value).toFixed(1)} ETH</div>
+                        `;
+                        container.appendChild(node);
+                        
+                        // 绘制连线到 NeuroBlok
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', `${x}%`);
+                        line.setAttribute('y1', `${y}%`);
+                        line.setAttribute('x2', '50%');
+                        line.setAttribute('y2', '40%');
+                        line.setAttribute('stroke', sourceAsset.color);
+                        line.setAttribute('stroke-width', '2');
+                        line.setAttribute('stroke-opacity', '0.4');
+                        line.setAttribute('stroke-dasharray', '5,3');
+                        svg.appendChild(line);
+                    }
+                });
             }
         }
 
