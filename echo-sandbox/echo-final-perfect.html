@@ -3376,6 +3376,11 @@
             }
             if (index === 4) {
                 renderValueNetwork();
+            } else {
+                // 离开 Stage 4 时暂停渲染以节省资源
+                if (valueRenderer) {
+                    // 不销毁，只是暂停动画循环
+                }
             }
         }
 
