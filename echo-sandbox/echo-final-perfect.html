@@ -3436,10 +3436,14 @@ function buildValueNetwork() {
     console.log('Stage 4 - Minted count:', mintedAssets.length);
     console.log('Stage 4 - Assets:', mintedAssets.map(a => a.id));
     
-    // 如果没有铸造资产，显示提示
+    // 如果没有铸造资产，只显示新药和提示
     if (mintedAssets.length === 0) {
-        console.warn('No minted assets found!');
-        // 创建提示文本
+        console.warn('No minted assets found! Showing root only.');
+        
+        // 仍然显示新药
+        createValueNode('root', '💊', '新药上市', totalRevenue, 0xffd700, 0, 0, 0, 5, 'drug', null);
+        
+        // 添加提示文字
         const canvas = document.createElement('canvas');
         canvas.width = 512;
         canvas.height = 128;
@@ -3447,16 +3451,20 @@ function buildValueNetwork() {
         ctx.fillStyle = 'rgba(0,0,0,0)';
         ctx.fillRect(0, 0, 512, 128);
         ctx.font = 'bold 32px Arial';
-        ctx.fillStyle = '#ffd700';
+        ctx.fillStyle = '#ff6b6b';
         ctx.textAlign = 'center';
         ctx.fillText('请先铸造资产', 256, 70);
         
         const tex = new THREE.CanvasTexture(canvas);
         const spriteMat = new THREE.SpriteMaterial({ map: tex });
         const sprite = new THREE.Sprite(spriteMat);
-        sprite.position.set(0, 0, 0);
-        sprite.scale.set(20, 5, 1);
+        sprite.position.set(0, 8, 0);
+        sprite.scale.set(15, 4, 1);
         valueScene.add(sprite);
+        
+        if (valueNodes.length > 0) {
+            showValueNodeDetail(valueNodes[0].mesh.userData);
+        }
         return;
     }
     
