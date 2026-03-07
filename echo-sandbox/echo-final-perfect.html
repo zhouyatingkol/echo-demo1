@@ -3454,7 +3454,7 @@ function buildValueNetwork() {
         label: '新药上市',
         value: totalRevenue,
         color: 0xffd700,
-        position: new THREE.Vector3(0, 18, 0),
+        position: new THREE.Vector3(0, 12, 0),
         asset: null,
         size: 8  // 最大
     });
@@ -3468,7 +3468,7 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(0, 2, 15),  // 靠近中心前方
+            position: new THREE.Vector3(0, 0, 10),  // 靠近中心前方
             asset: neuroBlok,
             size: 5
         });
@@ -3476,14 +3476,14 @@ function buildValueNetwork() {
     
     // ========== 外围：分子资产（网络节点，环形分布）==========
     const count = displayAssets.length;
-    const radius = 40;
+    const radius = 30;
     
     displayAssets.forEach((asset, i) => {
         const angle = (i / Math.max(count, 1)) * Math.PI * 2;
         // 分布在新药周围，形成网络
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
-        const y = -20 + Math.sin(angle * 3) * 6;  // 有点起伏
+        const y = -12 + Math.sin(angle * 3) * 4;  // 有点起伏
         
         let revenue;
         const isSource = sourceAssetIds.includes(asset.id);
