@@ -3404,31 +3404,36 @@ function buildValueNetwork() {
     });
     
     nodesData.forEach(nodeData => {
-        const geometry = new THREE.SphereGeometry(nodeData.size, 32, 32);
-        const material = new THREE.MeshPhongMaterial({
-            color: nodeData.color,
-            emissive: nodeData.color,
-            emissiveIntensity: 0.3,
-            shininess: 100,
-            transparent: true,
-            opacity: 0.95
-        });
+        // 使用分子模型而不是球体
+        let moleculeGroup;
+        if (nodeData.id === 'root') {
+            // 根节点 - 新药上市，用特殊的金色球体
+            moleculeGroup = createMolecule('protein', nodeData.color, 1.2);
+        } else if (nodeData.id === 'neuroblok') {
+            // 融合资产 - 用协作融合形态
+            moleculeGroup = createMolecule('collaboration', nodeData.color, 1.0);
+        } else if (nodeData.asset) {
+            // 原始资产 - 用对应的分子形态
+            moleculeGroup = createMolecule(nodeData.asset.type, nodeData.color, 0.8);
+        } else {
+            moleculeGroup = createMolecule('compound', nodeData.color, 0.8);
+        }
         
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.copy(nodeData.position);
-        mesh.userData = nodeData;
+        moleculeGroup.position.copy(nodeData.position);
+        moleculeGroup.userData = nodeData;
         
-        const glowGeometry = new THREE.SphereGeometry(nodeData.size * 1.4, 32, 32);
+        // 添加发光效果
+        const glowGeometry = new THREE.SphereGeometry(nodeData.size * 1.2, 32, 32);
         const glowMaterial = new THREE.MeshBasicMaterial({
             color: nodeData.color,
             transparent: true,
-            opacity: 0.15
+            opacity: 0.1
         });
         const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-        mesh.add(glowMesh);
+        moleculeGroup.add(glowMesh);
         
-        valueScene.add(mesh);
-        valueNodes.push({ mesh: mesh, data: nodeData });
+        valueScene.add(moleculeGroup);
+        valueNodes.push({ mesh: moleculeGroup, data: nodeData });
     });
     
     if (hasFusion) {
@@ -3515,6 +3520,9 @@ function animateValue3D() {
     valueNodes.forEach((node, i) => {
         const scale = 1 + Math.sin(Date.now() * 0.002 + i * 0.5) * 0.08;
         node.mesh.scale.setScalar(scale);
+        // 旋转分子
+        node.mesh.rotation.y += 0.005;
+        node.mesh.rotation.x += 0.002;
     });
     
     valueRenderer.render(valueScene, valueCamera);
@@ -3534,11 +3542,19 @@ function onValueMouseDown(event) {
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, valueCamera);
     
-    const meshes = valueNodes.map(n => n.mesh);
-    const intersects = raycaster.intersectObjects(meshes);
+    // 对 Group 进行射线检测
+    const intersects = raycaster.intersectObjects(valueScene.children, true);
     
     if (intersects.length > 0) {
-        showValueNodeDetail(intersects[0].object.userData);
+        // 找到最顶层的 Group
+        let target = intersects[0].object;
+        while (target.parent && target.parent.type !== 'Scene') {
+            if (target.userData && target.userData.id) break;
+            target = target.parent;
+        }
+        if (target.userData && target.userData.id) {
+            showValueNodeDetail(target.userData);
+        }
     }
 }
 
@@ -3553,11 +3569,23 @@ function onValueMouseMove(event) {
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(mouse, valueCamera);
         
-        const meshes = valueNodes.map(n => n.mesh);
-        const intersects = raycaster.intersectObjects(meshes);
+        // 对 Group 进行射线检测
+        const intersects = raycaster.intersectObjects(valueScene.children, true);
+        let isHovering = false;
+        
+        if (intersects.length > 0) {
+            let target = intersects[0].object;
+            while (target.parent && target.parent.type !== 'Scene') {
+                if (target.userData && target.userData.id) {
+                    isHovering = true;
+                    break;
+                }
+                target = target.parent;
+            }
+        }
         
         const canvas = document.getElementById('value3dCanvas');
-        canvas.style.cursor = intersects.length > 0 ? 'pointer' : 'grab';
+        canvas.style.cursor = isHovering ? 'pointer' : 'grab';
         return;
     }
     
