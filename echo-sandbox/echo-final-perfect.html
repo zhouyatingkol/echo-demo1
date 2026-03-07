@@ -3439,77 +3439,61 @@ function buildValueNetwork() {
     
     nodesData.push({
         id: 'root',
-        icon: '🏥',
+        icon: '💊',
         label: '新药上市',
         value: totalRevenue,
         color: 0xffd700,
-        position: new THREE.Vector3(0, 10, 0),
+        position: new THREE.Vector3(0, 0, 0),
         asset: null,
         size: 3
     });
     
-    if (hasFusion) {
-        nodesData.push({
-            id: 'neuroblok',
-            icon: '✨',
-            label: 'NeuroBlok',
-            value: neuroBlokRevenue,
-            color: 0x00f0ff,
-            position: new THREE.Vector3(0, 2, 0),
-            asset: neuroBlok,
-            size: 2.5
-        });
-        
-        const sources = neuroBlok.generatedFrom ? neuroBlok.generatedFrom.split('+') : [];
-        const angleStep = (Math.PI * 2) / Math.max(sources.length, 1);
-        
-        sources.forEach((sourceId, i) => {
-            const sourceAsset = assets.find(a => a.id === sourceId);
-            if (sourceAsset) {
-                const angle = angleStep * i;
-                const radius = 8;
-                const x = Math.cos(angle) * radius;
-                const z = Math.sin(angle) * radius;
-                const share = 1 / sources.length;
-                const revenue = neuroBlokRevenue * share * 0.5;
-                
-                nodesData.push({
-                    id: sourceId,
-                    icon: sourceAsset.icon,
-                    label: sourceId,
-                    value: revenue,
-                    color: sourceAsset.colorHex,
-                    position: new THREE.Vector3(x, -6, z),
-                    asset: sourceAsset,
-                    size: 2
-                });
-            }
-        });
-    }
+    // 所有已铸造资产围绕中心在同一平面分布
+    const allMinted = mintedAssets.filter(a => a.id !== 'NeuroBlok');
+    const count = allMinted.length;
+    const radius = 10;
     
-    const otherAssets = mintedAssets.filter(a => 
-        a.id !== 'NeuroBlok' && !nodesData.find(n => n.id === a.id)
-    );
-    
-    otherAssets.forEach((asset, i) => {
-        const revenue = (asset.value / 20) * (totalRevenue - neuroBlokRevenue);
-        const angle = (Math.PI * 2 * i / Math.max(otherAssets.length, 1)) + Math.PI;
-        const radius = hasFusion ? 12 : 8;
+    allMinted.forEach((asset, i) => {
+        const angle = (i / Math.max(count, 1)) * Math.PI * 2;
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
-        const y = hasFusion ? -6 : 0;
+        
+        // 计算收益
+        let revenue;
+        if (hasFusion && neuroBlok.generatedFrom && neuroBlok.generatedFrom.includes(asset.id)) {
+            const sources = neuroBlok.generatedFrom.split('+');
+            revenue = (neuroBlokRevenue / sources.length) * 0.5;
+        } else {
+            revenue = (asset.value / 20) * (totalRevenue - neuroBlokRevenue);
+        }
         
         nodesData.push({
             id: asset.id,
             icon: asset.icon,
             label: asset.id,
+            name: asset.name,
             value: revenue,
             color: asset.colorHex,
-            position: new THREE.Vector3(x, y, z),
+            position: new THREE.Vector3(x, 0, z),
             asset: asset,
             size: 2
         });
     });
+    
+    // NeuroBlok放在中心和新药之间（同一平面）
+    if (hasFusion) {
+        nodesData.push({
+            id: 'neuroblok',
+            icon: '✨',
+            label: 'NeuroBlok',
+            name: neuroBlok.name,
+            value: neuroBlokRevenue,
+            color: 0x00f0ff,
+            position: new THREE.Vector3(0, 0, -5),
+            asset: neuroBlok,
+            size: 2.5
+        });
+    }
     
     nodesData.forEach(nodeData => {
         // 使用分子模型而不是球体
@@ -3550,18 +3534,19 @@ function buildValueNetwork() {
         valueNodes.push({ mesh: moleculeGroup, data: nodeData });
     });
     
+    // 创建连线 - 中心到所有资产
+    allMinted.forEach(asset => {
+        createValueConnection('root', asset.id, asset.colorHex);
+    });
+    
+    // NeuroBlok的连线
     if (hasFusion) {
         createValueConnection('root', 'neuroblok', 0xffd700);
-        
         const sources = neuroBlok.generatedFrom ? neuroBlok.generatedFrom.split('+') : [];
         sources.forEach(sourceId => {
             createValueConnection('neuroblok', sourceId, 0x00f0ff);
         });
     }
-    
-    otherAssets.forEach(asset => {
-        createValueConnection('root', asset.id, asset.colorHex);
-    });
     
     createValueParticles();
     
@@ -3761,7 +3746,7 @@ function showValueNodeDetail(nodeData) {
         content.innerHTML = `
             <div style="margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px;">
                 <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">资产名称</div>
-                <div style="font-size: 16px; color: ${colorHex};">${nodeData.asset.name}</div>
+                <div style="font-size: 16px; color: ${colorHex};">${nodeData.name || nodeData.asset.name}</div>
             </div>
             <div style="font-size: 11px; color: rgba(150,170,200,0.8); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
                 贡献者收益分配
