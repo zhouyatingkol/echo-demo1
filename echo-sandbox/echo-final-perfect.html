@@ -3447,19 +3447,19 @@ function buildValueNetwork() {
     
     const nodesData = [];
     
-    // ========== 顶层：新药上市（最终成果，高高在上）==========
+    // ========== 中心：新药上市（网络核心）==========
     nodesData.push({
         id: 'root',
         icon: '💊',
         label: '新药上市',
         value: totalRevenue,
         color: 0xffd700,
-        position: new THREE.Vector3(0, 25, 0),  // 最高
+        position: new THREE.Vector3(0, 8, 0),
         asset: null,
-        size: 7  // 最大
+        size: 8  // 最大
     });
     
-    // ========== 中层：NeuroBlok（融合平台，承上启下）==========
+    // ========== 中层：NeuroBlok（网络枢纽）==========
     if (hasFusion) {
         nodesData.push({
             id: 'neuroblok',
@@ -3468,23 +3468,22 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(0, 8, 0),  // 中间，作为桥梁
+            position: new THREE.Vector3(-15, -8, 0),  // 左侧
             asset: neuroBlok,
             size: 5
         });
     }
     
-    // ========== 底层：分子资产（基础层，半圆形排列）==========
+    // ========== 外围：分子资产（网络节点，环形分布）==========
     const count = displayAssets.length;
-    const bottomRadius = 32;
-    const arcAngle = Math.PI;  // 180度半圆
-    const startAngle = -Math.PI / 2;  // 从正前方开始
+    const radius = 25;
     
     displayAssets.forEach((asset, i) => {
-        // 在半圆上均匀分布
-        const angle = startAngle + (i / Math.max(count - 1, 1)) * arcAngle;
-        const x = Math.cos(angle) * bottomRadius;
-        const z = Math.sin(angle) * bottomRadius * 0.5;  // 稍微压扁，更有层次感
+        const angle = (i / Math.max(count, 1)) * Math.PI * 2;
+        // 分布在新药周围，形成网络
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
+        const y = -10 + Math.sin(angle * 2) * 3;  // 有点起伏
         
         let revenue;
         const isSource = sourceAssetIds.includes(asset.id);
@@ -3500,10 +3499,9 @@ function buildValueNetwork() {
             label: asset.name,
             value: revenue,
             color: asset.colorHex,
-            position: new THREE.Vector3(x, -15, z),  // 底层
+            position: new THREE.Vector3(x, y, z),
             asset: asset,
-            size: 3.5,
-            isSource: isSource
+            size: 4
         });
     });
     
@@ -3512,43 +3510,43 @@ function buildValueNetwork() {
         const group = new THREE.Group();
         group.position.copy(nodeData.position);
         
-        // 创建3D分子模型
+        // 创建3D分子模型 - 更大！
         let moleculeGroup;
         if (nodeData.id === 'root') {
-            moleculeGroup = createBigDrugCapsule(nodeData.size * 0.5);
+            moleculeGroup = createBigDrugCapsule(nodeData.size * 0.8);  // 更大
         } else if (nodeData.id === 'neuroblok') {
-            moleculeGroup = createBigStar(nodeData.size * 0.5, nodeData.color);
+            moleculeGroup = createBigStar(nodeData.size * 0.8, nodeData.color);  // 更大
         } else if (nodeData.asset) {
-            moleculeGroup = createBigMolecule(nodeData.asset.type, nodeData.color, 1.5);
+            moleculeGroup = createBigMolecule(nodeData.asset.type, nodeData.color, 2.2);  // 更大
         } else {
-            moleculeGroup = createBigMolecule('compound', nodeData.color, 1.5);
+            moleculeGroup = createBigMolecule('compound', nodeData.color, 2.2);  // 更大
         }
         
-        // 内敛的发光层
+        // 超小发光层 - 几乎贴着模型
         const innerGlow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 1.15, 32, 32),
+            new THREE.SphereGeometry(nodeData.size * 1.05, 32, 32),  // 只大一点点
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.3,
+                opacity: 0.2,  // 很淡
                 blending: THREE.AdditiveBlending
             })
         );
         group.add(innerGlow);
         
         const outerGlow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 1.5, 32, 32),
+            new THREE.SphereGeometry(nodeData.size * 1.2, 32, 32),  // 只大一点点
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.15,
+                opacity: 0.08,  // 很淡
                 blending: THREE.AdditiveBlending
             })
         );
         group.add(outerGlow);
         
         // 添加强点光源
-        const light = new THREE.PointLight(nodeData.color, 1.5, 35);
+        const light = new THREE.PointLight(nodeData.color, 1.5, 30);
         group.add(light);
         
         // 添加模型
@@ -3559,21 +3557,40 @@ function buildValueNetwork() {
         valueNodes.push({ mesh: group, data: nodeData });
     });
     
-    // 创建连线 - 清晰的价值流动路径
+    // 创建网络化连线 - 纵横交错形成网络感
     if (hasFusion) {
-        // NeuroBlok 向上贡献给新药（粗线，主路径）
+        // NeuroBlok 连接到新药
         createValueConnection('neuroblok', 'root', 0x00f0ff, true);
+        
+        // 源资产连接到 NeuroBlok
+        sourceAssetIds.forEach(sourceId => {
+            createValueConnection(sourceId, 'neuroblok', 0x00aaff, false);
+        });
+        
+        // 源资产也直接连接到新药（体现双重贡献）
+        sourceAssetIds.forEach(sourceId => {
+            if (Math.random() > 0.5) {  // 随机一些连线，避免太乱
+                createValueConnection(sourceId, 'root', 0xffd700, false);
+            }
+        });
     }
     
+    // 所有资产都连接到新药（主要价值流）
     displayAssets.forEach(asset => {
-        if (hasFusion && sourceAssetIds.includes(asset.id)) {
-            // 源资产先汇聚到 NeuroBlok
-            createValueConnection(asset.id, 'neuroblok', asset.colorHex, false);
-        } else {
-            // 其他资产直接向上贡献给新药
+        if (!sourceAssetIds.includes(asset.id)) {
             createValueConnection(asset.id, 'root', asset.colorHex, false);
         }
     });
+    
+    // 资产之间也互相连接（网络化）
+    for (let i = 0; i < displayAssets.length; i++) {
+        for (let j = i + 1; j < displayAssets.length; j++) {
+            // 相邻资产互相连接
+            if (j === i + 1 || (i === 0 && j === displayAssets.length - 1)) {
+                createValueConnection(displayAssets[i].id, displayAssets[j].id, 0x444444, false);
+            }
+        }
+    }
     
     createValueParticles();
     
