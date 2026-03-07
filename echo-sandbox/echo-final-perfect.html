@@ -3389,8 +3389,8 @@ function initValue3D() {
     valueScene = new THREE.Scene();
     valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.015);
     
-    valueCamera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    valueCamera.position.set(0, 12, 45);
+    valueCamera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    valueCamera.position.set(0, 25, 60);
     valueCamera.lookAt(0, 0, 0);
     
     valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
@@ -3447,19 +3447,19 @@ function buildValueNetwork() {
     
     const nodesData = [];
     
-    // ========== 顶部：新药上市（最终成果）==========
+    // ========== 中心：新药上市（最大最亮）==========
     nodesData.push({
         id: 'root',
         icon: '💊',
         label: '新药上市',
         value: totalRevenue,
         color: 0xffd700,
-        position: new THREE.Vector3(0, 20, 0),
+        position: new THREE.Vector3(0, 0, 0),
         asset: null,
-        size: 4
+        size: 6  // 更大
     });
     
-    // ========== 中部：NeuroBlok（融合成果）==========
+    // ========== 内环：NeuroBlok（如有融合）==========
     if (hasFusion) {
         nodesData.push({
             id: 'neuroblok',
@@ -3468,20 +3468,20 @@ function buildValueNetwork() {
             name: neuroBlok.name,
             value: neuroBlokRevenue,
             color: 0x00f0ff,
-            position: new THREE.Vector3(0, 0, 0),
+            position: new THREE.Vector3(0, 0, -12),  // 在中心后方
             asset: neuroBlok,
-            size: 3
+            size: 4  // 较大
         });
     }
     
-    // ========== 底部：分子资产（原始贡献者）==========
+    // ========== 外环：分子资产（环绕分布）==========
     const count = displayAssets.length;
-    const bottomRadius = 28;
+    const outerRadius = 28;  // 外环半径
     
     displayAssets.forEach((asset, i) => {
         const angle = (i / Math.max(count, 1)) * Math.PI * 2;
-        const x = Math.cos(angle) * bottomRadius;
-        const z = Math.sin(angle) * bottomRadius;
+        const x = Math.cos(angle) * outerRadius;
+        const z = Math.sin(angle) * outerRadius;
         
         let revenue;
         const isSource = sourceAssetIds.includes(asset.id);
@@ -3497,43 +3497,54 @@ function buildValueNetwork() {
             label: asset.name,
             value: revenue,
             color: asset.colorHex,
-            position: new THREE.Vector3(x, -20, z),
+            position: new THREE.Vector3(x, 0, z),
             asset: asset,
-            size: 2.2
+            size: 3  // 较大的分子
         });
     });
     
     // 创建节点
     nodesData.forEach((nodeData) => {
         const group = new THREE.Group();
+        group.position.copy(nodeData.position);
         
         // 创建3D分子模型
         let moleculeGroup;
         if (nodeData.id === 'root') {
-            moleculeGroup = createMolecule('drug', nodeData.color, 1.2);
+            moleculeGroup = createBigDrugCapsule(nodeData.size / 2.5);
         } else if (nodeData.id === 'neuroblok') {
-            moleculeGroup = createMolecule('collaboration', nodeData.color, 0.9);
+            moleculeGroup = createBigStar(nodeData.size / 2.5, nodeData.color);
         } else if (nodeData.asset) {
-            moleculeGroup = createMolecule(nodeData.asset.type, nodeData.color, 0.7);
+            moleculeGroup = createBigMolecule(nodeData.asset.type, nodeData.color, 1.2);
         } else {
-            moleculeGroup = createMolecule('compound', nodeData.color, 0.7);
+            moleculeGroup = createBigMolecule('compound', nodeData.color, 1.2);
         }
         
-        group.position.copy(nodeData.position);
+        // 添加明亮的发光层（多层）
+        const innerGlow = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 1.3, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.4,
+                blending: THREE.AdditiveBlending
+            })
+        );
+        group.add(innerGlow);
         
-        // 添加发光效果（不随模型旋转）
-        const glow = new THREE.Mesh(
+        const outerGlow = new THREE.Mesh(
             new THREE.SphereGeometry(nodeData.size * 2, 32, 32),
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.2
+                opacity: 0.2,
+                blending: THREE.AdditiveBlending
             })
         );
-        group.add(glow);
+        group.add(outerGlow);
         
-        // 添加点光源
-        const light = new THREE.PointLight(nodeData.color, 1, 25);
+        // 添加强点光源
+        const light = new THREE.PointLight(nodeData.color, 2, 40);
         group.add(light);
         
         // 添加模型
@@ -3544,16 +3555,16 @@ function buildValueNetwork() {
         valueNodes.push({ mesh: group, data: nodeData });
     });
     
-    // 创建连线 - 正确的价值流动逻辑
+    // 创建连线
     if (hasFusion) {
-        createValueConnection('neuroblok', 'root', 0x00f0ff);
+        createValueConnection('neuroblok', 'root', 0x00f0ff, true);
     }
     
     displayAssets.forEach(asset => {
         if (hasFusion && sourceAssetIds.includes(asset.id)) {
-            createValueConnection(asset.id, 'neuroblok', asset.colorHex);
+            createValueConnection(asset.id, 'neuroblok', asset.colorHex, false);
         } else {
-            createValueConnection(asset.id, 'root', asset.colorHex);
+            createValueConnection(asset.id, 'root', asset.colorHex, false);
         }
     });
     
@@ -3562,6 +3573,166 @@ function buildValueNetwork() {
     if (nodesData.length > 0) {
         showValueNodeDetail(nodesData[0]);
     }
+}
+
+// 大胶囊（新药）- 明亮高级
+function createBigDrugCapsule(scale) {
+    const group = new THREE.Group();
+    
+    // 明亮金色材质
+    const goldMat = new THREE.MeshPhongMaterial({
+        color: 0xffd700,
+        emissive: 0xffaa00,
+        emissiveIntensity: 0.8,  // 很亮
+        shininess: 120
+    });
+    
+    // 白色材质
+    const whiteMat = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.3,
+        shininess: 120
+    });
+    
+    // 上半球（金色）
+    const top = new THREE.Mesh(
+        new THREE.SphereGeometry(scale, 32, 16, 0, Math.PI*2, 0, Math.PI/2),
+        goldMat
+    );
+    top.position.y = scale;
+    
+    // 下半球（白色）
+    const bot = new THREE.Mesh(
+        new THREE.SphereGeometry(scale, 32, 16, 0, Math.PI*2, Math.PI/2, Math.PI/2),
+        whiteMat
+    );
+    bot.position.y = -scale;
+    
+    // 中间圆柱（金色）
+    const mid = new THREE.Mesh(
+        new THREE.CylinderGeometry(scale, scale, scale*2, 32),
+        goldMat
+    );
+    
+    group.add(top, bot, mid);
+    
+    // 环绕的青蓝色粒子
+    for (let i = 0; i < 10; i++) {
+        const angle = (i / 10) * Math.PI * 2;
+        const particle = new THREE.Mesh(
+            new THREE.SphereGeometry(0.15 * scale, 8, 8),
+            new THREE.MeshPhongMaterial({
+                color: 0x00f0ff,
+                emissive: 0x00f0ff,
+                emissiveIntensity: 1.0
+            })
+        );
+        particle.position.set(
+            Math.cos(angle) * 1.8 * scale,
+            Math.sin(i * 0.8) * 0.5 * scale,
+            Math.sin(angle) * 1.8 * scale
+        );
+        group.add(particle);
+    }
+    
+    return group;
+}
+
+// 大星形（NeuroBlok）
+function createBigStar(scale, color) {
+    const group = new THREE.Group();
+    
+    const mat = new THREE.MeshPhongMaterial({
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.7,
+        shininess: 100
+    });
+    
+    // 中心核心
+    group.add(new THREE.Mesh(new THREE.SphereGeometry(scale, 20, 20), mat));
+    
+    // 8个环绕卫星
+    for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const satellite = new THREE.Mesh(
+            new THREE.SphereGeometry(0.3 * scale, 12, 12),
+            mat
+        );
+        satellite.position.set(
+            Math.cos(angle) * 1.8 * scale,
+            0,
+            Math.sin(angle) * 1.8 * scale
+        );
+        group.add(satellite);
+    }
+    
+    return group;
+}
+
+// 大分子模型
+function createBigMolecule(type, color, scale) {
+    const group = new THREE.Group();
+    
+    const mat = new THREE.MeshPhongMaterial({
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.6,
+        shininess: 100
+    });
+    
+    switch(type) {
+        case 'protein':
+            // 大螺旋
+            for (let i = 0; i < 12; i++) {
+                const sphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.3 * scale, 12, 12),
+                    mat
+                );
+                const angle = i * 0.5;
+                sphere.position.set(
+                    Math.cos(angle) * scale,
+                    (i - 6) * 0.3 * scale,
+                    Math.sin(angle) * scale
+                );
+                group.add(sphere);
+            }
+            break;
+            
+        case 'compound':
+            // 大六边形
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const sphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.35 * scale, 12, 12),
+                    mat
+                );
+                sphere.position.set(Math.cos(angle) * scale, 0, Math.sin(angle) * scale);
+                group.add(sphere);
+            }
+            group.add(new THREE.Mesh(new THREE.SphereGeometry(0.5 * scale, 16, 16), mat));
+            break;
+            
+        case 'gene':
+            // 大双螺旋
+            for (let i = 0; i < 10; i++) {
+                const t = i / 10;
+                const y = (t - 0.5) * 2.5 * scale;
+                const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.25 * scale, 10, 10), mat);
+                s1.position.set(Math.cos(t * Math.PI * 3) * 0.8 * scale, y, Math.sin(t * Math.PI * 3) * 0.8 * scale);
+                const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.25 * scale, 10, 10), mat);
+                s2.position.set(Math.cos(t * Math.PI * 3 + Math.PI) * 0.8 * scale, y, Math.sin(t * Math.PI * 3 + Math.PI) * 0.8 * scale);
+                group.add(s1, s2);
+            }
+            break;
+            
+        default:
+            // 默认球体
+            group.add(new THREE.Mesh(new THREE.SphereGeometry(0.6 * scale, 16, 16), mat));
+    }
+    
+    return group;
 }
 
 function createValueConnection(fromId, toId, color) {
