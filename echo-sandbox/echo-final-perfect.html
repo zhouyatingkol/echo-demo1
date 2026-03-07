@@ -3393,6 +3393,14 @@ function initValue3D() {
     const width = canvas.clientWidth || window.innerWidth;
     const height = canvas.clientHeight || window.innerHeight;
     
+    try {
+        valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    } catch (e) {
+        console.error('WebGL not supported:', e);
+        canvas.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ff6b6b;font-size:18px;">⚠️ 您的浏览器不支持 WebGL，无法显示3D网络</div>';
+        return;
+    }
+    
     valueScene = new THREE.Scene();
     valueScene.fog = new THREE.FogExp2(0x050510, 0.012);
     
@@ -3400,7 +3408,6 @@ function initValue3D() {
     valueCamera.position.set(0, 20, 60);
     valueCamera.lookAt(0, 0, 0);
     
-    valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
     valueRenderer.setSize(width, height);
     valueRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
