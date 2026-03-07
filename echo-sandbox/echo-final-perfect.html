@@ -3471,7 +3471,11 @@ function buildValueNetwork() {
     }
     
     // 分子资产（外环环形分布）
-    const baseAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
+    // 如果没有铸造任何资产，显示所有资产作为演示
+    let baseAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
+    if (baseAssets.length === 0) {
+        baseAssets = assets.filter(a => a.id !== 'NeuroBlok');
+    }
     const count = baseAssets.length;
     const radius = 35;
     
