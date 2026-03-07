@@ -3387,12 +3387,6 @@ let mouseX = 0, mouseY = 0;
 let targetRotationX = 0, targetRotationY = 0;
 
 // ===== Stage 4: 价值分配网络 - 修复版 =====
-let valueScene, valueCamera, valueRenderer;
-let valueNodes = [], valueConnections = [], valueParticles = [];
-let isDragging = false;
-let mouseX = 0, mouseY = 0;
-let targetRotationX = 0, targetRotationY = 0;
-
 function initValue3D() {
     const canvas = document.getElementById('value3dCanvas');
     if (!canvas) {
