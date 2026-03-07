@@ -3504,47 +3504,46 @@ function buildValueNetwork() {
         });
     }
     
-    // 创建3D节点 - 高级材质
+    // 创建3D节点 - 使用分子模型
     nodesData.forEach((nodeData, index) => {
-        const group = new THREE.Group();
+        let moleculeGroup;
         
-        // 核心球体 - 使用物理材质
-        const coreGeometry = new THREE.SphereGeometry(nodeData.size, 64, 64);
-        const coreMaterial = new THREE.MeshPhysicalMaterial({
-            color: nodeData.color,
-            emissive: nodeData.color,
-            emissiveIntensity: nodeData.id === 'root' ? 1.0 : 0.5,
-            metalness: 0.8,
-            roughness: 0.15,
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.1
-        });
-        const core = new THREE.Mesh(coreGeometry, coreMaterial);
-        group.add(core);
+        if (nodeData.id === 'root') {
+            // 新药 - 胶囊模型
+            moleculeGroup = createMolecule('drug', nodeData.color, 1.8);
+        } else if (nodeData.id === 'neuroblok') {
+            // 融合资产 - 协作模型
+            moleculeGroup = createMolecule('collaboration', nodeData.color, 1.3);
+        } else if (nodeData.asset) {
+            // 原始资产 - 使用对应的分子形态
+            moleculeGroup = createMolecule(nodeData.asset.type, nodeData.color, 1.0);
+        } else {
+            moleculeGroup = createMolecule('compound', nodeData.color, 1.0);
+        }
         
-        // 内层辉光
+        // 添加辉光效果
         const innerGlow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 1.5, 32, 32),
+            new THREE.SphereGeometry(nodeData.size * 1.8, 32, 32),
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.4,
+                opacity: 0.3,
                 blending: THREE.AdditiveBlending
             })
         );
-        group.add(innerGlow);
+        moleculeGroup.add(innerGlow);
         
-        // 外层大气辉光
+        // 外层辉光
         const outerGlow = new THREE.Mesh(
-            new THREE.SphereGeometry(nodeData.size * 2.5, 32, 32),
+            new THREE.SphereGeometry(nodeData.size * 3, 32, 32),
             new THREE.MeshBasicMaterial({
                 color: nodeData.color,
                 transparent: true,
-                opacity: 0.15,
+                opacity: 0.12,
                 blending: THREE.AdditiveBlending
             })
         );
-        group.add(outerGlow);
+        moleculeGroup.add(outerGlow);
         
         // 根节点特殊光晕
         if (nodeData.id === 'root') {
@@ -3557,19 +3556,19 @@ function buildValueNetwork() {
                     blending: THREE.AdditiveBlending
                 })
             );
-            group.add(halo);
+            moleculeGroup.add(halo);
         }
         
         // 强光源
         const light = new THREE.PointLight(nodeData.color, nodeData.id === 'root' ? 3 : 1.5, 80);
         light.position.set(0, 0, 0);
-        group.add(light);
+        moleculeGroup.add(light);
         
-        group.position.copy(nodeData.position);
-        group.userData = nodeData;
+        moleculeGroup.position.copy(nodeData.position);
+        moleculeGroup.userData = nodeData;
         
-        valueScene.add(group);
-        valueNodes.push({ mesh: group, data: nodeData });
+        valueScene.add(moleculeGroup);
+        valueNodes.push({ mesh: moleculeGroup, data: nodeData });
     });
     
     // 创建价值流动光束
