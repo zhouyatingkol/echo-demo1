@@ -2626,6 +2626,8 @@
         function confirmMint() {
             if (!selectedAsset) return;
             selectedAsset.minted = true;
+            console.log('Minted:', selectedAsset.id, 'Minted status:', selectedAsset.minted);
+            console.log('All assets minted status:', assets.map(a => ({id: a.id, minted: a.minted})));
             const card = document.querySelector(`[data-id="${selectedAsset.id}"]`);
             card.classList.add('minted');
             card.classList.remove('selected');
