@@ -1,0 +1,4194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO Protocol - 完整演示</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #020208;
+            color: #fff;
+            font-family: 'Orbitron', 'Noto+Sans+SC', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* ===== 多页容器 ===== */
+        .stage {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            z-index: 1;
+        }
+        .stage.active { display: block; }
+        
+        /* 3D背景 */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* 导航点 */
+        .nav-dots {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+            background: rgba(0,0,0,0.4);
+            padding: 10px 18px;
+            border-radius: 25px;
+            border: 1px solid rgba(0,240,255,0.1);
+        }
+        .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: rgba(0,240,255,0.2);
+            border: 1px solid rgba(0,240,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dot:hover { background: rgba(0,240,255,0.4); }
+        .dot.active { background: #00f0ff; box-shadow: 0 0 15px rgba(0,240,255,0.6); }
+        
+        /* 导航点 - 隐藏但保留代码 */
+        .nav-dots {
+            display: none;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+        
+        /* 进入下一页按钮 */
+        .next-page-btn {
+            padding: 12px 40px;
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            border-radius: 25px;
+            color: #00f0ff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            backdrop-filter: blur(10px);
+        }
+        .next-page-btn:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: rgba(0, 240, 255, 0.6);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* ===== STAGE 0: 开场 ===== */
+        .stage-0-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .glass-card {
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .stage-0-content .glass-card {
+            padding: 70px 100px;
+            text-align: center;
+            border-color: rgba(255,215,0,0.2);
+        }
+        .main-title {
+            font-size: 48px;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.6);
+        }
+        .subtitle {
+            font-size: 16px;
+            color: rgba(200,220,240,0.8);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+        .btn {
+            padding: 14px 36px;
+            border: 1px solid rgba(0,240,255,0.4);
+            background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(0,100,200,0.05));
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        .btn:hover { box-shadow: 0 0 30px rgba(0,240,255,0.4); }
+        .btn-gold {
+            border-color: rgba(255,215,0,0.4);
+            color: #ffd700;
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(200,150,0,0.05));
+        }
+        .btn-gold:hover { box-shadow: 0 0 30px rgba(255,215,0,0.4); }
+        .btn:disabled {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(200, 150, 0, 0.1) 100%);
+            color: #ffd700;
+            cursor: not-allowed;
+        }
+        
+        /* ===== 主容器 ===== */
+        .main-container {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            padding: 0 20px 20px;
+            gap: 20px;
+            background: transparent;
+            z-index: 1;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+            background: rgba(10, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        .nav-item {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-item:hover, .nav-item.active { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        
+        /* 左侧资产库 */
+        .asset-library {
+            width: 380px;
+            height: 100%;
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .library-header { 
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        .library-title {
+            color: #00f0ff;
+            font-size: 16px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            margin-bottom: 6px;
+        }
+        .library-subtitle { 
+            color: rgba(150, 170, 200, 0.6); 
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+        .asset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            align-content: start;
+            padding-right: 5px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .asset-grid::-webkit-scrollbar { display: none; }
+        
+        /* 资产卡片 */
+        .asset-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid;
+            border-radius: 16px;
+            padding: 12px 10px 10px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+            min-height: 140px;
+        }
+        .asset-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .asset-card.minted {
+            border-color: #ffd700 !important;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+        .asset-card.minted::after {
+            content: '✓';
+            position: absolute;
+            top: 8px; right: 8px;
+            width: 20px; height: 20px;
+            font-size: 12px;
+            color: #000;
+            background: #ffd700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .asset-card.selected {
+            box-shadow: 0 0 30px currentColor;
+        }
+        .asset-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        .mol-canvas-container {
+            width: 80px; height: 80px;
+            position: relative;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+        .asset-id {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .asset-name {
+            font-size: 11px;
+            color: rgba(200, 220, 240, 0.7);
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        /* 中央预览区 */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(0,240,255,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(255,215,0,0.05) 0%, transparent 50%);
+        }
+        .preview-area::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            right: 50px;
+            bottom: 50px;
+            border: 1px solid rgba(0, 240, 255, 0.08);
+            border-radius: 24px;
+            pointer-events: none;
+        }
+        .preview-container {
+            width: 480px; height: 480px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .platform-rings {
+            position: absolute;
+            width: 100%; height: 100%;
+        }
+        .platform-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid;
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+        .platform-ring:nth-child(1) { width: 100%; height: 100%; border-color: rgba(0, 240, 255, 0.3); border-style: dashed; }
+        .platform-ring:nth-child(2) { width: 75%; height: 75%; border-color: rgba(0, 240, 255, 0.2); animation-duration: 7s; animation-direction: reverse; }
+        .platform-ring:nth-child(3) { width: 50%; height: 50%; border-color: rgba(0, 240, 255, 0.4); animation-duration: 5s; }
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        
+        #preview-canvas {
+            width: 440px !important;
+            height: 440px !important;
+            z-index: 10;
+        }
+        .preview-info {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .preview-id {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            letter-spacing: 5px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #00f0ff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .preview-type {
+            font-size: 15px;
+            color: rgba(200, 220, 240, 0.8);
+            margin-bottom: 25px;
+        }
+        .mint-btn {
+            padding: 18px 60px;
+            border: 2px solid #00f0ff;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 100, 200, 0.1) 100%);
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        .mint-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.3) 0%, rgba(0, 100, 200, 0.2) 100%);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        .mint-btn:disabled {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(200, 150, 0, 0.1) 100%);
+            color: #ffd700;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 铸造进度提示 - 移到左侧面板 */
+        .mint-progress-hint {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .mint-progress-hint .hint-title {
+            font-size: 13px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .mint-progress-hint .hint-title span {
+            color: #00f0ff;
+            font-weight: 600;
+        }
+        .mint-progress-hint .hint-sub {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.7);
+            margin-bottom: 10px;
+        }
+        .next-stage-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(0, 100, 200, 0.1));
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            border-radius: 8px;
+            color: #00f0ff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .next-stage-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(0, 100, 200, 0.2));
+        }
+        
+        /* 右侧权属面板 */
+        .ownership-panel {
+            width: 320px;
+            height: 100%;
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .ownership-panel::-webkit-scrollbar { width: 4px; }
+        .ownership-panel::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .ownership-panel::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.3); border-radius: 2px; }
+        .panel-title {
+            color: #ffd700;
+            font-size: 16px;
+            letter-spacing: 3px;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        .ownership-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .section-label {
+            font-size: 10px;
+            color: rgba(150, 170, 200, 0.8);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .section-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .share-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            font-size: 12px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .contributor-list { display: flex; flex-direction: column; gap: 10px; }
+        .contributor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border-left: 3px solid #ffd700;
+        }
+        .contributor-name { font-size: 13px; color: rgba(220, 230, 240, 0.9); }
+        .contributor-share {
+            font-size: 12px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .rule-box {
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.08);
+            border-left: 3px solid #ffd700;
+            border-radius: 0 10px 10px 0;
+            font-size: 12px;
+            color: rgba(220, 230, 240, 0.9);
+            line-height: 1.6;
+        }
+        .meta-list { display: flex; flex-direction: column; gap: 8px; }
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-left: 3px solid #ffd700;
+        }
+        .meta-label { font-size: 12px; color: rgba(200, 220, 240, 0.8); }
+        .meta-value {
+            font-size: 11px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(150, 170, 200, 0.6);
+        }
+        .empty-icon { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
+        
+        /* ===== 底部统计面板 ===== */
+        .stats-panel { 
+            margin-top: auto; 
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-label { 
+            color: rgba(150, 170, 200, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-label::before {
+            display: none;
+        }
+        .stat-value { 
+            color: #00f0ff; 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .progress-bar { 
+            height: 3px; 
+            background: rgba(255,255,255,0.08); 
+            border-radius: 2px; 
+            overflow: hidden; 
+            margin-top: 8px;
+        }
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #00f0ff, #0088ff); 
+            width: 0%; 
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+        
+        /* 颜色主题 */
+        .asset-card[data-id="PDB-001"] { border-color: rgba(0, 240, 255, 0.5); }
+        .asset-card[data-id="PDB-001"]:hover { box-shadow: 0 15px 40px rgba(0, 240, 255, 0.4); }
+        .asset-card[data-id="PDB-001"] .asset-id { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        
+        .asset-card[data-id="CHEM-002"] { border-color: rgba(0, 255, 136, 0.5); }
+        .asset-card[data-id="CHEM-002"]:hover { box-shadow: 0 15px 40px rgba(0, 255, 136, 0.4); }
+        .asset-card[data-id="CHEM-002"] .asset-id { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+        
+        .asset-card[data-id="GENE-003"] { border-color: rgba(0, 136, 255, 0.5); }
+        .asset-card[data-id="GENE-003"]:hover { box-shadow: 0 15px 40px rgba(0, 136, 255, 0.4); }
+        .asset-card[data-id="GENE-003"] .asset-id { color: #0088ff; text-shadow: 0 0 10px rgba(0, 136, 255, 0.5); }
+        
+        .asset-card[data-id="VSCREEN-004"] { border-color: rgba(136, 255, 204, 0.5); }
+        .asset-card[data-id="VSCREEN-004"]:hover { box-shadow: 0 15px 40px rgba(136, 255, 204, 0.4); }
+        .asset-card[data-id="VSCREEN-004"] .asset-id { color: #88ffcc; text-shadow: 0 0 10px rgba(136, 255, 204, 0.5); }
+        
+        .asset-card[data-id="ASSAY-005"] { border-color: rgba(162, 155, 254, 0.5); }
+        .asset-card[data-id="ASSAY-005"]:hover { box-shadow: 0 15px 40px rgba(162, 155, 254, 0.4); }
+        .asset-card[data-id="ASSAY-005"] .asset-id { color: #a29bfe; text-shadow: 0 0 10px rgba(162, 155, 254, 0.5); }
+        
+        .asset-card[data-id="CLINICAL-006"] { border-color: rgba(255, 165, 0, 0.5); }
+        .asset-card[data-id="CLINICAL-006"]:hover { box-shadow: 0 15px 40px rgba(255, 165, 0, 0.4); }
+        .asset-card[data-id="CLINICAL-006"] .asset-id { color: #ffa500; text-shadow: 0 0 10px rgba(255, 165, 0, 0.5); }
+        
+        .asset-card[data-id="PATENT-007"] { border-color: rgba(255, 105, 180, 0.5); }
+        .asset-card[data-id="PATENT-007"]:hover { box-shadow: 0 15px 40px rgba(255, 105, 180, 0.4); }
+        .asset-card[data-id="PATENT-007"] .asset-id { color: #ff69b4; text-shadow: 0 0 10px rgba(255, 105, 180, 0.5); }
+        
+        .asset-card[data-id="PAPER-008"] { border-color: rgba(255, 107, 107, 0.5); }
+        .asset-card[data-id="PAPER-008"]:hover { box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4); }
+        .asset-card[data-id="PAPER-008"] .asset-id { color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
+        
+        .asset-card[data-id="NeuroBlok"] { border-color: rgba(255, 215, 0, 0.6); }
+        .asset-card[data-id="NeuroBlok"]:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.5); }
+        .asset-card[data-id="NeuroBlok"] .asset-id { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        
+        /* ===== STAGE 2: 协作衍生 ===== */
+        .fusion-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .fusion-pool {
+            flex: 1;
+            width: 100%;
+            position: relative;
+            border: 2px dashed rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            background: 
+                radial-gradient(ellipse at center, rgba(255,215,0,0.05) 0%, rgba(0,0,0,0.3) 70%),
+                linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fusion-pool::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            border-radius: 16px;
+            pointer-events: none;
+        }
+        
+        .fusion-pool::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 1px dashed rgba(255, 215, 0, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .fusion-pool.drag-over {
+            border-color: rgba(255, 215, 0, 0.6);
+            background: radial-gradient(ellipse at center, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.2) 70%);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.2);
+        }
+        
+        .pool-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pool-asset {
+            position: absolute;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            border: 2px solid;
+            background: rgba(10,15,30,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px currentColor;
+            animation: dropIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+        .pool-asset:active { cursor: grabbing; }
+        @keyframes dropIn {
+            from { opacity: 0; transform: scale(0) rotate(-180deg); }
+            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .pool-asset:hover { transform: scale(1.1); z-index: 20; }
+        .pool-asset-icon { font-size: 32px; margin-bottom: 4px; }
+        .pool-asset-id { font-size: 10px; font-family: 'Orbitron', sans-serif; }
+        .pool-asset-remove {
+            position: absolute;
+            top: -5px; right: -5px;
+            width: 24px; height: 24px;
+            background: #ff4757;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255,71,87,0.5);
+        }
+        .pool-asset:hover .pool-asset-remove { opacity: 1; }
+        
+        .pool-center-preview {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.6), transparent);
+            transform-origin: left center;
+            pointer-events: none;
+            animation: pulseLine 2s infinite;
+        }
+        @keyframes pulseLine {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(255,215,0,0.8)); }
+        }
+        
+        .pool-hint {
+            text-align: center;
+            color: rgba(150,170,200,0.4);
+            pointer-events: none;
+        }
+        .pool-hint-icon { font-size: 60px; margin-bottom: 15px; opacity: 0.5; }
+        .pool-hint-text { font-size: 14px; letter-spacing: 3px; margin-bottom: 8px; }
+        .pool-hint-sub { font-size: 12px; opacity: 0.6; }
+        
+        .fusion-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .fusion-control::before {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.2);
+            border-left: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 0 0 0 6px;
+        }
+        
+        .fusion-stats { display: flex; gap: 50px; }
+        .stat-item { text-align: center; }
+        .stat-num { font-size: 32px; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.4); font-family: 'Orbitron', sans-serif; }
+        .stat-label { font-size: 10px; color: rgba(150,170,200,0.6); letter-spacing: 1px; margin-top: 5px; }
+        .fusion-btns { display: flex; gap: 12px; }
+        
+        .fuse-btn {
+            padding: 16px 50px;
+            border: 2px solid #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(200, 150, 0, 0.1) 100%);
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        .fuse-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(200, 150, 0, 0.2) 100%);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+        }
+        .fuse-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .selected-tags { margin-bottom: 15px; }
+        .tag-item {
+            display: inline-flex;
+            padding: 6px 14px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid;
+            border-radius: 20px;
+            font-size: 11px;
+            margin: 3px;
+            letter-spacing: 1px;
+        }
+        .dist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 3px solid;
+        }
+        .dist-icon { font-size: 20px; }
+        .dist-info { flex: 1; }
+        .dist-name { font-size: 12px; color: rgba(200,220,240,0.9); margin-bottom: 4px; }
+        .dist-bar-bg {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .dist-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        .dist-share {
+            font-size: 14px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            min-width: 45px;
+            text-align: right;
+        }
+        
+        /* 拖拽提示 */
+        .drag-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 20px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            color: rgba(255,215,0,0.8);
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .fusion-pool:has(.pool-asset) .drag-hint { opacity: 1; }
+        
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .mint-modal, .fusion-modal {
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+        .fusion-modal {
+            border-color: rgba(255, 215, 0, 0.3);
+            max-width: 450px;
+        }
+        .modal-overlay.active .mint-modal, .modal-overlay.active .fusion-modal { transform: scale(1); }
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            color: #00f0ff;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+        .fusion-modal .modal-title { color: #ffd700; }
+        .modal-preview {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 25px;
+        }
+        .modal-asset-name {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .modal-asset-id {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: #ffd700;
+            margin-bottom: 25px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .fusion-result {
+            padding: 15px 30px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            font-size: 18px;
+            color: #ffd700;
+            margin-bottom: 25px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+        
+        /* 成功动画 */
+        .success-animation {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2000;
+            opacity: 0;
+        }
+        .success-animation.active { animation: successPop 1s ease-out forwards; }
+        @keyframes successPop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+        }
+        .success-icon { font-size: 80px; color: #ffd700; text-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        
+        /* ===== STAGE 3: 融资决策 ===== */
+        .finance-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .finance-config {
+            flex: 1;
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .finance-config::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid rgba(0, 240, 255, 0.05);
+            border-radius: 16px;
+            pointer-events: none;
+        }
+        
+        .config-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        
+        .config-title {
+            color: #00f0ff;
+            font-size: 20px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            margin-bottom: 8px;
+        }
+        
+        .config-subtitle {
+            color: rgba(150, 170, 200, 0.7);
+            font-size: 12px;
+        }
+        
+        .config-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .finance-asset-preview {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .finance-asset-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .finance-asset-name {
+            font-size: 18px;
+            color: #00f0ff;
+            margin-bottom: 5px;
+        }
+        
+        .finance-asset-id {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+        }
+        
+        .finance-slider-group {
+            margin-bottom: 25px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: rgba(200, 220, 240, 0.9);
+        }
+        
+        .slider-value {
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .finance-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .finance-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .finance-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .finance-stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        
+        .finance-stat-label {
+            font-size: 10px;
+            color: rgba(150, 170, 200, 0.7);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .finance-stat-value {
+            font-size: 20px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .config-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .finance-compare {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(10, 15, 30, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .compare-item {
+            flex: 1;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            text-align: center;
+            opacity: 0.6;
+        }
+        
+        .compare-item.highlight {
+            opacity: 1;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .compare-label {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: rgba(200, 220, 240, 0.9);
+        }
+        
+        .compare-cons, .compare-pros {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .cons-item {
+            font-size: 12px;
+            color: rgba(255, 100, 100, 0.9);
+            padding: 8px;
+            background: rgba(255, 100, 100, 0.1);
+            border-radius: 6px;
+        }
+        
+        .pros-item {
+            font-size: 12px;
+            color: rgba(0, 255, 136, 0.9);
+            padding: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 6px;
+        }
+        
+        .deal-summary {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .deal-summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .deal-summary-label {
+            font-size: 12px;
+            color: rgba(150,170,200,0.8);
+        }
+        
+        .deal-summary-value {
+            font-size: 14px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* ===== 融合结果展示（Stage 2.5） ===== */
+        .fusion-result-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .fusion-showcase {
+            flex: 1;
+            background: rgba(10, 15, 30, 0.9);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .fusion-showcase::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .fusion-graph {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fusion-center {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+        
+        .fusion-center-icon {
+            font-size: 100px;
+            margin-bottom: 15px;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(255,215,0,0.8)); }
+        }
+        
+        .fusion-center-name {
+            font-size: 24px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+        
+        .fusion-center-id {
+            font-size: 14px;
+            color: rgba(150,170,200,0.7);
+        }
+        
+        .fusion-source {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .fusion-source-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid;
+            background: rgba(10,15,30,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 0 20px currentColor;
+        }
+        
+        .fusion-source-info {
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .fusion-source-id {
+            font-size: 11px;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 2px;
+        }
+        
+        .fusion-source-share {
+            font-size: 12px;
+            color: #ffd700;
+        }
+        
+        .fusion-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.6), transparent);
+            transform-origin: left center;
+            pointer-events: none;
+        }
+        
+        .fusion-line::after {
+            content: '→';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffd700;
+            font-size: 12px;
+        }
+        
+        .fusion-ownership-flow {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(10, 15, 30, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .fusion-flow-item {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .fusion-flow-item::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffd700;
+            font-size: 20px;
+        }
+        
+        .fusion-flow-item:last-child::after {
+            display: none;
+        }
+        
+        .fusion-flow-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .fusion-flow-label {
+            font-size: 12px;
+            color: rgba(150,170,200,0.7);
+            margin-bottom: 5px;
+        }
+        
+        .fusion-flow-value {
+            font-size: 16px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* ===== STAGE 4: 其他页面 ===== */
+        .stage-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 40px;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(0,240,255,0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,215,0,0.05) 0%, transparent 40%);
+        }
+        .stage-title {
+            font-size: 32px;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+        .stage-subtitle {
+            color: rgba(200,220,240,0.6);
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D背景 -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- 底部导航 -->
+    <div class="bottom-nav" id="bottomNav">
+        <div class="nav-dots" style="display:none;">
+            <div class="dot active" onclick="goTo(0)"></div>
+            <div class="dot" onclick="goTo(1)"></div>
+            <div class="dot" onclick="goTo(2)"></div>
+            <div class="dot" onclick="goTo(3)"></div>
+            <div class="dot" onclick="goTo(4)"></div>
+        </div>
+        <button class="next-page-btn" id="nextPageBtn" onclick="goToNext()">
+            进入下一页 →
+        </button>
+    </div>
+
+    <!-- STAGE 0: 开场 -->
+    <div class="stage active" id="stage0">
+        <div class="stage-0-content">
+            <div class="glass-card">
+                <h1 class="main-title">ECHO PROTOCOL</h1>
+                <div class="subtitle">价值溯源：一款新药的数字旅程</div>
+                <button class="btn btn-gold" onclick="goTo(1)">开始探索</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 1: 资产铸造 -->
+    <div class="stage" id="stage1">
+        <div class="top-nav">
+            <div class="nav-item" onclick="goTo(0)">开场</div>
+            <div class="nav-item active">资产铸造</div>
+            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
+            <div class="nav-item" onclick="goTo(3)">融资决策</div>
+            <div class="nav-item" onclick="goTo(4)">价值分配</div>
+        </div>
+        
+        <div class="main-container">
+            <!-- 左侧资产库 -->
+            <div class="asset-library">
+                <div class="library-header">
+                    <div class="library-title">⬡ 资产分子库</div>
+                    <div class="library-subtitle">点击卡片进行铸造</div>
+                </div>
+                <div class="asset-grid" id="assetGrid"></div>
+                <div class="stats-panel">
+                    <div class="stat-row">
+                        <span class="stat-label">总资产</span>
+                        <span class="stat-value" id="totalAssets">8</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">已铸造</span>
+                        <span class="stat-value" id="mintedCount">0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 中央预览区 -->
+            <div class="preview-area">
+                <div class="preview-container">
+                    <div class="platform-rings">
+                        <div class="platform-ring"></div>
+                        <div class="platform-ring"></div>
+                        <div class="platform-ring"></div>
+                    </div>
+                    <canvas id="preview-canvas"></canvas>
+                </div>
+                <div class="preview-info">
+                    <div class="preview-id" id="previewId">ECHO PROTOCOL</div>
+                    <div class="preview-type" id="previewType">选择一个资产分子进行铸造</div>
+                    <button class="mint-btn" id="mainMintBtn" onclick="openMintModal()" disabled>请先选择资产</button>
+                </div>
+            </div>
+            
+            <!-- 右侧权属面板 -->
+            <div class="ownership-panel" id="ownershipPanel">
+                <div class="panel-title">⬡ 权属蓝图</div>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">⬡</div>
+                    <div class="empty-text">选择左侧资产查看详细权属信息</div>
+                </div>
+                <div id="ownershipContent" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <!-- 铸造弹窗 -->
+        <div class="modal-overlay" id="mintModal">
+            <div class="mint-modal">
+                <div class="modal-title">确认铸造</div>
+                <div class="modal-preview">
+                    <canvas id="modal-canvas" style="width: 150px; height: 150px;"></canvas>
+                </div>
+                <div class="modal-asset-name" id="modalAssetName"></div>
+                <div class="modal-asset-id" id="modalAssetId"></div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-gold" onclick="confirmMint()">确认铸造</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 成功动画 -->
+        <div class="success-animation" id="successAnimation">
+            <div class="success-icon">✓</div>
+        </div>
+    </div>
+
+    <!-- STAGE 2: 协作衍生（优化版） -->
+    <div class="stage" id="stage2">
+        <div class="top-nav">
+            <div class="nav-item" onclick="goTo(0)">开场</div>
+            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
+            <div class="nav-item active">协作衍生</div>
+            <div class="nav-item" onclick="goTo(3)">融资决策</div>
+            <div class="nav-item" onclick="goTo(4)">价值分配</div>
+        </div>
+        
+        <div class="main-container">
+            <!-- 左侧已铸造资产 -->
+            <div class="asset-library">
+                <div class="library-header">
+                    <div class="library-title">⬡ 已铸造资产</div>
+                    <div class="library-subtitle">拖拽资产到协作池进行融合</div>
+                </div>
+                <div class="asset-grid" id="fusionGrid"></div>
+            </div>
+            
+            <!-- 中央协作池 -->
+            <div class="fusion-area">
+                <div class="fusion-pool" id="poolContainer">
+                    <div class="pool-content" id="poolContent">
+                        <div class="pool-hint" id="poolHint">
+                            <div class="pool-hint-icon">⬡</div>
+                            <div class="pool-hint-text">协作池</div>
+                            <div class="pool-hint-sub">拖拽左侧资产到此处开始融合</div>
+                        </div>
+                        <div class="pool-center-preview" id="poolCenterPreview">
+                            <canvas id="pool-canvas" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="drag-hint">可拖拽调整位置</div>
+                </div>
+                
+                <div class="fusion-control">
+                    <div class="fusion-stats">
+                        <div class="stat-item">
+                            <div class="stat-num" id="poolCount">0</div>
+                            <div class="stat-label">已选资产</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-num" id="totalShare">100%</div>
+                            <div class="stat-label">总权益</div>
+                        </div>
+                    </div>
+                    <div class="fusion-btns">
+                        <button class="btn" id="clearBtn" onclick="clearPool()" style="opacity:0; pointer-events:none; border-color:rgba(255,71,87,0.4); color:#ff4757;">清空</button>
+                        <button class="fuse-btn" id="fuseBtn" onclick="openFusionModal()" disabled>✨ 开始融合</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧融合权属 -->
+            <div class="ownership-panel">
+                <div class="panel-title">⬡ 融合权属</div>
+                <div id="fusionPanel">
+                    <div class="section-label">已选资产</div>
+                    <div class="selected-tags" id="selectedTags">
+                        <div style="color: rgba(150,170,200,0.5); font-size: 12px; padding: 10px 0;">暂无选中资产</div>
+                    </div>
+                    
+                    <div class="section-label">权益分配</div>
+                    <div id="shareList"></div>
+                    
+                    <div class="section-label">融合规则</div>
+                    <div class="rule-box">
+                        • 所有选中资产的权属将合并<br>
+                        • 收益按资产类型权重自动分配<br>
+                        • 继承上游资产全部规则<br>
+                        • 里程碑触发即时结算
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 融合弹窗 -->
+        <div class="modal-overlay" id="fusionModal">
+            <div class="fusion-modal">
+                <div class="modal-title">确认融合</div>
+                <div class="modal-preview">
+                    <canvas id="fusion-canvas" style="width: 150px; height: 150px;"></canvas>
+                </div>
+                <div class="fusion-result" id="fusionResult">NeuroBlok</div>
+                <div class="modal-asset-name" id="fusionAssetName"></div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeFusionModal()">取消</button>
+                    <button class="btn btn-gold" onclick="confirmFusion()">确认融合</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 融合成功弹窗 - 详细权属图谱展示 -->
+        <div class="modal-overlay" id="fusionSuccessModal">
+            <div class="fusion-modal" style="max-width: 900px; width: 95%; max-height: 95vh; overflow-y: auto;">
+                <div class="modal-icon" style="font-size: 50px; margin-bottom: 10px;">✨</div>
+                <div class="modal-title">融合成功</div>
+                <div class="modal-subtitle" style="color: rgba(150,170,200,0.7); margin-bottom: 25px;">新资产已生成 | 详细的权属关系图谱</div>
+                
+                <!-- 融合资产图谱展示 -->
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,215,0,0.2); border-radius: 20px; padding: 30px; margin-bottom: 25px; position: relative; min-height: 300px;" id="fusionGraphContainer">
+                    <!-- 中心融合资产 -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10;">
+                        <div style="font-size: 80px; margin-bottom: 10px; animation: pulse 2s infinite; filter: drop-shadow(0 0 30px rgba(255,215,0,0.6));">✨</div>
+                        <div style="font-size: 22px; color: #ffd700; font-family: Orbitron; letter-spacing: 2px;">NeuroBlok</div>
+                        <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">融合资产 v2.0</div>
+                        <div style="font-size: 14px; color: #00f0ff; margin-top: 8px;">估值: <span id="fusionValue">5.0</span> ETH</div>
+                    </div>
+                    
+                    <!-- 来源资产将通过JS动态生成 -->
+                    <div id="fusionSourcesContainer"></div>
+                    
+                    <!-- 连线SVG -->
+                    <svg id="fusionLines" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></svg>
+                </div>
+                
+                <!-- 权属流转流程 -->
+                <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(0,240,255,0.1);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">🧬</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">来源资产</div>
+                        <div style="font-size: 14px; color: #00f0ff; font-family: Orbitron;" id="sourceCount">2个</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(255,215,0,0.2);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">🔄</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">融合规则</div>
+                        <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">加权合并</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(255,215,0,0.2);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">✨</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">生成资产</div>
+                        <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">NeuroBlok</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(0,255,136,0.1);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">📝</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">权属继承</div>
+                        <div style="font-size: 14px; color: #00ff88; font-family: Orbitron;">100%</div>
+                    </div>
+                </div>
+                
+                <!-- 详细权属列表 -->
+                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: left;">
+                    <div style="font-size: 12px; color: rgba(150,170,200,0.8); margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;">权益分配明细</div>
+                    <div id="fusionDetailList" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 融合规则说明 -->
+                <div style="background: rgba(255,215,0,0.08); border-left: 3px solid #ffd700; border-radius: 0 10px 10px 0; padding: 15px; margin-bottom: 25px; text-align: left; font-size: 12px; color: rgba(220,230,240,0.9); line-height: 1.6;">
+                    <strong style="color: #ffd700;">融合规则说明：</strong><br>
+                    • 所有选中资产的权属将合并至新资产<br>
+                    • 收益权按资产类型权重自动分配<br>
+                    • 上游资产的全部规则被继承<br>
+                    • 里程碑触发时自动结算收益
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeFusionSuccessModal()" style="border-color: rgba(0,240,255,0.4); color: #00f0ff;">返回协作池</button>
+                    <button class="btn btn-gold" onclick="goToFinanceFromFusion()">进入融资决策 →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 3: 融资决策（完整版） -->
+    <div class="stage" id="stage3">
+        <div class="top-nav">
+            <div class="nav-item" onclick="goTo(0)">开场</div>
+            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
+            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
+            <div class="nav-item active">融资决策</div>
+            <div class="nav-item" onclick="goTo(4)">价值分配</div>
+        </div>
+        
+        <div class="main-container">
+            <!-- 左侧：可融资资产 -->
+            <div class="asset-library">
+                <div class="library-header">
+                    <div class="library-title">⬡ 可融资资产</div>
+                    <div class="library-subtitle">选择资产进行融资</div>
+                </div>
+                <div class="asset-grid" id="financeGrid"></div>
+                <div class="stats-panel">
+                    <div class="stat-row">
+                        <span class="stat-label">总资产价值</span>
+                        <span class="stat-value" id="totalValue">0 ETH</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">可融资额度</span>
+                        <span class="stat-value" style="color: #ffd700;" id="availableCredit">0 ETH</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 中央：融资配置 -->
+            <div class="finance-center">
+                <div class="finance-config">
+                    <div class="config-header">
+                        <div class="config-title">⬡ 融资配置</div>
+                        <div class="config-subtitle">所有权与收益权分离</div>
+                    </div>
+                    
+                    <div class="config-content" id="configContent">
+                        <div class="empty-state">
+                            <div class="empty-icon">⬡</div>
+                            <div class="empty-text">选择左侧资产开始配置融资方案</div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-actions" id="configActions" style="display: none;">
+                        <button class="btn" onclick="resetFinance()">重置</button>
+                        <button class="btn btn-gold" onclick="previewDeal()">生成融资方案</button>
+                    </div>
+                </div>
+                
+                <!-- 融资对比 -->
+                <div class="finance-compare">
+                    <div class="compare-item">
+                        <div class="compare-label">传统融资</div>
+                        <div class="compare-cons">
+                            <div class="cons-item">✗ 股权稀释</div>
+                            <div class="cons-item">✗ 所有权丧失</div>
+                            <div class="cons-item">✗ 决策权受限</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compare-item highlight">
+                        <div class="compare-label" style="color: #ffd700;">ECHO融资</div>
+                        <div class="compare-pros">
+                            <div class="pros-item">✓ 收益权代币化</div>
+                            <div class="pros-item">✓ 所有权零稀释</div>
+                            <div class="pros-item">✓ 数据灵魂永存</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧：融资条款预览 -->
+            <div class="ownership-panel" id="dealPanel">
+                <div class="panel-title">⬡ 融资条款预览</div>
+                <div id="dealContent">
+                    <div class="empty-state">
+                        <div class="empty-icon">⬡</div>
+                        <div class="empty-text">配置融资方案后查看条款</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 融资确认弹窗 -->
+        <div class="modal-overlay" id="dealModal">
+            <div class="fusion-modal">
+                <div class="modal-title">确认融资方案</div>
+                <div class="modal-preview">
+                    <canvas id="deal-canvas" style="width: 150px; height: 150px;"></canvas>
+                </div>
+                <div class="deal-summary" id="dealSummary"></div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeDealModal()">取消</button>
+                    <button class="btn btn-gold" onclick="confirmDeal()">确认融资</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 融资成功弹窗 -->
+        <div class="modal-overlay" id="dealSuccessModal">
+            <div class="fusion-modal">
+                <div class="modal-icon" style="font-size: 60px; margin-bottom: 20px;">💰</div>
+                <div class="modal-title">融资成功</div>
+                <div class="modal-subtitle" style="color: rgba(150,170,200,0.7); margin-bottom: 20px;">收益权代币已铸造</div>
+                <div class="fusion-result" id="tokenResult">1000 ECHO-Tokens</div>
+                <div class="modal-actions">
+                    <button class="btn btn-gold" onclick="closeDealSuccessModal()">进入价值分配</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 4: 3D价值分配网络 -->
+    <div class="stage" id="stage4">
+        <div class="top-nav">
+            <div class="nav-item" onclick="goTo(0)">开场</div>
+            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
+            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
+            <div class="nav-item" onclick="goTo(3)">融资决策</div>
+            <div class="nav-item active">价值分配</div>
+        </div>
+        
+        <div class="value-3d-container">
+            <div class="value-3d-header">
+                <div class="value-3d-title">⬡ 价值溯源网络</div>
+                <div class="value-3d-subtitle">点击节点查看贡献者收益详情</div>
+            </div>
+            
+            <!-- 3D Canvas -->
+            <div class="value-canvas-wrapper">
+                <canvas id="value3dCanvas"></canvas>
+                
+                <!-- 悬浮信息卡 -->
+                <div class="value-tooltip" id="valueTooltip" style="display: none;">
+                    <div class="tooltip-icon" id="tooltipIcon">🏥</div>
+                    <div class="tooltip-name" id="tooltipName">新药上市</div>
+                    <div class="tooltip-value" id="tooltipValue">$100M</div>
+                </div>
+            </div>
+            
+            <!-- 总收益显示 -->
+            <div class="total-revenue-3d">
+                <div class="revenue-label">总收益池</div>
+                <div class="revenue-amount">$100,000,000</div>
+                <div class="revenue-flow">↓ 价值沿分子链流动</div>
+            </div>
+            
+            <!-- 详情面板 -->
+            <div class="value-detail-3d" id="valueDetail3d">
+                <div class="detail-3d-header">
+                    <div class="detail-3d-icon" id="detail3dIcon">💰</div>
+                    <div class="detail-3d-title" id="detail3dTitle">选择一个节点</div>
+                </div>
+                <div class="detail-3d-content" id="detail3dContent">
+                    <div class="detail-3d-empty">点击3D网络中的节点查看详细收益分配</div>
+                </div>
+            </div>
+            
+            <!-- 控制提示 -->
+            <div class="value-controls-hint">
+                <span>🖱️ 拖拽旋转视角</span>
+                <span>👆 点击节点查看详情</span>
+                <span>🔍 滚轮缩放</span>
+            </div>
+        </div>
+        
+        <style>
+            .value-3d-container {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                overflow: hidden;
+            }
+            
+            .value-3d-header {
+                position: absolute;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+                z-index: 10;
+                pointer-events: none;
+            }
+            
+            .value-3d-title {
+                font-size: 24px;
+                color: #ffd700;
+                font-family: 'Orbitron', sans-serif;
+                letter-spacing: 3px;
+                text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+                margin-bottom: 8px;
+            }
+            
+            .value-3d-subtitle {
+                font-size: 12px;
+                color: rgba(150, 170, 200, 0.8);
+            }
+            
+            .value-canvas-wrapper {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            
+            #value3dCanvas {
+                width: 100%;
+                height: 100%;
+                cursor: grab;
+            }
+            
+            #value3dCanvas:active {
+                cursor: grabbing;
+            }
+            
+            .value-tooltip {
+                position: absolute;
+                background: rgba(10, 15, 30, 0.95);
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                border-radius: 12px;
+                padding: 15px 20px;
+                text-align: center;
+                pointer-events: none;
+                transform: translate(-50%, -120%);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(10px);
+                z-index: 100;
+                min-width: 120px;
+            }
+            
+            .tooltip-icon {
+                font-size: 32px;
+                margin-bottom: 8px;
+            }
+            
+            .tooltip-name {
+                font-size: 13px;
+                color: rgba(220, 230, 240, 0.9);
+                margin-bottom: 4px;
+            }
+            
+            .tooltip-value {
+                font-size: 16px;
+                color: #ffd700;
+                font-family: 'Orbitron', sans-serif;
+            }
+            
+            .total-revenue-3d {
+                position: absolute;
+                top: 20px;
+                left: 40px;
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                border-radius: 16px;
+                padding: 20px 30px;
+                z-index: 10;
+            }
+            
+            .revenue-label {
+                font-size: 11px;
+                color: rgba(150, 170, 200, 0.8);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-bottom: 5px;
+            }
+            
+            .revenue-amount {
+                font-size: 28px;
+                color: #ffd700;
+                font-family: 'Orbitron', sans-serif;
+                text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            }
+            
+            .revenue-flow {
+                font-size: 11px;
+                color: rgba(0, 240, 255, 0.8);
+                margin-top: 5px;
+            }
+            
+            .value-detail-3d {
+                position: absolute;
+                right: 40px;
+                top: 20px;
+                width: 340px;
+                background: rgba(10, 15, 30, 0.9);
+                border: 1px solid rgba(255, 215, 0, 0.2);
+                border-radius: 20px;
+                padding: 25px;
+                backdrop-filter: blur(20px);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                max-height: calc(100vh - 150px);
+                overflow-y: auto;
+                z-index: 10;
+            }
+            
+            .detail-3d-header {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 20px;
+            }
+            
+            .detail-3d-icon {
+                font-size: 40px;
+            }
+            
+            .detail-3d-title {
+                font-size: 18px;
+                font-family: 'Orbitron', sans-serif;
+                color: #ffd700;
+            }
+            
+            .detail-3d-empty {
+                text-align: center;
+                padding: 40px 20px;
+                color: rgba(150, 170, 200, 0.6);
+                font-size: 13px;
+                line-height: 1.6;
+            }
+            
+            .contributor-3d-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 14px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 12px;
+                margin-bottom: 10px;
+                border-left: 3px solid;
+                transition: all 0.3s;
+            }
+            
+            .contributor-3d-row:hover {
+                transform: translateX(5px);
+                background: rgba(0, 0, 0, 0.5);
+            }
+            
+            .contributor-3d-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                background: rgba(255, 215, 0, 0.1);
+                border: 1px solid rgba(255, 215, 0, 0.3);
+            }
+            
+            .contributor-3d-info {
+                flex: 1;
+            }
+            
+            .contributor-3d-name {
+                font-size: 13px;
+                color: rgba(220, 230, 240, 0.9);
+                margin-bottom: 2px;
+            }
+            
+            .contributor-3d-share {
+                font-size: 11px;
+                color: rgba(150, 170, 200, 0.6);
+            }
+            
+            .contributor-3d-amount {
+                font-size: 14px;
+                font-family: 'Orbitron', sans-serif;
+                color: #ffd700;
+            }
+            
+            .detail-3d-total {
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .detail-3d-total-label {
+                font-size: 12px;
+                color: rgba(150, 170, 200, 0.8);
+            }
+            
+            .detail-3d-total-value {
+                font-size: 20px;
+                color: #ffd700;
+                font-family: 'Orbitron', sans-serif;
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
+            
+            .value-controls-hint {
+                position: absolute;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 30px;
+                font-size: 12px;
+                color: rgba(150, 170, 200, 0.7);
+                background: rgba(0, 0, 0, 0.4);
+                padding: 12px 25px;
+                border-radius: 30px;
+                backdrop-filter: blur(10px);
+                z-index: 10;
+            }
+            
+            .value-controls-hint span {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+        </style>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // 资产数据
+        const assets = [
+            { id: 'PDB-001', name: '蛋白质结构', icon: '🧬', color: '#00f0ff', colorHex: 0x00f0ff, type: 'protein', weight: 1.2, minted: false,
+              contributors: [{name: 'AlphaFold Team', share: '45%'}, {name: 'Dr. Zhang Lab', share: '35%'}, {name: 'Open Data Fund', share: '20%'}],
+              rules: '商业应用需署名原始贡献者<br>衍生作品自动继承50%收益权<br>开源使用无需授权费用',
+              created: '2024.03.15' },
+            { id: 'CHEM-002', name: '化合物库', icon: '⚗️', color: '#00ff88', colorHex: 0x00ff88, type: 'compound', weight: 1.0, minted: false,
+              contributors: [{name: 'ChemCorp Inc.', share: '60%'}, {name: 'University Lab', share: '30%'}, {name: 'Community', share: '10%'}],
+              rules: '商业使用需支付1%营收作为反馈金<br>二次开发需共享改进数据<br>专利引用自动触发收益分配',
+              created: '2024.02.20' },
+            { id: 'GENE-003', name: '基因序列', icon: '🧪', color: '#0088ff', colorHex: 0x0088ff, type: 'gene', weight: 1.5, minted: false,
+              contributors: [{name: 'Genome Project', share: '50%'}, {name: 'MIT Lab', share: '30%'}, {name: 'Public', share: '20%'}],
+              rules: '开源使用免费，商业应用需获得授权<br>数据使用需遵守伦理委员会规定<br>商业转化收益的20%用于罕见病研究',
+              created: '2024.01.10' },
+            { id: 'VSCREEN-004', name: '虚拟筛选', icon: '💻', color: '#88ffcc', colorHex: 0x88ffcc, type: 'screening', weight: 0.8, minted: false,
+              contributors: [{name: 'AI Pharma', share: '70%'}, {name: 'Cloud Compute', share: '30%'}],
+              rules: '按使用量计费，收益自动分配给贡献方<br>算法改进需开源贡献<br>阳性结果触发自动通知',
+              created: '2024.03.01' },
+            { id: 'ASSAY-005', name: '实验数据', icon: '📊', color: '#a29bfe', colorHex: 0xa29bfe, type: 'assay', weight: 1.3, minted: false,
+              contributors: [{name: 'BioLab Co.', share: '80%'}, {name: 'Researchers', share: '20%'}],
+              rules: '原始数据不可篡改<br>实验方法需完整披露<br>重复实验优先使用相同设备',
+              created: '2024.02.15' },
+            { id: 'CLINICAL-006', name: '临床数据', icon: '🏥', color: '#ffa502', colorHex: 0xffa502, type: 'clinical', weight: 2.0, minted: false,
+              contributors: [{name: 'Hospital Network', share: '40%'}, {name: 'Patient Consent', share: '35%'}, {name: 'Ethics Board', share: '25%'}],
+              rules: '患者隐私受零知识证明保护<br>负面结果同等重要并奖励<br>数据使用需伦理委员会批准',
+              created: '2024.03.10' },
+            { id: 'PATENT-007', name: '专利信息', icon: '📜', color: '#ff69b4', colorHex: 0xff69b4, type: 'patent', weight: 1.8, minted: false,
+              contributors: [{name: 'Inventor Team', share: '50%'}, {name: 'Institution', share: '35%'}, {name: 'Legal DAO', share: '15%'}],
+              rules: '专利到期自动转为开放许可<br>侵权诉讼收益按比例分配<br>许可费用按引用次数递减',
+              created: '2024.01.25' },
+            { id: 'PAPER-008', name: '论文数据', icon: '📄', color: '#ff6b6b', colorHex: 0xff6b6b, type: 'paper', weight: 1.0, minted: false,
+              contributors: [{name: 'Author Team', share: '60%'}, {name: 'Journal DAO', share: '25%'}, {name: 'Peer Reviewers', share: '15%'}],
+              rules: '引用即产生微支付<br>数据复用需引用原始论文<br>开放获取版本收益归作者',
+              created: '2024.02.28' },
+            { id: 'NeuroBlok', name: '协作成果', icon: '✨', color: '#ffd700', colorHex: 0xffd700, type: 'collaboration', weight: 2.5, minted: false,
+              contributors: [{name: 'NeuroDAO', share: '40%'}, {name: 'Core Contributors', share: '35%'}, {name: 'Community Treasury', share: '25%'}],
+              rules: '重大决策需DAO投票<br>代码贡献与治理权重挂钩<br>新成员加入需现有成员背书',
+              created: '2024.03.20' }
+        ];
+
+        let selectedAsset = null;
+        let poolAssets = [];
+        let poolCounter = 0;
+        let currentStage = 0;
+        let previewScene, previewCamera, previewRenderer, previewMolecule;
+        let modalScene, modalCamera, modalRenderer, modalMolecule;
+        let fusionScene, fusionCamera, fusionRenderer, fusionMolecule;
+        let poolScene, poolCamera, poolRenderer, poolMolecule;
+        const cardScenes = new Map(), cardRenderers = new Map(), cardMolecules = new Map();
+
+        // ===== 创建3D分子（不同形状）=====
+        function createMolecule(type, color, scale = 1) {
+            const group = new THREE.Group();
+            const material = new THREE.MeshPhongMaterial({ 
+                color: color, 
+                emissive: color, 
+                emissiveIntensity: 0.3, 
+                shininess: 100 
+            });
+            
+            switch(type) {
+                case 'protein':
+                    // 蛋白质 - 螺旋结构
+                    for (let i = 0; i < 20; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.3 * scale, 16, 16),
+                            material
+                        );
+                        const angle = i * 0.5;
+                        const y = (i - 10) * 0.25;
+                        sphere.position.set(
+                            Math.cos(angle) * 1.2 * scale, 
+                            y * scale, 
+                            Math.sin(angle) * 1.2 * scale
+                        );
+                        group.add(sphere);
+                        if (i > 0) {
+                            const prev = group.children[i - 1];
+                            const line = new THREE.Line(
+                                new THREE.BufferGeometry().setFromPoints([prev.position, sphere.position]),
+                                new THREE.LineBasicMaterial({ color: color, opacity: 0.5, transparent: true })
+                            );
+                            group.add(line);
+                        }
+                    }
+                    break;
+                    
+                case 'compound':
+                    // 化合物 - 六边形环结构
+                    const ringCount = 6;
+                    for (let i = 0; i < ringCount; i++) {
+                        const angle = (i / ringCount) * Math.PI * 2;
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.35 * scale, 16, 16),
+                            material
+                        );
+                        sphere.position.set(
+                            Math.cos(angle) * 1.0 * scale, 
+                            0, 
+                            Math.sin(angle) * 1.0 * scale
+                        );
+                        group.add(sphere);
+                        
+                        const nextAngle = ((i + 1) % ringCount / ringCount) * Math.PI * 2;
+                        const nextPos = new THREE.Vector3(
+                            Math.cos(nextAngle) * 1.0 * scale, 
+                            0, 
+                            Math.sin(nextAngle) * 1.0 * scale
+                        );
+                        const line = new THREE.Line(
+                            new THREE.BufferGeometry().setFromPoints([sphere.position, nextPos]),
+                            new THREE.LineBasicMaterial({ color: color, opacity: 0.6, transparent: true })
+                        );
+                        group.add(line);
+                    }
+                    // 中心原子
+                    const centerAtom = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.45 * scale, 16, 16),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.5 })
+                    );
+                    centerAtom.position.set(0, 0.3 * scale, 0);
+                    group.add(centerAtom);
+                    break;
+                    
+                case 'gene':
+                    // 基因 - 双螺旋结构
+                    for (let i = 0; i < 24; i++) {
+                        const t = i * 0.3;
+                        const y = (i - 12) * 0.2;
+                        
+                        // 第一条链
+                        const sphere1 = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.22 * scale, 12, 12),
+                            material
+                        );
+                        sphere1.position.set(
+                            Math.cos(t) * 0.9 * scale, 
+                            y * scale, 
+                            Math.sin(t) * 0.9 * scale
+                        );
+                        group.add(sphere1);
+                        
+                        // 第二条链
+                        const sphere2 = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.22 * scale, 12, 12),
+                            material
+                        );
+                        sphere2.position.set(
+                            Math.cos(t + Math.PI) * 0.9 * scale, 
+                            y * scale, 
+                            Math.sin(t + Math.PI) * 0.9 * scale
+                        );
+                        group.add(sphere2);
+                        
+                        // 连接桥
+                        if (i % 2 === 0) {
+                            const bridge = new THREE.Line(
+                                new THREE.BufferGeometry().setFromPoints([sphere1.position, sphere2.position]),
+                                new THREE.LineBasicMaterial({ color: color, opacity: 0.3, transparent: true })
+                            );
+                            group.add(bridge);
+                        }
+                    }
+                    break;
+                    
+                case 'screening':
+                    // 虚拟筛选 - 网格立方体
+                    for (let x = -2; x <= 2; x++) {
+                        for (let y = -2; y <= 2; y++) {
+                            for (let z = -2; z <= 2; z++) {
+                                if (Math.random() > 0.65) {
+                                    const sphere = new THREE.Mesh(
+                                        new THREE.SphereGeometry(0.12 * scale, 8, 8),
+                                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.4 })
+                                    );
+                                    sphere.position.set(x * 0.7 * scale, y * 0.7 * scale, z * 0.7 * scale);
+                                    group.add(sphere);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                    
+                case 'assay':
+                    // 实验数据 - 柱状图
+                    for (let i = 0; i < 8; i++) {
+                        const height = 0.3 + Math.random() * 1.2;
+                        const bar = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.25 * scale, height * scale, 0.25 * scale),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2, transparent: true, opacity: 0.9 })
+                        );
+                        bar.position.set((i - 3.5) * 0.45 * scale, (height * scale / 2) - 0.8, 0);
+                        group.add(bar);
+                    }
+                    break;
+                    
+                case 'clinical':
+                    // 临床数据 - 心形结构
+                    const heartShape = [];
+                    for (let i = 0; i <= 20; i++) {
+                        const t = (i / 20) * Math.PI * 2;
+                        const x = 16 * Math.pow(Math.sin(t), 3);
+                        const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                        heartShape.push(new THREE.Vector3(x * 0.06 * scale, y * 0.06 * scale, 0));
+                    }
+                    for (let i = 0; i < heartShape.length - 1; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.15 * scale, 12, 12),
+                            material
+                        );
+                        sphere.position.copy(heartShape[i]);
+                        group.add(sphere);
+                        
+                        const line = new THREE.Line(
+                            new THREE.BufferGeometry().setFromPoints([heartShape[i], heartShape[i + 1]]),
+                            new THREE.LineBasicMaterial({ color: color, opacity: 0.5 })
+                        );
+                        group.add(line);
+                    }
+                    break;
+                    
+                case 'drug':
+                    // 新药 - 胶囊形状 + 分子环绕
+                    // 胶囊主体
+                    const capsuleGroup = new THREE.Group();
+                    
+                    // 上半球
+                    const topSphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6 * scale, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffd700, 
+                            emissive: 0xffaa00, 
+                            emissiveIntensity: 0.3,
+                            shininess: 120
+                        })
+                    );
+                    topSphere.position.y = 0.6 * scale;
+                    capsuleGroup.add(topSphere);
+                    
+                    // 下半球
+                    const bottomSphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6 * scale, 32, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffffff, 
+                            emissive: 0xdddddd, 
+                            emissiveIntensity: 0.2,
+                            shininess: 120
+                        })
+                    );
+                    bottomSphere.position.y = -0.6 * scale;
+                    capsuleGroup.add(bottomSphere);
+                    
+                    // 中间圆柱
+                    const cylinder = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.6 * scale, 0.6 * scale, 1.2 * scale, 32),
+                        [
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0xffffff, 
+                                emissive: 0xdddddd, 
+                                emissiveIntensity: 0.2 
+                            }),
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0xffd700, 
+                                emissive: 0xffaa00, 
+                                emissiveIntensity: 0.3 
+                            })
+                        ]
+                    );
+                    capsuleGroup.add(cylinder);
+                    
+                    // 环绕的小分子
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (i / 12) * Math.PI * 2;
+                        const orbitRadius = 1.3 * scale;
+                        const smallSphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.12 * scale, 12, 12),
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0x00f0ff, 
+                                emissive: 0x00f0ff, 
+                                emissiveIntensity: 0.5 
+                            })
+                        );
+                        smallSphere.position.set(
+                            Math.cos(angle) * orbitRadius,
+                            Math.sin(i * 0.5) * 0.5 * scale,
+                            Math.sin(angle) * orbitRadius
+                        );
+                        capsuleGroup.add(smallSphere);
+                    }
+                    
+                    group.add(capsuleGroup);
+                    break;
+                    
+                case 'patent':
+                    // 专利 - 文档形状 + 心形徽章
+                    const docGroup = new THREE.Group();
+                    const doc = new THREE.Mesh(
+                        new THREE.BoxGeometry(1.8 * scale, 2.2 * scale, 0.15 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                    );
+                    docGroup.add(doc);
+                    
+                    // 专利章 - 心形
+                    const patentHeartShape = new THREE.Shape();
+                    patentHeartShape.moveTo(0, 0);
+                    patentHeartShape.bezierCurveTo(0, -0.5, -1, -1, -1.5, 0);
+                    patentHeartShape.bezierCurveTo(-2, 1, -1, 2, 0, 3);
+                    patentHeartShape.bezierCurveTo(1, 2, 2, 1, 1.5, 0);
+                    patentHeartShape.bezierCurveTo(1, -1, 0, -0.5, 0, 0);
+                    const patentExtrudeSettings = { depth: 0.3 * scale, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.05 * scale, bevelThickness: 0.05 * scale };
+                    const patentHeartGeo = new THREE.ExtrudeGeometry(patentHeartShape, patentExtrudeSettings);
+                    const patentHeart = new THREE.Mesh(
+                        patentHeartGeo,
+                        new THREE.MeshPhongMaterial({ color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 0.4, shininess: 100 })
+                    );
+                    patentHeart.scale.set(scale * 0.25, scale * 0.25, scale * 0.25);
+                    patentHeart.position.set(0.4 * scale, 0.3 * scale, 0.1 * scale);
+                    patentHeart.rotation.z = Math.PI;
+                    docGroup.add(patentHeart);
+                    
+                    // 线条装饰
+                    for (let i = 0; i < 4; i++) {
+                        const line = new THREE.Mesh(
+                            new THREE.BoxGeometry(1.2 * scale, 0.08 * scale, 0.02 * scale),
+                            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })
+                        );
+                        line.position.set(0, 0.5 * scale - i * 0.35 * scale, 0.08 * scale);
+                        docGroup.add(line);
+                    }
+                    
+                    group.add(docGroup);
+                    break;
+                    // 添加文字线条效果
+                    for (let i = 0; i < 4; i++) {
+                        const line = new THREE.Mesh(
+                            new THREE.BoxGeometry(1.3 * scale, 0.08 * scale, 0.05 * scale),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 })
+                        );
+                        line.position.set(0, 0.7 - i * 0.35, 0.1 * scale);
+                        docGroup.add(line);
+                    }
+                    group.add(docGroup);
+                    break;
+                    
+                case 'paper':
+                    // 论文 - 卷轴/书本形状
+                    const paperGroup = new THREE.Group();
+                    // 左页
+                    const leftPage = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.9 * scale, 2.0 * scale, 0.1 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                    );
+                    leftPage.position.set(-0.5 * scale, 0, 0);
+                    leftPage.rotation.z = 0.1;
+                    paperGroup.add(leftPage);
+                    // 右页
+                    const rightPage = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.9 * scale, 2.0 * scale, 0.1 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                    );
+                    rightPage.position.set(0.5 * scale, 0, 0);
+                    rightPage.rotation.z = -0.1;
+                    paperGroup.add(rightPage);
+                    // 书脊
+                    const spine = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.2 * scale, 2.0 * scale, 0.15 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.4 })
+                    );
+                    paperGroup.add(spine);
+                    // 线条
+                    for (let i = 0; i < 3; i++) {
+                        const lineL = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.6 * scale, 0.06 * scale, 0.05 * scale),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 })
+                        );
+                        lineL.position.set(-0.5 * scale, 0.5 - i * 0.4, 0.08 * scale);
+                        lineL.rotation.z = 0.1;
+                        paperGroup.add(lineL);
+                        
+                        const lineR = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.6 * scale, 0.06 * scale, 0.05 * scale),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 })
+                        );
+                        lineR.position.set(0.5 * scale, 0.5 - i * 0.4, 0.08 * scale);
+                        lineR.rotation.z = -0.1;
+                        paperGroup.add(lineR);
+                    }
+                    group.add(paperGroup);
+                    break;
+                    
+                case 'collaboration':
+                    // 协作成果 - 十二面体网络
+                    const collabGeo = new THREE.IcosahedronGeometry(1.0 * scale, 1);
+                    const wireframe = new THREE.WireframeGeometry(collabGeo);
+                    const line = new THREE.LineSegments(wireframe, new THREE.LineBasicMaterial({ color: color, opacity: 0.6, transparent: true }));
+                    group.add(line);
+                    const pos = collabGeo.attributes.position;
+                    for (let i = 0; i < pos.count; i += 2) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.08 * scale, 8, 8),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.8 })
+                        );
+                        sphere.position.set(pos.getX(i), pos.getY(i), pos.getZ(i));
+                        group.add(sphere);
+                    }
+                    break;
+                    
+                default:
+                    // 默认螺旋
+                    for (let i = 0; i < 15; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.3 * scale, 16, 16),
+                            material
+                        );
+                        const angle = i * 0.5;
+                        sphere.position.set(
+                            Math.cos(angle) * 1.2 * scale, 
+                            (i - 7) * 0.3 * scale, 
+                            Math.sin(angle) * 1.2 * scale
+                        );
+                        group.add(sphere);
+                    }
+            }
+            return group;
+        }
+
+        // 初始化预览场景
+        function initPreviewScene() {
+            const canvas = document.getElementById('preview-canvas');
+            previewScene = new THREE.Scene();
+            previewCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+            previewCamera.position.z = 7;
+            previewRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            previewRenderer.setSize(380, 380);
+            previewScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const pl = new THREE.PointLight(0x00f0ff, 1.5, 100);
+            pl.position.set(8, 8, 8);
+            previewScene.add(pl);
+            const pl2 = new THREE.PointLight(0xffd700, 1, 100);
+            pl2.position.set(-8, -8, 8);
+            previewScene.add(pl2);
+            animatePreview();
+        }
+
+        function animatePreview() {
+            requestAnimationFrame(animatePreview);
+            if (previewMolecule) {
+                previewMolecule.rotation.y += 0.005;
+                previewMolecule.rotation.x += 0.003;
+            }
+            if (previewRenderer) previewRenderer.render(previewScene, previewCamera);
+        }
+
+        // 初始化弹窗场景
+        function initModalScene() {
+            const canvas = document.getElementById('modal-canvas');
+            modalScene = new THREE.Scene();
+            modalCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            modalCamera.position.z = 5;
+            modalRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            modalRenderer.setSize(150, 150);
+            modalScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const pl = new THREE.PointLight(0x00f0ff, 1.5, 100);
+            pl.position.set(5, 5, 5);
+            modalScene.add(pl);
+            animateModal();
+        }
+
+        function animateModal() {
+            requestAnimationFrame(animateModal);
+            if (modalMolecule) modalMolecule.rotation.y += 0.01;
+            if (modalRenderer && modalCamera) modalRenderer.render(modalScene, modalCamera);
+        }
+
+        // 初始化协作池场景
+        function initPoolScene() {
+            const canvas = document.getElementById('pool-canvas');
+            poolScene = new THREE.Scene();
+            poolCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            poolCamera.position.z = 6;
+            poolRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            poolRenderer.setSize(300, 300);
+            poolScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const pl = new THREE.PointLight(0xffd700, 1.5, 100);
+            pl.position.set(5, 5, 5);
+            poolScene.add(pl);
+            animatePool();
+        }
+
+        function animatePool() {
+            requestAnimationFrame(animatePool);
+            if (poolMolecule) {
+                poolMolecule.rotation.y += 0.008;
+                poolMolecule.rotation.x += 0.005;
+            }
+            if (poolRenderer && poolCamera) poolRenderer.render(poolScene, poolCamera);
+        }
+
+        // 初始化卡片3D场景
+        function initCardScene(asset, container) {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 5;
+            const renderer = new THREE.WebGLRenderer({ canvas: container, alpha: true, antialias: true });
+            renderer.setSize(90, 90);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const pl = new THREE.PointLight(asset.colorHex, 1, 100);
+            pl.position.set(5, 5, 5);
+            scene.add(pl);
+            const molecule = createMolecule(asset.type, asset.colorHex, 0.65);
+            scene.add(molecule);
+            cardScenes.set(asset.id, scene);
+            cardRenderers.set(asset.id, renderer);
+            cardMolecules.set(asset.id, molecule);
+        }
+
+        // 渲染卡片动画
+        function animateCards() {
+            cardMolecules.forEach((molecule) => {
+                molecule.rotation.y += 0.012;
+                molecule.rotation.x += 0.006;
+            });
+            cardScenes.forEach((scene, id) => {
+                const renderer = cardRenderers.get(id);
+                const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                camera.position.z = 5;
+                renderer.render(scene, camera);
+            });
+            requestAnimationFrame(animateCards);
+        }
+
+        // 生成资产卡片
+        function generateAssetCards() {
+            const grid = document.getElementById('assetGrid');
+            grid.innerHTML = '';
+            assets.filter(a => a.id !== 'NeuroBlok').forEach((asset, index) => {
+                const card = document.createElement('div');
+                card.className = 'asset-card' + (asset.minted ? ' minted' : '');
+                card.dataset.id = asset.id;
+                card.innerHTML = `
+                    <div class="mol-canvas-container">
+                        <canvas class="mol-canvas" id="canvas-${asset.id}"></canvas>
+                    </div>
+                    <div class="asset-id">${asset.id}</div>
+                    <div class="asset-name">${asset.name}</div>
+                `;
+                // 所有资产都可以点击查看详情
+                card.addEventListener('click', () => selectAsset(asset));
+                grid.appendChild(card);
+                setTimeout(() => {
+                    const canvas = document.getElementById(`canvas-${asset.id}`);
+                    if (canvas) initCardScene(asset, canvas);
+                }, index * 100);
+            });
+            setTimeout(() => animateCards(), 1000);
+        }
+
+        // 选择资产
+        function selectAsset(asset) {
+            selectedAsset = asset;
+            
+            document.querySelectorAll('#assetGrid .asset-card').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`[data-id="${asset.id}"]`).classList.add('selected');
+            
+            if (previewMolecule) previewScene.remove(previewMolecule);
+            previewMolecule = createMolecule(asset.type, asset.colorHex, 1.0);
+            previewScene.add(previewMolecule);
+            
+            document.getElementById('previewId').textContent = asset.id;
+            document.getElementById('previewType').textContent = asset.name;
+            
+            const btn = document.getElementById('mainMintBtn');
+            if (asset.minted) {
+                btn.textContent = '✓ 已铸造';
+                btn.disabled = true;
+            } else {
+                btn.textContent = '开始铸造';
+                btn.disabled = false;
+            }
+            
+            document.getElementById('emptyState').style.display = 'none';
+            const content = document.getElementById('ownershipContent');
+            content.style.display = 'block';
+            content.innerHTML = `
+                <div class="ownership-section">
+                    <div class="section-label">资产标识</div>
+                    <div class="section-value" style="color:${asset.color};">${asset.name}</div>
+                    <span class="share-badge">${asset.id}</span>
+                </div>
+                <div class="ownership-section">
+                    <div class="section-label">主要贡献者</div>
+                    <div class="contributor-list">
+                        ${asset.contributors.map(c => `
+                            <div class="contributor-item">
+                                <span class="contributor-name">${c.name}</span>
+                                <span class="contributor-share">${c.share}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="ownership-section">
+                    <div class="section-label">分配规则</div>
+                    <div class="rule-box">${asset.rules}</div>
+                </div>
+                <div class="ownership-section" style="border-bottom: none;">
+                    <div class="section-label">元数据</div>
+                    <div class="meta-list">
+                        <div class="meta-item"><span class="meta-label">创建时间</span><span class="meta-value">${asset.created}</span></div>
+                        <div class="meta-item"><span class="meta-label">数据哈希</span><span class="meta-value">0x7f3a...9e2d</span></div>
+                        <div class="meta-item"><span class="meta-label">访问权限</span><span class="meta-value">授权访问</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 弹窗
+        function openMintModal() {
+            if (!selectedAsset || selectedAsset.minted) return;
+            document.getElementById('modalAssetName').textContent = selectedAsset.name;
+            document.getElementById('modalAssetId').textContent = selectedAsset.id;
+            const canvas = document.getElementById('modal-canvas');
+            if (!modalScene) initModalScene();
+            if (modalMolecule) modalScene.remove(modalMolecule);
+            modalMolecule = createMolecule(selectedAsset.type, selectedAsset.colorHex, 0.8);
+            modalScene.add(modalMolecule);
+            document.getElementById('mintModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('mintModal').classList.remove('active');
+        }
+
+        function confirmMint() {
+            if (!selectedAsset) return;
+            selectedAsset.minted = true;
+            const card = document.querySelector(`[data-id="${selectedAsset.id}"]`);
+            card.classList.add('minted');
+            card.classList.remove('selected');
+            const btn = document.getElementById('mainMintBtn');
+            btn.textContent = '✓ 已铸造';
+            btn.disabled = true;
+            updateProgress();
+            document.getElementById('successAnimation').classList.add('active');
+            setTimeout(() => document.getElementById('successAnimation').classList.remove('active'), 1000);
+            closeModal();
+        }
+
+        function updateProgress() {
+            const minted = assets.filter(a => a.minted).length;
+            document.getElementById('mintedCount').textContent = minted;
+            document.getElementById('progressFill').style.width = `${(minted / 8) * 100}%`;
+        }
+
+        // ===== 协作衍生功能 =====
+        
+        // 渲染已铸造资产列表
+        function renderFusionGrid() {
+            const grid = document.getElementById('fusionGrid');
+            const minted = assets.filter(a => a.minted && a.id !== 'NeuroBlok');
+            if (minted.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(150,170,200,0.5)">请先铸造资产</div>';
+                return;
+            }
+            grid.innerHTML = minted.map(asset => `
+                <div class="asset-card" draggable="true" data-id="${asset.id}" style="border-color:${asset.color}50;">
+                    <div class="mol-canvas-container">
+                        <canvas class="mol-canvas" id="fcanvas-${asset.id}"></canvas>
+                    </div>
+                    <div class="asset-id" style="color:${asset.color};text-shadow:0 0 10px ${asset.color}80;">${asset.id}</div>
+                    <div class="asset-name">${asset.name}</div>
+                </div>
+            `).join('');
+            
+            minted.forEach(asset => {
+                const canvas = document.getElementById(`fcanvas-${asset.id}`);
+                if (canvas && !cardScenes.has(`f-${asset.id}`)) {
+                    initCardScene({...asset, id: `f-${asset.id}`}, canvas);
+                }
+            });
+            
+            // 添加拖拽事件
+            document.querySelectorAll('#fusionGrid .asset-card').forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+        }
+
+        // 拖拽处理
+        let draggedAssetId = null;
+
+        function handleDragStart(e) {
+            draggedAssetId = this.dataset.id;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+        }
+
+        // 设置协作池拖拽接收
+        function setupPoolDropZone() {
+            const pool = document.getElementById('poolContainer');
+            
+            pool.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                pool.classList.add('drag-over');
+            });
+            
+            pool.addEventListener('dragleave', () => {
+                pool.classList.remove('drag-over');
+            });
+            
+            pool.addEventListener('drop', (e) => {
+                e.preventDefault();
+                pool.classList.remove('drag-over');
+                if (draggedAssetId) {
+                    addToPool(draggedAssetId);
+                    draggedAssetId = null;
+                }
+            });
+        }
+
+        // 添加到协作池
+        function addToPool(id) {
+            const a = assets.find(x => x.id === id);
+            if (!a || poolAssets.find(p => p.id === id)) return;
+            
+            poolAssets.push(a);
+            poolCounter++;
+            
+            document.getElementById('poolHint').style.display = 'none';
+            document.getElementById('poolCenterPreview').style.opacity = poolAssets.length >= 2 ? '0' : '1';
+            
+            const poolContent = document.getElementById('poolContent');
+            const el = document.createElement('div');
+            el.className = 'pool-asset';
+            el.id = 'pool-' + poolCounter;
+            el.draggable = true;
+            el.style.color = a.color;
+            el.style.borderColor = a.color;
+            
+            // 优化布局：圆形分布
+            const centerX = poolContent.offsetWidth / 2 - 50;
+            const centerY = poolContent.offsetHeight / 2 - 50;
+            let x, y;
+            
+            if (poolAssets.length === 1) {
+                // 第一个放在上方
+                x = centerX;
+                y = centerY - 100;
+            } else if (poolAssets.length === 2) {
+                // 第二个放在右下方
+                x = centerX + 87;
+                y = centerY + 50;
+            } else if (poolAssets.length === 3) {
+                // 第三个放在左下方
+                x = centerX - 87;
+                y = centerY + 50;
+            } else {
+                // 更多资产时均匀分布
+                const angle = ((poolAssets.length - 1) / 6) * Math.PI * 2 - Math.PI / 2;
+                const radius = 140;
+                x = centerX + Math.cos(angle) * radius;
+                y = centerY + Math.sin(angle) * radius;
+            }
+            
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            
+            el.innerHTML = `
+                <div class="pool-asset-icon">${a.icon}</div>
+                <div class="pool-asset-id">${a.id}</div>
+                <div class="pool-asset-remove" onclick="event.stopPropagation(); removeFromPool('${a.id}', 'pool-${poolCounter}')">×</div>
+            `;
+            
+            // 池内拖拽
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            
+            el.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = parseFloat(el.style.left);
+                initialTop = parseFloat(el.style.top);
+                el.style.zIndex = 100;
+                el.style.cursor = 'grabbing';
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                el.style.left = (initialLeft + dx) + 'px';
+                el.style.top = (initialTop + dy) + 'px';
+                drawConnections();
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    el.style.zIndex = 10;
+                    el.style.cursor = 'grab';
+                }
+            });
+            
+            poolContent.appendChild(el);
+            
+            drawConnections();
+            updateFusionPanel();
+        }
+
+        // 从池移除
+        function removeFromPool(id, elId) {
+            poolAssets = poolAssets.filter(p => p.id !== id);
+            document.getElementById(elId)?.remove();
+            
+            if (poolAssets.length === 0) {
+                document.getElementById('poolHint').style.display = 'block';
+                document.getElementById('poolCenterPreview').style.opacity = '1';
+            }
+            
+            // 重新编号
+            document.querySelectorAll('.pool-asset').forEach((el, i) => {
+                el.id = 'pool-' + (i + 1);
+            });
+            poolCounter = poolAssets.length;
+            
+            drawConnections();
+            updateFusionPanel();
+        }
+
+        // 清空池
+        function clearPool() {
+            poolAssets = [];
+            document.querySelectorAll('.pool-asset').forEach(el => el.remove());
+            document.querySelectorAll('.connection-line').forEach(el => el.remove());
+            document.getElementById('poolHint').style.display = 'block';
+            document.getElementById('poolCenterPreview').style.opacity = '1';
+            poolCounter = 0;
+            updateFusionPanel();
+        }
+
+        // 绘制连线
+        function drawConnections() {
+            document.querySelectorAll('.connection-line').forEach(l => l.remove());
+            if (poolAssets.length < 2) return;
+            
+            const poolContent = document.getElementById('poolContent');
+            const cx = poolContent.offsetWidth / 2;
+            const cy = poolContent.offsetHeight / 2;
+            
+            poolAssets.forEach((a, i) => {
+                const el = document.getElementById('pool-' + (i + 1));
+                if (!el) return;
+                const rect = el.getBoundingClientRect();
+                const prect = poolContent.getBoundingClientRect();
+                const x = rect.left - prect.left + 50;
+                const y = rect.top - prect.top + 50;
+                const len = Math.sqrt((cx - x) ** 2 + (cy - y) ** 2);
+                const ang = Math.atan2(cy - y, cx - x) * 180 / Math.PI;
+                
+                const line = document.createElement('div');
+                line.className = 'connection-line';
+                line.style.cssText = `width:${len}px;left:${x}px;top:${y}px;transform:rotate(${ang}deg);`;
+                poolContent.appendChild(line);
+            });
+        }
+
+        // 更新融合面板
+        function updateFusionPanel() {
+            document.getElementById('poolCount').textContent = poolAssets.length;
+            
+            const totalWeight = poolAssets.reduce((s, a) => s + a.weight, 0);
+            
+            const tagsEl = document.getElementById('selectedTags');
+            if (poolAssets.length === 0) {
+                tagsEl.innerHTML = '<div style="color: rgba(150,170,200,0.5); font-size: 12px; padding: 10px 0;">暂无选中资产</div>';
+            } else {
+                tagsEl.innerHTML = poolAssets.map(a => 
+                    `<span class="tag-item" style="border-color:${a.color}60;color:${a.color};background:rgba(0,0,0,0.3);">
+                        <span style="margin-right:6px;">${a.icon}</span>${a.id}
+                    </span>`
+                ).join('');
+            }
+            
+            const shareList = document.getElementById('shareList');
+            if (poolAssets.length === 0) {
+                shareList.innerHTML = '';
+            } else {
+                shareList.innerHTML = poolAssets.map(a => {
+                    const share = totalWeight > 0 ? ((a.weight / totalWeight) * 100) : 0;
+                    return `
+                        <div class="dist-item" style="border-color:${a.color};">
+                            <div class="dist-icon">${a.icon}</div>
+                            <div class="dist-info">
+                                <div class="dist-name">${a.name}</div>
+                                <div class="dist-bar-bg">
+                                    <div class="dist-bar-fill" style="width:${share}%;background:${a.color};"></div>
+                                </div>
+                            </div>
+                            <div class="dist-share">${share.toFixed(0)}%</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            const canFuse = poolAssets.length >= 2;
+            document.getElementById('fuseBtn').disabled = !canFuse;
+            const clearBtn = document.getElementById('clearBtn');
+            clearBtn.style.opacity = poolAssets.length > 0 ? '1' : '0';
+            clearBtn.style.pointerEvents = poolAssets.length > 0 ? 'auto' : 'none';
+        }
+
+        // 打开融合弹窗
+        function openFusionModal() {
+            if (poolAssets.length < 2) return;
+            
+            const canvas = document.getElementById('fusion-canvas');
+            if (!fusionScene) {
+                fusionScene = new THREE.Scene();
+                fusionCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                fusionCamera.position.z = 5;
+                fusionRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+                fusionRenderer.setSize(150, 150);
+                fusionScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                const pl = new THREE.PointLight(0xffd700, 1.5, 100);
+                pl.position.set(5, 5, 5);
+                fusionScene.add(pl);
+                animateFusion();
+            }
+            if (fusionMolecule) fusionScene.remove(fusionMolecule);
+            fusionMolecule = createMolecule('collaboration', 0xffd700, 0.8);
+            fusionScene.add(fusionMolecule);
+            
+            document.getElementById('fusionAssetName').textContent = poolAssets.map(a => a.name).join(' + ');
+            document.getElementById('fusionModal').classList.add('active');
+        }
+
+        function animateFusion() {
+            requestAnimationFrame(animateFusion);
+            if (fusionMolecule) fusionMolecule.rotation.y += 0.01;
+            if (fusionRenderer && fusionCamera) fusionRenderer.render(fusionScene, fusionCamera);
+        }
+
+        function closeFusionModal() {
+            document.getElementById('fusionModal').classList.remove('active');
+        }
+
+        function confirmFusion() {
+            closeFusionModal();
+            // 标记 NeuroBlok 为已生成/可融资
+            const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
+            if (neuroBlok) {
+                neuroBlok.minted = true;
+                neuroBlok.generatedFrom = poolAssets.map(p => p.id).join('+');
+                // 计算融合后的估值
+                neuroBlok.value = poolAssets.reduce((sum, p) => sum + p.value * 0.8, 0);
+            }
+            // 生成权属图谱
+            renderFusionGraph();
+            document.getElementById('fusionSuccessModal').classList.add('active');
+        }
+
+        function renderFusionGraph() {
+            const container = document.getElementById('fusionSourcesContainer');
+            const svg = document.getElementById('fusionLines');
+            const detailList = document.getElementById('fusionDetailList');
+            const sourceCount = document.getElementById('sourceCount');
+            const fusionValue = document.getElementById('fusionValue');
+            
+            if (!container || !poolAssets.length) return;
+            
+            // 更新来源数量
+            if (sourceCount) sourceCount.textContent = poolAssets.length + '个';
+            
+            // 计算融合估值
+            const totalValue = poolAssets.reduce((sum, p) => sum + p.value * 0.8, 0);
+            if (fusionValue) fusionValue.textContent = totalValue.toFixed(1);
+            
+            // 清空容器
+            container.innerHTML = '';
+            svg.innerHTML = '';
+            
+            const centerX = 50; // 百分比
+            const centerY = 50; // 百分比
+            const radius = 35; // 百分比
+            
+            const totalWeight = poolAssets.reduce((s, a) => s + a.weight, 0);
+            
+            // 生成来源资产节点
+            poolAssets.forEach((asset, index) => {
+                const angle = (index / poolAssets.length) * Math.PI * 2 - Math.PI / 2;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                const share = totalWeight > 0 ? ((asset.weight / totalWeight) * 100).toFixed(0) : 0;
+                
+                // 创建节点
+                const node = document.createElement('div');
+                node.style.cssText = `
+                    position: absolute;
+                    left: ${x}%;
+                    top: ${y}%;
+                    transform: translate(-50%, -50%);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 5px;
+                    z-index: 5;
+                `;
+                node.innerHTML = `
+                    <div style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid ${asset.color}; background: rgba(10,15,30,0.95); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 20px ${asset.color}60;">
+                        ${asset.icon}
+                    </div>
+                    <div style="background: rgba(0,0,0,0.7); padding: 5px 12px; border-radius: 15px; border: 1px solid ${asset.color}40; text-align: center;">
+                        <div style="font-size: 10px; font-family: Orbitron; color: ${asset.color}; margin-bottom: 2px;">${asset.id}</div>
+                        <div style="font-size: 11px; color: #ffd700;">${share}% 权益</div>
+                    </div>
+                `;
+                container.appendChild(node);
+                
+                // 绘制连线
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', `${x}%`);
+                line.setAttribute('y1', `${y}%`);
+                line.setAttribute('x2', `${centerX}%`);
+                line.setAttribute('y2', `${centerY}%`);
+                line.setAttribute('stroke', asset.color);
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-opacity', '0.5');
+                line.setAttribute('stroke-dasharray', '5,5');
+                svg.appendChild(line);
+            });
+            
+            // 生成详细列表
+            if (detailList) {
+                detailList.innerHTML = poolAssets.map(asset => {
+                    const share = totalWeight > 0 ? ((asset.weight / totalWeight) * 100).toFixed(0) : 0;
+                    return `
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; border-left: 3px solid ${asset.color};">
+                            <div style="font-size: 24px;">${asset.icon}</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; color: rgba(220,230,240,0.9); margin-bottom: 2px;">${asset.name}</div>
+                                <div style="font-size: 11px; color: ${asset.color};">${asset.id}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">${share}%</div>
+                                <div style="font-size: 10px; color: rgba(150,170,200,0.6);">权益比例</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function closeFusionSuccessModal() {
+            document.getElementById('fusionSuccessModal').classList.remove('active');
+            clearPool();
+        }
+
+        function goToFinanceFromFusion() {
+            document.getElementById('fusionSuccessModal').classList.remove('active');
+            // 自动选择 NeuroBlok 进入融资
+            selectedFinanceAsset = assets.find(a => a.id === 'NeuroBlok');
+            goTo(3);
+            // 如果有 NeuroBlok，自动选中
+            if (selectedFinanceAsset) {
+                setTimeout(() => selectFinanceAsset('NeuroBlok'), 300);
+            }
+        }
+
+        // ===== Stage 3: 融资决策功能 =====
+        let selectedFinanceAsset = null;
+        let financeAmount = 1.0;
+        let financeShare = 20;
+        let dealScene, dealCamera, dealRenderer, dealMolecule;
+        
+        function renderFinanceGrid() {
+            const grid = document.getElementById('financeGrid');
+            // 包含已铸造的原始资产和融合生成的 NeuroBlok
+            const minted = assets.filter(a => a.minted);
+            
+            const totalValue = minted.reduce((s, a) => s + a.value, 0);
+            document.getElementById('totalValue').textContent = totalValue.toFixed(1) + ' ETH';
+            document.getElementById('availableCredit').textContent = (totalValue * 0.7).toFixed(1) + ' ETH';
+            
+            if (minted.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(150,170,200,0.5)">请先铸造或融合资产</div>';
+                return;
+            }
+            
+            grid.innerHTML = minted.map(asset => {
+                const isFusion = asset.id === 'NeuroBlok';
+                const fusionBadge = isFusion ? '<div style="position:absolute;top:-5px;right:-5px;background:#ffd700;color:#000;font-size:9px;padding:2px 6px;border-radius:10px;">融合</div>' : '';
+                return `
+                <div class="asset-card" data-id="${asset.id}" style="border-color:${asset.color}50;cursor:pointer;position:relative;" onclick="selectFinanceAsset('${asset.id}')">
+                    ${fusionBadge}
+                    <div class="mol-canvas-container" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:${asset.color};">${asset.icon}</div>
+                    <div class="asset-id" style="color:${asset.color};text-shadow:0 0 10px ${asset.color}80;">${asset.id}</div>
+                    <div class="asset-name">${asset.name}</div>
+                    <div style="font-size:10px;color:#ffd700;margin-top:4px;">${asset.value} ETH</div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function selectFinanceAsset(id) {
+            const a = assets.find(x => x.id === id);
+            if (!a) return;
+            selectedFinanceAsset = a;
+            
+            document.querySelectorAll('#financeGrid .asset-card').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`#financeGrid [data-id="${id}"]`).classList.add('selected');
+            
+            financeAmount = a.value * 0.5;
+            financeShare = 20;
+            
+            const content = document.getElementById('configContent');
+            content.innerHTML = `
+                <div class="finance-asset-preview">
+                    <div class="finance-asset-icon" style="color:${a.color};">${a.icon}</div>
+                    <div class="finance-asset-name" style="color:${a.color};">${a.name}</div>
+                    <div class="finance-asset-id">${a.id} | 估值 ${a.value} ETH</div>
+                </div>
+                
+                <div class="finance-slider-group">
+                    <div class="slider-label">
+                        <span>融资金额</span>
+                        <span class="slider-value" id="amountValue">${financeAmount.toFixed(1)} ETH</span>
+                    </div>
+                    <input type="range" class="finance-slider" id="amountSlider" min="0.1" max="${a.value}" step="0.1" value="${financeAmount}"
+                        oninput="updateFinanceAmount(this.value)">
+                </div>
+                
+                <div class="finance-slider-group">
+                    <div class="slider-label">
+                        <span>出让收益权比例</span>
+                        <span class="slider-value" id="shareValue">${financeShare}%</span>
+                    </div>
+                    <input type="range" class="finance-slider" id="shareSlider" min="5" max="50" step="1" value="${financeShare}"
+                        oninput="updateFinanceShare(this.value)">
+                </div>
+                
+                <div class="finance-stats-grid">
+                    <div class="finance-stat-box">
+                        <div class="finance-stat-label">融资估值</div>
+                        <div class="finance-stat-value" id="valuationDisplay">${(financeAmount / (financeShare/100)).toFixed(1)} ETH</div>
+                    </div>
+                    <div class="finance-stat-box">
+                        <div class="finance-stat-label">保留所有权</div>
+                        <div class="finance-stat-value" style="color:#00ff88;">${100 - financeShare}%</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('configActions').style.display = 'flex';
+            updateDealPreview();
+        }
+
+        function updateFinanceAmount(val) {
+            financeAmount = parseFloat(val);
+            document.getElementById('amountValue').textContent = financeAmount.toFixed(1) + ' ETH';
+            document.getElementById('valuationDisplay').textContent = (financeAmount / (financeShare/100)).toFixed(1) + ' ETH';
+            updateDealPreview();
+        }
+
+        function updateFinanceShare(val) {
+            financeShare = parseInt(val);
+            document.getElementById('shareValue').textContent = financeShare + '%';
+            document.getElementById('valuationDisplay').textContent = (financeAmount / (financeShare/100)).toFixed(1) + ' ETH';
+            updateDealPreview();
+        }
+
+        function resetFinance() {
+            selectedFinanceAsset = null;
+            financeAmount = 1.0;
+            financeShare = 20;
+            document.getElementById('configContent').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">⬡</div>
+                    <div class="empty-text">选择左侧资产开始配置融资方案</div>
+                </div>
+            `;
+            document.getElementById('configActions').style.display = 'none';
+            document.querySelectorAll('#financeGrid .asset-card').forEach(c => c.classList.remove('selected'));
+            updateDealPreview();
+        }
+
+        function updateDealPreview() {
+            if (!selectedFinanceAsset) {
+                document.getElementById('dealContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⬡</div>
+                        <div class="empty-text">配置融资方案后查看条款</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const tokenAmount = Math.floor(financeAmount * 100);
+            document.getElementById('dealContent').innerHTML = `
+                <div class="ownership-section">
+                    <div class="section-label">融资资产</div>
+                    <div class="dist-item" style="border-color:${selectedFinanceAsset.color};">
+                        <div class="dist-icon">${selectedFinanceAsset.icon}</div>
+                        <div class="dist-info">
+                            <div class="dist-name">${selectedFinanceAsset.name}</div>
+                        </div>
+                        <div class="dist-share">${selectedFinanceAsset.value} ETH</div>
+                    </div>
+                </div>
+                
+                <div class="ownership-section">
+                    <div class="section-label">融资条款</div>
+                    <div class="meta-list">
+                        <div class="meta-item">
+                            <span class="meta-label">融资金额</span>
+                            <span class="meta-value">${financeAmount.toFixed(1)} ETH</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">出让收益权</span>
+                            <span class="meta-value">${financeShare}%</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">融资估值</span>
+                            <span class="meta-value">${(financeAmount / (financeShare/100)).toFixed(1)} ETH</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">代币数量</span>
+                            <span class="meta-value">${tokenAmount} ECHO</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ownership-section" style="border-bottom:none;">
+                    <div class="section-label">智能合约条款</div>
+                    <div class="rule-box">
+                        • 收益权代币永久可交易<br>
+                        • 所有权始终归原始创造者<br>
+                        • 代币持有者享有收益分配权<br>
+                        • 里程碑达成自动触发分红
+                    </div>
+                </div>
+            `;
+        }
+
+        function previewDeal() {
+            if (!selectedFinanceAsset) return;
+            
+            const canvas = document.getElementById('deal-canvas');
+            if (!dealScene) {
+                dealScene = new THREE.Scene();
+                dealCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                dealCamera.position.z = 5;
+                dealRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+                dealRenderer.setSize(150, 150);
+                dealScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                const pl = new THREE.PointLight(0xffd700, 1.5, 100);
+                pl.position.set(5, 5, 5);
+                dealScene.add(pl);
+                animateDeal();
+            }
+            if (dealMolecule) dealScene.remove(dealMolecule);
+            dealMolecule = createMolecule('collaboration', 0xffd700, 0.8);
+            dealScene.add(dealMolecule);
+            
+            const tokenAmount = Math.floor(financeAmount * 100);
+            document.getElementById('dealSummary').innerHTML = `
+                <div class="deal-summary-item">
+                    <span class="deal-summary-label">资产</span>
+                    <span class="deal-summary-value">${selectedFinanceAsset.name}</span>
+                </div>
+                <div class="deal-summary-item">
+                    <span class="deal-summary-label">融资额</span>
+                    <span class="deal-summary-value">${financeAmount.toFixed(1)} ETH</span>
+                </div>
+                <div class="deal-summary-item">
+                    <span class="deal-summary-label">代币</span>
+                    <span class="deal-summary-value">${tokenAmount} ECHO</span>
+                </div>
+            `;
+            
+            document.getElementById('dealModal').classList.add('active');
+        }
+
+        function animateDeal() {
+            requestAnimationFrame(animateDeal);
+            if (dealMolecule) dealMolecule.rotation.y += 0.01;
+            if (dealRenderer && dealCamera) dealRenderer.render(dealScene, dealCamera);
+        }
+
+        function closeDealModal() {
+            document.getElementById('dealModal').classList.remove('active');
+        }
+
+        function confirmDeal() {
+            closeDealModal();
+            const tokenAmount = Math.floor(financeAmount * 100);
+            document.getElementById('tokenResult').textContent = tokenAmount + ' ECHO-Tokens';
+            document.getElementById('dealSuccessModal').classList.add('active');
+        }
+
+        function closeDealSuccessModal() {
+            document.getElementById('dealSuccessModal').classList.remove('active');
+            goTo(4);
+        }
+
+        // 背景粒子
+        function initBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            const particleCount = 1500;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const color1 = new THREE.Color(0x00f0ff);
+            const color2 = new THREE.Color(0xffd700);
+            
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 100;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+                const mixedColor = color1.clone().lerp(color2, Math.random());
+                colors[i * 3] = mixedColor.r;
+                colors[i * 3 + 1] = mixedColor.g;
+                colors[i * 3 + 2] = mixedColor.b;
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.15,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            camera.position.z = 30;
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                particles.rotation.y += 0.0003;
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // 多页切换
+        function goTo(index) {
+            if (index < 0 || index > 4) return;
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            document.getElementById('stage' + index).classList.add('active');
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+            currentStage = index;
+            
+            if (index === 1) {
+                if (!previewScene) initPreviewScene();
+                generateAssetCards();
+            }
+            if (index === 2) {
+                renderFusionGrid();
+                setupPoolDropZone();
+                if (!poolScene) initPoolScene();
+                setTimeout(() => animateCards(), 500);
+            }
+            if (index === 3) {
+                renderFinanceGrid();
+                setTimeout(() => animateCards(), 500);
+            }
+            if (index === 4) {
+                renderValueNetwork();
+            }
+            
+            // 更新底部按钮显示
+            const nextBtn = document.getElementById('nextPageBtn');
+            if (nextBtn) {
+                if (index === 0 || index === 4) {
+                    nextBtn.style.display = 'none';
+                } else {
+                    nextBtn.style.display = 'block';
+                }
+            }
+        }
+
+        function goToNext() {
+            if (currentStage < 4) {
+                goTo(currentStage + 1);
+            }
+        }
+
+        // ===== Stage 4: 3D 价值网络可视化 =====
+let valueScene, valueCamera, valueRenderer;
+let valueNodes = [], valueConnections = [], valueParticles = [];
+let isDragging = false;
+let mouseX = 0, mouseY = 0;
+let targetRotationX = 0, targetRotationY = 0;
+
+function initValue3D() {
+    const canvas = document.getElementById('value3dCanvas');
+    if (!canvas) return;
+    
+    valueScene = new THREE.Scene();
+    valueScene.fog = new THREE.FogExp2(0x0a0a1a, 0.015);
+    
+    valueCamera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    valueCamera.position.set(0, 25, 60);
+    valueCamera.lookAt(0, 0, 0);
+    
+    valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    valueRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    valueRenderer.setPixelRatio(window.devicePixelRatio);
+    
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    valueScene.add(ambientLight);
+    
+    const pointLight = new THREE.PointLight(0xffd700, 1.2, 100);
+    pointLight.position.set(10, 20, 10);
+    valueScene.add(pointLight);
+    
+    const pointLight2 = new THREE.PointLight(0x00f0ff, 0.8, 100);
+    pointLight2.position.set(-10, 10, -10);
+    valueScene.add(pointLight2);
+    
+    buildValueNetwork();
+    
+    canvas.addEventListener('mousedown', onValueMouseDown);
+    canvas.addEventListener('mousemove', onValueMouseMove);
+    canvas.addEventListener('mouseup', onValueMouseUp);
+    canvas.addEventListener('wheel', onValueWheel);
+    
+    animateValue3D();
+}
+
+function buildValueNetwork() {
+    valueNodes.forEach(n => valueScene.remove(n.mesh));
+    valueConnections.forEach(c => valueScene.remove(c.line));
+    valueParticles.forEach(p => valueScene.remove(p.mesh));
+    valueNodes = [];
+    valueConnections = [];
+    valueParticles = [];
+    
+    const mintedAssets = assets.filter(a => a.minted);
+    const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
+    const hasFusion = neuroBlok && neuroBlok.minted;
+    
+    const totalRevenue = 100;
+    const neuroBlokRevenue = hasFusion ? totalRevenue * 0.4 : 0;
+    
+    // 获取源资产ID
+    let sourceAssetIds = [];
+    if (hasFusion && neuroBlok.generatedFrom) {
+        sourceAssetIds = neuroBlok.generatedFrom.split('+');
+    }
+    
+    // 如果没有铸造资产，显示所有资产作为演示
+    let displayAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
+    if (displayAssets.length === 0) {
+        displayAssets = assets.filter(a => a.id !== 'NeuroBlok');
+    }
+    
+    const nodesData = [];
+    
+    // ========== 中心：新药上市（最大最亮）==========
+    nodesData.push({
+        id: 'root',
+        icon: '💊',
+        label: '新药上市',
+        value: totalRevenue,
+        color: 0xffd700,
+        position: new THREE.Vector3(0, 0, 0),
+        asset: null,
+        size: 6  // 更大
+    });
+    
+    // ========== 内环：NeuroBlok（如有融合）==========
+    if (hasFusion) {
+        nodesData.push({
+            id: 'neuroblok',
+            icon: '✨',
+            label: 'NeuroBlok',
+            name: neuroBlok.name,
+            value: neuroBlokRevenue,
+            color: 0x00f0ff,
+            position: new THREE.Vector3(0, 0, -12),  // 在中心后方
+            asset: neuroBlok,
+            size: 4  // 较大
+        });
+    }
+    
+    // ========== 外环：分子资产（环绕分布）==========
+    const count = displayAssets.length;
+    const outerRadius = 28;  // 外环半径
+    
+    displayAssets.forEach((asset, i) => {
+        const angle = (i / Math.max(count, 1)) * Math.PI * 2;
+        const x = Math.cos(angle) * outerRadius;
+        const z = Math.sin(angle) * outerRadius;
+        
+        let revenue;
+        const isSource = sourceAssetIds.includes(asset.id);
+        if (hasFusion && isSource) {
+            revenue = (neuroBlokRevenue / sourceAssetIds.length) * 0.6;
+        } else {
+            revenue = (asset.value / 20) * (totalRevenue - neuroBlokRevenue) * 0.5;
+        }
+        
+        nodesData.push({
+            id: asset.id,
+            icon: asset.icon,
+            label: asset.name,
+            value: revenue,
+            color: asset.colorHex,
+            position: new THREE.Vector3(x, 0, z),
+            asset: asset,
+            size: 3  // 较大的分子
+        });
+    });
+    
+    // 创建节点
+    nodesData.forEach((nodeData) => {
+        const group = new THREE.Group();
+        group.position.copy(nodeData.position);
+        
+        // 创建3D分子模型 - 更大的比例
+        let moleculeGroup;
+        if (nodeData.id === 'root') {
+            moleculeGroup = createBigDrugCapsule(nodeData.size * 0.6);  // 更大
+        } else if (nodeData.id === 'neuroblok') {
+            moleculeGroup = createBigStar(nodeData.size * 0.6, nodeData.color);  // 更大
+        } else if (nodeData.asset) {
+            moleculeGroup = createBigMolecule(nodeData.asset.type, nodeData.color, 1.8);  // 更大
+        } else {
+            moleculeGroup = createBigMolecule('compound', nodeData.color, 1.8);  // 更大
+        }
+        
+        // 内敛的发光层 - 比模型略大一点点
+        const innerGlow = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 1.1, 32, 32),  // 更小
+            new THREE.MeshBasicMaterial({
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.25,  // 更淡
+                blending: THREE.AdditiveBlending
+            })
+        );
+        group.add(innerGlow);
+        
+        const outerGlow = new THREE.Mesh(
+            new THREE.SphereGeometry(nodeData.size * 1.4, 32, 32),  // 更小
+            new THREE.MeshBasicMaterial({
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.12,  // 更淡
+                blending: THREE.AdditiveBlending
+            })
+        );
+        group.add(outerGlow);
+        
+        // 添加强点光源
+        const light = new THREE.PointLight(nodeData.color, 2, 40);
+        group.add(light);
+        
+        // 添加模型
+        group.add(moleculeGroup);
+        group.userData = { ...nodeData, model: moleculeGroup };
+        
+        valueScene.add(group);
+        valueNodes.push({ mesh: group, data: nodeData });
+    });
+    
+    // 创建连线
+    if (hasFusion) {
+        createValueConnection('neuroblok', 'root', 0x00f0ff, true);
+    }
+    
+    displayAssets.forEach(asset => {
+        if (hasFusion && sourceAssetIds.includes(asset.id)) {
+            createValueConnection(asset.id, 'neuroblok', asset.colorHex, false);
+        } else {
+            createValueConnection(asset.id, 'root', asset.colorHex, false);
+        }
+    });
+    
+    createValueParticles();
+    
+    if (nodesData.length > 0) {
+        showValueNodeDetail(nodesData[0]);
+    }
+}
+
+// 大胶囊（新药）- 明亮高级
+function createBigDrugCapsule(scale) {
+    const group = new THREE.Group();
+    
+    // 明亮金色材质
+    const goldMat = new THREE.MeshPhongMaterial({
+        color: 0xffd700,
+        emissive: 0xffaa00,
+        emissiveIntensity: 0.8,  // 很亮
+        shininess: 120
+    });
+    
+    // 白色材质
+    const whiteMat = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.3,
+        shininess: 120
+    });
+    
+    // 上半球（金色）
+    const top = new THREE.Mesh(
+        new THREE.SphereGeometry(scale, 32, 16, 0, Math.PI*2, 0, Math.PI/2),
+        goldMat
+    );
+    top.position.y = scale;
+    
+    // 下半球（白色）
+    const bot = new THREE.Mesh(
+        new THREE.SphereGeometry(scale, 32, 16, 0, Math.PI*2, Math.PI/2, Math.PI/2),
+        whiteMat
+    );
+    bot.position.y = -scale;
+    
+    // 中间圆柱（金色）
+    const mid = new THREE.Mesh(
+        new THREE.CylinderGeometry(scale, scale, scale*2, 32),
+        goldMat
+    );
+    
+    group.add(top, bot, mid);
+    
+    // 环绕的青蓝色粒子
+    for (let i = 0; i < 10; i++) {
+        const angle = (i / 10) * Math.PI * 2;
+        const particle = new THREE.Mesh(
+            new THREE.SphereGeometry(0.15 * scale, 8, 8),
+            new THREE.MeshPhongMaterial({
+                color: 0x00f0ff,
+                emissive: 0x00f0ff,
+                emissiveIntensity: 1.0
+            })
+        );
+        particle.position.set(
+            Math.cos(angle) * 1.8 * scale,
+            Math.sin(i * 0.8) * 0.5 * scale,
+            Math.sin(angle) * 1.8 * scale
+        );
+        group.add(particle);
+    }
+    
+    return group;
+}
+
+// 大星形（NeuroBlok）
+function createBigStar(scale, color) {
+    const group = new THREE.Group();
+    
+    const mat = new THREE.MeshPhongMaterial({
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.7,
+        shininess: 100
+    });
+    
+    // 中心核心
+    group.add(new THREE.Mesh(new THREE.SphereGeometry(scale, 20, 20), mat));
+    
+    // 8个环绕卫星
+    for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const satellite = new THREE.Mesh(
+            new THREE.SphereGeometry(0.3 * scale, 12, 12),
+            mat
+        );
+        satellite.position.set(
+            Math.cos(angle) * 1.8 * scale,
+            0,
+            Math.sin(angle) * 1.8 * scale
+        );
+        group.add(satellite);
+    }
+    
+    return group;
+}
+
+// 大分子模型
+function createBigMolecule(type, color, scale) {
+    const group = new THREE.Group();
+    
+    const mat = new THREE.MeshPhongMaterial({
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.6,
+        shininess: 100
+    });
+    
+    switch(type) {
+        case 'protein':
+            // 大螺旋
+            for (let i = 0; i < 12; i++) {
+                const sphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.3 * scale, 12, 12),
+                    mat
+                );
+                const angle = i * 0.5;
+                sphere.position.set(
+                    Math.cos(angle) * scale,
+                    (i - 6) * 0.3 * scale,
+                    Math.sin(angle) * scale
+                );
+                group.add(sphere);
+            }
+            break;
+            
+        case 'compound':
+            // 大六边形
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const sphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.35 * scale, 12, 12),
+                    mat
+                );
+                sphere.position.set(Math.cos(angle) * scale, 0, Math.sin(angle) * scale);
+                group.add(sphere);
+            }
+            group.add(new THREE.Mesh(new THREE.SphereGeometry(0.5 * scale, 16, 16), mat));
+            break;
+            
+        case 'gene':
+            // 大双螺旋
+            for (let i = 0; i < 10; i++) {
+                const t = i / 10;
+                const y = (t - 0.5) * 2.5 * scale;
+                const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.25 * scale, 10, 10), mat);
+                s1.position.set(Math.cos(t * Math.PI * 3) * 0.8 * scale, y, Math.sin(t * Math.PI * 3) * 0.8 * scale);
+                const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.25 * scale, 10, 10), mat);
+                s2.position.set(Math.cos(t * Math.PI * 3 + Math.PI) * 0.8 * scale, y, Math.sin(t * Math.PI * 3 + Math.PI) * 0.8 * scale);
+                group.add(s1, s2);
+            }
+            break;
+            
+        default:
+            // 默认球体
+            group.add(new THREE.Mesh(new THREE.SphereGeometry(0.6 * scale, 16, 16), mat));
+    }
+    
+    return group;
+}
+
+function createValueConnection(fromId, toId, color) {
+    const fromNode = valueNodes.find(n => n.data.id === fromId);
+    const toNode = valueNodes.find(n => n.data.id === toId);
+    if (!fromNode || !toNode) return;
+    
+    const points = [fromNode.data.position, toNode.data.position];
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.3
+    });
+    
+    const line = new THREE.Line(geometry, material);
+    valueScene.add(line);
+    valueConnections.push({ line, from: fromNode, to: toNode });
+}
+
+function createValueParticles() {
+    valueConnections.forEach(conn => {
+        for (let i = 0; i < 4; i++) {
+            const geometry = new THREE.SphereGeometry(0.12, 8, 8);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.9
+            });
+            const particle = new THREE.Mesh(geometry, material);
+            valueScene.add(particle);
+            
+            valueParticles.push({
+                mesh: particle,
+                from: conn.from.data.position,
+                to: conn.to.data.position,
+                progress: i / 4,
+                speed: 0.008 + Math.random() * 0.004
+            });
+        }
+    });
+}
+
+function animateValue3D() {
+    requestAnimationFrame(animateValue3D);
+    
+    if (!valueRenderer || !valueScene || !valueCamera) return;
+    
+    const time = Date.now() * 0.001;
+    
+    if (!isDragging) {
+        valueScene.rotation.y += 0.0003;
+    }
+    
+    valueScene.rotation.x += (targetRotationX - valueScene.rotation.x) * 0.05;
+    valueScene.rotation.y += (targetRotationY - valueScene.rotation.y) * 0.05;
+    
+    valueParticles.forEach(p => {
+        p.progress += p.speed;
+        if (p.progress > 1) p.progress = 0;
+        
+        const pos = new THREE.Vector3().lerpVectors(p.from, p.to, p.progress);
+        p.mesh.position.copy(pos);
+    });
+    
+    valueNodes.forEach((node, i) => {
+        // 脉冲缩放
+        const pulse = 1 + Math.sin(time * 1.5 + i * 0.5) * 0.05;
+        node.mesh.scale.setScalar(pulse);
+        
+        // 只有分子模型旋转
+        const model = node.mesh.userData.model;
+        if (model) {
+            model.rotation.y += 0.008;
+            model.rotation.x += 0.003;
+        }
+    });
+    
+    valueRenderer.render(valueScene, valueCamera);
+}
+
+function onValueMouseDown(event) {
+    isDragging = true;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+    
+    const rect = valueRenderer.domElement.getBoundingClientRect();
+    const mouse = new THREE.Vector2(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1
+    );
+    
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, valueCamera);
+    
+    // 对 Group 进行射线检测
+    const intersects = raycaster.intersectObjects(valueScene.children, true);
+    
+    if (intersects.length > 0) {
+        // 找到最顶层的 Group
+        let target = intersects[0].object;
+        while (target.parent && target.parent.type !== 'Scene') {
+            if (target.userData && target.userData.id) break;
+            target = target.parent;
+        }
+        if (target.userData && target.userData.id) {
+            showValueNodeDetail(target.userData);
+        }
+    }
+}
+
+function onValueMouseMove(event) {
+    if (!isDragging) {
+        const rect = valueRenderer.domElement.getBoundingClientRect();
+        const mouse = new THREE.Vector2(
+            ((event.clientX - rect.left) / rect.width) * 2 - 1,
+            -((event.clientY - rect.top) / rect.height) * 2 + 1
+        );
+        
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, valueCamera);
+        
+        // 对 Group 进行射线检测
+        const intersects = raycaster.intersectObjects(valueScene.children, true);
+        let isHovering = false;
+        
+        if (intersects.length > 0) {
+            let target = intersects[0].object;
+            while (target.parent && target.parent.type !== 'Scene') {
+                if (target.userData && target.userData.id) {
+                    isHovering = true;
+                    break;
+                }
+                target = target.parent;
+            }
+        }
+        
+        const canvas = document.getElementById('value3dCanvas');
+        canvas.style.cursor = isHovering ? 'pointer' : 'grab';
+        return;
+    }
+    
+    const deltaX = event.clientX - mouseX;
+    const deltaY = event.clientY - mouseY;
+    
+    targetRotationY += deltaX * 0.008;
+    targetRotationX += deltaY * 0.008;
+    targetRotationX = Math.max(-0.5, Math.min(0.5, targetRotationX));
+    
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+}
+
+function onValueMouseUp() {
+    isDragging = false;
+}
+
+function onValueWheel(event) {
+    event.preventDefault();
+    valueCamera.position.z += event.deltaY * 0.05;
+    valueCamera.position.z = Math.max(15, Math.min(60, valueCamera.position.z));
+}
+
+function showValueNodeDetail(nodeData) {
+    const icon = document.getElementById('detail3dIcon');
+    const title = document.getElementById('detail3dTitle');
+    const content = document.getElementById('detail3dContent');
+    
+    if (!icon || !title || !content) return;
+    
+    const colorHex = '#' + nodeData.color.toString(16).padStart(6, '0');
+    
+    icon.textContent = nodeData.icon;
+    icon.style.color = colorHex;
+    title.textContent = nodeData.label;
+    title.style.color = colorHex;
+    
+    if (nodeData.asset && nodeData.asset.contributors) {
+        const contributorsHtml = nodeData.asset.contributors.map((c, i) => {
+            const share = parseInt(c.share);
+            const amount = (nodeData.value * share / 100);
+            const colors = ['#ffd700', '#00f0ff', '#00ff88', '#ff69b4'];
+            
+            return `
+                <div class="contributor-3d-row" style="border-color: ${colors[i % colors.length]};">
+                    <div class="contributor-3d-avatar" style="border-color: ${colors[i % colors.length]}60; color: ${colors[i % colors.length]};">
+                        ${c.name.charAt(0)}
+                    </div>
+                    <div class="contributor-3d-info">
+                        <div class="contributor-3d-name">${c.name}</div>
+                        <div class="contributor-3d-share">权益 ${c.share}</div>
+                    </div>
+                    <div class="contributor-3d-amount">$${amount.toFixed(2)}M</div>
+                </div>
+            `;
+        }).join('');
+        
+        content.innerHTML = `
+            <div style="margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px;">
+                <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">资产名称</div>
+                <div style="font-size: 16px; color: ${colorHex};">${nodeData.name || nodeData.asset.name}</div>
+            </div>
+            <div style="font-size: 11px; color: rgba(150,170,200,0.8); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                贡献者收益分配
+            </div>
+            ${contributorsHtml}
+            <div class="detail-3d-total">
+                <span class="detail-3d-total-label">该资产总收益</span>
+                <span class="detail-3d-total-value">$${nodeData.value.toFixed(2)}M</span>
+            </div>
+        `;
+    } else {
+        content.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <div style="font-size: 60px; margin-bottom: 20px; color: ${colorHex};">${nodeData.icon}</div>
+                <div style="font-size: 22px; color: ${colorHex}; margin-bottom: 15px;">${nodeData.label}</div>
+                <div style="font-size: 32px; color: #ffd700; font-family: Orbitron; margin-bottom: 20px;">$${nodeData.value.toFixed(1)}M</div>
+                <div style="font-size: 13px; color: rgba(150,170,200,0.7); line-height: 1.6;">
+                    新药成功上市带来的总收益<br>
+                    价值沿分子链条向下流动<br>
+                    精准分配至每个贡献者
+                </div>
+            </div>
+        `;
+    }
+}
+
+function renderValueNetwork() {
+    if (!valueScene) {
+        initValue3D();
+    } else {
+        buildValueNetwork();
+    }
+}
+        
+        function showNodeDetail(node) {
+            const panel = document.getElementById('nodeDetailPanel');
+            const content = document.getElementById('detailContent');
+            const icon = document.getElementById('detailIcon');
+            const title = document.getElementById('detailTitle');
+            
+            icon.textContent = node.icon;
+            icon.style.color = node.color;
+            title.textContent = node.label;
+            title.style.color = node.color;
+            
+            if (node.asset && node.asset.contributors) {
+                const contributorsHtml = node.asset.contributors.map((c, i) => {
+                    const share = parseInt(c.share);
+                    const amount = (node.value * share / 100);
+                    const colors = ['#ffd700', '#00f0ff', '#00ff88', '#ff69b4'];
+                    
+                    return `
+                        <div class="contributor-row" style="border-color: ${colors[i % colors.length]};">
+                            <div class="contributor-avatar" style="border-color: ${colors[i % colors.length]}60; color: ${colors[i % colors.length]};">
+                                ${c.name.charAt(0)}
+                            </div>
+                            <div class="contributor-info">
+                                <div class="contributor-name">${c.name}</div>
+                                <div class="contributor-share">权益 ${c.share}</div>
+                            </div>
+                            <div class="contributor-amount">$${(amount / 1000000).toFixed(2)}M</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                content.innerHTML = `
+                    <div class="detail-asset-info">
+                        <div class="detail-asset-icon" style="color: ${node.color};">${node.icon}</div>
+                        <div>
+                            <div class="detail-asset-name" style="color: ${node.color};">${node.asset.name}</div>
+                            <div class="detail-asset-id">${node.id}</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 11px; color: rgba(150,170,200,0.8); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                        贡献者收益明细
+                    </div>
+                    <div class="contributors-list">
+                        ${contributorsHtml}
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px; color: rgba(150,170,200,0.8);">该资产总收益</span>
+                            <span style="font-size: 18px; color: #ffd700; font-family: 'Orbitron';">$${(node.value / 1000000).toFixed(2)}M</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 30px;">
+                        <div style="font-size: 48px; margin-bottom: 15px; color: ${node.color};">${node.icon}</div>
+                        <div style="font-size: 18px; color: ${node.color}; margin-bottom: 10px;">${node.label}</div>
+                        <div style="font-size: 24px; color: #ffd700; font-family: 'Orbitron'; margin-bottom: 20px;">
+                            $${(node.value / 1000000).toFixed(1)}M
+                        </div>
+                        <div style="font-size: 12px; color: rgba(150,170,200,0.7); line-height: 1.6;">
+                            新药成功上市带来的总收益<br>
+                            价值沿分子链条向下流动<br>
+                            精准分配至每个贡献者
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 初始化
+        window.addEventListener('load', () => {
+            initBackground();
+            initPreviewScene();
+            generateAssetCards();
+            
+            // 首页隐藏底部导航
+            const nextBtn = document.getElementById('nextPageBtn');
+            if (nextBtn) nextBtn.style.display = 'none';
+            
+            gsap.from('.asset-library', { x: -50, opacity: 0, duration: 0.8, delay: 0.2 });
+            gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
+            gsap.from('.preview-area', { y: 30, opacity: 0, duration: 0.8, delay: 0.4 });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') goTo(currentStage + 1);
+            if (e.key === 'ArrowLeft') goTo(currentStage - 1);
+        });
+    </script>
+</body>
+</html>
