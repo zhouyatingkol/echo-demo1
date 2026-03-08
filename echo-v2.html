@@ -8020,145 +8020,104 @@ function createHierarchyNode(nodeData) {
         
         group.add(drugGroup);
         
-    // ===== Level 2: 融合资产 - 高级聚合结构 =====
+    // ===== Level 2: 融合资产 - 使用与阶段2相同的大分子模型 =====
     } else if (nodeData.level === 2) {
         const fusionGroup = new THREE.Group();
-        const fusionType = nodeData.asset?.id || '';
+        const fusionType = nodeData.asset?.type || 'fusion';
         
-        // 外发光壳
-        const aura = new THREE.Mesh(
-            new THREE.SphereGeometry(1.1 * scale, 20, 20),
-            new THREE.MeshBasicMaterial({ 
-                color: color,
-                transparent: true,
-                opacity: 0.08,
-                blending: THREE.AdditiveBlending
-            })
-        );
-        fusionGroup.add(aura);
+        // 使用与阶段2协作衍生相同的大分子模型
+        const bigMolScale = scale * 0.8;
+        const mat = new THREE.MeshPhongMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 0.5,
+            shininess: 100
+        });
         
-        if (fusionType.includes('Screening')) {
-            // 结构筛选 - 精致的分子簇
-            const core = new THREE.Mesh(
-                new THREE.IcosahedronGeometry(0.35 * scale, 1),
-                new THREE.MeshPhongMaterial({ 
-                    color: color, 
-                    emissive: color, 
-                    emissiveIntensity: 0.5 
-                })
-            );
-            fusionGroup.add(core);
+        // 根据融合资产类型选择模型
+        if (fusionType === 'screening' || fusionType.includes('Screening')) {
+            // 筛选型 - 大螺旋结构
+            for (let i = 0; i < 12; i++) {
+                const sphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.3 * bigMolScale, 14, 14),
+                    mat
+                );
+                const angle = i * 0.5;
+                sphere.position.set(
+                    Math.cos(angle) * bigMolScale,
+                    (i - 6) * 0.3 * bigMolScale,
+                    Math.sin(angle) * bigMolScale
+                );
+                fusionGroup.add(sphere);
+            }
             
+        } else if (fusionType === 'optimization' || fusionType.includes('Optimization')) {
+            // 优化型 - 大六边形结构
             for (let i = 0; i < 6; i++) {
                 const angle = (i / 6) * Math.PI * 2;
-                const ball = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.2 * scale, 14, 14),
-                    new THREE.MeshPhongMaterial({
-                        color: color,
-                        emissive: color,
-                        emissiveIntensity: 0.3
-                    })
+                const sphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.35 * bigMolScale, 14, 14),
+                    mat
                 );
-                ball.position.set(
-                    Math.cos(angle) * 0.85 * scale,
-                    (Math.sin(angle * 2) * 0.25) * scale,
-                    Math.sin(angle) * 0.85 * scale
+                sphere.position.set(
+                    Math.cos(angle) * bigMolScale, 
+                    0, 
+                    Math.sin(angle) * bigMolScale
                 );
-                fusionGroup.add(ball);
-                
-                // 发光连接线
-                const line = new THREE.Line(
-                    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), ball.position]),
-                    new THREE.LineBasicMaterial({ 
-                        color: color, 
-                        opacity: 0.35, 
-                        transparent: true,
-                        blending: THREE.AdditiveBlending
-                    })
-                );
-                fusionGroup.add(line);
+                fusionGroup.add(sphere);
             }
+            // 中心球
+            fusionGroup.add(new THREE.Mesh(
+                new THREE.SphereGeometry(0.5 * bigMolScale, 18, 18),
+                mat
+            ));
             
-        } else if (fusionType.includes('Optimization')) {
-            // 化学优化 - 环面结结构
-            const torusKnot = new THREE.Mesh(
-                new THREE.TorusKnotGeometry(0.6 * scale, 0.18 * scale, 60, 10, 2, 3),
-                new THREE.MeshPhongMaterial({ 
-                    color: color,
-                    emissive: color,
-                    emissiveIntensity: 0.35
-                })
-            );
-            fusionGroup.add(torusKnot);
-            
-            // 中心发光核
-            const core = new THREE.Mesh(
-                new THREE.SphereGeometry(0.25 * scale, 16, 16),
-                new THREE.MeshPhongMaterial({ 
-                    color: 0xffffff,
-                    emissive: color, 
-                    emissiveIntensity: 0.7 
-                })
-            );
-            fusionGroup.add(core);
-            
-        } else if (fusionType.includes('Candidate')) {
-            // 临床候选 - 精致的四面体结构
-            const topBall = new THREE.Mesh(
-                new THREE.SphereGeometry(0.45 * scale, 18, 18),
-                new THREE.MeshPhongMaterial({ 
-                    color: color, 
-                    emissive: color, 
-                    emissiveIntensity: 0.5 
-                })
-            );
-            topBall.position.y = 0.8 * scale;
-            fusionGroup.add(topBall);
-            
-            for (let i = 0; i < 3; i++) {
-                const angle = (i / 3) * Math.PI * 2;
-                const ball = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.3 * scale, 14, 14),
-                    material
+        } else if (fusionType === 'candidate' || fusionType.includes('Candidate')) {
+            // 候选型 - 大双螺旋结构
+            for (let i = 0; i < 10; i++) {
+                const t = i / 10;
+                const y = (t - 0.5) * 2.5 * bigMolScale;
+                const s1 = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.25 * bigMolScale, 12, 12),
+                    mat
                 );
-                ball.position.set(
-                    Math.cos(angle) * 0.9 * scale,
-                    -0.3 * scale,
-                    Math.sin(angle) * 0.9 * scale
+                s1.position.set(
+                    Math.cos(t * Math.PI * 3) * 0.8 * bigMolScale, 
+                    y, 
+                    Math.sin(t * Math.PI * 3) * 0.8 * bigMolScale
                 );
-                fusionGroup.add(ball);
-                
-                // 连接线到底部中心
-                const line = new THREE.Line(
-                    new THREE.BufferGeometry().setFromPoints([
-                        ball.position, 
-                        new THREE.Vector3(0, -0.3 * scale, 0)
-                    ]),
-                    new THREE.LineBasicMaterial({ color: color, opacity: 0.5, transparent: true })
+                const s2 = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.25 * bigMolScale, 12, 12),
+                    mat
                 );
-                fusionGroup.add(line);
+                s2.position.set(
+                    Math.cos(t * Math.PI * 3 + Math.PI) * 0.8 * bigMolScale, 
+                    y, 
+                    Math.sin(t * Math.PI * 3 + Math.PI) * 0.8 * bigMolScale
+                );
+                fusionGroup.add(s1);
+                fusionGroup.add(s2);
             }
-            
-            // 底部中心球
-            const bottomBall = new THREE.Mesh(
-                new THREE.SphereGeometry(0.35 * scale, 16, 16),
-                new THREE.MeshPhongMaterial({ 
-                    color: color, 
-                    emissive: color, 
-                    emissiveIntensity: 0.4 
-                })
-            );
-            bottomBall.position.y = -0.3 * scale;
-            fusionGroup.add(bottomBall);
             
         } else {
             // 默认融合 - 环面结
-            const torusKnot = new THREE.Mesh(
-                new THREE.TorusKnotGeometry(0.7 * scale, 0.25 * scale, 64, 12, 2, 3),
-                material
-            );
-            fusionGroup.add(torusKnot);
+            fusionGroup.add(new THREE.Mesh(
+                new THREE.TorusKnotGeometry(0.6 * bigMolScale, 0.2 * bigMolScale, 50, 10, 2, 3),
+                mat
+            ));
         }
+        
+        // 柔和光晕
+        const glow = new THREE.Mesh(
+            new THREE.SphereGeometry(1.3 * scale, 16, 16),
+            new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.1,
+                blending: THREE.AdditiveBlending
+            })
+        );
+        fusionGroup.add(glow);
         
         group.add(fusionGroup);
         
