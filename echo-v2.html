@@ -163,9 +163,16 @@
             bottom: 0;
             display: flex;
             padding: 0 20px 20px;
-            gap: 20px;
+            gap: 15px;
             background: transparent;
             z-index: 1;
+            justify-content: center;
+        }
+        
+        /* 阶段2布局优化 - 防止右侧被截断 */
+        #stage2 .main-container {
+            gap: 10px;
+            padding: 0 10px 20px;
         }
         
         /* 顶部导航 */
@@ -194,7 +201,7 @@
         
         /* 左侧资产库 */
         .asset-library {
-            width: 380px;
+            width: 320px;
             height: 100%;
             background: rgba(10, 15, 30, 0.6);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -204,6 +211,21 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 阶段2的左侧资产库 */
+        #stage2 .asset-library {
+            width: 280px;
+            min-width: 280px;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+        #stage2 .asset-card {
+            min-height: 120px;
+        }
+        #stage2 .mol-canvas-container {
+            width: 65px;
+            height: 65px;
         }
         .library-header { 
             margin-bottom: 15px;
@@ -278,6 +300,349 @@
             opacity: 0.5;
             transform: scale(0.95);
         }
+        
+        /* ===== 阶段1优化：搜索和筛选 ===== */
+        .stage1-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .search-box:focus {
+            border-color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+        .search-box::placeholder {
+            color: rgba(150, 170, 200, 0.5);
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        .filter-tab {
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: rgba(150, 170, 200, 0.7);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-tab:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            color: #00f0ff;
+        }
+        .filter-tab.active {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+        
+        /* ===== 阶段1优化：铸造成功粒子动画 ===== */
+        .mint-success-particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .success-particle {
+            position: absolute;
+            width: 6px; height: 6px;
+            background: #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+            animation: particleBurst 1s ease-out forwards;
+        }
+        @keyframes particleBurst {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+        .mint-success-flash {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9998;
+            animation: flashEffect 0.5s ease-out;
+        }
+        @keyframes flashEffect {
+            0% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+        
+        /* ===== 阶段1优化：铸造进度条 ===== */
+        .mint-progress-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .mint-progress-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mint-progress-container {
+            width: 400px;
+            padding: 40px;
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            text-align: center;
+        }
+        .mint-progress-title {
+            font-size: 20px;
+            color: #ffd700;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+        }
+        .mint-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .mint-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .mint-progress-steps {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.6);
+        }
+        .mint-progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .mint-progress-step.active {
+            color: #ffd700;
+        }
+        .mint-progress-step-icon {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .mint-progress-step.active .mint-progress-step-icon {
+            background: #ffd700;
+            color: #000;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* ===== 阶段1优化：资产对比模式 ===== */
+        .compare-mode-indicator {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 10px 30px;
+            background: rgba(0, 210, 255, 0.2);
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            border-radius: 25px;
+            color: #00d2ff;
+            font-size: 12px;
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .compare-mode-indicator.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .compare-panel {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 700px;
+            background: rgba(10, 15, 30, 0.98);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        .compare-panel.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .compare-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .compare-panel-title {
+            font-size: 18px;
+            color: #00f0ff;
+            letter-spacing: 2px;
+        }
+        .compare-panel-close {
+            width: 36px; height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .compare-panel-close:hover {
+            background: rgba(255, 71, 87, 0.3);
+            transform: rotate(90deg);
+        }
+        .compare-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .compare-item {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .compare-item-preview {
+            width: 120px; height: 120px;
+            margin: 0 auto 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .compare-item-name {
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .compare-item-id {
+            font-size: 12px;
+            text-align: center;
+            color: rgba(150, 170, 200, 0.6);
+            margin-bottom: 15px;
+        }
+        .compare-item-value {
+            text-align: center;
+            font-size: 24px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .compare-vs {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px; height: 50px;
+            background: rgba(0, 210, 255, 0.2);
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #00d2ff;
+        }
+        
+        /* 3D预览交互提示 */
+        .preview-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            font-size: 10px;
+            color: rgba(150, 170, 200, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .preview-area:hover .preview-hint {
+            opacity: 1;
+        }
+        
+        /* 选中对比的资产卡片 */
+        .asset-card.compare-selected {
+            border-color: #00d2ff !important;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+        }
+        .asset-card.compare-selected::before {
+            content: 'VS';
+            position: absolute;
+            top: -10px; right: -10px;
+            width: 24px; height: 24px;
+            background: #00d2ff;
+            color: #000;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        /* 双选提示 */
+        .compare-hint {
+            position: fixed;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: rgba(0, 210, 255, 0.15);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 25px;
+            color: #00d2ff;
+            font-size: 12px;
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .compare-hint.active {
+            opacity: 1;
+        }
+        
         .mol-canvas-container {
             width: 80px; height: 80px;
             position: relative;
@@ -348,6 +713,8 @@
             width: 440px !important;
             height: 440px !important;
             z-index: 10;
+            background: transparent !important;
+            display: block;
         }
         .preview-info {
             text-align: center;
@@ -449,6 +816,14 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        /* 阶段2的右侧面板更窄 */
+        #stage2 .ownership-panel {
+            width: 240px;
+            min-width: 240px;
+            padding: 15px;
         }
         .ownership-panel::-webkit-scrollbar { width: 4px; }
         .ownership-panel::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
@@ -622,12 +997,26 @@
         .asset-card[data-id="NeuroBlok"]:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.5); }
         .asset-card[data-id="NeuroBlok"] .asset-id { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
         
+        /* 新增融合资产样式 */
+        .asset-card[data-id="ScreeningBlok"] { border-color: rgba(0, 210, 255, 0.6); }
+        .asset-card[data-id="ScreeningBlok"]:hover { box-shadow: 0 15px 40px rgba(0, 210, 255, 0.5); }
+        .asset-card[data-id="ScreeningBlok"] .asset-id { color: #00d2ff; text-shadow: 0 0 10px rgba(0, 210, 255, 0.5); }
+        
+        .asset-card[data-id="OptimizationBlok"] { border-color: rgba(0, 255, 136, 0.6); }
+        .asset-card[data-id="OptimizationBlok"]:hover { box-shadow: 0 15px 40px rgba(0, 255, 136, 0.5); }
+        .asset-card[data-id="OptimizationBlok"] .asset-id { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+        
+        .asset-card[data-id="CandidateBlok"] { border-color: rgba(255, 149, 0, 0.6); }
+        .asset-card[data-id="CandidateBlok"]:hover { box-shadow: 0 15px 40px rgba(255, 149, 0, 0.5); }
+        .asset-card[data-id="CandidateBlok"] .asset-id { color: #ff9500; text-shadow: 0 0 10px rgba(255, 149, 0, 0.5); }
+        
         /* ===== STAGE 2: 协作衍生 ===== */
         .fusion-area {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+            min-width: 350px;
         }
         
         .fusion-pool {
@@ -636,46 +1025,66 @@
             position: relative;
             border: 2px dashed rgba(255, 215, 0, 0.3);
             border-radius: 24px;
-            background: 
-                radial-gradient(ellipse at center, rgba(255,215,0,0.05) 0%, rgba(0,0,0,0.3) 70%),
-                linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
+            background: transparent;
             overflow: visible;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
+        /* 能量场脉冲效果 */
         .fusion-pool::before {
             content: '';
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            bottom: 20px;
-            border: 1px solid rgba(0, 240, 255, 0.1);
-            border-radius: 16px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px; height: 300px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 50%;
+            animation: energyPulse 3s ease-out infinite;
             pointer-events: none;
         }
         
         .fusion-pool::after {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            border: 1px dashed rgba(255, 215, 0, 0.15);
+            width: 200px; height: 200px;
+            border: 1px dashed rgba(255, 215, 0, 0.3);
             border-radius: 50%;
+            animation: energyPulse 3s ease-out infinite 1s;
             pointer-events: none;
         }
         
+        @keyframes energyPulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+        
+        /* 涟漪效果层 */
+        .pool-ripple {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px; height: 100px;
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .pool-ripple.active {
+            animation: rippleEffect 0.8s ease-out;
+        }
+        @keyframes rippleEffect {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+        }
+        
         .fusion-pool.drag-over {
-            border-color: rgba(255, 215, 0, 0.6);
-            background: radial-gradient(ellipse at center, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.2) 70%);
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.2);
+            border-color: rgba(255, 215, 0, 0.8);
+            background: radial-gradient(ellipse at center, rgba(255,215,0,0.15) 0%, rgba(0,0,0,0.3) 70%);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.3), inset 0 0 60px rgba(255,215,0,0.05);
         }
         
         .pool-content {
@@ -698,17 +1107,31 @@
             align-items: center;
             justify-content: center;
             cursor: grab;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 0 30px currentColor;
             animation: dropIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
         }
-        .pool-asset:active { cursor: grabbing; }
-        @keyframes dropIn {
-            from { opacity: 0; transform: scale(0) rotate(-180deg); }
-            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        .pool-asset:hover { 
+            transform: scale(1.15); 
+            z-index: 20; 
+            box-shadow: 0 0 50px currentColor, 0 0 80px currentColor;
         }
-        .pool-asset:hover { transform: scale(1.1); z-index: 20; }
+        .pool-asset.dragging {
+            transform: scale(1.3);
+            box-shadow: 0 0 60px currentColor, 0 0 100px currentColor;
+            z-index: 100;
+            cursor: grabbing;
+        }
+        .pool-asset.magnetic {
+            animation: magneticSnap 0.3s ease-out;
+        }
+        @keyframes magneticSnap {
+            0% { transform: scale(1.3); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .pool-asset:active { cursor: grabbing; }
         .pool-asset-icon { font-size: 32px; margin-bottom: 4px; }
         .pool-asset-id { font-size: 10px; font-family: 'Orbitron', sans-serif; }
         .pool-asset-remove {
@@ -736,19 +1159,388 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
+            background: transparent !important;
+        }
+        
+        #pool-canvas {
+            width: 350px !important;
+            height: 350px !important;
+            background: transparent !important;
+            display: block;
+        }
+        
+        /* 确保协作池中的canvas容器透明 */
+        #poolContent {
+            background: transparent !important;
+        }
+        
+        #poolContainer {
+            background: transparent;
         }
         
         .connection-line {
             position: absolute;
             height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.6), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.8), transparent);
             transform-origin: left center;
             pointer-events: none;
-            animation: pulseLine 2s infinite;
+            animation: pulseLine 2s infinite, drawLine 0.5s ease-out;
         }
+        
+        /* 连线上的能量流动 */
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 20px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            border-radius: 2px;
+            transform: translateY(-50%);
+            animation: energyFlow 1.5s linear infinite;
+            box-shadow: 0 0 10px #ffd700;
+        }
+        @keyframes energyFlow {
+            0% { left: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+        
         @keyframes pulseLine {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+            0%, 100% { opacity: 0.3; box-shadow: 0 0 5px rgba(255,215,0,0.3); }
+            50% { opacity: 1; box-shadow: 0 0 15px rgba(255,215,0,0.8); }
+        }
+        @keyframes drawLine {
+            from { width: 0; }
+        }
+        
+        /* 协作池粒子 */
+        .pool-particles {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .pool-particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: rgba(255, 215, 0, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+            animation: poolFloat 4s ease-in-out infinite;
+        }
+        @keyframes poolFloat {
+            0%, 100% { 
+                transform: translateY(0) translateX(0); 
+                opacity: 0.3;
+            }
+            25% { 
+                transform: translateY(-20px) translateX(10px); 
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translateY(-40px) translateX(-5px); 
+                opacity: 1;
+            }
+            75% { 
+                transform: translateY(-20px) translateX(-10px); 
+                opacity: 0.6;
+            }
+        }
+        
+        /* 悬停预览 */
+        .pool-hover-preview {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px; height: 150px;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .pool-hover-preview.active {
+            opacity: 1;
+        }
+        .pool-hover-preview canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        /* 融合能量指示器 */
+        .fusion-energy-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            color: #ffd700;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .fusion-energy-indicator.active {
+            opacity: 1;
+        }
+        .fusion-energy-bar {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .fusion-energy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        
+        /* Toast 提示系统 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 12px 20px;
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            animation: toastIn 0.3s ease;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        .toast.toast-out {
+            animation: toastOut 0.3s ease forwards;
+        }
+        .toast-icon {
+            font-size: 20px;
+        }
+        .toast-content {
+            flex: 1;
+        }
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .toast-message {
+            color: rgba(200,220,240,0.8);
+            font-size: 12px;
+        }
+        .toast-success { border-color: rgba(0, 255, 136, 0.4); }
+        .toast-success .toast-icon { color: #00ff88; }
+        .toast-error { border-color: rgba(255, 71, 87, 0.4); }
+        .toast-error .toast-icon { color: #ff4757; }
+        .toast-warning { border-color: rgba(255, 149, 0, 0.4); }
+        .toast-warning .toast-icon { color: #ff9500; }
+        .toast-info { border-color: rgba(0, 210, 255, 0.4); }
+        .toast-info .toast-icon { color: #00d2ff; }
+        
+        @keyframes toastIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes toastOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        /* 资产详情弹窗 */
+        .asset-detail-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .asset-detail-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .asset-detail-content {
+            width: 500px;
+            max-height: 80vh;
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            overflow-y: auto;
+        }
+        .asset-detail-modal.active .asset-detail-content {
+            transform: scale(1);
+        }
+        .asset-detail-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .asset-detail-close:hover {
+            background: rgba(255,71,87,0.3);
+            transform: rotate(90deg);
+        }
+        .asset-detail-preview {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .asset-detail-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .asset-detail-name {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+        .asset-detail-id {
+            font-size: 14px;
+            color: rgba(200,220,240,0.6);
+            font-family: 'Orbitron', sans-serif;
+        }
+        .asset-detail-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .asset-detail-section:last-child {
+            border-bottom: none;
+        }
+        .asset-detail-label {
+            font-size: 12px;
+            color: rgba(200,220,240,0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .asset-detail-value {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.6;
+        }
+        .asset-detail-contributors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .asset-detail-contributor {
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .asset-detail-contributor-name {
+            color: rgba(255,255,255,0.9);
+        }
+        .asset-detail-contributor-share {
+            color: #ffd700;
+            font-size: 11px;
+        }
+        
+        /* 撤销按钮 */
+        .undo-btn {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 10px 20px;
+            background: rgba(0, 210, 255, 0.2);
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            border-radius: 25px;
+            color: #00d2ff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .undo-btn.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .undo-btn:hover {
+            background: rgba(0, 210, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+        }
+        
+        /* 快捷键提示 */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            font-size: 11px;
+            color: rgba(200,220,240,0.5);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+        .keyboard-hint span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .keyboard-hint kbd {
+            padding: 2px 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            font-family: monospace;
         }
         
         @keyframes pulse {
@@ -756,12 +1548,186 @@
             50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(255,215,0,0.8)); }
         }
         
+        /* 融合动画 */
+        .fusion-animating .pool-asset {
+            animation: mergeToCenter 1s ease-in-out forwards;
+        }
+        @keyframes mergeToCenter {
+            0% { transform: translate(var(--tx), var(--ty)) scale(1); }
+            50% { transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(0.8); }
+            100% { transform: translate(0, 0) scale(0); opacity: 0; }
+        }
+        
+        .fusion-burst {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, transparent 70%);
+            animation: burstEffect 0.8s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes burstEffect {
+            0% { width: 0; height: 0; opacity: 1; }
+            50% { width: 400px; height: 400px; opacity: 0.8; }
+            100% { width: 600px; height: 600px; opacity: 0; }
+        }
+        
+        .new-asset-birth {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            animation: assetBirth 0.6s ease-out forwards;
+        }
+        @keyframes assetBirth {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        /* 权益环形图 */
+        .share-chart-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+        }
+        .share-donut {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .donut-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 12;
+        }
+        .donut-segment {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: all 0.5s ease;
+        }
+        .donut-segment:hover {
+            stroke-width: 14;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .donut-num {
+            font-size: 20px;
+            font-family: 'Orbitron', sans-serif;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        .donut-label {
+            font-size: 10px;
+            color: rgba(150,170,200,0.6);
+            margin-top: 2px;
+        }
+        
+        /* 权益进度条 */
+        .share-progress-item {
+            margin-bottom: 12px;
+        }
+
+        /* 阶段2光粒子背景 */
+        .stage2-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .stage2-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 215, 0, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+            animation: stage2Float 8s linear infinite;
+        }
+        @keyframes stage2Float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+        .share-progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+        .share-progress-name {
+            color: rgba(200,220,240,0.8);
+        }
+        .share-progress-value {
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .share-progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .share-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .share-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
         .pool-hint {
             text-align: center;
             color: rgba(150,170,200,0.4);
             pointer-events: none;
+            transition: all 0.3s;
         }
-        .pool-hint-icon { font-size: 60px; margin-bottom: 15px; opacity: 0.5; }
+        .fusion-pool.drag-over .pool-hint {
+            opacity: 0.2;
+            transform: scale(0.9);
+        }
+        .pool-hint-icon { font-size: 60px; margin-bottom: 15px; opacity: 0.5; animation: floatHint 3s ease-in-out infinite; }
+        @keyframes floatHint {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
         .pool-hint-text { font-size: 14px; letter-spacing: 3px; margin-bottom: 8px; }
         .pool-hint-sub { font-size: 12px; opacity: 0.6; }
         
@@ -819,6 +1785,46 @@
         }
         
         .selected-tags { margin-bottom: 15px; }
+        
+        /* 选中资产3D预览 */
+        .selected-asset-preview {
+            width: 100%;
+            height: 120px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255,215,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        .preview-placeholder {
+            color: rgba(150,170,200,0.5);
+            font-size: 12px;
+            text-align: center;
+        }
+        .selected-asset-canvas {
+            width: 100px !important;
+            height: 100px !important;
+        }
+        
+        /* 权益分配列表可滚动 */
+        .share-list-scrollable {
+            max-height: 150px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .share-list-scrollable::-webkit-scrollbar { width: 3px; }
+        .share-list-scrollable::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .share-list-scrollable::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 2px; }
+        
+        /* 紧凑版融合规则 */
+        .fusion-rules-compact {
+            font-size: 11px;
+            line-height: 1.6;
+        }
         .tag-item {
             display: inline-flex;
             padding: 6px 14px;
@@ -950,6 +1956,524 @@
             margin-bottom: 25px;
             font-family: 'Orbitron', sans-serif;
             letter-spacing: 2px;
+        }
+        
+        /* 融合成功弹窗优化 */
+        #fusionSuccessModal .fusion-modal {
+            background: linear-gradient(135deg, rgba(10, 15, 30, 0.98), rgba(20, 25, 45, 0.95));
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.2), 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+        
+        #fusionSuccessModal .modal-icon {
+            animation: fusionIconPulse 2s ease-in-out infinite;
+        }
+        @keyframes fusionIconPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,215,0,0.6)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 40px rgba(255,215,0,0.9)); }
+        }
+        
+        /* 融合图谱容器 */
+        #fusionGraphContainer {
+            background: radial-gradient(ellipse at center, rgba(255,215,0,0.05) 0%, rgba(0,0,0,0.5) 70%);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: inset 0 0 60px rgba(255,215,0,0.05);
+        }
+        
+        /* 融合流程卡片 */
+        .fusion-flow-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .fusion-flow-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+        .fusion-flow-card::after {
+            content: '→';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: rgba(255, 215, 0, 0.5);
+        }
+        .fusion-flow-card:last-child::after {
+            display: none;
+        }
+        
+        /* 权属节点动画 */
+        .fusion-source-node {
+            animation: nodeAppear 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes nodeAppear {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        /* 连线绘制动画 */
+        .fusion-line {
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: drawLine 1s ease-out forwards;
+        }
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+        
+        /* ===== 融合成功弹窗 - 优化版 ===== */
+        .fusion-success-modal {
+            max-width: 800px !important;
+            width: 95% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            padding: 0 !important;
+            background: linear-gradient(135deg, rgba(10, 15, 30, 0.98), rgba(15, 20, 35, 0.95)) !important;
+            border: 1px solid rgba(255, 215, 0, 0.3) !important;
+            border-radius: 24px !important;
+        }
+        
+        /* 头部 */
+        .fusion-success-header {
+            text-align: center;
+            padding: 30px 40px 20px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .fusion-success-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+            animation: successIconPulse 2s ease-in-out infinite;
+        }
+        @keyframes successIconPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 40px rgba(255,215,0,0.8)); }
+        }
+        
+        .fusion-success-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            color: #ffd700;
+            margin-bottom: 8px;
+            letter-spacing: 3px;
+        }
+        
+        .fusion-success-subtitle {
+            font-size: 14px;
+            color: rgba(150, 170, 200, 0.7);
+        }
+        
+        /* 主体 - 左右分栏 */
+        .fusion-success-body {
+            display: flex;
+            gap: 30px;
+            padding: 30px 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .fusion-success-body {
+                flex-direction: column;
+            }
+        }
+        
+        /* 左侧面板 */
+        .fusion-asset-panel {
+            flex: 0 0 280px;
+        }
+        
+        /* 新资产卡片 */
+        .fusion-asset-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .fusion-asset-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.4));
+        }
+        
+        .fusion-asset-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            color: #ffd700;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        
+        .fusion-asset-meta {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+            margin-bottom: 12px;
+        }
+        
+        .fusion-asset-value {
+            font-size: 16px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .fusion-asset-value span {
+            color: #ffd700;
+        }
+        
+        /* 流程面板 */
+        .fusion-flow-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .fusion-flow-title {
+            font-size: 13px;
+            color: rgba(150, 170, 200, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .fusion-flow-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .fusion-flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            min-width: 70px;
+        }
+        
+        .fusion-flow-step.active {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .fusion-step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-family: 'Orbitron', sans-serif;
+            color: rgba(200, 220, 240, 0.8);
+        }
+        
+        .fusion-flow-step.active .fusion-step-num {
+            background: #ffd700;
+            color: #000;
+        }
+        
+        .fusion-step-text {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.8);
+        }
+        
+        .fusion-flow-step.active .fusion-step-text {
+            color: #ffd700;
+        }
+        
+        .fusion-flow-arrow {
+            color: rgba(255, 215, 0, 0.5);
+            font-size: 18px;
+        }
+        
+        /* 右侧面板 */
+        .fusion-details-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .fusion-detail-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .fusion-detail-title {
+            font-size: 13px;
+            color: rgba(150, 170, 200, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+        
+        /* 来源资产列表 */
+        .fusion-sources-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .fusion-source-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .fusion-source-icon {
+            font-size: 16px;
+        }
+        
+        .fusion-source-id {
+            font-family: 'Orbitron', sans-serif;
+            color: rgba(200, 220, 240, 0.9);
+        }
+        
+        .fusion-source-share {
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+        
+        /* 权益分配 */
+        .fusion-shares-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .fusion-share-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-left: 3px solid;
+        }
+        
+        .fusion-share-icon {
+            font-size: 20px;
+        }
+        
+        .fusion-share-info {
+            flex: 1;
+        }
+        
+        .fusion-share-name {
+            font-size: 12px;
+            color: rgba(200, 220, 240, 0.9);
+            margin-bottom: 5px;
+        }
+        
+        .fusion-share-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .fusion-share-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .fusion-share-percent {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: #ffd700;
+            min-width: 40px;
+            text-align: right;
+        }
+        
+        /* 规则说明 */
+        .fusion-rules-box {
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
+        }
+        
+        .fusion-rules-title {
+            font-size: 13px;
+            color: #ffd700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .fusion-rules-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .fusion-rules-list li {
+            font-size: 12px;
+            color: rgba(200, 220, 240, 0.8);
+            padding: 4px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+        
+        .fusion-rules-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #ffd700;
+        }
+        
+        /* 底部操作 */
+        .fusion-success-footer {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px 40px 30px;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        }
+        
+        .fusion-asset-value {
+            font-size: 14px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .fusion-asset-value span {
+            color: #ffd700;
+        }
+        
+        /* 来源资产列表 */
+        .fusion-sources-section {
+            margin-bottom: 25px;
+        }
+        
+        .fusion-section-title {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .fusion-sources-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .fusion-source-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .fusion-source-icon {
+            font-size: 16px;
+        }
+        
+        .fusion-source-id {
+            font-family: 'Orbitron', sans-serif;
+            color: rgba(200, 220, 240, 0.9);
+        }
+        
+        .fusion-source-share {
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+        }
+        
+        /* 权益分配 */
+        .fusion-shares-section {
+            margin-bottom: 30px;
+        }
+        
+        .fusion-shares-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .fusion-share-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-left: 3px solid;
+        }
+        
+        .fusion-share-icon {
+            font-size: 20px;
+        }
+        
+        .fusion-share-info {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .fusion-share-name {
+            font-size: 12px;
+            color: rgba(200, 220, 240, 0.9);
+        }
+        
+        .fusion-share-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        
+        .fusion-share-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        .fusion-share-percent {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: #ffd700;
+        }
+        
+        /* 操作按钮 */
+        .fusion-success-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
         }
         
         /* 成功动画 */
@@ -1374,6 +2898,300 @@
             font-family: 'Orbitron', sans-serif;
         }
         
+        /* 融合结果展示 */
+        .fusion-result-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .fusion-result-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 15px rgba(255,215,0,0.4));
+        }
+        
+        .fusion-result-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            color: #ffd700;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+        
+        .fusion-result-meta {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.7);
+            margin-bottom: 8px;
+        }
+        
+        .fusion-result-value {
+            font-size: 14px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .fusion-result-value span {
+            color: #ffd700;
+        }
+        
+        /* 结果来源资产列表 */
+        .result-sources-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .result-source-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            font-size: 11px;
+        }
+        
+        .result-source-icon {
+            font-size: 14px;
+        }
+        
+        .result-source-id {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .result-source-share {
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+        }
+        
+        /* 结果权益分配 */
+        .result-shares-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .result-share-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        
+        .result-share-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        
+        .result-share-icon {
+            font-size: 16px;
+        }
+        
+        .result-share-name {
+            flex: 1;
+            font-size: 12px;
+            color: rgba(200, 220, 240, 0.9);
+        }
+        
+        .result-share-percent {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            color: #ffd700;
+        }
+        
+        .result-share-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .result-share-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        /* 融合结果操作按钮 */
+        .fusion-result-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        /* 融合结果3D预览 */
+        .fusion-result-preview {
+            text-align: center;
+            margin-bottom: 15px;
+            background: transparent !important;
+        }
+        
+        .fusion-result-preview canvas {
+            width: 120px;
+            height: 120px;
+            background: transparent !important;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        /* 融合结果信息 */
+        .fusion-result-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .fusion-result-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            color: #ffd700;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+        
+        .fusion-result-meta {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.7);
+            margin-bottom: 8px;
+        }
+        
+        .fusion-result-value {
+            font-size: 14px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .fusion-result-value span {
+            color: #ffd700;
+        }
+        
+        /* 整合的权属详情 */
+        .fusion-ownership-details {
+            margin-bottom: 20px;
+        }
+        
+        .result-ownership-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .result-ownership-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .result-ownership-icon {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .result-ownership-info {
+            flex: 1;
+        }
+        
+        .result-ownership-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .result-ownership-name {
+            font-size: 13px;
+            color: rgba(200, 220, 240, 0.9);
+        }
+        
+        .result-ownership-id {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.7);
+        }
+        
+        .result-ownership-share {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: #ffd700;
+        }
+        
+        .result-ownership-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .result-ownership-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        /* 权属规则 */
+        .fusion-rules-section {
+            margin-bottom: 20px;
+        }
+        
+        .fusion-rules-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .fusion-rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        .fusion-rule-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .fusion-rule-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .fusion-rule-text strong {
+            font-size: 12px;
+            color: #ffd700;
+        }
+        
+        .fusion-rule-text span {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.8);
+            line-height: 1.4;
+        }
+        
         /* ===== STAGE 4: 其他页面 ===== */
         .stage-content {
             display: flex;
@@ -1442,8 +3260,20 @@
             <div class="asset-library">
                 <div class="library-header">
                     <div class="library-title">⬡ 资产分子库</div>
-                    <div class="library-subtitle">点击卡片进行铸造</div>
+                    <div class="library-subtitle">点击卡片铸造 · 双击快捷铸造 · Ctrl+点击对比</div>
                 </div>
+                
+                <!-- 搜索和筛选 -->
+                <div class="stage1-controls">
+                    <input type="text" class="search-box" id="assetSearchBox" placeholder="🔍 搜索资产..." oninput="filterAssets()">
+                    <div class="filter-tabs">
+                        <div class="filter-tab active" data-filter="all" onclick="setFilter('all')">全部</div>
+                        <div class="filter-tab" data-filter="data" onclick="setFilter('data')">数据</div>
+                        <div class="filter-tab" data-filter="algorithm" onclick="setFilter('algorithm')">算法</div>
+                        <div class="filter-tab" data-filter="result" onclick="setFilter('result')">成果</div>
+                    </div>
+                </div>
+                
                 <div class="asset-grid" id="assetGrid"></div>
                 <div class="stats-panel">
                     <div class="stat-row">
@@ -1469,6 +3299,7 @@
                         <div class="platform-ring"></div>
                     </div>
                     <canvas id="preview-canvas"></canvas>
+                    <div class="preview-hint">🖱️ 拖拽旋转 · 滚轮缩放</div>
                 </div>
                 <div class="preview-info">
                     <div class="preview-id" id="previewId">ECHO PROTOCOL</div>
@@ -1504,6 +3335,59 @@
             </div>
         </div>
         
+        <!-- 铸造进度覆盖层 -->
+        <div class="mint-progress-overlay" id="mintProgressOverlay">
+            <div class="mint-progress-container">
+                <div class="mint-progress-title">⬡ 正在铸造</div>
+                <div class="mint-progress-bar">
+                    <div class="mint-progress-fill" id="mintProgressFill"></div>
+                </div>
+                <div class="mint-progress-steps">
+                    <div class="mint-progress-step" id="step1">
+                        <div class="mint-progress-step-icon">1</div>
+                        <span>数据验证</span>
+                    </div>
+                    <div class="mint-progress-step" id="step2">
+                        <div class="mint-progress-step-icon">2</div>
+                        <span>智能合约部署</span>
+                    </div>
+                    <div class="mint-progress-step" id="step3">
+                        <div class="mint-progress-step-icon">3</div>
+                        <span>链上确认</span>
+                    </div>
+                    <div class="mint-progress-step" id="step4">
+                        <div class="mint-progress-step-icon">✓</div>
+                        <span>铸造完成</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 对比模式指示器 -->
+        <div class="compare-mode-indicator" id="compareModeIndicator">
+            🔍 对比模式：请选择第二个资产
+        </div>
+        
+        <!-- 对比提示 -->
+        <div class="compare-hint" id="compareHint">
+            💡 提示：按住 Ctrl 键点击两个资产进行对比
+        </div>
+        
+        <!-- 对比面板 -->
+        <div class="compare-panel" id="comparePanel">
+            <div class="compare-panel-header">
+                <div class="compare-panel-title">⬡ 资产对比</div>
+                <button class="compare-panel-close" onclick="closeComparePanel()">×</button>
+            </div>
+            <div class="compare-content" id="compareContent">
+                <!-- 动态生成对比内容 -->
+            </div>
+            <div class="compare-vs">VS</div>
+        </div>
+        
+        <!-- 铸造成功粒子容器 -->
+        <div class="mint-success-particles" id="mintSuccessParticles"></div>
+        
         <!-- 成功动画 -->
         <div class="success-animation" id="successAnimation">
             <div class="success-icon">✓</div>
@@ -1512,6 +3396,9 @@
 
     <!-- STAGE 2: 协作衍生（优化版） -->
     <div class="stage" id="stage2">
+        <!-- 光粒子背景 -->
+        <div class="stage2-particles" id="stage2Particles"></div>
+        
         <div class="top-nav">
             <div class="nav-item" onclick="goTo(0)">开场</div>
             <div class="nav-item" onclick="goTo(1)">资产铸造</div>
@@ -1525,7 +3412,7 @@
             <div class="asset-library">
                 <div class="library-header">
                     <div class="library-title">⬡ 已铸造资产</div>
-                    <div class="library-subtitle">拖拽资产到协作池进行融合</div>
+                    <div class="library-subtitle">拖拽资产到协作池 · 双击查看详情</div>
                 </div>
                 <div class="asset-grid" id="fusionGrid"></div>
             </div>
@@ -1533,14 +3420,32 @@
             <!-- 中央协作池 -->
             <div class="fusion-area">
                 <div class="fusion-pool" id="poolContainer">
+                    <!-- 粒子层 -->
+                    <div class="pool-particles" id="poolParticles"></div>
+                    <!-- 涟漪层 -->
+                    <div class="pool-ripple" id="poolRipple"></div>
                     <div class="pool-content" id="poolContent">
                         <div class="pool-hint" id="poolHint">
                             <div class="pool-hint-icon">⬡</div>
                             <div class="pool-hint-text">协作池</div>
                             <div class="pool-hint-sub">拖拽左侧资产到此处开始融合</div>
                         </div>
+                        <!-- 悬停预览 -->
+                        <div class="pool-hover-preview" id="poolHoverPreview">
+                            <canvas id="hover-preview-canvas" width="150" height="150"></canvas>
+                        </div>
+                        
                         <div class="pool-center-preview" id="poolCenterPreview">
-                            <canvas id="pool-canvas" width="300" height="300"></canvas>
+                            <canvas id="pool-canvas" width="350" height="350"></canvas>
+                        </div>
+                        
+                        <!-- 融合能量指示器 -->
+                        <div class="fusion-energy-indicator" id="fusionEnergyIndicator">
+                            <span>融合能量</span>
+                            <div class="fusion-energy-bar">
+                                <div class="fusion-energy-fill" id="fusionEnergyFill" style="width: 0%;"></div>
+                            </div>
+                            <span id="fusionEnergyPercent">0%</span>
                         </div>
                     </div>
                     
@@ -1566,23 +3471,104 @@
             </div>
             
             <!-- 右侧融合权属 -->
-            <div class="ownership-panel">
+            <div class="ownership-panel fusion-ownership">
                 <div class="panel-title">⬡ 融合权属</div>
                 <div id="fusionPanel">
-                    <div class="section-label">已选资产</div>
-                    <div class="selected-tags" id="selectedTags">
-                        <div style="color: rgba(150,170,200,0.5); font-size: 12px; padding: 10px 0;">暂无选中资产</div>
+                    <!-- 融合前状态 -->
+                    <div id="fusionBefore">
+                        <!-- 选中资产3D预览 -->
+                        <div class="selected-asset-preview" id="selectedAssetPreview">
+                            <div class="preview-placeholder">拖拽资产查看3D预览</div>
+                        </div>
+                        
+                        <!-- 权益环形图 -->
+                        <div class="share-chart-container">
+                            <svg class="share-donut" viewBox="0 0 120 120">
+                                <circle class="donut-bg" cx="60" cy="60" r="50"/>
+                                <g id="donutSegments"></g>
+                            </svg>
+                            <div class="donut-center">
+                                <div class="donut-num" id="donutPercent">0%</div>
+                                <div class="donut-label">总权益</div>
+                            </div>
+                        </div>
+                        
+                        <div class="section-label">已选资产</div>
+                        <div class="selected-tags" id="selectedTags">
+                            <div style="color: rgba(150,170,200,0.5); font-size: 12px; padding: 10px 0;">暂无选中资产</div>
+                        </div>
+                        
+                        <div class="section-label">权益分配</div>
+                        <div id="shareList" class="share-list-scrollable"></div>
+                        
+                        <div class="section-label">融合规则</div>
+                        <div class="rule-box fusion-rules-compact">
+                            • 所有选中资产的权属将合并<br>
+                            • 收益按资产类型权重自动分配<br>
+                            • 继承上游资产全部规则
+                        </div>
                     </div>
                     
-                    <div class="section-label">权益分配</div>
-                    <div id="shareList"></div>
-                    
-                    <div class="section-label">融合规则</div>
-                    <div class="rule-box">
-                        • 所有选中资产的权属将合并<br>
-                        • 收益按资产类型权重自动分配<br>
-                        • 继承上游资产全部规则<br>
-                        • 里程碑触发即时结算
+                    <!-- 融合后状态（初始隐藏）-->
+                    <div id="fusionAfter" style="display: none;">
+                        <!-- 新资产3D预览 -->
+                        <div class="fusion-result-preview">
+                            <canvas id="neuroblok-canvas" width="120" height="120"></canvas>
+                        </div>
+                        
+                        <!-- 新资产信息 -->
+                        <div class="fusion-result-info">
+                            <div class="fusion-result-name">NeuroBlok</div>
+                            <div class="fusion-result-meta">融合资产 v2.0</div>
+                            <div class="fusion-result-value">估值: <span id="resultValue">0</span> ETH</div>
+                        </div>
+                        
+                        <!-- 整合的权属详情 -->
+                        <div class="fusion-ownership-details">
+                            <div class="section-label">来源资产与权益分配 (<span id="resultSourceCount">0</span>个)</div>
+                            <div id="resultOwnershipList" class="result-ownership-list"></div>
+                        </div>
+                        
+                        <!-- 权属规则 -->
+                        <div class="fusion-rules-section">
+                            <div class="section-label">权属规则</div>
+                            <div class="fusion-rules-content">
+                                <div class="fusion-rule-item">
+                                    <div class="fusion-rule-icon">💰</div>
+                                    <div class="fusion-rule-text">
+                                        <strong>收益分配</strong>
+                                        <span>按权重比例自动分配，里程碑触发即时结算</span>
+                                    </div>
+                                </div>
+                                <div class="fusion-rule-item">
+                                    <div class="fusion-rule-icon">🔄</div>
+                                    <div class="fusion-rule-text">
+                                        <strong>权属继承</strong>
+                                        <span>上游资产规则完全继承，贡献者可追溯</span>
+                                    </div>
+                                </div>
+                                <div class="fusion-rule-item">
+                                    <div class="fusion-rule-icon">📝</div>
+                                    <div class="fusion-rule-text">
+                                        <strong>透明溯源</strong>
+                                        <span>所有权属关系上链存证，永久可查</span>
+                                    </div>
+                                </div>
+                                <div class="fusion-rule-item">
+                                    <div class="fusion-rule-icon">⚡</div>
+                                    <div class="fusion-rule-text">
+                                        <strong>自动执行</strong>
+                                        <span>智能合约自动结算，无需人工干预</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 操作按钮 -->
+                        <div class="fusion-result-actions">
+                            <button class="btn" onclick="resetFusionResult()" style="font-size: 11px; padding: 8px 16px;">继续融合</button>
+                            <button class="btn btn-gold" onclick="goToFinanceFromFusion()" style="font-size: 11px; padding: 8px 16px;">去融资 →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1604,78 +3590,57 @@
             </div>
         </div>
         
-        <!-- 融合成功弹窗 - 详细权属图谱展示 -->
-        <div class="modal-overlay" id="fusionSuccessModal">
-            <div class="fusion-modal" style="max-width: 900px; width: 95%; max-height: 95vh; overflow-y: auto;">
-                <div class="modal-icon" style="font-size: 50px; margin-bottom: 10px;">✨</div>
-                <div class="modal-title">融合成功</div>
-                <div class="modal-subtitle" style="color: rgba(150,170,200,0.7); margin-bottom: 25px;">新资产已生成 | 详细的权属关系图谱</div>
-                
-                <!-- 融合资产图谱展示 -->
-                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,215,0,0.2); border-radius: 20px; padding: 30px; margin-bottom: 25px; position: relative; min-height: 300px;" id="fusionGraphContainer">
-                    <!-- 中心融合资产 -->
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10;">
-                        <div style="font-size: 80px; margin-bottom: 10px; animation: pulse 2s infinite; filter: drop-shadow(0 0 30px rgba(255,215,0,0.6));">✨</div>
-                        <div style="font-size: 22px; color: #ffd700; font-family: Orbitron; letter-spacing: 2px;">NeuroBlok</div>
-                        <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">融合资产 v2.0</div>
-                        <div style="font-size: 14px; color: #00f0ff; margin-top: 8px;">估值: <span id="fusionValue">5.0</span> ETH</div>
-                    </div>
-                    
-                    <!-- 来源资产将通过JS动态生成 -->
-                    <div id="fusionSourcesContainer"></div>
-                    
-                    <!-- 连线SVG -->
-                    <svg id="fusionLines" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></svg>
+        <!-- Toast 容器 -->
+        <div class="toast-container" id="toastContainer"></div>
+        
+        <!-- 资产详情弹窗 -->
+        <div class="asset-detail-modal" id="assetDetailModal" onclick="closeAssetDetail(event)">
+            <div class="asset-detail-content" onclick="event.stopPropagation()">
+                <button class="asset-detail-close" onclick="closeAssetDetail()">×</button>
+                <div class="asset-detail-preview">
+                    <canvas id="asset-detail-canvas" width="150" height="150"></canvas>
                 </div>
-                
-                <!-- 权属流转流程 -->
-                <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
-                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(0,240,255,0.1);">
-                        <div style="font-size: 30px; margin-bottom: 8px;">🧬</div>
-                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">来源资产</div>
-                        <div style="font-size: 14px; color: #00f0ff; font-family: Orbitron;" id="sourceCount">2个</div>
-                    </div>
-                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(255,215,0,0.2);">
-                        <div style="font-size: 30px; margin-bottom: 8px;">🔄</div>
-                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">融合规则</div>
-                        <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">加权合并</div>
-                    </div>
-                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(255,215,0,0.2);">
-                        <div style="font-size: 30px; margin-bottom: 8px;">✨</div>
-                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">生成资产</div>
-                        <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">NeuroBlok</div>
-                    </div>
-                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(0,255,136,0.1);">
-                        <div style="font-size: 30px; margin-bottom: 8px;">📝</div>
-                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">权属继承</div>
-                        <div style="font-size: 14px; color: #00ff88; font-family: Orbitron;">100%</div>
-                    </div>
+                <div class="asset-detail-header">
+                    <div class="asset-detail-name" id="assetDetailName">--</div>
+                    <div class="asset-detail-id" id="assetDetailId">--</div>
                 </div>
-                
-                <!-- 详细权属列表 -->
-                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: left;">
-                    <div style="font-size: 12px; color: rgba(150,170,200,0.8); margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;">权益分配明细</div>
-                    <div id="fusionDetailList" style="display: flex; flex-direction: column; gap: 10px;">
-                        <!-- 动态生成 -->
+                <div class="asset-detail-section">
+                    <div class="asset-detail-label">资产描述</div>
+                    <div class="asset-detail-value" id="assetDetailDesc">--</div>
+                </div>
+                <div class="asset-detail-section">
+                    <div class="asset-detail-label">贡献者</div>
+                    <div class="asset-detail-contributors" id="assetDetailContributors"></div>
+                </div>
+                <div class="asset-detail-section">
+                    <div class="asset-detail-label">权益分配规则</div>
+                    <div class="asset-detail-value" id="assetDetailRules">--</div>
+                </div>
+                <div class="asset-detail-section">
+                    <div class="asset-detail-label">元数据</div>
+                    <div class="asset-detail-value">
+                        <div>创建时间: <span id="assetDetailCreated">--</span></div>
+                        <div>估值: <span id="assetDetailValue">--</span> ETH</div>
+                        <div>状态: <span id="assetDetailStatus">--</span></div>
                     </div>
-                </div>
-                
-                <!-- 融合规则说明 -->
-                <div style="background: rgba(255,215,0,0.08); border-left: 3px solid #ffd700; border-radius: 0 10px 10px 0; padding: 15px; margin-bottom: 25px; text-align: left; font-size: 12px; color: rgba(220,230,240,0.9); line-height: 1.6;">
-                    <strong style="color: #ffd700;">融合规则说明：</strong><br>
-                    • 所有选中资产的权属将合并至新资产<br>
-                    • 收益权按资产类型权重自动分配<br>
-                    • 上游资产的全部规则被继承<br>
-                    • 里程碑触发时自动结算收益
-                </div>
-                
-                <div class="modal-actions">
-                    <button class="btn" onclick="closeFusionSuccessModal()" style="border-color: rgba(0,240,255,0.4); color: #00f0ff;">返回协作池</button>
-                    <button class="btn btn-gold" onclick="goToFinanceFromFusion()">进入融资决策 →</button>
                 </div>
             </div>
         </div>
+        
+        <!-- 撤销按钮 -->
+        <button class="undo-btn" id="undoBtn" onclick="undoLastAction()">
+            <span>↩</span> 撤销删除
+        </button>
+        
+        <!-- 快捷键提示 -->
+        <div class="keyboard-hint" id="keyboardHint" style="display: none;">
+            <span><kbd>←</kbd> <kbd>→</kbd> 切换页面</span>
+            <span><kbd>Delete</kbd> 清空协作池</span>
+            <span><kbd>Enter</kbd> 确认融合</span>
+            <span><kbd>Esc</kbd> 关闭弹窗</span>
+        </div>
     </div>
+</div>
 
     <!-- STAGE 3: 融资决策（完整版） -->
     <div class="stage" id="stage3">
@@ -2135,10 +4100,18 @@
               contributors: [{name: 'Author Team', share: '60%'}, {name: 'Journal DAO', share: '25%'}, {name: 'Peer Reviewers', share: '15%'}],
               rules: '引用即产生微支付<br>数据复用需引用原始论文<br>开放获取版本收益归作者',
               created: '2024.02.28' },
-            { id: 'NeuroBlok', name: '协作成果', icon: '✨', color: '#ffd700', colorHex: 0xffd700, type: 'collaboration', weight: 2.5, minted: false,
-              contributors: [{name: 'NeuroDAO', share: '40%'}, {name: 'Core Contributors', share: '35%'}, {name: 'Community Treasury', share: '25%'}],
-              rules: '重大决策需DAO投票<br>代码贡献与治理权重挂钩<br>新成员加入需现有成员背书',
-              created: '2024.03.20' }
+            // 第一阶段融合资产：结构筛选
+            { id: 'ScreeningBlok', name: '结构筛选', icon: '🔬', color: '#00d2ff', colorHex: 0x00d2ff, type: 'screening', weight: 3.0, minted: false,
+              contributors: [], rules: '', created: '', 
+              description: '由蛋白质结构与虚拟筛选融合而成，锁定先导化合物' },
+            // 第二阶段融合资产：化学优化
+            { id: 'OptimizationBlok', name: '化学优化', icon: '⚗️', color: '#00ff88', colorHex: 0x00ff88, type: 'optimization', weight: 3.5, minted: false,
+              contributors: [], rules: '', created: '',
+              description: '由化合物库与实验数据融合而成，优化分子性质' },
+            // 第三阶段融合资产：临床候选
+            { id: 'CandidateBlok', name: '临床候选', icon: '💊', color: '#ff9500', colorHex: 0xff9500, type: 'candidate', weight: 4.0, minted: false,
+              contributors: [], rules: '', created: '',
+              description: '由筛选结果与临床数据融合而成，形成新药候选' }
         ];
 
         let selectedAsset = null;
@@ -2149,7 +4122,23 @@
         let modalScene, modalCamera, modalRenderer, modalMolecule;
         let fusionScene, fusionCamera, fusionRenderer, fusionMolecule;
         let poolScene, poolCamera, poolRenderer, poolMolecule;
-        const cardScenes = new Map(), cardRenderers = new Map(), cardMolecules = new Map();
+        const cardScenes = new Map(), cardRenderers = new Map(), cardMolecules = new Map(), cardCameras = new Map();
+        
+        // 清理卡片渲染器，限制数量防止WebGL上下文过多
+        function cleanupCardRenderers(keepCount = 4) {
+            if (cardRenderers.size <= keepCount) return;
+            
+            const entries = Array.from(cardRenderers.entries());
+            const toRemove = entries.slice(0, entries.length - keepCount);
+            
+            toRemove.forEach(([id, renderer]) => {
+                renderer.dispose();
+                cardRenderers.delete(id);
+                cardScenes.delete(id);
+                cardMolecules.delete(id);
+                cardCameras.delete(id);
+            });
+        }
 
         // ===== 创建3D分子（不同形状）=====
         function createMolecule(type, color, scale = 1) {
@@ -2325,7 +4314,7 @@
                 case 'drug':
                     // 新药 - 胶囊形状 + 分子环绕
                     // 胶囊主体
-                    const capsuleGroup = new THREE.Group();
+                    const drugCapsuleGroup = new THREE.Group();
                     
                     // 上半球
                     const topSphere = new THREE.Mesh(
@@ -2338,7 +4327,7 @@
                         })
                     );
                     topSphere.position.y = 0.6 * scale;
-                    capsuleGroup.add(topSphere);
+                    drugCapsuleGroup.add(topSphere);
                     
                     // 下半球
                     const bottomSphere = new THREE.Mesh(
@@ -2351,7 +4340,7 @@
                         })
                     );
                     bottomSphere.position.y = -0.6 * scale;
-                    capsuleGroup.add(bottomSphere);
+                    drugCapsuleGroup.add(bottomSphere);
                     
                     // 中间圆柱
                     const cylinder = new THREE.Mesh(
@@ -2369,7 +4358,7 @@
                             })
                         ]
                     );
-                    capsuleGroup.add(cylinder);
+                    drugCapsuleGroup.add(cylinder);
                     
                     // 环绕的小分子
                     for (let i = 0; i < 12; i++) {
@@ -2388,10 +4377,10 @@
                             Math.sin(i * 0.5) * 0.5 * scale,
                             Math.sin(angle) * orbitRadius
                         );
-                        capsuleGroup.add(smallSphere);
+                        drugCapsuleGroup.add(smallSphere);
                     }
                     
-                    group.add(capsuleGroup);
+                    group.add(drugCapsuleGroup);
                     break;
                     
                 case 'patent':
@@ -2508,6 +4497,123 @@
                     }
                     break;
                     
+                case 'screening':
+                    // 结构筛选 - 交叉的环结构
+                    const ring1 = new THREE.Mesh(
+                        new THREE.TorusGeometry(0.7 * scale, 0.15 * scale, 8, 32),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.5 })
+                    );
+                    ring1.rotation.x = Math.PI / 2;
+                    group.add(ring1);
+                    
+                    const ring2 = new THREE.Mesh(
+                        new THREE.TorusGeometry(0.7 * scale, 0.15 * scale, 8, 32),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.5 })
+                    );
+                    ring2.rotation.y = Math.PI / 2;
+                    group.add(ring2);
+                    
+                    // 中心球体
+                    const centerCore = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.25 * scale, 16, 16),
+                        new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: color, emissiveIntensity: 0.8 })
+                    );
+                    group.add(centerCore);
+                    break;
+                    
+                case 'optimization':
+                    // 化学优化 - 八面体核心+延伸臂
+                    const octaGeo = new THREE.OctahedronGeometry(0.6 * scale, 0);
+                    const octaMesh = new THREE.Mesh(
+                        octaGeo,
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.4, transparent: true, opacity: 0.9 })
+                    );
+                    group.add(octaMesh);
+                    
+                    // 四个延伸臂
+                    for (let i = 0; i < 4; i++) {
+                        const arm = new THREE.Mesh(
+                            new THREE.CylinderGeometry(0.08 * scale, 0.08 * scale, 0.8 * scale, 8),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.6 })
+                        );
+                        const angle = (i / 4) * Math.PI * 2;
+                        arm.position.set(Math.cos(angle) * 0.8 * scale, 0, Math.sin(angle) * 0.8 * scale);
+                        arm.rotation.z = Math.PI / 2;
+                        arm.rotation.y = angle;
+                        group.add(arm);
+                        
+                        // 臂端小球
+                        const armEnd = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.12 * scale, 8, 8),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: color, emissiveIntensity: 0.8 })
+                        );
+                        armEnd.position.set(Math.cos(angle) * 1.2 * scale, 0, Math.sin(angle) * 1.2 * scale);
+                        group.add(armEnd);
+                    }
+                    break;
+                    
+                case 'candidate':
+                    // 临床候选 - 复杂的胶囊/药丸形状 (使用圆柱+半球组合，兼容r128)
+                    const capsuleGroup = new THREE.Group();
+                    
+                    const capsuleMaterial = new THREE.MeshPhongMaterial({ 
+                        color: color, 
+                        emissive: color, 
+                        emissiveIntensity: 0.3 
+                    });
+                    
+                    // 胶囊主体 - 圆柱
+                    const capsuleCylinder = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.5 * scale, 0.5 * scale, 1.0 * scale, 16),
+                        capsuleMaterial
+                    );
+                    capsuleCylinder.rotation.z = Math.PI / 2;
+                    capsuleGroup.add(capsuleCylinder);
+                    
+                    // 左半球
+                    const leftHemi = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.5 * scale, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+                        capsuleMaterial
+                    );
+                    leftHemi.rotation.z = Math.PI / 2;
+                    leftHemi.position.x = -0.5 * scale;
+                    capsuleGroup.add(leftHemi);
+                    
+                    // 右半球
+                    const rightHemi = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.5 * scale, 16, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+                        capsuleMaterial
+                    );
+                    rightHemi.rotation.z = Math.PI / 2;
+                    rightHemi.position.x = 0.5 * scale;
+                    capsuleGroup.add(rightHemi);
+                    
+                    // 外层光环
+                    const glowRing = new THREE.Mesh(
+                        new THREE.TorusGeometry(0.9 * scale, 0.05 * scale, 8, 64),
+                        new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.4 })
+                    );
+                    glowRing.rotation.x = Math.PI / 2;
+                    capsuleGroup.add(glowRing);
+                    
+                    // 装饰球
+                    for (let i = 0; i < 6; i++) {
+                        const deco = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.1 * scale, 8, 8),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: color, emissiveIntensity: 1 })
+                        );
+                        const angle = (i / 6) * Math.PI * 2;
+                        deco.position.set(
+                            Math.cos(angle) * 0.7 * scale,
+                            Math.sin(angle) * 0.3 * scale,
+                            0
+                        );
+                        capsuleGroup.add(deco);
+                    }
+                    
+                    group.add(capsuleGroup);
+                    break;
+                    
                 default:
                     // 默认螺旋
                     for (let i = 0; i < 15; i++) {
@@ -2530,11 +4636,30 @@
         // 初始化预览场景
         function initPreviewScene() {
             const canvas = document.getElementById('preview-canvas');
+            if (!canvas) return;
+            
+            // 强制重置canvas
+            canvas.width = 440;
+            canvas.height = 440;
+            canvas.style.background = 'transparent';
+            canvas.style.display = 'block';
+            
+            // 清理之前的场景
+            previewRenderer = null;
+            previewScene = null;
+            previewMolecule = null;
+            
             previewScene = new THREE.Scene();
             previewCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
             previewCamera.position.z = 7;
-            previewRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-            previewRenderer.setSize(380, 380);
+            previewRenderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true, 
+                antialias: true,
+                powerPreference: "high-performance"
+            });
+            previewRenderer.setSize(440, 440);
+            previewRenderer.setClearColor(0x000000, 0);
             previewScene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const pl = new THREE.PointLight(0x00f0ff, 1.5, 100);
             pl.position.set(8, 8, 8);
@@ -2551,7 +4676,14 @@
                 previewMolecule.rotation.y += 0.005;
                 previewMolecule.rotation.x += 0.003;
             }
-            if (previewRenderer) previewRenderer.render(previewScene, previewCamera);
+            if (previewRenderer && previewScene && previewCamera) {
+                try {
+                    previewRenderer.render(previewScene, previewCamera);
+                } catch(e) {
+                    // 渲染失败时停止动画
+                    console.log('Preview render error:', e);
+                }
+            }
         }
 
         // 初始化弹窗场景
@@ -2578,25 +4710,43 @@
         // 初始化协作池场景
         function initPoolScene() {
             const canvas = document.getElementById('pool-canvas');
+            if (!canvas) return;
+            
+            // 如果已经初始化过，不再重复初始化
+            if (poolRenderer) return;
+            
             poolScene = new THREE.Scene();
             poolCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
             poolCamera.position.z = 6;
-            poolRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            poolRenderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true, 
+                antialias: true
+            });
             poolRenderer.setSize(300, 300);
+            poolRenderer.setClearColor(0x000000, 0);
             poolScene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const pl = new THREE.PointLight(0xffd700, 1.5, 100);
             pl.position.set(5, 5, 5);
             poolScene.add(pl);
+            
             animatePool();
         }
 
         function animatePool() {
+            if (!poolRenderer || !poolScene || !poolCamera) return;
+            
             requestAnimationFrame(animatePool);
             if (poolMolecule) {
                 poolMolecule.rotation.y += 0.008;
                 poolMolecule.rotation.x += 0.005;
             }
-            if (poolRenderer && poolCamera) poolRenderer.render(poolScene, poolCamera);
+            try {
+                poolRenderer.render(poolScene, poolCamera);
+            } catch(e) {
+                // 渲染失败时停止动画
+                console.log('Pool render error:', e);
+            }
         }
 
         // 初始化卡片3D场景
@@ -2615,47 +4765,42 @@
             cardScenes.set(asset.id, scene);
             cardRenderers.set(asset.id, renderer);
             cardMolecules.set(asset.id, molecule);
+            cardCameras.set(asset.id, camera);
         }
 
-        // 渲染卡片动画
+        // 渲染卡片动画（限制渲染器数量，防止WebGL上下文过多）
+        let cardRenderCount = 0;
         function animateCards() {
-            cardMolecules.forEach((molecule) => {
+            // 限制同时渲染的卡片数量
+            const maxCardsToRender = 8;
+            let rendered = 0;
+            
+            cardMolecules.forEach((molecule, id) => {
+                if (rendered >= maxCardsToRender) return;
+                
                 molecule.rotation.y += 0.012;
                 molecule.rotation.x += 0.006;
-            });
-            cardScenes.forEach((scene, id) => {
+                
+                const scene = cardScenes.get(id);
                 const renderer = cardRenderers.get(id);
-                const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-                camera.position.z = 5;
-                renderer.render(scene, camera);
+                const camera = cardCameras.get(id);
+                
+                if (renderer && scene && camera) {
+                    try {
+                        renderer.render(scene, camera);
+                        rendered++;
+                    } catch (e) {
+                        // 忽略渲染错误
+                    }
+                }
             });
+            
             requestAnimationFrame(animateCards);
         }
 
-        // 生成资产卡片
+        // 生成资产卡片（使用新的过滤渲染函数）
         function generateAssetCards() {
-            const grid = document.getElementById('assetGrid');
-            grid.innerHTML = '';
-            assets.filter(a => a.id !== 'NeuroBlok').forEach((asset, index) => {
-                const card = document.createElement('div');
-                card.className = 'asset-card' + (asset.minted ? ' minted' : '');
-                card.dataset.id = asset.id;
-                card.innerHTML = `
-                    <div class="mol-canvas-container">
-                        <canvas class="mol-canvas" id="canvas-${asset.id}"></canvas>
-                    </div>
-                    <div class="asset-id">${asset.id}</div>
-                    <div class="asset-name">${asset.name}</div>
-                `;
-                // 所有资产都可以点击查看详情
-                card.addEventListener('click', () => selectAsset(asset));
-                grid.appendChild(card);
-                setTimeout(() => {
-                    const canvas = document.getElementById(`canvas-${asset.id}`);
-                    if (canvas) initCardScene(asset, canvas);
-                }, index * 100);
-            });
-            setTimeout(() => animateCards(), 1000);
+            renderFilteredAssets();
         }
 
         // 选择资产
@@ -2735,17 +4880,10 @@
 
         function confirmMint() {
             if (!selectedAsset) return;
-            selectedAsset.minted = true;
-            const card = document.querySelector(`[data-id="${selectedAsset.id}"]`);
-            card.classList.add('minted');
-            card.classList.remove('selected');
-            const btn = document.getElementById('mainMintBtn');
-            btn.textContent = '✓ 已铸造';
-            btn.disabled = true;
-            updateProgress();
-            document.getElementById('successAnimation').classList.add('active');
-            setTimeout(() => document.getElementById('successAnimation').classList.remove('active'), 1000);
             closeModal();
+            showMintProgress(() => {
+                completeMint(selectedAsset);
+            });
         }
 
         function updateProgress() {
@@ -2754,25 +4892,471 @@
             document.getElementById('progressFill').style.width = `${(minted / 8) * 100}%`;
         }
 
+        // ========== 阶段1优化功能 ==========
+
+        // 搜索和筛选
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        function filterAssets() {
+            searchQuery = document.getElementById('assetSearchBox').value.toLowerCase();
+            renderFilteredAssets();
+        }
+
+        function setFilter(type) {
+            currentFilter = type;
+            // 更新标签样式
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.filter === type);
+            });
+            renderFilteredAssets();
+        }
+
+        function renderFilteredAssets() {
+            const grid = document.getElementById('assetGrid');
+            grid.innerHTML = '';
+
+            // 过滤资产
+            let filtered = assets.filter(a =>
+                !['ScreeningBlok', 'OptimizationBlok', 'CandidateBlok', 'NeuroBlok'].includes(a.id)
+            );
+
+            // 按类型筛选
+            if (currentFilter !== 'all') {
+                const typeMap = {
+                    'data': ['data', 'bio'],
+                    'algorithm': ['algorithm', 'tool'],
+                    'result': ['result', 'patent', 'drug']
+                };
+                const allowedTypes = typeMap[currentFilter] || [currentFilter];
+                filtered = filtered.filter(a => allowedTypes.includes(a.type));
+            }
+
+            // 按搜索词筛选
+            if (searchQuery) {
+                filtered = filtered.filter(a =>
+                    a.id.toLowerCase().includes(searchQuery) ||
+                    a.name.toLowerCase().includes(searchQuery) ||
+                    (a.description && a.description.toLowerCase().includes(searchQuery))
+                );
+            }
+
+            // 渲染卡片
+            filtered.forEach((asset, index) => {
+                const card = document.createElement('div');
+                card.className = 'asset-card' + (asset.minted ? ' minted' : '');
+                card.dataset.id = asset.id;
+                card.innerHTML = `
+                    <div class="mol-canvas-container">
+                        <canvas class="mol-canvas" id="canvas-${asset.id}"></canvas>
+                    </div>
+                    <div class="asset-id">${asset.id}</div>
+                    <div class="asset-name">${asset.name}</div>
+                `;
+
+                // 点击选择
+                card.addEventListener('click', (e) => handleAssetClick(asset, e));
+                // 双击快捷铸造
+                card.addEventListener('dblclick', () => quickMint(asset));
+
+                grid.appendChild(card);
+                setTimeout(() => {
+                    const canvas = document.getElementById(`canvas-${asset.id}`);
+                    if (canvas) initCardScene(asset, canvas);
+                }, index * 50);
+            });
+
+            setTimeout(() => animateCards(), 500);
+        }
+
+        // 对比模式
+        let compareMode = false;
+        let compareSelection = [];
+
+        function handleAssetClick(asset, e) {
+            // Ctrl+点击进入对比模式
+            if (e.ctrlKey || e.metaKey) {
+                toggleCompareSelection(asset);
+                return;
+            }
+
+            // 普通点击选择
+            if (compareMode) {
+                toggleCompareSelection(asset);
+            } else {
+                selectAsset(asset);
+            }
+        }
+
+        function toggleCompareSelection(asset) {
+            const index = compareSelection.findIndex(a => a.id === asset.id);
+            const card = document.querySelector(`[data-id="${asset.id}"]`);
+
+            if (index > -1) {
+                // 取消选择
+                compareSelection.splice(index, 1);
+                card.classList.remove('compare-selected');
+            } else if (compareSelection.length < 2) {
+                // 添加选择
+                compareSelection.push(asset);
+                card.classList.add('compare-selected');
+            }
+
+            // 更新对比模式状态
+            compareMode = compareSelection.length > 0;
+            document.getElementById('compareModeIndicator').classList.toggle('active', compareMode);
+
+            // 如果选中了两个，显示对比面板
+            if (compareSelection.length === 2) {
+                showComparePanel();
+            }
+        }
+
+        function showComparePanel() {
+            const [asset1, asset2] = compareSelection;
+            const content = document.getElementById('compareContent');
+
+            content.innerHTML = `
+                <div class="compare-item">
+                    <div class="compare-item-preview" style="border-color: ${asset1.color}40;">
+                        <canvas id="compare-canvas-1" width="120" height="120"></canvas>
+                    </div>
+                    <div class="compare-item-name" style="color: ${asset1.color};">${asset1.name}</div>
+                    <div class="compare-item-id">${asset1.id}</div>
+                    <div class="compare-item-value">${asset1.value} ETH</div>
+                    <div style="margin-top: 15px; font-size: 11px; color: rgba(150,170,200,0.7);">
+                        <div>类型: ${asset1.type}</div>
+                        <div>权重: ${asset1.weight}</div>
+                        <div style="margin-top: 8px;">${asset1.contributors.map(c => `${c.name}: ${c.share}`).join('<br>')}</div>
+                    </div>
+                </div>
+                <div class="compare-item">
+                    <div class="compare-item-preview" style="border-color: ${asset2.color}40;">
+                        <canvas id="compare-canvas-2" width="120" height="120"></canvas>
+                    </div>
+                    <div class="compare-item-name" style="color: ${asset2.color};">${asset2.name}</div>
+                    <div class="compare-item-id">${asset2.id}</div>
+                    <div class="compare-item-value">${asset2.value} ETH</div>
+                    <div style="margin-top: 15px; font-size: 11px; color: rgba(150,170,200,0.7);">
+                        <div>类型: ${asset2.type}</div>
+                        <div>权重: ${asset2.weight}</div>
+                        <div style="margin-top: 8px;">${asset2.contributors.map(c => `${c.name}: ${c.share}`).join('<br>')}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('comparePanel').classList.add('active');
+
+            // 初始化对比预览
+            setTimeout(() => {
+                initComparePreview(asset1, 'compare-canvas-1');
+                initComparePreview(asset2, 'compare-canvas-2');
+            }, 100);
+        }
+
+        function initComparePreview(asset, canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 5;
+
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(120, 120);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const light = new THREE.PointLight(asset.colorHex, 1, 100);
+            light.position.set(5, 5, 5);
+            scene.add(light);
+
+            const molecule = createMolecule(asset.type, asset.colorHex, 0.6);
+            scene.add(molecule);
+
+            function animate() {
+                if (!document.getElementById(canvasId)) return;
+                requestAnimationFrame(animate);
+                molecule.rotation.y += 0.01;
+                molecule.rotation.x += 0.005;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        function closeComparePanel() {
+            document.getElementById('comparePanel').classList.remove('active');
+            // 清除选择
+            compareSelection = [];
+            compareMode = false;
+            document.querySelectorAll('.asset-card.compare-selected').forEach(card => {
+                card.classList.remove('compare-selected');
+            });
+            document.getElementById('compareModeIndicator').classList.remove('active');
+        }
+
+        // 快捷铸造
+        function quickMint(asset) {
+            if (asset.minted) {
+                showToast('info', '提示', '该资产已经铸造过了');
+                return;
+            }
+
+            selectedAsset = asset;
+            selectAsset(asset);
+
+            // 显示进度动画
+            showMintProgress(() => {
+                completeMint(asset);
+            });
+        }
+
+        // 铸造进度动画
+        function showMintProgress(callback) {
+            const overlay = document.getElementById('mintProgressOverlay');
+            const fill = document.getElementById('mintProgressFill');
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+
+            overlay.classList.add('active');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 2;
+                fill.style.width = progress + '%';
+
+                // 更新步骤状态
+                if (progress >= 25) document.getElementById(steps[0]).classList.add('active');
+                if (progress >= 50) document.getElementById(steps[1]).classList.add('active');
+                if (progress >= 75) document.getElementById(steps[2]).classList.add('active');
+                if (progress >= 100) {
+                    document.getElementById(steps[3]).classList.add('active');
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                        // 重置步骤
+                        steps.forEach(id => document.getElementById(id).classList.remove('active'));
+                        fill.style.width = '0%';
+                        if (callback) callback();
+                    }, 500);
+                }
+            }, 30);
+        }
+
+        // 完成铸造
+        function completeMint(asset) {
+            asset.minted = true;
+
+            // 更新UI
+            const card = document.querySelector(`[data-id="${asset.id}"]`);
+            if (card) card.classList.add('minted');
+
+            const btn = document.getElementById('mainMintBtn');
+            btn.textContent = '✓ 已铸造';
+            btn.disabled = true;
+
+            updateProgress();
+
+            // 粒子动画
+            showMintSuccessParticles();
+
+            // 闪光效果
+            const flash = document.createElement('div');
+            flash.className = 'mint-success-flash';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 500);
+
+            showToast('success', '铸造成功', `${asset.name} 已成功铸造！`);
+
+            // 保存进度
+            saveProgress();
+        }
+
+        // 铸造成功粒子动画
+        function showMintSuccessParticles() {
+            const container = document.getElementById('mintSuccessParticles');
+            container.innerHTML = '';
+
+            // 从选中卡片位置发射粒子
+            const card = document.querySelector('.asset-card.selected');
+            const rect = card ? card.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2 };
+
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'success-particle';
+
+                // 随机方向和距离
+                const angle = (Math.PI * 2 * i) / 30;
+                const distance = 100 + Math.random() * 200;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+
+                container.appendChild(particle);
+            }
+
+            // 清理粒子
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 1000);
+        }
+
+        // 3D预览交互
+        let isDraggingPreview = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let previewRotation = { x: 0, y: 0 };
+        let previewScale = 1;
+
+        function initPreviewInteraction() {
+            const canvas = document.getElementById('preview-canvas');
+            if (!canvas) return;
+
+            // 鼠标拖拽旋转
+            canvas.addEventListener('mousedown', (e) => {
+                isDraggingPreview = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+                canvas.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDraggingPreview || !previewMolecule) return;
+
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+
+                previewRotation.y += deltaX * 0.01;
+                previewRotation.x += deltaY * 0.01;
+
+                previewMolecule.rotation.y = previewRotation.y;
+                previewMolecule.rotation.x = previewRotation.x;
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDraggingPreview = false;
+                if (canvas) canvas.style.cursor = 'grab';
+            });
+
+            // 滚轮缩放
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (!previewMolecule) return;
+
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                previewScale *= delta;
+                previewScale = Math.max(0.5, Math.min(2, previewScale));
+
+                previewMolecule.scale.set(previewScale, previewScale, previewScale);
+            });
+
+            canvas.style.cursor = 'grab';
+        }
+
+        // 阶段1键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (currentStage !== 1) return;
+
+            // 空格键快捷铸造
+            if (e.key === ' ' && selectedAsset && !selectedAsset.minted) {
+                e.preventDefault();
+                quickMint(selectedAsset);
+            }
+
+            // ↑↓ 切换选中资产
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                navigateAssets(e.key === 'ArrowDown' ? 1 : -1);
+            }
+        });
+
+        function navigateAssets(direction) {
+            const visibleAssets = assets.filter(a =>
+                !['ScreeningBlok', 'OptimizationBlok', 'CandidateBlok', 'NeuroBlok'].includes(a.id)
+            );
+
+            if (visibleAssets.length === 0) return;
+
+            let currentIndex = 0;
+            if (selectedAsset) {
+                currentIndex = visibleAssets.findIndex(a => a.id === selectedAsset.id);
+            }
+
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = visibleAssets.length - 1;
+            if (newIndex >= visibleAssets.length) newIndex = 0;
+
+            selectAsset(visibleAssets[newIndex]);
+
+            // 滚动到可见
+            const card = document.querySelector(`[data-id="${visibleAssets[newIndex].id}"]`);
+            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // 初始化预览交互
+        setTimeout(initPreviewInteraction, 1000);
+
         // ===== 协作衍生功能 =====
+
+        // 生成阶段2背景粒子
+        function generateStage2Particles() {
+            const container = document.getElementById('stage2Particles');
+            if (!container) {
+                console.log('Stage2 particles container not found');
+                return;
+            }
+            
+            // 清除现有粒子并重新生成（确保动画正常）
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'stage2-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                // 随机起始位置，避免同时从底部出现
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                
+                // 随机颜色：金色或青色
+                const isGold = Math.random() > 0.5;
+                const color = isGold ? '255, 215, 0' : '0, 240, 255';
+                particle.style.background = `rgba(${color}, ${0.4 + Math.random() * 0.4})`;
+                particle.style.boxShadow = `0 0 ${4 + Math.random() * 4}px rgba(${color}, 0.8)`;
+                
+                container.appendChild(particle);
+            }
+        }
         
         // 渲染已铸造资产列表
         function renderFusionGrid() {
             const grid = document.getElementById('fusionGrid');
-            const minted = assets.filter(a => a.minted && a.id !== 'NeuroBlok');
+            // 包含所有已铸造资产（包括 NeuroBlok）
+            const minted = assets.filter(a => a.minted);
             if (minted.length === 0) {
                 grid.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(150,170,200,0.5)">请先铸造资产</div>';
                 return;
             }
-            grid.innerHTML = minted.map(asset => `
-                <div class="asset-card" draggable="true" data-id="${asset.id}" style="border-color:${asset.color}50;">
+            grid.innerHTML = minted.map(asset => {
+                const isNeuroBlok = ['ScreeningBlok', 'OptimizationBlok', 'CandidateBlok', 'NeuroBlok'].includes(asset.id);
+                const fusionBadge = isNeuroBlok ? '<div style="position:absolute;top:-5px;right:-5px;background:' + asset.color + ';color:#000;font-size:9px;padding:2px 6px;border-radius:10px;">融合</div>' : '';
+                const draggableAttr = isNeuroBlok ? '' : 'draggable="true"';
+                return `
+                <div class="asset-card" ${draggableAttr} data-id="${asset.id}" style="border-color:${asset.color}50;position:relative;">
+                    ${fusionBadge}
                     <div class="mol-canvas-container">
                         <canvas class="mol-canvas" id="fcanvas-${asset.id}"></canvas>
                     </div>
                     <div class="asset-id" style="color:${asset.color};text-shadow:0 0 10px ${asset.color}80;">${asset.id}</div>
                     <div class="asset-name">${asset.name}</div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
             
             minted.forEach(asset => {
                 const canvas = document.getElementById(`fcanvas-${asset.id}`);
@@ -2781,11 +5365,96 @@
                 }
             });
             
-            // 添加拖拽事件
-            document.querySelectorAll('#fusionGrid .asset-card').forEach(card => {
+            // 添加拖拽事件（不包括 NeuroBlok）
+            document.querySelectorAll('#fusionGrid .asset-card[draggable="true"]').forEach(card => {
                 card.addEventListener('dragstart', handleDragStart);
                 card.addEventListener('dragend', handleDragEnd);
+                
+                // 添加悬停预览事件
+                card.addEventListener('mouseenter', () => showHoverPreview(card.dataset.id));
+                card.addEventListener('mouseleave', hideHoverPreview);
+                
+                // 添加点击查看详情事件（双击）
+                card.addEventListener('dblclick', () => openAssetDetail(card.dataset.id));
             });
+            
+            // 为融合资产添加点击查看详情（单击）
+            document.querySelectorAll('#fusionGrid .asset-card:not([draggable])').forEach(card => {
+                card.addEventListener('click', () => openAssetDetail(card.dataset.id));
+                card.style.cursor = 'pointer';
+            });
+        }
+        
+        // 悬停预览
+        let hoverPreviewScene, hoverPreviewRenderer, hoverPreviewMolecule;
+        
+        function showHoverPreview(assetId) {
+            // 如果协作池已有资产，不显示悬停预览
+            if (poolAssets.length > 0) return;
+            
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+            
+            const container = document.getElementById('poolHoverPreview');
+            const canvas = document.getElementById('hover-preview-canvas');
+            if (!container || !canvas) return;
+            
+            // 清理旧场景
+            if (hoverPreviewRenderer) {
+                hoverPreviewRenderer.dispose();
+            }
+            
+            // 初始化场景
+            hoverPreviewScene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 4.5;
+            
+            hoverPreviewRenderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true, 
+                antialias: true 
+            });
+            hoverPreviewRenderer.setSize(150, 150);
+            hoverPreviewRenderer.setClearColor(0x000000, 0);
+            
+            // 添加灯光
+            hoverPreviewScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const light = new THREE.PointLight(asset.colorHex, 1.5, 100);
+            light.position.set(4, 4, 6);
+            hoverPreviewScene.add(light);
+            
+            // 创建3D模型
+            hoverPreviewMolecule = createMolecule(asset.type, asset.colorHex, 0.6);
+            hoverPreviewScene.add(hoverPreviewMolecule);
+            
+            // 显示容器
+            container.classList.add('active');
+            document.getElementById('poolCenterPreview').style.opacity = '0.3';
+            
+            // 动画
+            function animate() {
+                if (!hoverPreviewRenderer || !container.classList.contains('active')) return;
+                requestAnimationFrame(animate);
+                if (hoverPreviewMolecule) {
+                    hoverPreviewMolecule.rotation.y += 0.012;
+                    hoverPreviewMolecule.rotation.x += 0.006;
+                }
+                hoverPreviewRenderer.render(hoverPreviewScene, camera);
+            }
+            animate();
+        }
+        
+        function hideHoverPreview() {
+            const container = document.getElementById('poolHoverPreview');
+            if (container) {
+                container.classList.remove('active');
+            }
+            if (poolAssets.length === 0) {
+                document.getElementById('poolCenterPreview').style.opacity = '1';
+            }
+            hoverPreviewRenderer = null;
+            hoverPreviewScene = null;
+            hoverPreviewMolecule = null;
         }
 
         // 拖拽处理
@@ -2819,54 +5488,74 @@
                 e.preventDefault();
                 pool.classList.remove('drag-over');
                 if (draggedAssetId) {
-                    addToPool(draggedAssetId);
+                    addToPool(draggedAssetId, e.clientX, e.clientY);
                     draggedAssetId = null;
                 }
             });
         }
 
         // 添加到协作池
-        function addToPool(id) {
+        function addToPool(id, dropX, dropY) {
             const a = assets.find(x => x.id === id);
-            if (!a || poolAssets.find(p => p.id === id)) return;
+            if (!a || poolAssets.find(p => p.id === id)) {
+                if (poolAssets.find(p => p.id === id)) {
+                    showToast('warning', '重复添加', '该资产已经在协作池中');
+                }
+                return;
+            }
             
             poolAssets.push(a);
             poolCounter++;
             
+            // 显示成功提示
+            showToast('success', '资产已添加', `${a.name} 已加入协作池`);
+            
+            // 触发涟漪效果
+            triggerRipple();
+            
+            // 生成粒子（第一次添加时）
+            if (poolAssets.length === 1) {
+                generatePoolParticles();
+            }
+            
             document.getElementById('poolHint').style.display = 'none';
-            document.getElementById('poolCenterPreview').style.opacity = poolAssets.length >= 2 ? '0' : '1';
+            // 有资产时隐藏中间预览
+            document.getElementById('poolCenterPreview').style.display = poolAssets.length >= 1 ? 'none' : 'flex';
             
             const poolContent = document.getElementById('poolContent');
             const el = document.createElement('div');
             el.className = 'pool-asset';
-            el.id = 'pool-' + poolCounter;
+            el.id = 'pool-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
             el.draggable = true;
             el.style.color = a.color;
             el.style.borderColor = a.color;
             
-            // 优化布局：圆形分布
             const centerX = poolContent.offsetWidth / 2 - 50;
             const centerY = poolContent.offsetHeight / 2 - 50;
             let x, y;
             
-            if (poolAssets.length === 1) {
-                // 第一个放在上方
-                x = centerX;
-                y = centerY - 100;
-            } else if (poolAssets.length === 2) {
-                // 第二个放在右下方
-                x = centerX + 87;
-                y = centerY + 50;
-            } else if (poolAssets.length === 3) {
-                // 第三个放在左下方
-                x = centerX - 87;
-                y = centerY + 50;
+            // 如果有指定投放位置，使用投放位置；否则使用默认布局
+            if (dropX !== undefined && dropY !== undefined) {
+                const poolRect = poolContent.getBoundingClientRect();
+                x = dropX - poolRect.left - 50;
+                y = dropY - poolRect.top - 50;
             } else {
-                // 更多资产时均匀分布
-                const angle = ((poolAssets.length - 1) / 6) * Math.PI * 2 - Math.PI / 2;
-                const radius = 140;
-                x = centerX + Math.cos(angle) * radius;
-                y = centerY + Math.sin(angle) * radius;
+                // 默认圆形布局
+                if (poolAssets.length === 1) {
+                    x = centerX;
+                    y = centerY - 100;
+                } else if (poolAssets.length === 2) {
+                    x = centerX + 87;
+                    y = centerY + 50;
+                } else if (poolAssets.length === 3) {
+                    x = centerX - 87;
+                    y = centerY + 50;
+                } else {
+                    const angle = ((poolAssets.length - 1) / 6) * Math.PI * 2 - Math.PI / 2;
+                    const radius = 140;
+                    x = centerX + Math.cos(angle) * radius;
+                    y = centerY + Math.sin(angle) * radius;
+                }
             }
             
             el.style.left = x + 'px';
@@ -2875,7 +5564,7 @@
             el.innerHTML = `
                 <div class="pool-asset-icon">${a.icon}</div>
                 <div class="pool-asset-id">${a.id}</div>
-                <div class="pool-asset-remove" onclick="event.stopPropagation(); removeFromPool('${a.id}', 'pool-${poolCounter}')">×</div>
+                <div class="pool-asset-remove" onclick="event.stopPropagation(); removeFromPool('${a.id}', '${el.id}')">×</div>
             `;
             
             // 池内拖拽
@@ -2890,6 +5579,7 @@
                 initialTop = parseFloat(el.style.top);
                 el.style.zIndex = 100;
                 el.style.cursor = 'grabbing';
+                el.classList.add('dragging');
             });
             
             document.addEventListener('mousemove', (e) => {
@@ -2906,10 +5596,15 @@
                     isDragging = false;
                     el.style.zIndex = 10;
                     el.style.cursor = 'grab';
+                    el.classList.remove('dragging');
                 }
             });
             
             poolContent.appendChild(el);
+            
+            // 添加磁吸动画
+            el.classList.add('magnetic');
+            setTimeout(() => el.classList.remove('magnetic'), 300);
             
             drawConnections();
             updateFusionPanel();
@@ -2917,33 +5612,59 @@
 
         // 从池移除
         function removeFromPool(id, elId) {
+            const asset = poolAssets.find(p => p.id === id);
+            const el = document.getElementById(elId);
+            
+            // 保存撤销信息
+            if (asset && el) {
+                saveUndoAction('remove', {
+                    asset: asset,
+                    x: parseFloat(el.style.left),
+                    y: parseFloat(el.style.top)
+                });
+            }
+            
             poolAssets = poolAssets.filter(p => p.id !== id);
-            document.getElementById(elId)?.remove();
+            el?.remove();
             
             if (poolAssets.length === 0) {
                 document.getElementById('poolHint').style.display = 'block';
-                document.getElementById('poolCenterPreview').style.opacity = '1';
+                document.getElementById('poolCenterPreview').style.display = 'flex';
+                document.getElementById('poolParticles').innerHTML = '';
             }
-            
-            // 重新编号
-            document.querySelectorAll('.pool-asset').forEach((el, i) => {
-                el.id = 'pool-' + (i + 1);
-            });
-            poolCounter = poolAssets.length;
             
             drawConnections();
             updateFusionPanel();
+            
+            showToast('info', '资产已移除', asset ? `${asset.name} 已从协作池移除` : '资产已移除');
         }
 
         // 清空池
         function clearPool() {
+            // 保存所有资产位置用于撤销
+            const assetsToSave = poolAssets.map((asset, index) => {
+                const el = document.querySelectorAll('.pool-asset')[index];
+                return {
+                    asset: asset,
+                    x: el ? parseFloat(el.style.left) : 0,
+                    y: el ? parseFloat(el.style.top) : 0
+                };
+            });
+            
+            if (assetsToSave.length > 0) {
+                saveUndoAction('clear', assetsToSave);
+            }
+            
             poolAssets = [];
+            poolCounter = 0;
             document.querySelectorAll('.pool-asset').forEach(el => el.remove());
             document.querySelectorAll('.connection-line').forEach(el => el.remove());
+            document.getElementById('poolParticles').innerHTML = '';
             document.getElementById('poolHint').style.display = 'block';
-            document.getElementById('poolCenterPreview').style.opacity = '1';
-            poolCounter = 0;
+            document.getElementById('poolCenterPreview').style.display = 'flex';
             updateFusionPanel();
+            
+            showToast('info', '协作池已清空', `已清空 ${assetsToSave.length} 个资产`);
         }
 
         // 绘制连线
@@ -2955,9 +5676,10 @@
             const cx = poolContent.offsetWidth / 2;
             const cy = poolContent.offsetHeight / 2;
             
-            poolAssets.forEach((a, i) => {
-                const el = document.getElementById('pool-' + (i + 1));
-                if (!el) return;
+            // 获取所有池内资产元素
+            const poolAssetElements = document.querySelectorAll('.pool-asset');
+            
+            poolAssetElements.forEach((el) => {
                 const rect = el.getBoundingClientRect();
                 const prect = poolContent.getBoundingClientRect();
                 const x = rect.left - prect.left + 50;
@@ -2976,7 +5698,42 @@
         function updateFusionPanel() {
             document.getElementById('poolCount').textContent = poolAssets.length;
             
+            // 更新右侧选中资产预览
+            updateSelectedAssetPreview();
+            
             const totalWeight = poolAssets.reduce((s, a) => s + a.weight, 0);
+            
+            // 更新环形图
+            const donutSegments = document.getElementById('donutSegments');
+            const donutPercent = document.getElementById('donutPercent');
+            
+            if (poolAssets.length === 0) {
+                donutSegments.innerHTML = '';
+                donutPercent.textContent = '0%';
+            } else {
+                let currentAngle = 0;
+                const radius = 50;
+                const circumference = 2 * Math.PI * radius;
+                
+                donutSegments.innerHTML = poolAssets.map((a, i) => {
+                    const share = totalWeight > 0 ? (a.weight / totalWeight) : 0;
+                    const segmentLength = share * circumference;
+                    const offset = circumference - segmentLength;
+                    
+                    const segment = `
+                        <circle class="donut-segment" cx="60" cy="60" r="50" 
+                            stroke="${a.color}" 
+                            stroke-dasharray="${segmentLength} ${circumference - segmentLength}"
+                            stroke-dashoffset="${-currentAngle}"
+                            data-asset="${a.id}"
+                        />
+                    `;
+                    currentAngle += segmentLength;
+                    return segment;
+                }).join('');
+                
+                donutPercent.textContent = '100%';
+            }
             
             const tagsEl = document.getElementById('selectedTags');
             if (poolAssets.length === 0) {
@@ -2989,6 +5746,7 @@
                 ).join('');
             }
             
+            // 使用新的进度条样式
             const shareList = document.getElementById('shareList');
             if (poolAssets.length === 0) {
                 shareList.innerHTML = '';
@@ -2996,15 +5754,14 @@
                 shareList.innerHTML = poolAssets.map(a => {
                     const share = totalWeight > 0 ? ((a.weight / totalWeight) * 100) : 0;
                     return `
-                        <div class="dist-item" style="border-color:${a.color};">
-                            <div class="dist-icon">${a.icon}</div>
-                            <div class="dist-info">
-                                <div class="dist-name">${a.name}</div>
-                                <div class="dist-bar-bg">
-                                    <div class="dist-bar-fill" style="width:${share}%;background:${a.color};"></div>
-                                </div>
+                        <div class="share-progress-item">
+                            <div class="share-progress-header">
+                                <span class="share-progress-name">${a.icon} ${a.name}</span>
+                                <span class="share-progress-value">${share.toFixed(0)}%</span>
                             </div>
-                            <div class="dist-share">${share.toFixed(0)}%</div>
+                            <div class="share-progress-bar">
+                                <div class="share-progress-fill" style="width:${share}%;background:${a.color};"></div>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -3015,7 +5772,703 @@
             const clearBtn = document.getElementById('clearBtn');
             clearBtn.style.opacity = poolAssets.length > 0 ? '1' : '0';
             clearBtn.style.pointerEvents = poolAssets.length > 0 ? 'auto' : 'none';
+            
+            // 更新融合能量指示器
+            const energyIndicator = document.getElementById('fusionEnergyIndicator');
+            const energyFill = document.getElementById('fusionEnergyFill');
+            const energyPercent = document.getElementById('fusionEnergyPercent');
+            
+            if (poolAssets.length > 0) {
+                energyIndicator.classList.add('active');
+                // 能量百分比：2个资产满能量，超过2个额外加成
+                let energy = Math.min(poolAssets.length / 2 * 100, 100);
+                if (poolAssets.length > 2) energy = 100;
+                energyFill.style.width = energy + '%';
+                energyPercent.textContent = Math.round(energy) + '%';
+            } else {
+                energyIndicator.classList.remove('active');
+            }
         }
+
+        // 确定应该生成哪个融合资产
+        function determineFusionAsset(poolAssets) {
+            const ids = poolAssets.map(a => a.id).sort().join(',');
+            
+            // 第一阶段：结构筛选 - PDB + VSCREEN
+            if (ids.includes('PDB-001') && ids.includes('VSCREEN-004')) {
+                return 'ScreeningBlok';
+            }
+            
+            // 第二阶段：化学优化 - CHEM + ASSAY
+            if (ids.includes('CHEM-002') && ids.includes('ASSAY-005')) {
+                return 'OptimizationBlok';
+            }
+            
+            // 第三阶段：临床候选 - CLINICAL 必须包含，且至少2个其他资产
+            if (ids.includes('CLINICAL-006') && poolAssets.length >= 3) {
+                return 'CandidateBlok';
+            }
+            
+            // 默认：如果包含临床数据但资产不足3个，仍是候选
+            if (ids.includes('CLINICAL-006')) {
+                return 'CandidateBlok';
+            }
+            
+            // 如果没有匹配特定组合，根据权重最高的资产决定
+            const maxWeight = Math.max(...poolAssets.map(a => a.weight));
+            if (maxWeight >= 2.0) {
+                return 'CandidateBlok';
+            } else if (maxWeight >= 1.5) {
+                return 'OptimizationBlok';
+            }
+            
+            return 'ScreeningBlok';
+        }
+
+        // 生成粒子
+        function generatePoolParticles() {
+            const container = document.getElementById('poolParticles');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            // 根据资产数量增加粒子数量
+            const particleCount = 15 + poolAssets.length * 8;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'pool-particle';
+                
+                // 随机位置（集中在中心区域）
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 150;
+                const x = 50 + Math.cos(angle) * distance / 4;
+                const y = 50 + Math.sin(angle) * distance / 4;
+                
+                particle.style.left = x + '%';
+                particle.style.top = y + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (3 + Math.random() * 2) + 's';
+                
+                // 如果有资产，使用资产颜色
+                if (poolAssets.length > 0) {
+                    const randomAsset = poolAssets[Math.floor(Math.random() * poolAssets.length)];
+                    particle.style.background = randomAsset.color;
+                    particle.style.boxShadow = `0 0 6px ${randomAsset.color}`;
+                }
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // 更新右侧选中资产预览
+        let selectedAssetPreviewScene, selectedAssetPreviewRenderer, selectedAssetPreviewMolecule;
+        
+        function updateSelectedAssetPreview() {
+            const container = document.getElementById('selectedAssetPreview');
+            if (!container) return;
+            
+            // 如果池中没有资产，显示占位符
+            if (poolAssets.length === 0) {
+                container.innerHTML = '<div class="preview-placeholder">拖拽资产查看3D预览</div>';
+                selectedAssetPreviewRenderer = null;
+                selectedAssetPreviewScene = null;
+                selectedAssetPreviewMolecule = null;
+                return;
+            }
+            
+            // 显示最新添加的资产预览
+            const lastAsset = poolAssets[poolAssets.length - 1];
+            
+            // 清理旧场景
+            if (selectedAssetPreviewRenderer) {
+                selectedAssetPreviewRenderer.dispose();
+            }
+            
+            // 创建新的canvas
+            container.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.className = 'selected-asset-canvas';
+            canvas.width = 100;
+            canvas.height = 100;
+            container.appendChild(canvas);
+            
+            // 初始化Three.js场景
+            selectedAssetPreviewScene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 4;
+            
+            selectedAssetPreviewRenderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true, 
+                antialias: true 
+            });
+            selectedAssetPreviewRenderer.setSize(100, 100);
+            selectedAssetPreviewRenderer.setClearColor(0x000000, 0);
+            
+            // 添加灯光
+            selectedAssetPreviewScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const light = new THREE.PointLight(lastAsset.colorHex, 1.2, 100);
+            light.position.set(3, 3, 5);
+            selectedAssetPreviewScene.add(light);
+            
+            // 创建资产3D模型
+            selectedAssetPreviewMolecule = createMolecule(lastAsset.type, lastAsset.colorHex, 0.5);
+            selectedAssetPreviewScene.add(selectedAssetPreviewMolecule);
+            
+            // 动画循环
+            function animate() {
+                if (!selectedAssetPreviewRenderer) return;
+                requestAnimationFrame(animate);
+                if (selectedAssetPreviewMolecule) {
+                    selectedAssetPreviewMolecule.rotation.y += 0.015;
+                    selectedAssetPreviewMolecule.rotation.x += 0.008;
+                }
+                selectedAssetPreviewRenderer.render(selectedAssetPreviewScene, camera);
+            }
+            animate();
+            
+            // 添加资产信息标签
+            const label = document.createElement('div');
+            label.style.cssText = `
+                position: absolute;
+                bottom: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 10px;
+                color: ${lastAsset.color};
+                background: rgba(0,0,0,0.6);
+                padding: 2px 8px;
+                border-radius: 10px;
+                border: 1px solid ${lastAsset.color}40;
+                white-space: nowrap;
+            `;
+            label.textContent = `${lastAsset.icon} ${lastAsset.id}`;
+            container.appendChild(label);
+        }
+
+        // ========== Toast 提示系统 ==========
+        function showToast(type, title, message, duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type] || 'ℹ'}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // ========== 资产详情弹窗 ==========
+        let assetDetailScene, assetDetailRenderer, assetDetailMolecule;
+        let currentDetailAsset = null;
+        
+        function openAssetDetail(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+            
+            currentDetailAsset = asset;
+            
+            // 填充基本信息
+            document.getElementById('assetDetailName').textContent = asset.name;
+            document.getElementById('assetDetailId').textContent = asset.id;
+            document.getElementById('assetDetailDesc').textContent = asset.description || '暂无描述';
+            document.getElementById('assetDetailRules').textContent = asset.rules || '按权重平均分配';
+            document.getElementById('assetDetailCreated').textContent = asset.created || '2024-01-15';
+            document.getElementById('assetDetailValue').textContent = asset.value || '0';
+            document.getElementById('assetDetailStatus').textContent = asset.minted ? '已铸造' : '未铸造';
+            
+            // 填充贡献者
+            const contributorsContainer = document.getElementById('assetDetailContributors');
+            if (asset.contributors && asset.contributors.length > 0) {
+                contributorsContainer.innerHTML = asset.contributors.map(c => `
+                    <div class="asset-detail-contributor" style="border: 1px solid ${asset.color}40;">
+                        <span style="color: ${asset.color};">${asset.icon}</span>
+                        <span class="asset-detail-contributor-name">${c.name}</span>
+                        <span class="asset-detail-contributor-share">${c.share}</span>
+                    </div>
+                `).join('');
+            } else {
+                contributorsContainer.innerHTML = '<div style="color: rgba(200,220,240,0.5);">暂无贡献者信息</div>';
+            }
+            
+            // 显示弹窗
+            document.getElementById('assetDetailModal').classList.add('active');
+            
+            // 初始化3D预览
+            setTimeout(() => initAssetDetailPreview(asset), 100);
+        }
+        
+        function closeAssetDetail(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('assetDetailModal').classList.remove('active');
+            currentDetailAsset = null;
+            if (assetDetailRenderer) {
+                assetDetailRenderer.dispose();
+                assetDetailRenderer = null;
+            }
+        }
+        
+        function initAssetDetailPreview(asset) {
+            const canvas = document.getElementById('asset-detail-canvas');
+            if (!canvas) return;
+            
+            if (assetDetailRenderer) assetDetailRenderer.dispose();
+            
+            assetDetailScene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 4.5;
+            
+            assetDetailRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            assetDetailRenderer.setSize(150, 150);
+            assetDetailRenderer.setClearColor(0x000000, 0);
+            
+            assetDetailScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const light = new THREE.PointLight(asset.colorHex, 1.5, 100);
+            light.position.set(4, 4, 6);
+            assetDetailScene.add(light);
+            
+            assetDetailMolecule = createMolecule(asset.type, asset.colorHex, 0.6);
+            assetDetailScene.add(assetDetailMolecule);
+            
+            function animate() {
+                if (!assetDetailRenderer) return;
+                requestAnimationFrame(animate);
+                if (assetDetailMolecule) {
+                    assetDetailMolecule.rotation.y += 0.012;
+                    assetDetailMolecule.rotation.x += 0.006;
+                }
+                assetDetailRenderer.render(assetDetailScene, camera);
+            }
+            animate();
+        }
+        
+        function addToPoolFromDetail() {
+            if (currentDetailAsset) {
+                // 检查是否已经在池中
+                if (poolAssets.find(p => p.id === currentDetailAsset.id)) {
+                    showToast('warning', '提示', '该资产已在协作池中');
+                    return;
+                }
+                addToPool(currentDetailAsset.id);
+                closeAssetDetail();
+                showToast('success', '添加成功', `${currentDetailAsset.name} 已添加到协作池`);
+            }
+        }
+
+        // ========== 撤销功能 ==========
+        let lastAction = null;
+        let undoTimeout = null;
+        
+        function saveUndoAction(type, data) {
+            lastAction = { type, data, timestamp: Date.now() };
+            
+            // 显示撤销按钮
+            const undoBtn = document.getElementById('undoBtn');
+            if (undoBtn) {
+                undoBtn.classList.add('active');
+                undoBtn.innerHTML = `<span>↩</span> 撤销${type === 'remove' ? '删除' : '清空'}`;
+            }
+            
+            // 5秒后隐藏撤销按钮
+            if (undoTimeout) clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => {
+                const btn = document.getElementById('undoBtn');
+                if (btn) btn.classList.remove('active');
+                lastAction = null;
+            }, 5000);
+        }
+        
+        function undoLastAction() {
+            if (!lastAction) return;
+            
+            if (lastAction.type === 'remove' && lastAction.data) {
+                // 恢复删除的资产
+                const asset = lastAction.data.asset;
+                const x = lastAction.data.x;
+                const y = lastAction.data.y;
+                
+                poolAssets.push(asset);
+                poolCounter++;
+                
+                // 重新创建元素
+                const poolContent = document.getElementById('poolContent');
+                const el = document.createElement('div');
+                el.className = 'pool-asset';
+                el.id = 'pool-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                el.draggable = true;
+                el.style.color = asset.color;
+                el.style.borderColor = asset.color;
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                el.innerHTML = `
+                    <div class="pool-asset-icon">${asset.icon}</div>
+                    <div class="pool-asset-id">${asset.id}</div>
+                    <div class="pool-asset-remove" onclick="event.stopPropagation(); removeFromPool('${asset.id}', '${el.id}')">×</div>
+                `;
+                poolContent.appendChild(el);
+                
+                // 重新添加拖拽事件
+                setupPoolAssetDrag(el, asset);
+                
+                showToast('success', '撤销成功', `已恢复 ${asset.name}`);
+                
+            } else if (lastAction.type === 'clear') {
+                // 恢复所有资产
+                lastAction.data.forEach(item => {
+                    poolAssets.push(item.asset);
+                    const poolContent = document.getElementById('poolContent');
+                    const el = document.createElement('div');
+                    el.className = 'pool-asset';
+                    el.id = 'pool-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                    el.draggable = true;
+                    el.style.color = item.asset.color;
+                    el.style.borderColor = item.asset.color;
+                    el.style.left = item.x + 'px';
+                    el.style.top = item.y + 'px';
+                    el.innerHTML = `
+                        <div class="pool-asset-icon">${item.asset.icon}</div>
+                        <div class="pool-asset-id">${item.asset.id}</div>
+                        <div class="pool-asset-remove" onclick="event.stopPropagation(); removeFromPool('${item.asset.id}', '${el.id}')">×</div>
+                    `;
+                    poolContent.appendChild(el);
+                    setupPoolAssetDrag(el, item.asset);
+                });
+                showToast('success', '撤销成功', `已恢复 ${lastAction.data.length} 个资产`);
+            }
+            
+            drawConnections();
+            updateFusionPanel();
+            
+            // 隐藏撤销按钮
+            document.getElementById('undoBtn').classList.remove('active');
+            lastAction = null;
+            if (undoTimeout) clearTimeout(undoTimeout);
+        }
+        
+        function setupPoolAssetDrag(el, asset) {
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            
+            el.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = parseFloat(el.style.left);
+                initialTop = parseFloat(el.style.top);
+                el.style.zIndex = 100;
+                el.style.cursor = 'grabbing';
+                el.classList.add('dragging');
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                el.style.left = (initialLeft + dx) + 'px';
+                el.style.top = (initialTop + dy) + 'px';
+                drawConnections();
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    el.style.zIndex = 10;
+                    el.style.cursor = 'grab';
+                    el.classList.remove('dragging');
+                }
+            });
+        }
+
+        // ========== 键盘快捷键（全局） ==========
+        document.addEventListener('keydown', (e) => {
+            // 左右箭头切换页面
+            if (e.key === 'ArrowRight') goTo(currentStage + 1);
+            if (e.key === 'ArrowLeft') goTo(currentStage - 1);
+            
+            // 只在阶段2的快捷键
+            if (currentStage === 2) {
+                // Delete 清空协作池
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    if (poolAssets.length > 0) {
+                        e.preventDefault();
+                        if (confirm('确定要清空协作池吗？')) {
+                            clearPool();
+                        }
+                    }
+                }
+                
+                // Enter 开始融合（如果满足条件）
+                if (e.key === 'Enter' && poolAssets.length >= 2) {
+                    e.preventDefault();
+                    const fusionModal = document.getElementById('fusionModal');
+                    if (fusionModal.classList.contains('active')) {
+                        confirmFusion();
+                    } else {
+                        openFusionModal();
+                    }
+                }
+                
+                // Ctrl+Z 撤销
+                if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                    e.preventDefault();
+                    undoLastAction();
+                }
+            }
+            
+            // Esc 关闭弹窗
+            if (e.key === 'Escape') {
+                closeFusionModal();
+                closeAssetDetail();
+            }
+            
+            // 显示/隐藏快捷键提示
+            if (e.key === '?' || e.key === '/') {
+                e.preventDefault();
+                const hint = document.getElementById('keyboardHint');
+                if (hint) {
+                    hint.style.display = hint.style.display === 'none' ? 'flex' : 'none';
+                }
+            }
+        });
+
+        // 触发涟漪效果
+        function triggerRipple() {
+            const ripple = document.getElementById('poolRipple');
+            if (!ripple) return;
+            
+            ripple.classList.remove('active');
+            void ripple.offsetWidth; // 触发重绘
+            ripple.classList.add('active');
+        }
+        
+        // ===== Toast 提示系统 =====
+        function showToast(type, title, message, duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '!',
+                info: 'ℹ'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type] || icons.info}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+        
+        // ===== 资产详情弹窗 =====
+        
+        function openAssetDetail(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+            
+            // 填充基本信息
+            document.getElementById('assetDetailName').textContent = asset.name;
+            document.getElementById('assetDetailId').textContent = asset.id;
+            document.getElementById('assetDetailDesc').textContent = asset.description || asset.name;
+            document.getElementById('assetDetailRules').textContent = asset.rules;
+            document.getElementById('assetDetailCreated').textContent = asset.created;
+            document.getElementById('assetDetailValue').textContent = asset.value;
+            document.getElementById('assetDetailStatus').textContent = asset.minted ? '已铸造 ✓' : '未铸造';
+            document.getElementById('assetDetailStatus').style.color = asset.minted ? '#00ff88' : '#ff9500';
+            
+            // 填充贡献者
+            const contributorsContainer = document.getElementById('assetDetailContributors');
+            if (asset.contributors && asset.contributors.length > 0) {
+                contributorsContainer.innerHTML = asset.contributors.map(c => `
+                    <div class="asset-detail-contributor" style="border: 1px solid ${asset.color}40;">
+                        <span class="asset-detail-contributor-name">${c.name}</span>
+                        <span class="asset-detail-contributor-share">${c.share}</span>
+                    </div>
+                `).join('');
+            } else {
+                contributorsContainer.innerHTML = '<div style="color: rgba(200,220,240,0.5);">暂无贡献者信息</div>';
+            }
+            
+            // 显示弹窗
+            document.getElementById('assetDetailModal').classList.add('active');
+            
+            // 初始化3D预览
+            setTimeout(() => initAssetDetailPreview(asset), 100);
+        }
+        
+        function initAssetDetailPreview(asset) {
+            const canvas = document.getElementById('asset-detail-canvas');
+            if (!canvas) return;
+            
+            // 清理旧场景
+            if (assetDetailRenderer) {
+                assetDetailRenderer.dispose();
+            }
+            
+            assetDetailScene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 4.5;
+            
+            assetDetailRenderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true, 
+                antialias: true 
+            });
+            assetDetailRenderer.setSize(150, 150);
+            assetDetailRenderer.setClearColor(0x000000, 0);
+            
+            // 添加灯光
+            assetDetailScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const light = new THREE.PointLight(asset.colorHex, 1.5, 100);
+            light.position.set(4, 4, 6);
+            assetDetailScene.add(light);
+            
+            // 创建3D模型
+            assetDetailMolecule = createMolecule(asset.type, asset.colorHex, 0.6);
+            assetDetailScene.add(assetDetailMolecule);
+            
+            // 动画
+            function animate() {
+                if (!assetDetailRenderer || !document.getElementById('assetDetailModal').classList.contains('active')) return;
+                requestAnimationFrame(animate);
+                if (assetDetailMolecule) {
+                    assetDetailMolecule.rotation.y += 0.01;
+                    assetDetailMolecule.rotation.x += 0.005;
+                }
+                assetDetailRenderer.render(assetDetailScene, camera);
+            }
+            animate();
+        }
+        
+        function closeAssetDetail(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('assetDetailModal').classList.remove('active');
+            assetDetailRenderer = null;
+            assetDetailScene = null;
+            assetDetailMolecule = null;
+        }
+        
+        // ===== 撤销功能 =====
+        
+        function saveActionForUndo(action, data) {
+            lastAction = { type: action, data: data, timestamp: Date.now() };
+            
+            // 显示撤销按钮
+            const undoBtn = document.getElementById('undoBtn');
+            if (undoBtn) {
+                undoBtn.classList.add('active');
+                
+                // 5秒后隐藏
+                clearTimeout(undoTimeout);
+                undoTimeout = setTimeout(() => {
+                    undoBtn.classList.remove('active');
+                    lastAction = null;
+                }, 5000);
+            }
+        }
+        
+        function undoLastAction() {
+            if (!lastAction) return;
+            
+            if (lastAction.type === 'removeFromPool') {
+                // 恢复被删除的资产
+                const asset = assets.find(a => a.id === lastAction.data.assetId);
+                if (asset) {
+                    addToPool(lastAction.data.assetId, lastAction.data.x, lastAction.data.y);
+                    showToast('success', '已撤销', '成功恢复删除的资产');
+                }
+            } else if (lastAction.type === 'clearPool') {
+                // 恢复所有被清空的资产
+                lastAction.data.assets.forEach((assetData, index) => {
+                    setTimeout(() => {
+                        addToPool(assetData.id);
+                    }, index * 100);
+                });
+                showToast('success', '已撤销', '成功恢复所有资产');
+            }
+            
+            // 隐藏撤销按钮
+            document.getElementById('undoBtn').classList.remove('active');
+            lastAction = null;
+        }
+        
+        // 修改 removeFromPool 函数，添加撤销支持
+        const originalRemoveFromPool = removeFromPool;
+        removeFromPool = function(id, elId) {
+            const asset = poolAssets.find(p => p.id === id);
+            const el = document.getElementById(elId);
+            const x = el ? parseFloat(el.style.left) : 0;
+            const y = el ? parseFloat(el.style.top) : 0;
+            
+            // 保存动作以便撤销
+            saveActionForUndo('removeFromPool', { assetId: id, x, y });
+            
+            // 调用原始函数
+            poolAssets = poolAssets.filter(p => p.id !== id);
+            if (el) el.remove();
+            
+            if (poolAssets.length === 0) {
+                document.getElementById('poolHint').style.display = 'block';
+                document.getElementById('poolCenterPreview').style.display = 'flex';
+                document.getElementById('poolParticles').innerHTML = '';
+            }
+            
+            drawConnections();
+            updateFusionPanel();
+            
+            showToast('info', '资产已移除', '点击撤销按钮可恢复');
+        };
+        
+        // 修改 clearPool 函数，添加撤销支持
+        const originalClearPool = clearPool;
+        clearPool = function() {
+            // 保存当前状态以便撤销
+            if (poolAssets.length > 0) {
+                saveActionForUndo('clearPool', { 
+                    assets: poolAssets.map(a => ({ id: a.id }))
+                });
+            }
+            
+            poolAssets = [];
+            poolCounter = 0;
+            document.querySelectorAll('.pool-asset').forEach(el => el.remove());
+            document.querySelectorAll('.connection-line').forEach(el => el.remove());
+            document.getElementById('poolParticles').innerHTML = '';
+            document.getElementById('poolHint').style.display = 'block';
+            document.getElementById('poolCenterPreview').style.display = 'flex';
+            updateFusionPanel();
+            
+            showToast('info', '协作池已清空', '点击撤销按钮可恢复');
+        };
 
         // 打开融合弹窗
         function openFusionModal() {
@@ -3054,123 +6507,216 @@
 
         function confirmFusion() {
             closeFusionModal();
-            // 标记 NeuroBlok 为已生成/可融资
-            const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
-            if (neuroBlok) {
-                neuroBlok.minted = true;
-                neuroBlok.generatedFrom = poolAssets.map(p => p.id).join('+');
-                // 计算融合后的估值
-                neuroBlok.value = poolAssets.reduce((sum, p) => sum + p.value * 0.8, 0);
-            }
-            // 生成权属图谱
-            renderFusionGraph();
-            document.getElementById('fusionSuccessModal').classList.add('active');
-        }
-
-        function renderFusionGraph() {
-            const container = document.getElementById('fusionSourcesContainer');
-            const svg = document.getElementById('fusionLines');
-            const detailList = document.getElementById('fusionDetailList');
-            const sourceCount = document.getElementById('sourceCount');
-            const fusionValue = document.getElementById('fusionValue');
             
-            if (!container || !poolAssets.length) return;
+            // 保存当前池内资产数据（在清空前）
+            const currentPoolAssets = [...poolAssets];
             
-            // 更新来源数量
-            if (sourceCount) sourceCount.textContent = poolAssets.length + '个';
+            // 确定要生成的融合资产
+            const fusionAssetId = determineFusionAsset(currentPoolAssets);
             
-            // 计算融合估值
-            const totalValue = poolAssets.reduce((sum, p) => sum + p.value * 0.8, 0);
-            if (fusionValue) fusionValue.textContent = totalValue.toFixed(1);
+            // 播放融合动画
+            const poolContent = document.getElementById('poolContent');
+            poolContent.classList.add('fusion-animating');
             
-            // 清空容器
-            container.innerHTML = '';
-            svg.innerHTML = '';
+            // 添加爆发光效
+            const burst = document.createElement('div');
+            burst.className = 'fusion-burst';
+            poolContent.appendChild(burst);
             
-            const centerX = 50; // 百分比
-            const centerY = 50; // 百分比
-            const radius = 35; // 百分比
-            
-            const totalWeight = poolAssets.reduce((s, a) => s + a.weight, 0);
-            
-            // 生成来源资产节点
-            poolAssets.forEach((asset, index) => {
-                const angle = (index / poolAssets.length) * Math.PI * 2 - Math.PI / 2;
-                const x = centerX + Math.cos(angle) * radius;
-                const y = centerY + Math.sin(angle) * radius;
-                const share = totalWeight > 0 ? ((asset.weight / totalWeight) * 100).toFixed(0) : 0;
-                
-                // 创建节点
-                const node = document.createElement('div');
-                node.style.cssText = `
-                    position: absolute;
-                    left: ${x}%;
-                    top: ${y}%;
-                    transform: translate(-50%, -50%);
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 5px;
-                    z-index: 5;
-                `;
-                node.innerHTML = `
-                    <div style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid ${asset.color}; background: rgba(10,15,30,0.95); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 20px ${asset.color}60;">
-                        ${asset.icon}
-                    </div>
-                    <div style="background: rgba(0,0,0,0.7); padding: 5px 12px; border-radius: 15px; border: 1px solid ${asset.color}40; text-align: center;">
-                        <div style="font-size: 10px; font-family: Orbitron; color: ${asset.color}; margin-bottom: 2px;">${asset.id}</div>
-                        <div style="font-size: 11px; color: #ffd700;">${share}% 权益</div>
-                    </div>
-                `;
-                container.appendChild(node);
-                
-                // 绘制连线
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', `${x}%`);
-                line.setAttribute('y1', `${y}%`);
-                line.setAttribute('x2', `${centerX}%`);
-                line.setAttribute('y2', `${centerY}%`);
-                line.setAttribute('stroke', asset.color);
-                line.setAttribute('stroke-width', '2');
-                line.setAttribute('stroke-opacity', '0.5');
-                line.setAttribute('stroke-dasharray', '5,5');
-                svg.appendChild(line);
+            // 计算每个资产的相对位置
+            const poolAssetElements = document.querySelectorAll('.pool-asset');
+            poolAssetElements.forEach(asset => {
+                const rect = asset.getBoundingClientRect();
+                const poolRect = poolContent.getBoundingClientRect();
+                const centerX = poolRect.width / 2;
+                const centerY = poolRect.height / 2;
+                const assetX = parseFloat(asset.style.left) + 50;
+                const assetY = parseFloat(asset.style.top) + 50;
+                asset.style.setProperty('--tx', (assetX - centerX) + 'px');
+                asset.style.setProperty('--ty', (assetY - centerY) + 'px');
             });
             
-            // 生成详细列表
-            if (detailList) {
-                detailList.innerHTML = poolAssets.map(asset => {
-                    const share = totalWeight > 0 ? ((asset.weight / totalWeight) * 100).toFixed(0) : 0;
+            setTimeout(() => {
+                // 标记对应的融合资产为已生成
+                const fusionAsset = assets.find(a => a.id === fusionAssetId);
+                if (fusionAsset) {
+                    fusionAsset.minted = true;
+                    fusionAsset.generatedFrom = currentPoolAssets.map(p => p.id).join('+');
+                    fusionAsset.value = currentPoolAssets.reduce((sum, p) => sum + p.value * 0.8, 0);
+                    // 保存当前融合资产ID，用于显示
+                    window.currentFusionAssetId = fusionAssetId;
+                }
+                
+                // 清空协作池
+                clearPool();
+                
+                // 移除爆发效果
+                burst.remove();
+                poolContent.classList.remove('fusion-animating');
+                
+                // 显示融合结果在右侧面板
+                showFusionResult(currentPoolAssets, fusionAssetId);
+                
+                // 显示成功提示
+                if (fusionAsset) {
+                    showToast('success', '融合成功！', `生成了 ${fusionAsset.name}`, 5000);
+                }
+            }, 1000);
+        }
+        
+        // 显示融合结果
+        function showFusionResult(data, fusionAssetId) {
+            // 获取融合资产信息
+            const fusionAsset = assets.find(a => a.id === fusionAssetId);
+            if (!fusionAsset) return;
+            
+            // 计算总估值和权重
+            const totalValue = data.reduce((sum, p) => sum + p.value * 0.8, 0);
+            const totalWeight = data.reduce((s, a) => s + a.weight, 0);
+            
+            // 更新融合资产信息
+            const nameEl = document.querySelector('.fusion-result-name');
+            if (nameEl) nameEl.textContent = fusionAsset.name;
+            
+            const metaEl = document.querySelector('.fusion-result-meta');
+            if (metaEl) metaEl.textContent = fusionAsset.description || '融合资产';
+            
+            const valueEl = document.getElementById('resultValue');
+            if (valueEl) {
+                valueEl.textContent = Number(totalValue).toFixed(1);
+            }
+            
+            const countEl = document.getElementById('resultSourceCount');
+            if (countEl) {
+                countEl.textContent = data.length;
+            }
+            
+            // 生成整合的来源资产与权益分配列表
+            const ownershipContainer = document.getElementById('resultOwnershipList');
+            if (ownershipContainer) {
+                ownershipContainer.innerHTML = data.map(a => {
+                    const share = totalWeight > 0 ? ((a.weight / totalWeight) * 100) : 0;
                     return `
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; border-left: 3px solid ${asset.color};">
-                            <div style="font-size: 24px;">${asset.icon}</div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 13px; color: rgba(220,230,240,0.9); margin-bottom: 2px;">${asset.name}</div>
-                                <div style="font-size: 11px; color: ${asset.color};">${asset.id}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">${share}%</div>
-                                <div style="font-size: 10px; color: rgba(150,170,200,0.6);">权益比例</div>
+                        <div class="result-ownership-item">
+                            <div class="result-ownership-icon" style="border: 1px solid ${a.color}40;">${a.icon}</div>
+                            <div class="result-ownership-info">
+                                <div class="result-ownership-header">
+                                    <div>
+                                        <div class="result-ownership-name">${a.name}</div>
+                                        <div class="result-ownership-id" style="color: ${a.color};">${a.id}</div>
+                                    </div>
+                                    <div class="result-ownership-share">${share.toFixed(0)}%</div>
+                                </div>
+                                <div class="result-ownership-bar">
+                                    <div class="result-ownership-fill" style="width: ${share}%; background: ${a.color};"></div>
+                                </div>
                             </div>
                         </div>
                     `;
                 }).join('');
             }
+            
+            // 销毁旧的3D场景，以便创建新的
+            if (neuroBlokRenderer) {
+                neuroBlokRenderer.dispose();
+                neuroBlokRenderer = null;
+                neuroBlokScene = null;
+                neuroBlokMolecule = null;
+            }
+            
+            // 延迟初始化融合资产3D预览，确保canvas已渲染
+            setTimeout(() => {
+                initFusionAssetScene(fusionAsset);
+            }, 100);
+            
+            // 切换显示状态
+            const beforeEl = document.getElementById('fusionBefore');
+            const afterEl = document.getElementById('fusionAfter');
+            if (beforeEl) beforeEl.style.display = 'none';
+            if (afterEl) afterEl.style.display = 'block';
+            
+            // 刷新左侧资产列表以显示新的融合资产
+            renderFusionGrid();
         }
-
-        function closeFusionSuccessModal() {
-            document.getElementById('fusionSuccessModal').classList.remove('active');
-            clearPool();
+        
+        // 初始化融合资产3D场景
+        let fusionAssetScene, fusionAssetCamera, fusionAssetRenderer, fusionAssetMolecule;
+        
+        function initFusionAssetScene(asset) {
+            const canvas = document.getElementById('neuroblok-canvas');
+            if (!canvas) return;
+            
+            // 清理旧场景
+            if (fusionAssetRenderer) {
+                fusionAssetRenderer.dispose();
+            }
+            
+            fusionAssetScene = new THREE.Scene();
+            fusionAssetCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            fusionAssetCamera.position.z = 5;
+            
+            fusionAssetRenderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true, 
+                antialias: true 
+            });
+            fusionAssetRenderer.setSize(120, 120);
+            fusionAssetRenderer.setClearColor(0x000000, 0);
+            
+            fusionAssetScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const pl = new THREE.PointLight(asset.colorHex, 1.5, 100);
+            pl.position.set(5, 5, 5);
+            fusionAssetScene.add(pl);
+            
+            // 创建对应类型的3D模型
+            fusionAssetMolecule = createMolecule(asset.type, asset.colorHex, 0.7);
+            fusionAssetScene.add(fusionAssetMolecule);
+            
+            animateFusionAsset();
+        }
+        
+        function animateFusionAsset() {
+            if (!fusionAssetRenderer || !fusionAssetScene || !fusionAssetCamera) return;
+            
+            requestAnimationFrame(animateFusionAsset);
+            if (fusionAssetMolecule) {
+                fusionAssetMolecule.rotation.y += 0.01;
+                fusionAssetMolecule.rotation.x += 0.005;
+            }
+            fusionAssetRenderer.render(fusionAssetScene, fusionAssetCamera);
+        }
+        
+        // 清理旧的 NeuroBlok 相关代码（保留兼容性）
+        let neuroBlokScene, neuroBlokCamera, neuroBlokRenderer, neuroBlokMolecule;
+        
+        function initNeuroBlokScene() {
+            // 兼容性：如果调用此函数，使用当前的融合资产
+            const currentId = window.currentFusionAssetId || 'ScreeningBlok';
+            const asset = assets.find(a => a.id === currentId);
+            if (asset) {
+                initFusionAssetScene(asset);
+            }
+        }
+        
+        // 重置融合结果，继续融合
+        function resetFusionResult() {
+            document.getElementById('fusionBefore').style.display = 'block';
+            document.getElementById('fusionAfter').style.display = 'none';
         }
 
         function goToFinanceFromFusion() {
-            document.getElementById('fusionSuccessModal').classList.remove('active');
-            // 自动选择 NeuroBlok 进入融资
-            selectedFinanceAsset = assets.find(a => a.id === 'NeuroBlok');
+            // 自动选择当前生成的融合资产进入融资
+            const fusionAssetId = window.currentFusionAssetId;
+            if (fusionAssetId) {
+                selectedFinanceAsset = assets.find(a => a.id === fusionAssetId);
+            }
+            // 如果没有当前融合资产，选择第一个已生成的融合资产
+            if (!selectedFinanceAsset) {
+                selectedFinanceAsset = assets.find(a => ['ScreeningBlok', 'OptimizationBlok', 'CandidateBlok'].includes(a.id) && a.minted);
+            }
             goTo(3);
-            // 如果有 NeuroBlok，自动选中
             if (selectedFinanceAsset) {
-                setTimeout(() => selectFinanceAsset('NeuroBlok'), 300);
+                setTimeout(() => selectFinanceAsset(selectedFinanceAsset.id), 300);
             }
         }
 
@@ -3473,20 +7019,82 @@
             currentStage = index;
             
             if (index === 1) {
-                if (!previewScene) initPreviewScene();
-                generateAssetCards();
+                // 清理阶段2的资源
+                if (poolRenderer) poolRenderer.dispose();
+                poolRenderer = null;
+                poolScene = null;
+                poolMolecule = null;
+                
+                // 清理卡片渲染器（只保留少数）
+                cleanupCardRenderers(4);
+                
+                // 延迟初始化确保DOM就绪
+                setTimeout(() => {
+                    // 强制重置预览画布
+                    const canvas = document.getElementById('preview-canvas');
+                    if (canvas) {
+                        canvas.style.background = 'transparent';
+                        canvas.width = 440;
+                        canvas.height = 440;
+                    }
+                    initPreviewScene();
+                    generateAssetCards();
+                }, 50);
             }
             if (index === 2) {
+                // 清理阶段1的资源
+                if (previewRenderer) previewRenderer.dispose();
+                previewRenderer = null;
+                previewScene = null;
+                previewMolecule = null;
+                
+                // 清理卡片渲染器
+                cleanupCardRenderers(6);
+                
                 renderFusionGrid();
                 setupPoolDropZone();
-                if (!poolScene) initPoolScene();
-                setTimeout(() => animateCards(), 500);
+                
+                // 延迟初始化pool场景，确保DOM已渲染
+                setTimeout(() => {
+                    // 重置pool画布
+                    const poolCanvas = document.getElementById('pool-canvas');
+                    if (poolCanvas) {
+                        poolCanvas.width = 350;
+                        poolCanvas.height = 350;
+                        poolCanvas.style.background = 'transparent';
+                    }
+                    initPoolScene();
+                    animateCards();
+                    generateStage2Particles();
+                }, 100);
             }
             if (index === 3) {
+                // 清理WebGL资源
+                if (previewRenderer) previewRenderer.dispose();
+                if (poolRenderer) poolRenderer.dispose();
+                previewRenderer = null;
+                previewScene = null;
+                poolRenderer = null;
+                poolScene = null;
+                
+                // 清理卡片渲染器
+                cleanupCardRenderers(4);
+                
                 renderFinanceGrid();
                 setTimeout(() => animateCards(), 500);
             }
             if (index === 4) {
+                // 清理WebGL资源
+                if (previewRenderer) previewRenderer.dispose();
+                if (poolRenderer) poolRenderer.dispose();
+                previewRenderer = null;
+                previewScene = null;
+                poolRenderer = null;
+                poolScene = null;
+                
+                // 清理大部分卡片渲染器
+                cleanupCardRenderers(2);
+                
                 renderValueNetwork();
             }
             
@@ -4183,11 +7791,6 @@ function renderValueNetwork() {
             gsap.from('.asset-library', { x: -50, opacity: 0, duration: 0.8, delay: 0.2 });
             gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
             gsap.from('.preview-area', { y: 30, opacity: 0, duration: 0.8, delay: 0.4 });
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') goTo(currentStage + 1);
-            if (e.key === 'ArrowLeft') goTo(currentStage - 1);
         });
     </script>
 </body>
