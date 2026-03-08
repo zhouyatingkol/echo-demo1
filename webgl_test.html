@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WebGL 测试</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; background: #020208; color: #0f0; font-family: monospace; padding: 20px; }
+        #status { margin: 10px 0; }
+        .ok { color: #0f0; }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h2>WebGL 诊断测试</h2>
+    <div id="status">检测中...</div>
+    <script>
+        const status = document.getElementById('status');
+        
+        // 1. 检查浏览器
+        status.innerHTML += '<br>1. 浏览器: ' + navigator.userAgent.substring(0, 50) + '...';
+        
+        // 2. 检查 Canvas
+        const canvas = document.createElement('canvas');
+        const hasCanvas = !!canvas;
+        status.innerHTML += '<br>2. Canvas 支持: ' + (hasCanvas ? '<span class="ok">✓</span>' : '<span class="error">✗</span>');
+        
+        // 3. 检查 WebGL
+        let gl = null;
+        try {
+            gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        } catch (e) {}
+        const hasWebGL = !!gl;
+        status.innerHTML += '<br>3. WebGL 支持: ' + (hasWebGL ? '<span class="ok">✓</span>' : '<span class="error">✗</span>');
+        
+        // 4. 检查 Three.js
+        const hasThree = typeof THREE !== 'undefined';
+        status.innerHTML += '<br>4. Three.js 加载: ' + (hasThree ? '<span class="ok">✓</span>' : '<span class="error">✗</span>');
+        
+        // 5. 尝试创建渲染器
+        if (hasThree) {
+            try {
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+                status.innerHTML += '<br>5. Three.js WebGLRenderer: <span class="ok">✓ 成功</span>';
+            } catch (e) {
+                status.innerHTML += '<br>5. Three.js WebGLRenderer: <span class="error">✗ 失败 - ' + e.message + '</span>';
+            }
+        }
+    </script>
+</body>
+</html>

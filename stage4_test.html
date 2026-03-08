@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Stage 4 诊断</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; background: #020208; overflow: hidden; }
+        #canvas { width: 100vw; height: 100vh; }
+        #info { position: fixed; top: 10px; left: 10px; color: #0f0; font-family: monospace; z-index: 100; }
+    </style>
+</head>
+<body>
+    <div id="info">加载中...</div>
+    <canvas id="canvas"></canvas>
+    
+    <script>
+        const info = document.getElementById('info');
+        
+        try {
+            info.textContent = '1. Three.js 加载成功';
+            
+            const canvas = document.getElementById('canvas');
+            info.textContent = '2. Canvas 元素找到';
+            
+            const scene = new THREE.Scene();
+            info.textContent = '3. Scene 创建成功';
+            
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.z = 50;
+            info.textContent = '4. Camera 创建成功';
+            
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            info.textContent = '5. Renderer 创建成功';
+            
+            // 添加一个测试球体
+            const geo = new THREE.SphereGeometry(10, 32, 32);
+            const mat = new THREE.MeshPhongMaterial({ color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 0.3 });
+            const mesh = new THREE.Mesh(geo, mat);
+            scene.add(mesh);
+            
+            // 灯光
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            const light = new THREE.PointLight(0xffd700, 1, 100);
+            light.position.set(10, 10, 10);
+            scene.add(light);
+            
+            info.textContent = '6. 场景构建完成 - 应该能看到金色球体';
+            info.style.color = '#0f0';
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+        } catch (e) {
+            info.textContent = '错误: ' + e.message;
+            info.style.color = '#f00';
+            console.error(e);
+        }
+    </script>
+</body>
+</html>

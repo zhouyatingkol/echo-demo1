@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO Protocol - 完整演示</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #020208;
+            color: #fff;
+            font-family: 'Orbitron', 'Noto+Sans+SC', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* ===== 多页容器 ===== */
+        .stage {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            z-index: 1;
+        }
+        .stage.active { display: block; }
+        
+        /* 3D背景 - 所有阶段共享 */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* 导航点 */
+        .nav-dots {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+            background: rgba(0,0,0,0.4);
+            padding: 10px 18px;
+            border-radius: 25px;
+            border: 1px solid rgba(0,240,255,0.1);
+        }
+        .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: rgba(0,240,255,0.2);
+            border: 1px solid rgba(0,240,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dot:hover { background: rgba(0,240,255,0.4); }
+        .dot.active { background: #00f0ff; box-shadow: 0 0 15px rgba(0,240,255,0.6); }
+        
+        /* ===== STAGE 0: 开场 ===== */
+        .stage-0-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .glass-card {
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .stage-0-content .glass-card {
+            padding: 70px 100px;
+            text-align: center;
+            border-color: rgba(255,215,0,0.2);
+        }
+        .main-title {
+            font-size: 48px;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.6);
+        }
+        .subtitle {
+            font-size: 16px;
+            color: rgba(200,220,240,0.8);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+        .btn {
+            padding: 14px 36px;
+            border: 1px solid rgba(0,240,255,0.4);
+            background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(0,100,200,0.05));
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        .btn:hover { box-shadow: 0 0 30px rgba(0,240,255,0.4); }
+        .btn-gold {
+            border-color: rgba(255,215,0,0.4);
+            color: #ffd700;
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(200,150,0,0.05));
+        }
+        .btn-gold:hover { box-shadow: 0 0 30px rgba(255,215,0,0.4); }
+        .btn:disabled {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(200, 150, 0, 0.1) 100%);
+            color: #ffd700;
+            cursor: not-allowed;
+        }
+        
+        /* ===== 主容器 ===== */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            padding: 80px 20px 80px;
+            gap: 20px;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+            background: rgba(10, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        .nav-item {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-item:hover, .nav-item.active { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        
+        /* 左侧资产库 - 优化版 */
+        .asset-library {
+            width: 380px;
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .library-header { 
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        .library-title {
+            color: #00f0ff;
+            font-size: 16px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            margin-bottom: 6px;
+        }
+        .library-subtitle { 
+            color: rgba(150, 170, 200, 0.6); 
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+        .asset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            align-content: start;
+        }
+        .asset-grid::-webkit-scrollbar { width: 4px; }
+        .asset-grid::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 2px; }
+        .asset-grid::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.3); border-radius: 2px; }
+        
+        /* 资产卡片 */
+        .asset-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid;
+            border-radius: 16px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+        .asset-card:hover { transform: scale(1.05); z-index: 10; }
+        .asset-card.minted { border-color: #ffd700 !important; box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+        .asset-card.minted::after {
+            content: '✓';
+            position: absolute;
+            top: 8px; right: 8px;
+            width: 20px; height: 20px;
+            font-size: 12px;
+            color: #000;
+            background: #ffd700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .asset-card.selected { box-shadow: 0 0 30px currentColor; }
+        .asset-card.dragging { opacity: 0.5; transform: scale(0.95); }
+        .mol-canvas-container { width: 80px; height: 80px; position: relative; margin-bottom: 8px; }
+        .asset-id { font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 1px; margin-bottom: 4px; }
+        .asset-name { font-size: 10px; color: rgba(200, 220, 240, 0.8); text-align: center; }
+        
+        /* 中央预览区 */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .preview-container { width: 420px; height: 420px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .platform-rings { position: absolute; width: 100%; height: 100%; }
+        .platform-ring {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid;
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+        .platform-ring:nth-child(1) { width: 100%; height: 100%; border-color: rgba(0, 240, 255, 0.3); border-style: dashed; }
+        .platform-ring:nth-child(2) { width: 75%; height: 75%; border-color: rgba(0, 240, 255, 0.2); animation-duration: 7s; animation-direction: reverse; }
+        .platform-ring:nth-child(3) { width: 50%; height: 50%; border-color: rgba(0, 240, 255, 0.4); animation-duration: 5s; }
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        
+        #preview-canvas { width: 380px !important; height: 380px !important; z-index: 10; }
+        .preview-info { text-align: center; margin-top: 20px; }
+        .preview-id {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00f0ff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .preview-type { font-size: 14px; color: rgba(200, 220, 240, 0.8); margin-bottom: 20px; }
+        .mint-btn {
+            padding: 16px 50px;
+            border: 2px solid #00f0ff;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 100, 200, 0.1) 100%);
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        .mint-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.3) 0%, rgba(0, 100, 200, 0.2) 100%);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        .mint-btn:disabled {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(200, 150, 0, 0.1) 100%);
+            color: #ffd700;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 右侧权属面板 - 优化版 */
+        .ownership-panel {
+            width: 320px;
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .ownership-panel::-webkit-scrollbar { width: 4px; }
+        .ownership-panel::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .ownership-panel::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.3); border-radius: 2px; }
+        .panel-title {
+            color: #ffd700;
+            font-size: 16px;
+            letter-spacing: 3px;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+        }
+        .ownership-section {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            border-left: 3px solid rgba(255, 215, 0, 0.3);
+        }
+        .section-label {
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .section-value { 
+            font-size: 18px; 
+            font-weight: 500; 
+            color: #fff; 
+            margin-bottom: 8px;
+        }
+        .share-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: 8px;
+            font-size: 11px;
+            color: #00f0ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .contributor-list { display: flex; flex-direction: column; gap: 8px; }
+        .contributor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+        .contributor-name { font-size: 12px; color: rgba(220, 230, 240, 0.9); }
+        .contributor-share { 
+            font-size: 11px; 
+            color: #ffd700; 
+            font-family: 'Orbitron', sans-serif;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .rule-box {
+            padding: 14px;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            font-size: 12px;
+            color: rgba(220, 230, 240, 0.85);
+            line-height: 1.7;
+        }
+        .meta-list { display: flex; flex-direction: column; gap: 8px; }
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .meta-item:last-child { border-bottom: none; }
+        .meta-label { font-size: 12px; color: rgba(150, 170, 200, 0.7); }
+        .meta-value { 
+            font-size: 11px; 
+            color: #ffd700; 
+            font-family: 'Orbitron', sans-serif;
+        }
+        .empty-state { 
+            text-align: center; 
+            padding: 40px 20px; 
+            color: rgba(150, 170, 200, 0.5);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .empty-icon { 
+            font-size: 48px; 
+            margin-bottom: 16px; 
+            opacity: 0.3;
+        }
+        .empty-text { font-size: 13px; }
+        
+        /* 颜色主题 */
+        .asset-card[data-id="PDB-001"] { border-color: rgba(0, 240, 255, 0.5); }
+        .asset-card[data-id="PDB-001"] .asset-id { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+        .asset-card[data-id="CHEM-002"] { border-color: rgba(0, 255, 136, 0.5); }
+        .asset-card[data-id="CHEM-002"] .asset-id { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+        .asset-card[data-id="GENE-003"] { border-color: rgba(0, 136, 255, 0.5); }
+        .asset-card[data-id="GENE-003"] .asset-id { color: #0088ff; text-shadow: 0 0 10px rgba(0, 136, 255, 0.5); }
+        .asset-card[data-id="VSCREEN-004"] { border-color: rgba(136, 255, 204, 0.5); }
+        .asset-card[data-id="VSCREEN-004"] .asset-id { color: #88ffcc; text-shadow: 0 0 10px rgba(136, 255, 204, 0.5); }
+        .asset-card[data-id="ASSAY-005"] { border-color: rgba(162, 155, 254, 0.5); }
+        .asset-card[data-id="ASSAY-005"] .asset-id { color: #a29bfe; text-shadow: 0 0 10px rgba(162, 155, 254, 0.5); }
+        .asset-card[data-id="CLINICAL-006"] { border-color: rgba(255, 165, 0, 0.5); }
+        .asset-card[data-id="CLINICAL-006"] .asset-id { color: #ffa500; text-shadow: 0 0 10px rgba(255, 165, 0, 0.5); }
+        .asset-card[data-id="PATENT-007"] { border-color: rgba(255, 105, 180, 0.5); }
+        .asset-card[data-id="PATENT-007"] .asset-id { color: #ff69b4; text-shadow: 0 0 10px rgba(255, 105, 180, 0.5); }
+        .asset-card[data-id="PAPER-008"] { border-color: rgba(255, 107, 107, 0.5); }
+        .asset-card[data-id="PAPER-008"] .asset-id { color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
+        .asset-card[data-id="NeuroBlok"] { border-color: rgba(255, 215, 0, 0.6); }
+        .asset-card[data-id="NeuroBlok"] .asset-id { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        
+        /* ===== STAGE 2: 协作衍生 ===== */
+        .fusion-area { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .fusion-pool {
+            flex: 1;
+            width: 100%;
+            position: relative;
+            border: 2px dashed rgba(255, 215, 0, 0.3);
+            border-radius: 24px;
+            background: rgba(0, 0, 0, 0.2);
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fusion-pool.drag-over {
+            border-color: rgba(255, 215, 0, 0.6);
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.2);
+        }
+        .pool-content { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .pool-asset {
+            position: absolute;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            border: 2px solid;
+            background: rgba(10,15,30,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px currentColor;
+            animation: dropIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+        .pool-asset:active { cursor: grabbing; }
+        @keyframes dropIn {
+            from { opacity: 0; transform: scale(0) rotate(-180deg); }
+            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .pool-asset:hover { transform: scale(1.1); z-index: 20; }
+        .pool-asset-icon { font-size: 32px; margin-bottom: 4px; }
+        .pool-asset-id { font-size: 10px; font-family: 'Orbitron', sans-serif; }
+        .pool-asset-remove {
+            position: absolute;
+            top: -5px; right: -5px;
+            width: 24px; height: 24px;
+            background: #ff4757;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255,71,87,0.5);
+        }
+        .pool-asset:hover .pool-asset-remove { opacity: 1; }
+        .pool-center-preview { position: absolute; width: 300px; height: 300px; display: flex; align-items: center; justify-content: center; }
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.6), transparent);
+            transform-origin: left center;
+            pointer-events: none;
+            animation: pulseLine 2s infinite;
+        }
+        @keyframes pulseLine { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+        .pool-hint { text-align: center; color: rgba(150,170,200,0.4); pointer-events: none; }
+        .pool-hint-icon { font-size: 60px; margin-bottom: 15px; opacity: 0.5; }
+        .pool-hint-text { font-size: 14px; letter-spacing: 3px; margin-bottom: 8px; }
+        .pool-hint-sub { font-size: 12px; opacity: 0.6; }
+        .fusion-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .fusion-stats { display: flex; gap: 50px; }
+        .stat-item { text-align: center; }
+        .stat-num { font-size: 32px; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.4); font-family: 'Orbitron', sans-serif; }
+        .stat-label { font-size: 10px; color: rgba(150,170,200,0.6); letter-spacing: 1px; margin-top: 5px; }
+        .fusion-btns { display: flex; gap: 12px; }
+        .fuse-btn {
+            padding: 16px 50px;
+            border: 2px solid #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(200, 150, 0, 0.1) 100%);
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+        .fuse-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(200, 150, 0, 0.2) 100%);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+        }
+        .fuse-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+        .selected-tags { margin-bottom: 15px; }
+        .tag-item {
+            display: inline-flex;
+            padding: 6px 14px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid;
+            border-radius: 20px;
+            font-size: 11px;
+            margin: 3px;
+            letter-spacing: 1px;
+        }
+        .dist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 3px solid;
+        }
+        .dist-icon { font-size: 20px; }
+        .dist-info { flex: 1; }
+        .dist-name { font-size: 12px; color: rgba(200,220,240,0.9); margin-bottom: 4px; }
+        .dist-bar-bg { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+        .dist-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+        .dist-share { font-size: 14px; color: #ffd700; font-family: 'Orbitron', sans-serif; min-width: 45px; text-align: right; }
+        .drag-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 20px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            color: rgba(255,215,0,0.8);
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .fusion-pool:has(.pool-asset) .drag-hint { opacity: 1; }
+        
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .mint-modal, .fusion-modal {
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+        .fusion-modal { border-color: rgba(255, 215, 0, 0.3); max-width: 450px; }
+        .modal-overlay.active .mint-modal, .modal-overlay.active .fusion-modal { transform: scale(1); }
+        .modal-title { font-family: 'Orbitron', sans-serif; font-size: 22px; color: #00f0ff; margin-bottom: 20px; letter-spacing: 3px; }
+        .fusion-modal .modal-title { color: #ffd700; }
+        .modal-preview { width: 150px; height: 150px; margin: 0 auto 25px; }
+        .modal-asset-name { font-size: 16px; color: #fff; margin-bottom: 8px; }
+        .modal-asset-id { font-family: 'Orbitron', sans-serif; font-size: 14px; color: #ffd700; margin-bottom: 25px; }
+        .modal-actions { display: flex; gap: 15px; justify-content: center; }
+        .fusion-result {
+            padding: 15px 30px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            font-size: 18px;
+            color: #ffd700;
+            margin-bottom: 25px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+        
+        /* 成功动画 */
+        .success-animation {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2000;
+            opacity: 0;
+        }
+        .success-animation.active { animation: successPop 1s ease-out forwards; }
+        @keyframes successPop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+        }
+        .success-icon { font-size: 80px; color: #ffd700; text-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        
+        /* ===== STAGE 3: 融资决策 ===== */
+        .finance-center { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .finance-config {
+            flex: 1;
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .config-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(0, 240, 255, 0.1); }
+        .config-title { color: #00f0ff; font-size: 20px; letter-spacing: 3px; text-shadow: 0 0 15px rgba(0, 240, 255, 0.3); margin-bottom: 8px; }
+        .config-subtitle { color: rgba(150, 170, 200, 0.7); font-size: 12px; }
+        .config-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .finance-asset-preview { text-align: center; margin-bottom: 30px; }
+        .finance-asset-icon { font-size: 60px; margin-bottom: 15px; }
+        .finance-asset-name { font-size: 18px; color: #00f0ff; margin-bottom: 5px; }
+        .finance-asset-id { font-size: 12px; color: rgba(150, 170, 200, 0.7); }
+        .finance-slider-group { margin-bottom: 25px; }
+        .slider-label { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; color: rgba(200, 220, 240, 0.9); }
+        .slider-value { color: #ffd700; font-family: 'Orbitron', sans-serif; }
+        .finance-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .finance-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .finance-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .finance-stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        .finance-stat-label { font-size: 10px; color: rgba(150, 170, 200, 0.7); margin-bottom: 8px; letter-spacing: 1px; }
+        .finance-stat-value { font-size: 20px; color: #00f0ff; font-family: 'Orbitron', sans-serif; }
+        .config-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .finance-compare {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(10, 15, 30, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        .compare-item {
+            flex: 1;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            text-align: center;
+            opacity: 0.6;
+        }
+        .compare-item.highlight { opacity: 1; background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.2); }
+        .compare-label { font-size: 14px; margin-bottom: 15px; color: rgba(200, 220, 240, 0.9); }
+        .compare-cons, .compare-pros { display: flex; flex-direction: column; gap: 8px; }
+        .cons-item { font-size: 12px; color: rgba(255, 100, 100, 0.9); padding: 8px; background: rgba(255, 100, 100, 0.1); border-radius: 6px; }
+        .pros-item { font-size: 12px; color: rgba(0, 255, 136, 0.9); padding: 8px; background: rgba(0, 255, 136, 0.1); border-radius: 6px; }
+        .deal-summary { margin-bottom: 25px; text-align: left; }
+        .deal-summary-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .deal-summary-label { font-size: 12px; color: rgba(150,170,200,0.8); }
+        .deal-summary-value { font-size: 14px; color: #ffd700; font-family: 'Orbitron', sans-serif; }
+        
+        /* ===== STAGE 4: 3D价值网络 - 太阳系网络化布局 ===== */
+        .stage-4-container {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        
+        .stage-4-header {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .stage-4-title {
+            font-size: 24px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            margin-bottom: 8px;
+        }
+        
+        .stage-4-subtitle {
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.8);
+        }
+        
+        .value-canvas-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #value3dCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        
+        #value3dCanvas:active { cursor: grabbing; }
+        
+        .value-tooltip {
+            position: absolute;
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px 20px;
+            text-align: center;
+            pointer-events: none;
+            transform: translate(-50%, -120%);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            min-width: 120px;
+        }
+        
+        .tooltip-icon { font-size: 32px; margin-bottom: 8px; }
+        .tooltip-name { font-size: 13px; color: rgba(220, 230, 240, 0.9); margin-bottom: 4px; }
+        .tooltip-value { font-size: 16px; color: #ffd700; font-family: 'Orbitron', sans-serif; }
+        
+        .total-revenue-3d {
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px 30px;
+            z-index: 10;
+        }
+        
+        .revenue-label { font-size: 11px; color: rgba(150, 170, 200, 0.8); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .revenue-amount { font-size: 28px; color: #ffd700; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+        .revenue-flow { font-size: 11px; color: rgba(0, 240, 255, 0.8); margin-top: 5px; }
+        
+        .value-detail-3d {
+            position: absolute;
+            right: 40px;
+            top: 20px;
+            width: 340px;
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            z-index: 10;
+        }
+        
+        .detail-3d-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .detail-3d-icon { font-size: 40px; }
+        .detail-3d-title { font-size: 18px; font-family: 'Orbitron', sans-serif; color: #ffd700; }
+        
+        .detail-3d-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(150, 170, 200, 0.6);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .contributor-3d-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid;
+            transition: all 0.3s;
+        }
+        
+        .contributor-3d-row:hover { transform: translateX(5px); background: rgba(0, 0, 0, 0.5); }
+        
+        .contributor-3d-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .contributor-3d-info { flex: 1; }
+        .contributor-3d-name { font-size: 13px; color: rgba(220, 230, 240, 0.9); margin-bottom: 2px; }
+        .contributor-3d-share { font-size: 11px; color: rgba(150, 170, 200, 0.6); }
+        .contributor-3d-amount { font-size: 14px; font-family: 'Orbitron', sans-serif; color: #ffd700; }
+        
+        .detail-3d-total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .detail-3d-total-label { font-size: 12px; color: rgba(150, 170, 200, 0.8); }
+        .detail-3d-total-value { font-size: 20px; color: #ffd700; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        
+        .value-controls-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            font-size: 12px;
+            color: rgba(150, 170, 200, 0.7);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 25px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+        
+        .value-controls-hint span { display: flex; align-items: center; gap: 6px; }
+        
+        /* ===== 底部统计面板 - 统一格式 ===== */
+        .stats-panel { 
+            margin-top: auto; 
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-label { 
+            color: rgba(150, 170, 200, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-label::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: rgba(0, 240, 255, 0.5);
+            border-radius: 50%;
+        }
+        .stat-value { 
+            color: #00f0ff; 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .progress-bar { 
+            height: 3px; 
+            background: rgba(255,255,255,0.08); 
+            border-radius: 2px; 
+            overflow: hidden; 
+            margin-top: 12px;
+        }
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #00f0ff, #0088ff); 
+            width: 0%; 
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D背景 - 所有阶段共享 -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- 导航点 -->
+    <div class="nav-dots">
+        <div class="dot active" onclick="goTo(0)"></div>
+        <div class="dot" onclick="goTo(1)"></div>
+        <div class="dot" onclick="goTo(2)"></div>
+        <div class="dot" onclick="goTo(3)"></div>
+        <div class="dot" onclick="goTo(4)"></div>
+    </div>
+
+    <!-- STAGE 0: 开场 -->
+    <div class="stage active" id="stage0">
+        <div class="stage-0-content">
+            <div class="glass-card">
+                <h1 class="main-title">ECHO PROTOCOL</h1>
+                <div class="subtitle">价值溯源：一款新药的数字旅程</div>
+                <button class="btn btn-gold" onclick="goTo(1)">开始探索</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 1: 资产铸造 -->
+    <div class="stage" id="stage1">
+        <div class="top-nav">
+            <div class="nav-item" onclick="goTo(0)">开场</div>
+            <div class="nav-item active">资产铸造</div>
+            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
+            <div class="nav-item" onclick="goTo(3)">融资决策</div>
+            <div class="nav-item" onclick="goTo(4)">价值分配</div>
+        </div>
+        
+        <div class="main-container">
+            <div class="asset-library">
+                <div class="library-header">
+                    <div class="library-title">⬡ 资产分子库</div>
+                    <div class="library-subtitle">点击卡片进行铸造</div>
+                </div>
+                <div class="asset-grid" id="assetGrid"></div>
+                <div class="stats-panel">
+                    <div class="stat-row">
+                        <span class="stat-label">总资产</span>
+                        <span class="stat-value" id="totalAssets">8</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">已铸造</span>
+                        <span class="stat-value" id="mintedCount">0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview-area">
+                <div class="preview-container">
+                    <div class="platform-rings">
+                        <div class="platform-ring"></div>
+                        <div class="platform-ring"></div>
+                        <div class="platform-ring"></div>
+                    </div>
+                    <canvas id="preview-canvas"></canvas>
+                </div>
+                <div class="preview-info">
+                    <div class="preview-id" id="previewId">ECHO PROTOCOL</div>
+                    <div class="preview-type" id="previewType">选择一个资产分子进行铸造</div>
+                    <button class="mint-btn" id="mainMintBtn" onclick="openMintModal()" disabled>请先选择资产</button>
+                </div>
+            </div>
+            
+            <div class="ownership-panel" id="ownershipPanel">
+                <div class="panel-title">⬡ 权属蓝图</div>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">⬡</div>
+                    <div class="empty-text">选择左侧资产查看详细权属信息</div>
+                </div>
+                <div id="ownershipContent" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <div class="modal-overlay" id="mintModal">
+            <div class="mint-modal">
+                <div class="modal-title">确认铸造</div>
+                <div class="modal-preview">
+                    <canvas id="modal-canvas" style="width: 150px; height: 150px;"></canvas>
+                </div>
+                <div class="modal-asset-name" id="modalAssetName"></div>
+                <div class="modal-asset-id" id="modalAssetId"></div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeModal()">取消</button>
+                    <button class="btn btn-gold" onclick="confirmMint()">确认铸造</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="success-animation" id="successAnimation">
+            <div class="success-icon">✓</div>
+        </div>
+    </div>
+
+    <!-- STAGE 2: 协作衍生 -->
+    <div class="stage" id="stage2">
+        <div class="top-nav">
+            <div class="nav-item" onclick="goTo(0)">开场</div>
+            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
+            <div class="nav-item active">协作衍生</div>
+            <div class="nav-item" onclick="goTo(3)">融资决策</div>
+            <div class="nav-item" onclick="goTo(4)">价值分配</div>
+        </div>
+        
+        <div class="main-container">
+            <div class="asset-library">
+                <div class="library-header">
+                    <div class="library-title">⬡ 已铸造资产</div>
+                    <div class="library-subtitle">拖拽资产到协作池进行融合</div>
+                </div>
+                <div class="asset-grid" id="fusionGrid"></div>
+            </div>
+            
+            <div class="fusion-area">
+                <div class="fusion-pool" id="poolContainer">
+                    <div class="pool-content" id="poolContent">
+                        <div class="pool-hint" id="poolHint">
+                            <div class="pool-hint-icon">⬡</div>
+                            <div class="pool-hint-text">协作池</div>
+                            <div class="pool-hint-sub">拖拽左侧资产到此处开始融合</div>
+                        </div>
+                        <div class="pool-center-preview" id="poolCenterPreview">
+                            <canvas id="pool-canvas" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                    <div class="drag-hint">可拖拽调整位置</div>
+                </div>
+                
+                <div class="fusion-control">
+                    <div class="fusion-stats">
+                        <div class="stat-item">
+                            <div class="stat-num" id="poolCount">0</div>
+                            <div class="stat-label">已选资产</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-num" id="totalShare">100%</div>
+                            <div class="stat-label">总权益</div>
+                        </div>
+                    </div>
+                    <div class="fusion-btns">
+                        <button class="btn" id="clearBtn" onclick="clearPool()" style="opacity:0; pointer-events:none; border-color:rgba(255,71,87,0.4); color:#ff4757;">清空</button>
+                        <button class="fuse-btn" id="fuseBtn" onclick="openFusionModal()" disabled>✨ 开始融合</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ownership-panel">
+                <div class="panel-title">⬡ 融合权属</div>
+                <div id="fusionPanel">
+                    <div class="section-label">已选资产</div>
+                    <div class="selected-tags" id="selectedTags">
+                        <div style="color: rgba(150,170,200,0.5); font-size: 12px; padding: 10px 0;">暂无选中资产</div>
+                    </div>
+                    <div class="section-label">权益分配</div>
+                    <div id="shareList"></div>
+                    <div class="section-label">融合规则</div>
+                    <div class="rule-box">
+                        • 所有选中资产的权属将合并<br>
+                        • 收益按资产类型权重自动分配<br>
+                        • 继承上游资产全部规则<br>
+                        • 里程碑触发即时结算
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-overlay" id="fusionModal">
+            <div class="fusion-modal">
+                <div class="modal-title">确认融合</div>
+                <div class="modal-preview">
+                    <canvas id="fusion-canvas" style="width: 150px; height: 150px;"></canvas>
+                </div>
+                <div class="fusion-result" id="fusionResult">NeuroBlok</div>
+                <div class="modal-asset-name" id="fusionAssetName"></div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeFusionModal()">取消</button>
+                    <button class="btn btn-gold" onclick="confirmFusion()">确认融合</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-overlay" id="fusionSuccessModal">
+            <div class="fusion-modal" style="max-width: 900px; width: 95%; max-height: 95vh; overflow-y: auto;">
+                <div style="font-size: 50px; margin-bottom: 10px;">✨</div>
+                <div class="modal-title">融合成功</div>
+                <div style="color: rgba(150,170,200,0.7); margin-bottom: 25px;">新资产已生成 | 详细的权属关系图谱</div>
+                
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,215,0,0.2); border-radius: 20px; padding: 30px; margin-bottom: 25px; position: relative; min-height: 300px;" id="fusionGraphContainer">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10;">
+                        <div style="font-size: 80px; margin-bottom: 10px; animation: pulse 2s infinite; filter: drop-shadow(0 0 30px rgba(255,215,0,0.6));">✨</div>
+                        <div style="font-size: 22px; color: #ffd700; font-family: Orbitron; letter-spacing: 2px;">NeuroBlok</div>
+                        <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-top: 5px;">融合资产 v2.0</div>
+                        <div style="font-size: 14px; color: #00f0ff; margin-top: 8px;">估值: <span id="fusionValue">5.0</span> ETH</div>
+                    </div>
+                    <div id="fusionSourcesContainer"></div>
+                    <svg id="fusionLines" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;"></svg>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(0,240,255,0.1);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">🧬</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">来源资产</div>
+                        <div style="font-size: 14px; color: #00f0ff; font-family: Orbitron;" id="sourceCount">2个</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(255,215,0,0.2);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">🔄</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">融合规则</div>
+                        <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">加权合并</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(255,215,0,0.2);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">✨</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">生成资产</div>
+                        <div style="font-size: 14px; color: #ffd700; font-family: Orbitron;">NeuroBlok</div>
+                    </div>
+                    <div style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid rgba(0,255,136,0.1);">
+                        <div style="font-size: 30px; margin-bottom: 8px;">📝</div>
+                        <div style="font-size: 11px; color: rgba(150,170,200,0.7);">权属继承</div>
+                        <div style="font-size: 14px; color: #00ff88; font-family: Orbitron;">100%</div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: left;">
+                    <div style="font-size: 12px; color: rgba(150,170,200,0.8); margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;">权益分配明细</div>
+                    <div id="fusionDetailList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+                
+                <div style="background: rgba(255,215,0,0.08); border-left: 3px solid #ffd700; border-radius: 0 10px 10px 0; padding: 15px; margin-bottom: 25px; text-align: left; font-size: 12px; color: rgba(220,230,240,0.9); line-height: 1.6;">
+                    <strong style="color: #ffd700;">融合规则说明：</strong><br>
+                    • 所有选中资产的权属将合并至新资产<br>
+                    • 收益权按资产类型权重自动分配<br>
+                    • 上游资产的全部规则被继承<br>
+                    • 里程碑触发时自动结算收益
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeFusionSuccessModal()" style="border-color: rgba(0,240,255,0.4); color: #00f0ff;">返回协作池</button>
+                    <button class="btn btn-gold" onclick="goToFinanceFromFusion()">进入融资决策 →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 3: 融资决策 -->
+    <div class="stage" id="stage3">
+        <div class="top-nav">
+            <div class="nav-item" onclick="goTo(0)">开场</div>
+            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
+            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
+            <div class="nav-item active">融资决策</div>
+            <div class="nav-item" onclick="goTo(4)">价值分配</div>
+        </div>
+        
+        <div class="main-container">
+            <div class="asset-library">
+                <div class="library-header">
+                    <div class="library-title">⬡ 可融资资产</div>
+                    <div class="library-subtitle">选择资产进行融资</div>
+                </div>
+                <div class="asset-grid" id="financeGrid"></div>
+                <div class="stats-panel">
+                    <div class="stat-row">
+                        <span class="stat-label">总资产价值</span>
+                        <span class="stat-value" id="totalValue">0 ETH</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">可融资额度</span>
+                        <span class="stat-value" style="color: #ffd700;" id="availableCredit">0 ETH</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="finance-center">
+                <div class="finance-config">
+                    <div class="config-header">
+                        <div class="config-title">⬡ 融资配置</div>
+                        <div class="config-subtitle">所有权与收益权分离</div>
+                    </div>
+                    
+                    <div class="config-content" id="configContent">
+                        <div class="empty-state">
+                            <div class="empty-icon">⬡</div>
+                            <div class="empty-text">选择左侧资产开始配置融资方案</div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-actions" id="configActions" style="display: none;">
+                        <button class="btn" onclick="resetFinance()">重置</button>
+                        <button class="btn btn-gold" onclick="previewDeal()">生成融资方案</button>
+                    </div>
+                </div>
+                
+                <div class="finance-compare">
+                    <div class="compare-item">
+                        <div class="compare-label">传统融资</div>
+                        <div class="compare-cons">
+                            <div class="cons-item">✗ 股权稀释</div>
+                            <div class="cons-item">✗ 所有权丧失</div>
+                            <div class="cons-item">✗ 决策权受限</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compare-item highlight">
+                        <div class="compare-label" style="color: #ffd700;">ECHO融资</div>
+                        <div class="compare-pros">
+                            <div class="pros-item">✓ 收益权代币化</div>
+                            <div class="pros-item">✓ 所有权零稀释</div>
+                            <div class="pros-item">✓ 数据灵魂永存</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ownership-panel" id="dealPanel">
+                <div class="panel-title">⬡ 融资条款预览</div>
+                <div id="dealContent">
+                    <div class="empty-state">
+                        <div class="empty-icon">⬡</div>
+                        <div class="empty-text">配置融资方案后查看条款</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-overlay" id="dealModal">
+            <div class="fusion-modal">
+                <div class="modal-title">确认融资方案</div>
+                <div class="modal-preview">
+                    <canvas id="deal-canvas" style="width: 150px; height: 150px;"></canvas>
+                </div>
+                <div class="deal-summary" id="dealSummary"></div>
+                <div class="modal-actions">
+                    <button class="btn" onclick="closeDealModal()">取消</button>
+                    <button class="btn btn-gold" onclick="confirmDeal()">确认融资</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-overlay" id="dealSuccessModal">
+            <div class="fusion-modal">
+                <div style="font-size: 60px; margin-bottom: 20px;">💰</div>
+                <div class="modal-title">融资成功</div>
+                <div style="color: rgba(150,170,200,0.7); margin-bottom: 20px;">收益权代币已铸造</div>
+                <div class="fusion-result" id="tokenResult">1000 ECHO-Tokens</div>
+                <div class="modal-actions">
+                    <button class="btn btn-gold" onclick="closeDealSuccessModal()">进入价值分配</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 4: 3D价值网络 - 太阳系网络化布局 -->
+    <div class="stage" id="stage4">
+        <div class="top-nav">
+            <div class="nav-item" onclick="goTo(0)">开场</div>
+            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
+            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
+            <div class="nav-item" onclick="goTo(3)">融资决策</div>
+            <div class="nav-item active">价值分配</div>
+        </div>
+        
+        <div class="stage-4-container">
+            <div class="stage-4-header">
+                <div class="stage-4-title">⬡ 价值溯源网络</div>
+                <div class="stage-4-subtitle">点击节点查看贡献者收益详情</div>
+            </div>
+            
+            <div class="value-canvas-wrapper">
+                <canvas id="value3dCanvas"></canvas>
+            </div>
+            
+            <div class="total-revenue-3d">
+                <div class="revenue-label">总收益池</div>
+                <div class="revenue-amount">$100,000,000</div>
+                <div class="revenue-flow">↓ 价值沿分子链流动</div>
+            </div>
+            
+            <div class="value-detail-3d" id="valueDetail3d">
+                <div class="detail-3d-header">
+                    <div class="detail-3d-icon" id="detail3dIcon">💰</div>
+                    <div class="detail-3d-title" id="detail3dTitle">选择一个节点</div>
+                </div>
+                <div class="detail-3d-content" id="detail3dContent">
+                    <div class="detail-3d-empty">点击3D网络中的节点查看详细收益分配</div>
+                </div>
+            </div>
+            
+            <div class="value-controls-hint">
+                <span>🖱️ 拖拽旋转视角</span>
+                <span>👆 点击节点查看详情</span>
+                <span>🔍 滚轮缩放</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ===== 资产数据 =====
+        const assets = [
+            { id: 'PDB-001', name: '蛋白质结构', icon: '🧬', color: '#00f0ff', colorHex: 0x00f0ff, type: 'protein', weight: 1.2, value: 2.5, minted: false,
+              contributors: [{name: 'AlphaFold Team', share: '45%'}, {name: 'Dr. Zhang Lab', share: '35%'}, {name: 'Open Data Fund', share: '20%'}],
+              rules: '商业应用需署名原始贡献者<br>衍生作品自动继承50%收益权<br>开源使用无需授权费用',
+              created: '2024.03.15' },
+            { id: 'CHEM-002', name: '化合物库', icon: '⚗️', color: '#00ff88', colorHex: 0x00ff88, type: 'compound', weight: 1.0, value: 2.0, minted: false,
+              contributors: [{name: 'ChemCorp Inc.', share: '60%'}, {name: 'University Lab', share: '30%'}, {name: 'Community', share: '10%'}],
+              rules: '商业使用需支付1%营收作为反馈金<br>二次开发需共享改进数据<br>专利引用自动触发收益分配',
+              created: '2024.02.20' },
+            { id: 'GENE-003', name: '基因序列', icon: '🧪', color: '#0088ff', colorHex: 0x0088ff, type: 'gene', weight: 1.5, value: 3.0, minted: false,
+              contributors: [{name: 'Genome Project', share: '50%'}, {name: 'MIT Lab', share: '30%'}, {name: 'Public', share: '20%'}],
+              rules: '开源使用免费，商业应用需获得授权<br>数据使用需遵守伦理委员会规定<br>商业转化收益的20%用于罕见病研究',
+              created: '2024.01.10' },
+            { id: 'VSCREEN-004', name: '虚拟筛选', icon: '💻', color: '#88ffcc', colorHex: 0x88ffcc, type: 'screening', weight: 0.8, value: 1.5, minted: false,
+              contributors: [{name: 'AI Pharma', share: '70%'}, {name: 'Cloud Compute', share: '30%'}],
+              rules: '按使用量计费，收益自动分配给贡献方<br>算法改进需开源贡献<br>阳性结果触发自动通知',
+              created: '2024.03.01' },
+            { id: 'ASSAY-005', name: '实验数据', icon: '📊', color: '#a29bfe', colorHex: 0xa29bfe, type: 'assay', weight: 1.3, value: 2.8, minted: false,
+              contributors: [{name: 'BioLab Co.', share: '80%'}, {name: 'Researchers', share: '20%'}],
+              rules: '原始数据不可篡改<br>实验方法需完整披露<br>重复实验优先使用相同设备',
+              created: '2024.02.15' },
+            { id: 'CLINICAL-006', name: '临床数据', icon: '🏥', color: '#ffa502', colorHex: 0xffa502, type: 'clinical', weight: 2.0, value: 5.0, minted: false,
+              contributors: [{name: 'Hospital Network', share: '40%'}, {name: 'Patient Consent', share: '35%'}, {name: 'Ethics Board', share: '25%'}],
+              rules: '患者隐私受零知识证明保护<br>负面结果同等重要并奖励<br>数据使用需伦理委员会批准',
+              created: '2024.03.10' },
+            { id: 'PATENT-007', name: '专利信息', icon: '📜', color: '#ff69b4', colorHex: 0xff69b4, type: 'patent', weight: 1.8, value: 4.5, minted: false,
+              contributors: [{name: 'Inventor Team', share: '50%'}, {name: 'Institution', share: '35%'}, {name: 'Legal DAO', share: '15%'}],
+              rules: '专利到期自动转为开放许可<br>侵权诉讼收益按比例分配<br>许可费用按引用次数递减',
+              created: '2024.01.25' },
+            { id: 'PAPER-008', name: '论文数据', icon: '📄', color: '#ff6b6b', colorHex: 0xff6b6b, type: 'paper', weight: 1.0, value: 1.8, minted: false,
+              contributors: [{name: 'Author Team', share: '60%'}, {name: 'Journal DAO', share: '25%'}, {name: 'Peer Reviewers', share: '15%'}],
+              rules: '引用即产生微支付<br>数据复用需引用原始论文<br>开放获取版本收益归作者',
+              created: '2024.02.28' },
+            { id: 'NeuroBlok', name: 'NeuroBlok', icon: '✨', color: '#ffd700', colorHex: 0xffd700, type: 'collaboration', weight: 2.5, value: 8.0, minted: false,
+              contributors: [{name: 'NeuroDAO', share: '40%'}, {name: 'Core Contributors', share: '35%'}, {name: 'Community Treasury', share: '25%'}],
+              rules: '重大决策需DAO投票<br>代码贡献与治理权重挂钩<br>新成员加入需现有成员背书',
+              created: '2024.03.20' }
+        ];
+
+        let selectedAsset = null;
+        let poolAssets = [];
+        let poolCounter = 0;
+        let currentStage = 0;
+        let bgRenderer, bgScene, bgCamera, bgParticles;
+
+        // ===== 创建3D分子模型（与前面阶段一致）=====
+        function createMolecule(type, color, scale = 1) {
+            const group = new THREE.Group();
+            const material = new THREE.MeshPhongMaterial({ 
+                color: color, 
+                emissive: color, 
+                emissiveIntensity: 0.3, 
+                shininess: 100 
+            });
+            
+            switch(type) {
+                case 'protein':
+                    for (let i = 0; i < 20; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.3 * scale, 16, 16),
+                            material
+                        );
+                        const angle = i * 0.5;
+                        const y = (i - 10) * 0.25;
+                        sphere.position.set(
+                            Math.cos(angle) * 1.2 * scale, 
+                            y * scale, 
+                            Math.sin(angle) * 1.2 * scale
+                        );
+                        group.add(sphere);
+                        if (i > 0) {
+                            const prev = group.children[i - 1];
+                            const line = new THREE.Line(
+                                new THREE.BufferGeometry().setFromPoints([prev.position, sphere.position]),
+                                new THREE.LineBasicMaterial({ color: color, opacity: 0.5, transparent: true })
+                            );
+                            group.add(line);
+                        }
+                    }
+                    break;
+                    
+                case 'compound':
+                    const ringCount = 6;
+                    for (let i = 0; i < ringCount; i++) {
+                        const angle = (i / ringCount) * Math.PI * 2;
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.35 * scale, 16, 16),
+                            material
+                        );
+                        sphere.position.set(
+                            Math.cos(angle) * 1.0 * scale, 
+                            0, 
+                            Math.sin(angle) * 1.0 * scale
+                        );
+                        group.add(sphere);
+                        
+                        const nextAngle = ((i + 1) % ringCount / ringCount) * Math.PI * 2;
+                        const nextPos = new THREE.Vector3(
+                            Math.cos(nextAngle) * 1.0 * scale, 
+                            0, 
+                            Math.sin(nextAngle) * 1.0 * scale
+                        );
+                        const line = new THREE.Line(
+                            new THREE.BufferGeometry().setFromPoints([sphere.position, nextPos]),
+                            new THREE.LineBasicMaterial({ color: color, opacity: 0.6, transparent: true })
+                        );
+                        group.add(line);
+                    }
+                    const centerAtom = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.45 * scale, 16, 16),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.5 })
+                    );
+                    centerAtom.position.set(0, 0.3 * scale, 0);
+                    group.add(centerAtom);
+                    break;
+                    
+                case 'gene':
+                    for (let i = 0; i < 24; i++) {
+                        const t = i * 0.3;
+                        const y = (i - 12) * 0.2;
+                        const sphere1 = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.22 * scale, 12, 12),
+                            material
+                        );
+                        sphere1.position.set(
+                            Math.cos(t) * 0.9 * scale, 
+                            y * scale, 
+                            Math.sin(t) * 0.9 * scale
+                        );
+                        group.add(sphere1);
+                        
+                        const sphere2 = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.22 * scale, 12, 12),
+                            material
+                        );
+                        sphere2.position.set(
+                            Math.cos(t + Math.PI) * 0.9 * scale, 
+                            y * scale, 
+                            Math.sin(t + Math.PI) * 0.9 * scale
+                        );
+                        group.add(sphere2);
+                        
+                        if (i % 2 === 0) {
+                            const bridge = new THREE.Line(
+                                new THREE.BufferGeometry().setFromPoints([sphere1.position, sphere2.position]),
+                                new THREE.LineBasicMaterial({ color: color, opacity: 0.3, transparent: true })
+                            );
+                            group.add(bridge);
+                        }
+                    }
+                    break;
+                    
+                case 'screening':
+                    for (let x = -2; x <= 2; x++) {
+                        for (let y = -2; y <= 2; y++) {
+                            for (let z = -2; z <= 2; z++) {
+                                if (Math.random() > 0.65) {
+                                    const sphere = new THREE.Mesh(
+                                        new THREE.SphereGeometry(0.12 * scale, 8, 8),
+                                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.4 })
+                                    );
+                                    sphere.position.set(x * 0.7 * scale, y * 0.7 * scale, z * 0.7 * scale);
+                                    group.add(sphere);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                    
+                case 'assay':
+                    for (let i = 0; i < 8; i++) {
+                        const height = 0.3 + Math.random() * 1.2;
+                        const bar = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.25 * scale, height * scale, 0.25 * scale),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2, transparent: true, opacity: 0.9 })
+                        );
+                        bar.position.set((i - 3.5) * 0.45 * scale, (height * scale / 2) - 0.8, 0);
+                        group.add(bar);
+                    }
+                    break;
+                    
+                case 'clinical':
+                    const heartShape = [];
+                    for (let i = 0; i <= 20; i++) {
+                        const t = (i / 20) * Math.PI * 2;
+                        const x = 16 * Math.pow(Math.sin(t), 3);
+                        const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                        heartShape.push(new THREE.Vector3(x * 0.06 * scale, y * 0.06 * scale, 0));
+                    }
+                    for (let i = 0; i < heartShape.length - 1; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.15 * scale, 12, 12),
+                            material
+                        );
+                        sphere.position.copy(heartShape[i]);
+                        group.add(sphere);
+                        
+                        const line = new THREE.Line(
+                            new THREE.BufferGeometry().setFromPoints([heartShape[i], heartShape[i + 1]]),
+                            new THREE.LineBasicMaterial({ color: color, opacity: 0.5 })
+                        );
+                        group.add(line);
+                    }
+                    break;
+                    
+                case 'patent':
+                    const docGroup = new THREE.Group();
+                    const doc = new THREE.Mesh(
+                        new THREE.BoxGeometry(1.8 * scale, 2.2 * scale, 0.15 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                    );
+                    docGroup.add(doc);
+                    
+                    const patentHeartShape = new THREE.Shape();
+                    patentHeartShape.moveTo(0, 0);
+                    patentHeartShape.bezierCurveTo(0, -0.5, -1, -1, -1.5, 0);
+                    patentHeartShape.bezierCurveTo(-2, 1, -1, 2, 0, 3);
+                    patentHeartShape.bezierCurveTo(1, 2, 2, 1, 1.5, 0);
+                    patentHeartShape.bezierCurveTo(1, -1, 0, -0.5, 0, 0);
+                    const patentExtrudeSettings = { depth: 0.3 * scale, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.05 * scale, bevelThickness: 0.05 * scale };
+                    const patentHeartGeo = new THREE.ExtrudeGeometry(patentHeartShape, patentExtrudeSettings);
+                    const patentHeart = new THREE.Mesh(
+                        patentHeartGeo,
+                        new THREE.MeshPhongMaterial({ color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 0.4, shininess: 100 })
+                    );
+                    patentHeart.scale.set(scale * 0.25, scale * 0.25, scale * 0.25);
+                    patentHeart.position.set(0.4 * scale, 0.3 * scale, 0.1 * scale);
+                    patentHeart.rotation.z = Math.PI;
+                    docGroup.add(patentHeart);
+                    
+                    for (let i = 0; i < 4; i++) {
+                        const line = new THREE.Mesh(
+                            new THREE.BoxGeometry(1.2 * scale, 0.08 * scale, 0.02 * scale),
+                            new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })
+                        );
+                        line.position.set(0, 0.5 * scale - i * 0.35 * scale, 0.08 * scale);
+                        docGroup.add(line);
+                    }
+                    group.add(docGroup);
+                    break;
+                    
+                case 'paper':
+                    const paperGroup = new THREE.Group();
+                    const leftPage = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.9 * scale, 2.0 * scale, 0.1 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                    );
+                    leftPage.position.set(-0.5 * scale, 0, 0);
+                    leftPage.rotation.z = 0.1;
+                    paperGroup.add(leftPage);
+                    
+                    const rightPage = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.9 * scale, 2.0 * scale, 0.1 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
+                    );
+                    rightPage.position.set(0.5 * scale, 0, 0);
+                    rightPage.rotation.z = -0.1;
+                    paperGroup.add(rightPage);
+                    
+                    const spine = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.2 * scale, 2.0 * scale, 0.15 * scale),
+                        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.4 })
+                    );
+                    paperGroup.add(spine);
+                    
+                    for (let i = 0; i < 3; i++) {
+                        const lineL = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.6 * scale, 0.06 * scale, 0.05 * scale),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 })
+                        );
+                        lineL.position.set(-0.5 * scale, 0.5 - i * 0.4, 0.08 * scale);
+                        lineL.rotation.z = 0.1;
+                        paperGroup.add(lineL);
+                        
+                        const lineR = new THREE.Mesh(
+                            new THREE.BoxGeometry(0.6 * scale, 0.06 * scale, 0.05 * scale),
+                            new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 })
+                        );
+                        lineR.position.set(0.5 * scale, 0.5 - i * 0.4, 0.08 * scale);
+                        lineR.rotation.z = -0.1;
+                        paperGroup.add(lineR);
+                    }
+                    group.add(paperGroup);
+                    break;
+                    
+                case 'collaboration':
+                    const collabGeo = new THREE.IcosahedronGeometry(1.0 * scale, 1);
+                    const wireframe = new THREE.WireframeGeometry(collabGeo);
+                    const line = new THREE.LineSegments(wireframe, new THREE.LineBasicMaterial({ color: color, opacity: 0.6, transparent: true }));
+                    group.add(line);
+                    const pos = collabGeo.attributes.position;
+                    for (let i = 0; i < pos.count; i += 2) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.08 * scale, 8, 8),
+                            new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.8 })
+                        );
+                        sphere.position.set(pos.getX(i), pos.getY(i), pos.getZ(i));
+                        group.add(sphere);
+                    }
+                    break;
+                    
+                case 'drug':
+                    const capsuleGroup = new THREE.Group();
+                    
+                    const topSphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6 * scale, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffd700, 
+                            emissive: 0xffaa00, 
+                            emissiveIntensity: 0.5,
+                            shininess: 120
+                        })
+                    );
+                    topSphere.position.y = 0.6 * scale;
+                    capsuleGroup.add(topSphere);
+                    
+                    const bottomSphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6 * scale, 32, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffffff, 
+                            emissive: 0xdddddd, 
+                            emissiveIntensity: 0.2,
+                            shininess: 120
+                        })
+                    );
+                    bottomSphere.position.y = -0.6 * scale;
+                    capsuleGroup.add(bottomSphere);
+                    
+                    const cylinder = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.6 * scale, 0.6 * scale, 1.2 * scale, 32),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffd700, 
+                            emissive: 0xffaa00, 
+                            emissiveIntensity: 0.3 
+                        })
+                    );
+                    capsuleGroup.add(cylinder);
+                    
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (i / 12) * Math.PI * 2;
+                        const orbitRadius = 1.3 * scale;
+                        const smallSphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.12 * scale, 12, 12),
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0x00f0ff, 
+                                emissive: 0x00f0ff, 
+                                emissiveIntensity: 0.5 
+                            })
+                        );
+                        smallSphere.position.set(
+                            Math.cos(angle) * orbitRadius,
+                            Math.sin(i * 0.5) * 0.5 * scale,
+                            Math.sin(angle) * orbitRadius
+                        );
+                        capsuleGroup.add(smallSphere);
+                    }
+                    
+                    group.add(capsuleGroup);
+                    break;
+                    
+                default:
+                    for (let i = 0; i < 15; i++) {
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.3 * scale, 16, 16),
+                            material
+                        );
+                        const angle = i * 0.5;
+                        sphere.position.set(
+                            Math.cos(angle) * 1.2 * scale, 
+                            (i - 7) * 0.3 * scale, 
+                            Math.sin(angle) * 1.2 * scale
+                        );
+                        group.add(sphere);
+                    }
+            }
+            return group;
+        }
+
+        // ===== 背景粒子系统（所有阶段共享）=====
+        function initBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            if (!canvas) return;
+            
+            bgScene = new THREE.Scene();
+            bgCamera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            bgRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            bgRenderer.setSize(window.innerWidth, window.innerHeight);
+            bgRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            const particleCount = 1500;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const color1 = new THREE.Color(0x00f0ff);
+            const color2 = new THREE.Color(0xffd700);
+            
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 100;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+                const mixedColor = color1.clone().lerp(color2, Math.random());
+                colors[i * 3] = mixedColor.r;
+                colors[i * 3 + 1] = mixedColor.g;
+                colors[i * 3 + 2] = mixedColor.b;
+            }
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.15,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            bgParticles = new THREE.Points(geometry, material);
+            bgScene.add(bgParticles);
+            bgCamera.position.z = 30;
+            
+            animateBackground();
+            
+            window.addEventListener('resize', () => {
+                if (bgCamera && bgRenderer) {
+                    bgCamera.aspect = window.innerWidth / window.innerHeight;
+                    bgCamera.updateProjectionMatrix();
+                    bgRenderer.setSize(window.innerWidth, window.innerHeight);
+                }
+            });
+        }
+
+        function animateBackground() {
+            requestAnimationFrame(animateBackground);
+            if (bgParticles) {
+                bgParticles.rotation.y += 0.0003;
+            }
+            if (bgRenderer && bgScene && bgCamera) {
+                bgRenderer.render(bgScene, bgCamera);
+            }
+        }
+
+        // ===== Stage 4: 太阳系网络化3D价值网络 =====
+        let valueScene, valueCamera, valueRenderer;
+        let valueNodes = [], valueConnections = [], valueParticles = [];
+        let isDragging = false;
+        let mouseX = 0, mouseY = 0;
+        let targetRotationX = 0, targetRotationY = 0;
+
+        function initValue3D() {
+            const canvas = document.getElementById('value3dCanvas');
+            if (!canvas) return;
+            
+            valueScene = new THREE.Scene();
+            valueScene.fog = new THREE.FogExp2(0x020208, 0.012);
+            
+            valueCamera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            valueCamera.position.set(0, 35, 80);
+            valueCamera.lookAt(0, 0, 0);
+            
+            valueRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            valueRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            valueRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            valueScene.add(ambientLight);
+            
+            const pointLight = new THREE.PointLight(0xffd700, 1.5, 150);
+            pointLight.position.set(20, 30, 20);
+            valueScene.add(pointLight);
+            
+            const pointLight2 = new THREE.PointLight(0x00f0ff, 0.8, 150);
+            pointLight2.position.set(-20, 20, -20);
+            valueScene.add(pointLight2);
+            
+            buildSolarNetwork();
+            
+            canvas.addEventListener('mousedown', onValueMouseDown);
+            canvas.addEventListener('mousemove', onValueMouseMove);
+            canvas.addEventListener('mouseup', onValueMouseUp);
+            canvas.addEventListener('wheel', onValueWheel);
+            
+            animateValue3D();
+        }
+
+        function buildSolarNetwork() {
+            // 清除旧节点
+            valueNodes.forEach(n => valueScene.remove(n.mesh));
+            valueConnections.forEach(c => valueScene.remove(c.line));
+            valueParticles.forEach(p => valueScene.remove(p.mesh));
+            valueNodes = [];
+            valueConnections = [];
+            valueParticles = [];
+            
+            const mintedAssets = assets.filter(a => a.minted);
+            const neuroBlok = assets.find(a => a.id === 'NeuroBlok');
+            const hasFusion = neuroBlok && neuroBlok.minted;
+            
+            // 获取源资产ID
+            let sourceAssetIds = [];
+            if (hasFusion && neuroBlok.generatedFrom) {
+                sourceAssetIds = neuroBlok.generatedFrom.split('+');
+            }
+            
+            // 如果没有铸造资产，显示所有资产作为演示
+            let displayAssets = mintedAssets.filter(a => a.id !== 'NeuroBlok');
+            if (displayAssets.length === 0) {
+                displayAssets = assets.filter(a => a.id !== 'NeuroBlok').slice(0, 6);
+            }
+            
+            const totalRevenue = 100;
+            const neuroBlokRevenue = hasFusion ? totalRevenue * 0.4 : 0;
+            
+            const nodesData = [];
+            
+            // ========== 中心：新药上市（太阳）==========
+            nodesData.push({
+                id: 'root',
+                icon: '💊',
+                label: '新药上市',
+                name: '新药上市',
+                value: totalRevenue,
+                color: 0xffd700,
+                position: new THREE.Vector3(0, 0, 0),
+                asset: null,
+                size: 5.5
+            });
+            
+            // ========== 内环：NeuroBlok（如有融合）==========
+            if (hasFusion) {
+                nodesData.push({
+                    id: 'neuroblok',
+                    icon: '✨',
+                    label: 'NeuroBlok',
+                    name: neuroBlok.name,
+                    value: neuroBlokRevenue,
+                    color: 0x00f0ff,
+                    position: new THREE.Vector3(0, 0, -14),
+                    asset: neuroBlok,
+                    size: 3.5
+                });
+            }
+            
+            // ========== 外环：分子资产（太阳系式分布）==========
+            const count = displayAssets.length;
+            const outerRadius = 32;  // 外环半径
+            
+            displayAssets.forEach((asset, i) => {
+                const angle = (i / Math.max(count, 1)) * Math.PI * 2;
+                const x = Math.cos(angle) * outerRadius;
+                const z = Math.sin(angle) * outerRadius;
+                
+                let revenue;
+                const isSource = sourceAssetIds.includes(asset.id);
+                if (hasFusion && isSource) {
+                    revenue = (neuroBlokRevenue / sourceAssetIds.length) * 0.6;
+                } else {
+                    revenue = (asset.value / 20) * (totalRevenue - neuroBlokRevenue) * 0.5;
+                }
+                
+                nodesData.push({
+                    id: asset.id,
+                    icon: asset.icon,
+                    label: asset.name,
+                    name: asset.name,
+                    value: revenue,
+                    color: asset.colorHex,
+                    position: new THREE.Vector3(x, 0, z),
+                    asset: asset,
+                    size: 2.8
+                });
+            });
+            
+            // 创建节点
+            nodesData.forEach((nodeData) => {
+                const group = new THREE.Group();
+                group.position.copy(nodeData.position);
+                
+                // 创建3D分子模型 - 使用统一的createMolecule函数
+                let moleculeGroup;
+                if (nodeData.id === 'root') {
+                    moleculeGroup = createMolecule('drug', nodeData.color, 2.2);
+                } else if (nodeData.id === 'neuroblok') {
+                    moleculeGroup = createMolecule('collaboration', nodeData.color, 1.8);
+                } else if (nodeData.asset) {
+                    moleculeGroup = createMolecule(nodeData.asset.type, nodeData.color, 1.6);
+                } else {
+                    moleculeGroup = createMolecule('compound', nodeData.color, 1.6);
+                }
+                
+                // 内敛的发光层
+                const innerGlow = new THREE.Mesh(
+                    new THREE.SphereGeometry(nodeData.size * 1.15, 32, 32),
+                    new THREE.MeshBasicMaterial({
+                        color: nodeData.color,
+                        transparent: true,
+                        opacity: 0.2,
+                        blending: THREE.AdditiveBlending
+                    })
+                );
+                group.add(innerGlow);
+                
+                const outerGlow = new THREE.Mesh(
+                    new THREE.SphereGeometry(nodeData.size * 1.5, 32, 32),
+                    new THREE.MeshBasicMaterial({
+                        color: nodeData.color,
+                        transparent: true,
+                        opacity: 0.08,
+                        blending: THREE.AdditiveBlending
+                    })
+                );
+                group.add(outerGlow);
+                
+                // 添加强点光源
+                const light = new THREE.PointLight(nodeData.color, 2, 50);
+                group.add(light);
+                
+                // 添加模型
+                group.add(moleculeGroup);
+                group.userData = { ...nodeData, model: moleculeGroup };
+                
+                valueScene.add(group);
+                valueNodes.push({ mesh: group, data: nodeData });
+            });
+            
+            // 创建轨道线
+            if (displayAssets.length > 0) {
+                const orbitGeometry = new THREE.RingGeometry(outerRadius - 0.5, outerRadius + 0.5, 64);
+                const orbitMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.05,
+                    side: THREE.DoubleSide
+                });
+                const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+                orbit.rotation.x = Math.PI / 2;
+                valueScene.add(orbit);
+            }
+            
+            // 创建连线
+            if (hasFusion) {
+                createValueConnection('neuroblok', 'root', 0x00f0ff);
+            }
+            
+            displayAssets.forEach(asset => {
+                if (hasFusion && sourceAssetIds.includes(asset.id)) {
+                    createValueConnection(asset.id, 'neuroblok', asset.colorHex);
+                } else {
+                    createValueConnection(asset.id, 'root', asset.colorHex);
+                }
+            });
+            
+            createValueParticles();
+            
+            if (nodesData.length > 0) {
+                showValueNodeDetail(nodesData[0]);
+            }
+        }
+
+        function createValueConnection(fromId, toId, color) {
+            const fromNode = valueNodes.find(n => n.data.id === fromId);
+            const toNode = valueNodes.find(n => n.data.id === toId);
+            if (!fromNode || !toNode) return;
+            
+            const points = [fromNode.data.position, toNode.data.position];
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.25
+            });
+            
+            const line = new THREE.Line(geometry, material);
+            valueScene.add(line);
+            valueConnections.push({ line, from: fromNode, to: toNode });
+        }
+
+        function createValueParticles() {
+            valueConnections.forEach(conn => {
+                for (let i = 0; i < 3; i++) {
+                    const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+                    const material = new THREE.MeshBasicMaterial({
+                        color: 0xffd700,
+                        transparent: true,
+                        opacity: 0.9
+                    });
+                    const particle = new THREE.Mesh(geometry, material);
+                    valueScene.add(particle);
+                    
+                    valueParticles.push({
+                        mesh: particle,
+                        from: conn.from.data.position,
+                        to: conn.to.data.position,
+                        progress: i / 3,
+                        speed: 0.006 + Math.random() * 0.003
+                    });
+                }
+            });
+        }
+
+        function animateValue3D() {
+            requestAnimationFrame(animateValue3D);
+            
+            if (!valueRenderer || !valueScene || !valueCamera) return;
+            
+            const time = Date.now() * 0.001;
+            
+            if (!isDragging) {
+                valueScene.rotation.y += 0.00025;
+            }
+            
+            valueScene.rotation.x += (targetRotationX - valueScene.rotation.x) * 0.05;
+            valueScene.rotation.y += (targetRotationY - valueScene.rotation.y) * 0.05;
+            
+            valueParticles.forEach(p => {
+                p.progress += p.speed;
+                if (p.progress > 1) p.progress = 0;
+                
+                const pos = new THREE.Vector3().lerpVectors(p.from, p.to, p.progress);
+                p.mesh.position.copy(pos);
+            });
+            
+            valueNodes.forEach((node, i) => {
+                const pulse = 1 + Math.sin(time * 1.5 + i * 0.5) * 0.05;
+                node.mesh.scale.setScalar(pulse);
+                
+                const model = node.mesh.userData.model;
+                if (model) {
+                    model.rotation.y += 0.008;
+                    model.rotation.x += 0.003;
+                }
+            });
+            
+            valueRenderer.render(valueScene, valueCamera);
+        }
+
+        function onValueMouseDown(event) {
+            isDragging = true;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+            
+            const rect = valueRenderer.domElement.getBoundingClientRect();
+            const mouse = new THREE.Vector2(
+                ((event.clientX - rect.left) / rect.width) * 2 - 1,
+                -((event.clientY - rect.top) / rect.height) * 2 + 1
+            );
+            
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, valueCamera);
+            
+            const intersects = raycaster.intersectObjects(valueScene.children, true);
+            
+            if (intersects.length > 0) {
+                let target = intersects[0].object;
+                while (target.parent && target.parent.type !== 'Scene') {
+                    if (target.userData && target.userData.id) break;
+                    target = target.parent;
+                }
+                if (target.userData && target.userData.id) {
+                    showValueNodeDetail(target.userData);
+                }
+            }
+        }
+
+        function onValueMouseMove(event) {
+            if (!isDragging) {
+                const rect = valueRenderer.domElement.getBoundingClientRect();
+                const mouse = new THREE.Vector2(
+                    ((event.clientX - rect.left) / rect.width) * 2 - 1,
+                    -((event.clientY - rect.top) / rect.height) * 2 + 1
+                );
+                
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(mouse, valueCamera);
+                
+                const intersects = raycaster.intersectObjects(valueScene.children, true);
+                let isHovering = false;
+                
+                if (intersects.length > 0) {
+                    let target = intersects[0].object;
+                    while (target.parent && target.parent.type !== 'Scene') {
+                        if (target.userData && target.userData.id) {
+                            isHovering = true;
+                            break;
+                        }
+                        target = target.parent;
+                    }
+                }
+                
+                const canvas = document.getElementById('value3dCanvas');
+                if (canvas) canvas.style.cursor = isHovering ? 'pointer' : 'grab';
+                return;
+            }
+            
+            const deltaX = event.clientX - mouseX;
+            const deltaY = event.clientY - mouseY;
+            
+            targetRotationY += deltaX * 0.008;
+            targetRotationX += deltaY * 0.008;
+            targetRotationX = Math.max(-0.5, Math.min(0.5, targetRotationX));
+            
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        }
+
+        function onValueMouseUp() {
+            isDragging = false;
+        }
+
+        function onValueWheel(event) {
+            event.preventDefault();
+            valueCamera.position.z += event.deltaY * 0.05;
+            valueCamera.position.z = Math.max(20, Math.min(100, valueCamera.position.z));
+        }
+
+        function showValueNodeDetail(nodeData) {
+            const icon = document.getElementById('detail3dIcon');
+            const title = document.getElementById('detail3dTitle');
+            const content = document.getElementById('detail3dContent');
+            
+            if (!icon || !title || !content) return;
+            
+            const colorHex = '#' + nodeData.color.toString(16).padStart(6, '0');
+            
+            icon.textContent = nodeData.icon;
+            icon.style.color = colorHex;
+            title.textContent = nodeData.label;
+            title.style.color = colorHex;
+            
+            if (nodeData.asset && nodeData.asset.contributors) {
+                const contributorsHtml = nodeData.asset.contributors.map((c, i) => {
+                    const share = parseInt(c.share);
+                    const amount = (nodeData.value * share / 100);
+                    const colors = ['#ffd700', '#00f0ff', '#00ff88', '#ff69b4'];
+                    
+                    return `
+                        <div class="contributor-3d-row" style="border-color: ${colors[i % colors.length]};">
+                            <div class="contributor-3d-avatar" style="border-color: ${colors[i % colors.length]}60; color: ${colors[i % colors.length]};">
+                                ${c.name.charAt(0)}
+                            </div>
+                            <div class="contributor-3d-info">
+                                <div class="contributor-3d-name">${c.name}</div>
+                                <div class="contributor-3d-share">权益 ${c.share}</div>
+                            </div>
+                            <div class="contributor-3d-amount">$${amount.toFixed(2)}M</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                content.innerHTML = `
+                    <div style="margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px;">
+                        <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">资产名称</div>
+                        <div style="font-size: 16px; color: ${colorHex};">${nodeData.name || nodeData.asset.name}</div>
+                    </div>
+                    <div style="font-size: 11px; color: rgba(150,170,200,0.8); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                        贡献者收益分配
+                    </div>
+                    ${contributorsHtml}
+                    <div class="detail-3d-total">
+                        <span class="detail-3d-total-label">该资产总收益</span>
+                        <span class="detail-3d-total-value">$${nodeData.value.toFixed(2)}M</span>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 60px; margin-bottom: 20px; color: ${colorHex};">${nodeData.icon}</div>
+                        <div style="font-size: 22px; color: ${colorHex}; margin-bottom: 15px;">${nodeData.label}</div>
+                        <div style="font-size: 32px; color: #ffd700; font-family: Orbitron; margin-bottom: 20px;">$${nodeData.value.toFixed(1)}M</div>
+                        <div style="font-size: 13px; color: rgba(150,170,200,0.7); line-height: 1.6;">
+                            新药成功上市带来的总收益<br>
+                            价值沿分子链条向下流动<br>
+                            精准分配至每个贡献者
+                        </div>
+                    </div>
+                `;
+            }
+        }</script></body></html>

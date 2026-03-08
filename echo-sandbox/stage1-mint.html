@@ -679,9 +679,27 @@
             animate();
         }
         
+        // WebGL 检测
+        function isWebGLAvailable() {
+            try {
+                const canvas = document.createElement('canvas');
+                return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            } catch (e) {
+                return false;
+            }
+        }
+        
         window.onload = () => {
-            initBackground();
-            initForge();
+            if (isWebGLAvailable()) {
+                initBackground();
+                initForge();
+            } else {
+                console.warn('WebGL not available');
+                const forgeCanvas = document.getElementById('forgeCanvas');
+                if (forgeCanvas) {
+                    forgeCanvas.style.background = 'radial-gradient(circle, rgba(0,240,255,0.2) 0%, transparent 70%)';
+                }
+            }
         };
     </script>
 </body>

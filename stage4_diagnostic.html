@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Stage 4 诊断</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; background: #020208; overflow: hidden; color: #0f0; font-family: monospace; }
+        #info { position: fixed; top: 10px; left: 10px; z-index: 100; background: rgba(0,0,0,0.8); padding: 10px; }
+        #canvas { width: 100vw; height: 100vh; display: block; }
+    </style>
+</head>
+<body>
+    <div id="info">初始化中...</div>
+    <canvas id="canvas"></canvas>
+    
+    <script>
+        const info = document.getElementById('info');
+        const log = (msg) => {
+            info.innerHTML += '<br>' + msg;
+            console.log(msg);
+        };
+        
+        try {
+            log('1. 开始初始化');
+            
+            const canvas = document.getElementById('canvas');
+            log('2. Canvas: ' + (canvas ? '找到' : '未找到'));
+            log('   尺寸: ' + canvas.clientWidth + 'x' + canvas.clientHeight);
+            
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050510, 0.012);
+            log('3. Scene 创建成功');
+            
+            const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth/canvas.clientHeight || 1, 0.1, 1000);
+            camera.position.set(0, 20, 60);
+            camera.lookAt(0, 0, 0);
+            log('4. Camera 创建成功');
+            
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(canvas.clientWidth || window.innerWidth, canvas.clientHeight || window.innerHeight);
+            log('5. Renderer 创建成功');
+            
+            // 灯光
+            scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+            const mainLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            mainLight.position.set(10, 20, 10);
+            scene.add(mainLight);
+            
+            // 中心大节点 - 新药
+            const rootGroup = new THREE.Group();
+            
+            // 胶囊形状
+            const topSphere = new THREE.Mesh(
+                new THREE.SphereGeometry(2.4, 32, 16, 0, Math.PI*2, 0, Math.PI/2),
+                new THREE.MeshPhongMaterial({ color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 0.3 })
+            );
+            topSphere.position.y = 2.4;
+            rootGroup.add(topSphere);
+            
+            const botSphere = new THREE.Mesh(
+                new THREE.SphereGeometry(2.4, 32, 16, 0, Math.PI*2, Math.PI/2, Math.PI/2),
+                new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xdddddd, emissiveIntensity: 0.2 })
+            );
+            botSphere.position.y = -2.4;
+            rootGroup.add(botSphere);
+            
+            const cylinder = new THREE.Mesh(
+                new THREE.CylinderGeometry(2.4, 2.4, 4.8, 32),
+                new THREE.MeshPhongMaterial({ color: 0xffd700 })
+            );
+            rootGroup.add(cylinder);
+            
+            // 发光效果
+            const glow1 = new THREE.Mesh(
+                new THREE.SphereGeometry(6, 32, 32),
+                new THREE.MeshBasicMaterial({ color: 0xffd700, transparent: true, opacity: 0.3 })
+            );
+            rootGroup.add(glow1);
+            
+            const glow2 = new THREE.Mesh(
+                new THREE.SphereGeometry(10, 32, 32),
+                new THREE.MeshBasicMaterial({ color: 0xffd700, transparent: true, opacity: 0.1 })
+            );
+            rootGroup.add(glow2);
+            
+            // 点光源
+            rootGroup.add(new THREE.PointLight(0xffd700, 1.5, 25));
+            
+            scene.add(rootGroup);
+            log('6. 中心节点创建成功');
+            
+            // 外围节点
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const x = Math.cos(angle) * 25;
+                const z = Math.sin(angle) * 25;
+                
+                const node = new THREE.Group();
+                const sphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(1.5, 32, 32),
+                    new THREE.MeshPhongMaterial({ color: 0x00f0ff, emissive: 0x00f0ff, emissiveIntensity: 0.3 })
+                );
+                node.add(sphere);
+                
+                // 发光
+                node.add(new THREE.Mesh(
+                    new THREE.SphereGeometry(3, 32, 32),
+                    new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.2 })
+                ));
+                
+                // 点光源
+                node.add(new THREE.PointLight(0x00f0ff, 1, 15));
+                
+                node.position.set(x, 0, z);
+                scene.add(node);
+                
+                // 连线
+                const lineGeo = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, 0, 0), new THREE.Vector3(x, 0, z)
+                ]);
+                scene.add(new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.3 })));
+            }
+            log('7. 8个外围节点创建成功');
+            
+            // 动画
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                scene.rotation.y += 0.001;
+                
+                rootGroup.rotation.y += 0.01;
+                rootGroup.children.forEach((child, i) => {
+                    if (child.geometry && child.geometry.type === 'SphereGeometry') {
+                        const s = 1 + Math.sin(Date.now() * 0.002 + i) * 0.05;
+                        child.scale.setScalar(s);
+                    }
+                });
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+            log('8. 动画开始 - 应该能看到画面了！');
+            
+        } catch (e) {
+            log('错误: ' + e.message);
+            console.error(e);
+        }
+    </script>
+</body>
+</html>

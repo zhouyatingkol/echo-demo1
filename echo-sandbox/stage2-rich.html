@@ -944,8 +944,22 @@
             }
         }
         
+        // WebGL 检测
+        function isWebGLAvailable() {
+            try {
+                const canvas = document.createElement('canvas');
+                return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            } catch (e) {
+                return false;
+            }
+        }
+        
         window.addEventListener('load', () => {
-            initBackground();
+            if (isWebGLAvailable()) {
+                initBackground();
+            } else {
+                console.warn('WebGL not available');
+            }
             initAssetList();
             initCollabArea();
             initParticleCanvas();
@@ -1178,56 +1192,62 @@
             
             setTimeout(() => {
                 const canvas = document.getElementById('result3d');
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-                camera.position.z = 5;
+                if (!canvas || !isWebGLAvailable()) return;
                 
-                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-                renderer.setSize(170, 170);
-                
-                scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-                const light = new THREE.PointLight(0xffd700, 2, 100);
-                light.position.set(5, 5, 5);
-                scene.add(light);
-                
-                const group = new THREE.Group();
-                const core = new THREE.Mesh(
-                    new THREE.IcosahedronGeometry(0.8, 1),
-                    new THREE.MeshPhongMaterial({ 
-                        color: 0xffd700, 
-                        emissive: 0xffd700, 
-                        emissiveIntensity: 0.4,
-                        wireframe: true
-                    })
-                );
-                group.add(core);
-                
-                // 周围粒子
-                for (let i = 0; i < 12; i++) {
-                    const angle = (i / 12) * Math.PI * 2;
-                    const sphere = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.15, 8, 8),
+                try {
+                    const scene = new THREE.Scene();
+                    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                    camera.position.z = 5;
+                    
+                    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                    renderer.setSize(170, 170);
+                    
+                    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                    const light = new THREE.PointLight(0xffd700, 2, 100);
+                    light.position.set(5, 5, 5);
+                    scene.add(light);
+                    
+                    const group = new THREE.Group();
+                    const core = new THREE.Mesh(
+                        new THREE.IcosahedronGeometry(0.8, 1),
                         new THREE.MeshPhongMaterial({ 
                             color: 0xffd700, 
                             emissive: 0xffd700, 
-                            emissiveIntensity: 0.6 
+                            emissiveIntensity: 0.4,
+                            wireframe: true
                         })
                     );
-                    const radius = 1.8;
-                    sphere.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
-                    group.add(sphere);
+                    group.add(core);
+                    
+                    // 周围粒子
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (i / 12) * Math.PI * 2;
+                        const sphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.15, 8, 8),
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0xffd700, 
+                                emissive: 0xffd700, 
+                                emissiveIntensity: 0.6 
+                            })
+                        );
+                        const radius = 1.8;
+                        sphere.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
+                        group.add(sphere);
+                    }
+                    
+                    scene.add(group);
+                    
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        group.rotation.y += 0.015;
+                        group.rotation.x += 0.008;
+                        core.scale.setScalar(1 + Math.sin(Date.now() * 0.002) * 0.1);
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                } catch (e) {
+                    console.warn('3D result preview failed:', e);
                 }
-                
-                scene.add(group);
-                
-                function animate() {
-                    requestAnimationFrame(animate);
-                    group.rotation.y += 0.015;
-                    group.rotation.x += 0.008;
-                    core.scale.setScalar(1 + Math.sin(Date.now() * 0.002) * 0.1);
-                    renderer.render(scene, camera);
-                }
-                animate();
             }, 100);
         }
         
