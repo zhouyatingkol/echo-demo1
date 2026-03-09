@@ -4008,22 +4008,22 @@
                             </div>
                             
                             <!-- 滑块控制 -->
-                            <div class="finance-slider-group" style="margin-bottom: 20px;">
-                                <div class="slider-label">
-                                    <span>融资金额</span>
-                                    <span class="slider-value" id="amountValue">0.5 ETH</span>
+                            <div class="finance-slider-group" style="margin-bottom: 25px;">
+                                <div class="slider-label" style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                                    <span style="color: rgba(200,220,240,0.9);">融资金额</span>
+                                    <span class="slider-value" id="amountValue" style="color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 16px;">0.5 ETH</span>
                                 </div>
                                 <input type="range" class="finance-slider" id="amountSlider" min="0.1" max="10" step="0.1" value="0.5"
-                                    oninput="updateFinanceAmount(this.value)">
+                                    oninput="updateFinanceAmount(this.value)" style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none;">
                             </div>
                             
-                            <div class="finance-slider-group" style="margin-bottom: 20px;">
-                                <div class="slider-label">
-                                    <span>出让收益权比例</span>
-                                    <span class="slider-value" id="shareValue">20%</span>
+                            <div class="finance-slider-group" style="margin-bottom: 25px;">
+                                <div class="slider-label" style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                                    <span style="color: rgba(200,220,240,0.9);">出让收益权比例</span>
+                                    <span class="slider-value" id="shareValue" style="color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 16px;">20%</span>
                                 </div>
                                 <input type="range" class="finance-slider" id="shareSlider" min="5" max="50" step="1" value="20"
-                                    oninput="updateFinanceShare(this.value)">
+                                    oninput="updateFinanceShare(this.value)" style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none;">
                             </div>
                             
                             <div class="finance-stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
@@ -7779,7 +7779,7 @@ function createHierarchyNode(nodeData) {
     const color = nodeData.color;
     
     // 更大的尺寸层级 - 调大所有模型
-    const scale = nodeData.level === 1 ? 5.5 : (nodeData.level === 2 ? 4.0 : 3.5);
+    const scale = nodeData.level === 1 ? 7.0 : (nodeData.level === 2 ? 3.0 : 3.5);
     
     const material = new THREE.MeshPhongMaterial({ 
         color: color, 
@@ -8390,7 +8390,7 @@ function createHierarchyNode(nodeData) {
     
     // 添加名字标签
     const label = createTextLabel(nodeData.name || nodeData.label, color);
-    label.position.y = glowSize * 1.8; // 在光晕上方
+    label.position.y = glowSize * 2.2; // 在光晕上方，与模型对齐
     group.add(label);
     
     // 存储数据
@@ -8403,19 +8403,19 @@ function createHierarchyNode(nodeData) {
 function createTextLabel(text, color) {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-    canvas.width = 256;
-    canvas.height = 64;
+    canvas.width = 512;
+    canvas.height = 128;
     
-    // 绘制文字
-    context.font = 'bold 24px "Orbitron", "Noto Sans SC", sans-serif';
+    // 绘制文字 - 更大的字体
+    context.font = 'bold 48px "Orbitron", "Noto Sans SC", sans-serif';
     context.fillStyle = '#' + color.toString(16).padStart(6, '0');
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     
     // 添加文字阴影
     context.shadowColor = '#' + color.toString(16).padStart(6, '0');
-    context.shadowBlur = 10;
-    context.fillText(text, 128, 32);
+    context.shadowBlur = 20;
+    context.fillText(text, 256, 64);
     
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.SpriteMaterial({ 
@@ -8424,7 +8424,7 @@ function createTextLabel(text, color) {
         opacity: 0.9
     });
     const sprite = new THREE.Sprite(material);
-    sprite.scale.set(4, 1, 1);
+    sprite.scale.set(10, 2.5, 1);
     
     return sprite;
 }
@@ -8503,7 +8503,7 @@ function animateHierarchy3D() {
     
     // 自动旋转
     if (hierarchyAutoRotate && !isHierarchyDragging) {
-        hierarchyScene.rotation.y += 0.001;
+        hierarchyScene.rotation.y += 0.005;
     }
     
     // 平滑相机移动
