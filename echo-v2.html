@@ -7931,8 +7931,8 @@ function createHierarchyNode(nodeData) {
     const type = nodeData.asset?.type || 'protein';
     const color = nodeData.color;
     
-    // 更大的尺寸层级
-    const scale = nodeData.level === 1 ? 4.0 : (nodeData.level === 2 ? 2.5 : 1.5);
+    // 更大的尺寸层级 - 调大所有模型
+    const scale = nodeData.level === 1 ? 5.5 : (nodeData.level === 2 ? 4.0 : 2.5);
     
     const material = new THREE.MeshPhongMaterial({ 
         color: color, 
@@ -8541,10 +8541,45 @@ function createHierarchyNode(nodeData) {
     const light = new THREE.PointLight(color, nodeData.level === 1 ? 2.5 : (nodeData.level === 2 ? 1.5 : 1.0), nodeData.level === 1 ? 80 : 50);
     group.add(light);
     
+    // 添加名字标签
+    const label = createTextLabel(nodeData.name || nodeData.label, color);
+    label.position.y = glowSize * 1.8; // 在光晕上方
+    group.add(label);
+    
     // 存储数据
     group.userData = { ...nodeData, mesh: group, originalScale: 1 };
     hierarchyScene.add(group);
     hierarchyNodes.push({ mesh: group, data: nodeData });
+}
+
+// 创建文字标签
+function createTextLabel(text, color) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 256;
+    canvas.height = 64;
+    
+    // 绘制文字
+    context.font = 'bold 24px "Orbitron", "Noto Sans SC", sans-serif';
+    context.fillStyle = '#' + color.toString(16).padStart(6, '0');
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    
+    // 添加文字阴影
+    context.shadowColor = '#' + color.toString(16).padStart(6, '0');
+    context.shadowBlur = 10;
+    context.fillText(text, 128, 32);
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    const material = new THREE.SpriteMaterial({ 
+        map: texture, 
+        transparent: true,
+        opacity: 0.9
+    });
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(4, 1, 1);
+    
+    return sprite;
 }
 
 
