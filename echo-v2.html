@@ -4611,48 +4611,48 @@
     <script>
         // 资产数据
         const assets = [
-            { id: 'PDB-001', name: '蛋白质结构', icon: '🧬', color: '#00f0ff', colorHex: 0x00f0ff, type: 'protein', weight: 1.2, minted: false,
+            { id: 'PDB-001', name: '蛋白质结构', icon: '🧬', color: '#00f0ff', colorHex: 0x00f0ff, type: 'protein', weight: 1.2, minted: false, value: 10,
               contributors: [{name: 'AlphaFold Team', share: '45%'}, {name: 'Dr. Zhang Lab', share: '35%'}, {name: 'Open Data Fund', share: '20%'}],
               rules: '商业应用需署名原始贡献者<br>衍生作品自动继承50%收益权<br>开源使用无需授权费用',
               created: '2024.03.15' },
-            { id: 'CHEM-002', name: '化合物库', icon: '⚗️', color: '#00ff88', colorHex: 0x00ff88, type: 'compound', weight: 1.0, minted: false,
+            { id: 'CHEM-002', name: '化合物库', icon: '⚗️', color: '#00ff88', colorHex: 0x00ff88, type: 'compound', weight: 1.0, minted: false, value: 8,
               contributors: [{name: 'ChemCorp Inc.', share: '60%'}, {name: 'University Lab', share: '30%'}, {name: 'Community', share: '10%'}],
               rules: '商业使用需支付1%营收作为反馈金<br>二次开发需共享改进数据<br>专利引用自动触发收益分配',
               created: '2024.02.20' },
-            { id: 'GENE-003', name: '基因序列', icon: '🧪', color: '#0088ff', colorHex: 0x0088ff, type: 'gene', weight: 1.5, minted: false,
+            { id: 'GENE-003', name: '基因序列', icon: '🧪', color: '#0088ff', colorHex: 0x0088ff, type: 'gene', weight: 1.5, minted: false, value: 12,
               contributors: [{name: 'Genome Project', share: '50%'}, {name: 'MIT Lab', share: '30%'}, {name: 'Public', share: '20%'}],
               rules: '开源使用免费，商业应用需获得授权<br>数据使用需遵守伦理委员会规定<br>商业转化收益的20%用于罕见病研究',
               created: '2024.01.10' },
-            { id: 'VSCREEN-004', name: '虚拟筛选', icon: '💻', color: '#88ffcc', colorHex: 0x88ffcc, type: 'screening', weight: 0.8, minted: false,
+            { id: 'VSCREEN-004', name: '虚拟筛选', icon: '💻', color: '#88ffcc', colorHex: 0x88ffcc, type: 'screening', weight: 0.8, minted: false, value: 6,
               contributors: [{name: 'AI Pharma', share: '70%'}, {name: 'Cloud Compute', share: '30%'}],
               rules: '按使用量计费，收益自动分配给贡献方<br>算法改进需开源贡献<br>阳性结果触发自动通知',
               created: '2024.03.01' },
-            { id: 'ASSAY-005', name: '实验数据', icon: '📊', color: '#a29bfe', colorHex: 0xa29bfe, type: 'assay', weight: 1.3, minted: false,
+            { id: 'ASSAY-005', name: '实验数据', icon: '📊', color: '#a29bfe', colorHex: 0xa29bfe, type: 'assay', weight: 1.3, minted: false, value: 9,
               contributors: [{name: 'BioLab Co.', share: '80%'}, {name: 'Researchers', share: '20%'}],
               rules: '原始数据不可篡改<br>实验方法需完整披露<br>重复实验优先使用相同设备',
               created: '2024.02.15' },
-            { id: 'CLINICAL-006', name: '临床数据', icon: '🏥', color: '#ffa502', colorHex: 0xffa502, type: 'clinical', weight: 2.0, minted: false,
+            { id: 'CLINICAL-006', name: '临床数据', icon: '🏥', color: '#ffa502', colorHex: 0xffa502, type: 'clinical', weight: 2.0, minted: false, value: 15,
               contributors: [{name: 'Hospital Network', share: '40%'}, {name: 'Patient Consent', share: '35%'}, {name: 'Ethics Board', share: '25%'}],
               rules: '患者隐私受零知识证明保护<br>负面结果同等重要并奖励<br>数据使用需伦理委员会批准',
               created: '2024.03.10' },
-            { id: 'PATENT-007', name: '专利信息', icon: '📜', color: '#ff69b4', colorHex: 0xff69b4, type: 'patent', weight: 1.8, minted: false,
+            { id: 'PATENT-007', name: '专利信息', icon: '📜', color: '#ff69b4', colorHex: 0xff69b4, type: 'patent', weight: 1.8, minted: false, value: 14,
               contributors: [{name: 'Inventor Team', share: '50%'}, {name: 'Institution', share: '35%'}, {name: 'Legal DAO', share: '15%'}],
               rules: '专利到期自动转为开放许可<br>侵权诉讼收益按比例分配<br>许可费用按引用次数递减',
               created: '2024.01.25' },
-            { id: 'PAPER-008', name: '论文数据', icon: '📄', color: '#ff6b6b', colorHex: 0xff6b6b, type: 'paper', weight: 1.0, minted: false,
+            { id: 'PAPER-008', name: '论文数据', icon: '📄', color: '#ff6b6b', colorHex: 0xff6b6b, type: 'paper', weight: 1.0, minted: false, value: 7,
               contributors: [{name: 'Author Team', share: '60%'}, {name: 'Journal DAO', share: '25%'}, {name: 'Peer Reviewers', share: '15%'}],
               rules: '引用即产生微支付<br>数据复用需引用原始论文<br>开放获取版本收益归作者',
               created: '2024.02.28' },
             // 第一阶段融合资产：结构筛选
-            { id: 'ScreeningBlok', name: '结构筛选', icon: '🔬', color: '#00d2ff', colorHex: 0x00d2ff, type: 'screening', weight: 3.0, minted: false,
+            { id: 'ScreeningBlok', name: '结构筛选', icon: '🔬', color: '#00d2ff', colorHex: 0x00d2ff, type: 'screening', weight: 3.0, minted: false, value: 25,
               contributors: [], rules: '', created: '', 
               description: '由蛋白质结构与虚拟筛选融合而成，锁定先导化合物' },
             // 第二阶段融合资产：化学优化
-            { id: 'OptimizationBlok', name: '化学优化', icon: '⚗️', color: '#00ff88', colorHex: 0x00ff88, type: 'optimization', weight: 3.5, minted: false,
+            { id: 'OptimizationBlok', name: '化学优化', icon: '⚗️', color: '#00ff88', colorHex: 0x00ff88, type: 'optimization', weight: 3.5, minted: false, value: 30,
               contributors: [], rules: '', created: '',
               description: '由化合物库与实验数据融合而成，优化分子性质' },
             // 第三阶段融合资产：临床候选
-            { id: 'CandidateBlok', name: '临床候选', icon: '💊', color: '#ff9500', colorHex: 0xff9500, type: 'candidate', weight: 4.0, minted: false,
+            { id: 'CandidateBlok', name: '临床候选', icon: '💊', color: '#ff9500', colorHex: 0xff9500, type: 'candidate', weight: 4.0, minted: false, value: 40,
               contributors: [], rules: '', created: '',
               description: '由筛选结果与临床数据融合而成，形成新药候选' }
         ];
@@ -5292,53 +5292,142 @@
             }
         }
 
-        // 初始化卡片3D场景
-        function initCardScene(asset, container) {
+        // 初始化卡片3D场景（使用共享渲染器方案，解决上下文限制）
+        let sharedCardRenderer = null;
+        let sharedCardCanvas = null;
+        const cardContexts = new Map(); // 存储每个卡片的 2D context
+        
+        function initSharedCardRenderer() {
+            if (sharedCardRenderer) return;
+            
+            // 创建离屏 canvas 作为主渲染目标
+            sharedCardCanvas = document.createElement('canvas');
+            sharedCardCanvas.width = 64;
+            sharedCardCanvas.height = 64;
+            
+            try {
+                sharedCardRenderer = new THREE.WebGLRenderer({ 
+                    canvas: sharedCardCanvas, 
+                    alpha: true, 
+                    antialias: false,
+                    powerPreference: "low-power"
+                });
+                sharedCardRenderer.setSize(64, 64);
+                sharedCardRenderer.setPixelRatio(1);
+            } catch (e) {
+                console.warn('无法创建共享渲染器:', e);
+                sharedCardRenderer = null;
+            }
+        }
+        
+        // 清理所有卡片场景
+        function cleanupAllCardRenderers() {
+            stopCardAnimation();
+            cardScenes.clear();
+            cardMolecules.clear();
+            cardCameras.clear();
+            cardContexts.clear();
+            if (sharedCardRenderer) {
+                sharedCardRenderer.dispose();
+                sharedCardRenderer = null;
+            }
+            sharedCardCanvas = null;
+        }
+        
+        // 显示图标回退
+        function showIconFallback(asset, container) {
+            if (!container) return;
+            container.innerHTML = `
+                <div style="
+                    width: 100%; 
+                    height: 100%; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    font-size: 32px;
+                    color: ${asset.color};
+                ">${asset.icon}</div>
+            `;
+        }
+
+        // 初始化卡片3D场景（使用共享渲染器）
+        function initCardScene(asset, canvas) {
+            // 确保共享渲染器已初始化
+            initSharedCardRenderer();
+            if (!sharedCardRenderer) {
+                showIconFallback(asset, canvas.parentElement);
+                return;
+            }
+            
+            // 设置 canvas 尺寸
+            canvas.width = 64;
+            canvas.height = 64;
+            
+            // 获取 2D context 用于复制渲染结果
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                showIconFallback(asset, canvas.parentElement);
+                return;
+            }
+            cardContexts.set(asset.id, ctx);
+            
+            // 创建场景
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-            camera.position.z = 5;
-            const renderer = new THREE.WebGLRenderer({ canvas: container, alpha: true, antialias: true });
-            renderer.setSize(90, 90);
             scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const pl = new THREE.PointLight(asset.colorHex, 1, 100);
             pl.position.set(5, 5, 5);
             scene.add(pl);
-            const molecule = createMolecule(asset.type, asset.colorHex, 0.65);
+            
+            // 创建相机
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 5;
+            
+            // 创建分子
+            const scale = 0.5;
+            const molecule = createMolecule(asset.type, asset.colorHex, scale);
             scene.add(molecule);
+            
+            // 存储引用
             cardScenes.set(asset.id, scene);
-            cardRenderers.set(asset.id, renderer);
             cardMolecules.set(asset.id, molecule);
             cardCameras.set(asset.id, camera);
         }
-
-        // 渲染卡片动画（限制渲染器数量，防止WebGL上下文过多）
-        let cardRenderCount = 0;
+        
+        // 渲染所有卡片（使用共享渲染器轮流渲染）
+        let cardAnimationId = null;
         function animateCards() {
-            // 限制同时渲染的卡片数量
-            const maxCardsToRender = 8;
-            let rendered = 0;
+            if (!sharedCardRenderer || cardScenes.size === 0) return;
             
-            cardMolecules.forEach((molecule, id) => {
-                if (rendered >= maxCardsToRender) return;
-                
-                molecule.rotation.y += 0.012;
-                molecule.rotation.x += 0.006;
-                
-                const scene = cardScenes.get(id);
-                const renderer = cardRenderers.get(id);
+            cardScenes.forEach((scene, id) => {
+                const molecule = cardMolecules.get(id);
                 const camera = cardCameras.get(id);
+                const ctx = cardContexts.get(id);
                 
-                if (renderer && scene && camera) {
-                    try {
-                        renderer.render(scene, camera);
-                        rendered++;
-                    } catch (e) {
-                        // 忽略渲染错误
-                    }
+                if (molecule) {
+                    molecule.rotation.y += 0.012;
+                    molecule.rotation.x += 0.006;
+                }
+                
+                if (scene && camera && ctx) {
+                    // 设置共享渲染器大小
+                    sharedCardRenderer.setSize(64, 64);
+                    // 渲染到共享 canvas
+                    sharedCardRenderer.render(scene, camera);
+                    // 复制到目标 canvas
+                    ctx.clearRect(0, 0, 64, 64);
+                    ctx.drawImage(sharedCardCanvas, 0, 0, 64, 64);
                 }
             });
             
-            requestAnimationFrame(animateCards);
+            cardAnimationId = requestAnimationFrame(animateCards);
+        }
+        
+        // 停止卡片动画
+        function stopCardAnimation() {
+            if (cardAnimationId) {
+                cancelAnimationFrame(cardAnimationId);
+                cardAnimationId = null;
+            }
         }
 
         // 生成资产卡片（使用新的过滤渲染函数）
@@ -5906,7 +5995,7 @@
                 <div class="asset-card" ${draggableAttr} data-id="${asset.id}" style="border-color:${asset.color}50;position:relative;">
                     ${fusionBadge}
                     <div class="mol-canvas-container">
-                        <canvas class="mol-canvas" id="fcanvas-${asset.id}"></canvas>
+                        <canvas class="mol-canvas" id="fcanvas-${asset.id}" width="64" height="64"></canvas>
                     </div>
                     <div class="asset-id" style="color:${asset.color};text-shadow:0 0 10px ${asset.color}80;">${asset.id}</div>
                     <div class="asset-name">${asset.name}</div>
@@ -5914,12 +6003,15 @@
             `;
             }).join('');
             
-            minted.forEach(asset => {
-                const canvas = document.getElementById(`fcanvas-${asset.id}`);
-                if (canvas && !cardScenes.has(`f-${asset.id}`)) {
-                    initCardScene({...asset, id: `f-${asset.id}`}, canvas);
-                }
-            });
+            // 延迟初始化以确保DOM已渲染
+            setTimeout(() => {
+                minted.forEach((asset, index) => {
+                    const canvas = document.getElementById(`fcanvas-${asset.id}`);
+                    if (canvas && !cardScenes.has(`f-${asset.id}`)) {
+                        initCardScene({...asset, id: `f-${asset.id}`}, canvas);
+                    }
+                });
+            }, 100);
             
             // 添加拖拽事件（不包括 NeuroBlok）
             document.querySelectorAll('#fusionGrid .asset-card[draggable="true"]').forEach(card => {
