@@ -8030,173 +8030,309 @@ function createHierarchyNode(nodeData) {
         
         group.add(drugGroup);
         
-    // ===== Level 2: 融合资产 - 使用与阶段2相同的大分子模型 =====
+    // ===== Level 2: 融合资产 - 全新大气设计（与分子资产的有机化学风格区分）=====
     } else if (nodeData.level === 2) {
         const fusionGroup = new THREE.Group();
         const fusionType = nodeData.asset?.type || 'fusion';
         
-        // 使用MeshStandardMaterial替代MeshPhongMaterial
-        const bigMolScale = scale * 0.8;
+        // 更大的尺寸，更大气（从 0.8 提升到 1.3）
+        const bigMolScale = scale * 1.3;
         
         // 根据融合资产类型选择模型 - 全新设计，与分子资产完全不同
         if (fusionType === 'screening' || fusionType.includes('Screening')) {
-            // 筛选型 - AI计算晶体（与分子资产的有机结构完全不同）
-            // 核心八面体晶体
-            const crystalCore = new THREE.Mesh(
-                new THREE.OctahedronGeometry(0.6 * bigMolScale, 1),
+            // 筛选型 - AI计算核心（科技晶体风格）
+            // 外层：八面体水晶框架（更大更气派）
+            const crystalFrame = new THREE.Mesh(
+                new THREE.OctahedronGeometry(1.2 * bigMolScale, 0),
+                new THREE.MeshStandardMaterial({
+                    color: 0x4488ff,
+                    roughness: 0.1,
+                    metalness: 0.6,
+                    transparent: true,
+                    opacity: 0.4
+                })
+            );
+            fusionGroup.add(crystalFrame);
+            
+            // 中层：多层旋转数据环
+            const dataRing1 = new THREE.Mesh(
+                new THREE.TorusGeometry(0.9 * bigMolScale, 0.1 * bigMolScale, 16, 64),
+                new THREE.MeshStandardMaterial({
+                    color: color,
+                    roughness: 0.2,
+                    metalness: 0.8,
+                    emissive: color,
+                    emissiveIntensity: 0.4
+                })
+            );
+            dataRing1.rotation.x = Math.PI / 2;
+            fusionGroup.add(dataRing1);
+            
+            const dataRing2 = new THREE.Mesh(
+                new THREE.TorusGeometry(0.65 * bigMolScale, 0.08 * bigMolScale, 16, 48),
                 new THREE.MeshStandardMaterial({
                     color: 0x88ccff,
-                    roughness: 0.1,
-                    metalness: 0.3,
-                    transparent: true,
-                    opacity: 0.9
+                    roughness: 0.2,
+                    metalness: 0.8
                 })
             );
-            fusionGroup.add(crystalCore);
+            dataRing2.rotation.x = Math.PI / 3;
+            fusionGroup.add(dataRing2);
             
-            // 外层网格框架（代表AI计算网格）
-            const gridFrame = new THREE.Mesh(
-                new THREE.IcosahedronGeometry(1.0 * bigMolScale, 1),
-                new THREE.MeshBasicMaterial({
-                    color: color,
-                    transparent: true,
-                    opacity: 0.25,
-                    wireframe: true
+            // 核心：发光数据球（更大）
+            const coreSphere = new THREE.Mesh(
+                new THREE.SphereGeometry(0.35 * bigMolScale, 32, 32),
+                new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    emissive: color,
+                    emissiveIntensity: 1.0,
+                    roughness: 0.1
                 })
             );
-            fusionGroup.add(gridFrame);
+            fusionGroup.add(coreSphere);
             
-            // 四个方向的数据流节点
+            // 四个方向的数据节点（更大）
             for (let i = 0; i < 4; i++) {
                 const angle = (i / 4) * Math.PI * 2;
                 const dataNode = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2 * bigMolScale, 0.2 * bigMolScale, 0.2 * bigMolScale),
+                    new THREE.BoxGeometry(0.35 * bigMolScale, 0.35 * bigMolScale, 0.35 * bigMolScale),
                     new THREE.MeshStandardMaterial({
-                        color: 0xffffff,
-                        emissive: color,
-                        emissiveIntensity: 0.5
+                        color: 0xaaddff,
+                        emissive: 0x4488ff,
+                        emissiveIntensity: 0.5,
+                        roughness: 0.2,
+                        metalness: 0.5
                     })
                 );
                 dataNode.position.set(
-                    Math.cos(angle) * 0.7 * bigMolScale,
-                    Math.sin(angle * 2) * 0.3 * bigMolScale,
-                    Math.sin(angle) * 0.7 * bigMolScale
+                    Math.cos(angle) * 1.5 * bigMolScale,
+                    Math.sin(angle * 2) * 0.5 * bigMolScale,
+                    Math.sin(angle) * 1.5 * bigMolScale
                 );
                 fusionGroup.add(dataNode);
             }
             
         } else if (fusionType === 'optimization' || fusionType.includes('Optimization')) {
-            // 优化型 - 精密反应器（工业感，与分子资产的有机感对比）
-            // 核心反应室 - 圆柱形
-            const reactorCore = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.5 * bigMolScale, 0.5 * bigMolScale, 1.2 * bigMolScale, 16),
+            // 优化型 - 精密反应器（工业设备风格，更大）
+            // 主体：更大的多层圆柱反应塔
+            const mainBody = new THREE.Mesh(
+                new THREE.CylinderGeometry(1.0 * bigMolScale, 1.0 * bigMolScale, 2.0 * bigMolScale, 24),
                 new THREE.MeshStandardMaterial({
-                    color: 0x445566,
+                    color: 0x334455,
                     roughness: 0.3,
                     metalness: 0.7
                 })
             );
-            fusionGroup.add(reactorCore);
+            fusionGroup.add(mainBody);
             
-            // 上下反应器盖
+            // 顶部反应盖（更大）
             const topCap = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.55 * bigMolScale, 0.55 * bigMolScale, 0.15 * bigMolScale, 16),
+                new THREE.CylinderGeometry(1.1 * bigMolScale, 1.1 * bigMolScale, 0.25 * bigMolScale, 24),
                 new THREE.MeshStandardMaterial({
                     color: color,
                     roughness: 0.2,
-                    metalness: 0.5
+                    metalness: 0.6,
+                    emissive: color,
+                    emissiveIntensity: 0.3
                 })
             );
-            topCap.position.y = 0.65 * bigMolScale;
+            topCap.position.y = 1.1 * bigMolScale;
             fusionGroup.add(topCap);
             
+            // 底部支撑（更大）
             const bottomCap = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.55 * bigMolScale, 0.55 * bigMolScale, 0.15 * bigMolScale, 16),
+                new THREE.CylinderGeometry(1.1 * bigMolScale, 1.1 * bigMolScale, 0.25 * bigMolScale, 24),
                 new THREE.MeshStandardMaterial({
                     color: color,
                     roughness: 0.2,
-                    metalness: 0.5
+                    metalness: 0.6
                 })
             );
-            bottomCap.position.y = -0.65 * bigMolScale;
+            bottomCap.position.y = -1.1 * bigMolScale;
             fusionGroup.add(bottomCap);
             
-            // 侧面管道接口
+            // 侧面管道系统（3个主要管道，更大）
             for (let i = 0; i < 3; i++) {
                 const angle = (i / 3) * Math.PI * 2;
-                const pipe = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.1 * bigMolScale, 0.1 * bigMolScale, 0.4 * bigMolScale, 8),
+                
+                // 主管道
+                const mainPipe = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.2 * bigMolScale, 0.2 * bigMolScale, 1.0 * bigMolScale, 12),
                     new THREE.MeshStandardMaterial({
-                        color: 0xaaaaaa,
+                        color: 0x8899aa,
                         roughness: 0.2,
+                        metalness: 0.9
+                    })
+                );
+                mainPipe.rotation.z = Math.PI / 2;
+                mainPipe.rotation.y = angle;
+                mainPipe.position.set(
+                    Math.cos(angle) * 1.1 * bigMolScale,
+                    (i - 1) * 0.4 * bigMolScale,
+                    Math.sin(angle) * 1.1 * bigMolScale
+                );
+                fusionGroup.add(mainPipe);
+                
+                // 管道接口（发光，更大）
+                const pipeJoint = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.28 * bigMolScale, 16, 16),
+                    new THREE.MeshStandardMaterial({
+                        color: color,
+                        emissive: color,
+                        emissiveIntensity: 0.6,
+                        roughness: 0.1,
                         metalness: 0.8
                     })
                 );
-                pipe.rotation.z = Math.PI / 2;
-                pipe.rotation.y = angle;
-                pipe.position.set(
-                    Math.cos(angle) * 0.55 * bigMolScale,
-                    (i - 1) * 0.25 * bigMolScale,
-                    Math.sin(angle) * 0.55 * bigMolScale
+                pipeJoint.position.set(
+                    Math.cos(angle) * 1.6 * bigMolScale,
+                    (i - 1) * 0.4 * bigMolScale,
+                    Math.sin(angle) * 1.6 * bigMolScale
                 );
-                fusionGroup.add(pipe);
+                fusionGroup.add(pipeJoint);
             }
             
-            // 核心发光液体
-            const liquid = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.35 * bigMolScale, 0.35 * bigMolScale, 0.8 * bigMolScale, 12),
+            // 核心发光反应液（更大）
+            const coreLiquid = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.65 * bigMolScale, 0.65 * bigMolScale, 1.3 * bigMolScale, 20),
                 new THREE.MeshStandardMaterial({
                     color: color,
                     emissive: color,
-                    emissiveIntensity: 0.4,
+                    emissiveIntensity: 0.5,
                     transparent: true,
-                    opacity: 0.8
+                    opacity: 0.8,
+                    roughness: 0.1
                 })
             );
-            fusionGroup.add(liquid);
+            fusionGroup.add(coreLiquid);
             
         } else if (fusionType === 'candidate' || fusionType.includes('Candidate')) {
-            // 候选型 - 完整的药物胶囊系统（比AI新药更复杂的封装）
-            // 外层保护壳 - 半透明球壳
+            // 候选型 - 完整药物封装系统（更大更气派）
+            // 外层：更大的球形保护舱
             const outerShell = new THREE.Mesh(
-                new THREE.SphereGeometry(1.0 * bigMolScale, 32, 32),
+                new THREE.SphereGeometry(1.5 * bigMolScale, 32, 32),
                 new THREE.MeshStandardMaterial({
                     color: 0xffffff,
                     transparent: true,
                     opacity: 0.15,
                     roughness: 0.1,
-                    metalness: 0.1,
+                    metalness: 0.2,
                     side: THREE.DoubleSide
                 })
             );
             fusionGroup.add(outerShell);
             
-            // 内层胶囊 - 完整双色胶囊
+            // 中层：更大的保护框架
+            const protectFrame = new THREE.Mesh(
+                new THREE.IcosahedronGeometry(1.3 * bigMolScale, 1),
+                new THREE.MeshStandardMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.3,
+                    wireframe: true
+                })
+            );
+            fusionGroup.add(protectFrame);
+            
+            // 内层：更大的双色胶囊
             const capsuleGroup = new THREE.Group();
             
             // 上半 - 金色
             const topSphere = new THREE.Mesh(
-                new THREE.SphereGeometry(0.5 * bigMolScale, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+                new THREE.SphereGeometry(0.75 * bigMolScale, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2),
                 new THREE.MeshStandardMaterial({
                     color: 0xffd700,
-                    roughness: 0.3,
-                    metalness: 0.2
+                    roughness: 0.2,
+                    metalness: 0.3
                 })
             );
-            topSphere.position.y = 0.25 * bigMolScale;
+            topSphere.position.y = 0.35 * bigMolScale;
             capsuleGroup.add(topSphere);
             
             // 中间圆柱
             const midCyl = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.5 * bigMolScale, 0.5 * bigMolScale, 0.5 * bigMolScale, 24),
+                new THREE.CylinderGeometry(0.75 * bigMolScale, 0.75 * bigMolScale, 0.7 * bigMolScale, 24),
                 new THREE.MeshStandardMaterial({
                     color: 0xffd700,
-                    roughness: 0.3,
-                    metalness: 0.2
+                    roughness: 0.2,
+                    metalness: 0.3
                 })
             );
-            midCyl.position.y = 0;
             capsuleGroup.add(midCyl);
+            
+            // 下半 - 橙色
+            const bottomSphere = new THREE.Mesh(
+                new THREE.SphereGeometry(0.75 * bigMolScale, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+                new THREE.MeshStandardMaterial({
+                    color: 0xff9500,
+                    roughness: 0.2,
+                    metalness: 0.3
+                })
+            );
+            bottomSphere.position.y = -0.35 * bigMolScale;
+            capsuleGroup.add(bottomSphere);
+            
+            // 胶囊中部的发光标识环
+            const idRing = new THREE.Mesh(
+                new THREE.TorusGeometry(0.77 * bigMolScale, 0.05 * bigMolScale, 8, 32),
+                new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    emissive: 0xffffff,
+                    emissiveIntensity: 0.7
+                })
+            );
+            idRing.rotation.x = Math.PI / 2;
+            capsuleGroup.add(idRing);
+            
+            fusionGroup.add(capsuleGroup);
+            
+            // 环绕的分子守护者（8个，更大）
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const guardian = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.2 * bigMolScale, 12, 12),
+                    new THREE.MeshStandardMaterial({
+                        color: 0xffffff,
+                        emissive: color,
+                        emissiveIntensity: 0.5,
+                        roughness: 0.1
+                    })
+                );
+                guardian.position.set(
+                    Math.cos(angle) * 1.2 * bigMolScale,
+                    Math.sin(angle * 2) * 0.3 * bigMolScale,
+                    Math.sin(angle) * 1.2 * bigMolScale
+                );
+                fusionGroup.add(guardian);
+            }
+            
+        } else {
+            // 默认融合 - 更大的复杂几何体
+            const defaultMat = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.3,
+                metalness: 0.4
+            });
+            const defaultGeo = new THREE.Mesh(
+                new THREE.IcosahedronGeometry(1.0 * bigMolScale, 1),
+                defaultMat
+            );
+            fusionGroup.add(defaultGeo);
+        }
+        
+        // 更大气光晕
+        const glow = new THREE.Mesh(
+            new THREE.SphereGeometry(1.8 * scale, 20, 20),
+            new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.15,
+                blending: THREE.AdditiveBlending
+            })
+        );
+        fusionGroup.add(glow);
+        
+        group.add(fusionGroup);
             
             // 下半 - 蓝色
             const bottomSphere = new THREE.Mesh(
@@ -8818,10 +8954,29 @@ function animateHierarchy3D() {
             });
         }
         
-        // Level 2: 融合资产 - 浮动+旋转
+        // Level 2: 融合资产 - 自转 + 子元素动画
         if (level === 2) {
-            group.rotation.y += 0.004;
-            group.position.y += Math.sin(time * 1.5 + i) * 0.015;
+            // 整体缓慢自转
+            group.rotation.y += 0.008;
+            group.position.y += Math.sin(time * 1.5 + i) * 0.02;
+            
+            // 子元素动态效果
+            group.children.forEach((child, idx) => {
+                if (child.geometry) {
+                    // 数据环/框架反向旋转
+                    if (idx < 3) {
+                        child.rotation.y -= 0.015;
+                        child.rotation.x += 0.005;
+                    }
+                    // 守护者/节点轨道运动
+                    else if (idx > 3 && idx < 12) {
+                        const angle = (idx - 4) * 0.8 + time * 0.5;
+                        const radius = 1.5;
+                        child.position.x = Math.cos(angle) * radius;
+                        child.position.z = Math.sin(angle) * radius;
+                    }
+                }
+            });
         }
         
         // Level 3: 分子资产 - 轻微旋转
