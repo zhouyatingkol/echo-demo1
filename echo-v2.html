@@ -5687,6 +5687,35 @@
             // 保存进度
             saveProgress();
         }
+        
+        // 保存进度到 localStorage
+        function saveProgress() {
+            const mintedIds = assets.filter(a => a.minted).map(a => a.id);
+            localStorage.setItem('echo_minted_assets', JSON.stringify(mintedIds));
+        }
+        
+        // 从 localStorage 加载进度
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem('echo_minted_assets');
+                if (saved) {
+                    const mintedIds = JSON.parse(saved);
+                    assets.forEach(asset => {
+                        if (mintedIds.includes(asset.id)) {
+                            asset.minted = true;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn('加载进度失败:', e);
+            }
+        }
+        
+        // 重置进度
+        function resetProgress() {
+            localStorage.removeItem('echo_minted_assets');
+            assets.forEach(asset => asset.minted = false);
+        }
 
         // 铸造成功粒子动画
         function showMintSuccessParticles() {
@@ -9515,6 +9544,9 @@ function showValueNodeDetail(nodeData) {
 
         // 初始化
         window.addEventListener('load', () => {
+            // 先加载保存的进度
+            loadProgress();
+            
             initBackground();
             initPreviewScene();
             generateAssetCards();
