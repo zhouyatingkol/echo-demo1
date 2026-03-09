@@ -337,6 +337,28 @@
             max-width: 95%;
             padding: 0 2px;
         }
+        
+        /* 阶段3布局优化 - 填满空间 */
+        #stage3 .main-container {
+            width: 100%;
+            max-width: none;
+            padding: 0 10px 20px;
+            gap: 10px;
+        }
+        #stage3 .asset-library {
+            width: 280px;
+            min-width: 280px;
+            flex-shrink: 0;
+        }
+        #stage3 .finance-center {
+            flex: 1;
+            min-width: 0;
+        }
+        #stage3 .ownership-panel {
+            width: 280px;
+            min-width: 280px;
+            flex-shrink: 0;
+        }
         .library-header { 
             margin-bottom: 15px;
             padding-bottom: 12px;
@@ -5578,27 +5600,57 @@
                 const card = document.createElement('div');
                 card.className = 'asset-card' + (asset.minted ? ' minted' : '');
                 card.dataset.id = asset.id;
-                card.style.cursor = 'pointer';
+                card.style.cssText = 'cursor: pointer; position: relative;';
+                
+                // 添加点击提示层
+                const clickHint = asset.minted ? '' : `
+                    <div class="click-hint" style="
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0, 240, 255, 0.2);
+                        border: 1px solid rgba(0, 240, 255, 0.5);
+                        border-radius: 20px;
+                        padding: 6px 16px;
+                        font-size: 11px;
+                        color: #00f0ff;
+                        opacity: 0;
+                        transition: opacity 0.3s;
+                        pointer-events: none;
+                        z-index: 5;
+                    ">点击铸造</div>
+                `;
+                
                 card.innerHTML = `
-                    <div class="mol-canvas-container" style="width:80px;height:80px;">
+                    ${clickHint}
+                    <div class="mol-canvas-container" style="width:80px;height:80px; pointer-events: none;">
                         <canvas class="mol-canvas" id="canvas-${asset.id}" width="80" height="80"></canvas>
                     </div>
                     <div class="asset-id">${asset.id}</div>
                     <div class="asset-name">${asset.name}</div>
                 `;
 
-                // 整个卡片点击选择
+                // 悬停显示提示
+                if (!asset.minted) {
+                    card.addEventListener('mouseenter', () => {
+                        const hint = card.querySelector('.click-hint');
+                        if (hint) hint.style.opacity = '1';
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        const hint = card.querySelector('.click-hint');
+                        if (hint) hint.style.opacity = '0';
+                    });
+                }
+
+                // 整个卡片点击选择 - 更大的点击区域
                 card.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    handleAssetClick(asset, e);
-                });
-                
-                // 双击快捷铸造 - 整个卡片区域都可双击
-                card.addEventListener('dblclick', (e) => {
-                    e.stopPropagation();
+                    // 选择资产
+                    selectAsset(asset);
+                    // 如果未铸造，直接进入铸造流程
                     if (!asset.minted) {
-                        selectAsset(asset);
-                        setTimeout(() => openMintModal(), 100);
+                        openMintModal();
                     }
                 });
 
@@ -8665,9 +8717,14 @@ function createHierarchyNode(nodeData) {
     const light = new THREE.PointLight(color, nodeData.level === 1 ? 2.5 : (nodeData.level === 2 ? 1.5 : 1.0), nodeData.level === 1 ? 80 : 50);
     group.add(light);
     
-    // 添加名字标签 - 3D立体效果，放在模型上方
-    const label = createTextLabel(nodeData.name || nodeData.label, color, scale);
-    label.position.y = glowSize * 1.5;
+    // 添加名字标签 - 3D立体效果，放在模型上方，与模型对齐
+    const labelScale = nodeData.level === 1 ? 2.5 : (nodeData.level === 2 ? 1.8 : 1.2);
+    const label = createTextLabel(nodeData.name || nodeData.label, color, labelScale);
+    // 根据层级调整标签高度，确保与模型顶部对齐
+    const labelHeight = nodeData.level === 1 ? 7 : (nodeData.level === 2 ? 5 : 3.5);
+    label.position.y = labelHeight;
+    // 让标签始终面向相机
+    label.lookAt(0, labelHeight, 50);
     group.add(label);
     
     // 存储数据
@@ -8684,38 +8741,64 @@ function createTextLabel(text, color, scale) {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     canvas.width = 512;
-    canvas.height = 128;
+    canvas.height = 160;
     
-    // 绘制背景发光
-    const gradient = context.createLinearGradient(0, 0, 0, 128);
-    gradient.addColorStop(0, 'rgba(0,0,0,0.8)');
-    gradient.addColorStop(1, 'rgba(0,0,0,0.4)');
-    context.fillStyle = gradient;
-    context.roundRect(10, 10, 492, 108, 20);
+    // 绘制背景发光 - 半透明黑色背景
+    context.fillStyle = 'rgba(0,0,0,0.7)';
+    context.roundRect(10, 10, 492, 140, 20);
     context.fill();
     
-    // 绘制边框
+    // 绘制边框发光
     context.strokeStyle = '#' + color.toString(16).padStart(6, '0');
-    context.lineWidth = 3;
-    context.roundRect(10, 10, 492, 108, 20);
+    context.lineWidth = 4;
+    context.roundRect(10, 10, 492, 140, 20);
     context.stroke();
     
-    // 绘制文字
-    context.font = 'bold 52px "Orbitron", "Noto Sans SC", sans-serif';
+    // 确定资产类型和ID
+    let assetType = '分子资产';
+    let assetId = '';
+    
+    // 根据名称判断类型
+    if (text === 'AI制药资产') {
+        assetType = '终极资产';
+        assetId = 'AI-PHARMA';
+    } else if (['结构筛选', '化学优化', '临床候选'].includes(text)) {
+        assetType = '融合资产';
+        if (text === '结构筛选') assetId = 'ScreeningBlok';
+        if (text === '化学优化') assetId = 'OptimizationBlok';
+        if (text === '临床候选') assetId = 'CandidateBlok';
+    } else {
+        // 分子资产 - 查找对应的ID
+        const asset = assets.find(a => a.name === text);
+        if (asset) {
+            assetId = asset.id;
+        }
+        assetType = '分子资产';
+    }
+    
+    // 绘制资产名称（主标题）
+    context.font = 'bold 48px "Orbitron", "Noto Sans SC", sans-serif';
     context.fillStyle = '#ffffff';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.fillText(text, 256, 64);
+    context.fillText(text, 256, 50);
     
-    // 绘制副标题
+    // 绘制资产ID（副标题）
+    if (assetId) {
+        context.font = 'bold 32px "Orbitron", monospace';
+        context.fillStyle = '#' + color.toString(16).padStart(6, '0');
+        context.fillText(assetId, 256, 90);
+    }
+    
+    // 绘制资产类型标签
     context.font = '24px "Orbitron", "Noto Sans SC", sans-serif';
-    context.fillStyle = '#' + color.toString(16).padStart(6, '0');
-    context.fillText(text === 'AI制药资产' ? '终极资产' : 
-                     text === '结构筛选' ? '融合资产' :
-                     text === '化学优化' ? '融合资产' :
-                     text === '临床候选' ? '融合资产' : '分子资产', 256, 100);
+    context.fillStyle = 'rgba(255,255,255,0.7)';
+    context.fillText(assetType, 256, 125);
     
     const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    
     const material = new THREE.MeshBasicMaterial({ 
         map: texture, 
         transparent: true,
@@ -8723,8 +8806,15 @@ function createTextLabel(text, color, scale) {
         side: THREE.DoubleSide
     });
     
-    const geometry = new THREE.PlaneGeometry(scale * 3, scale * 0.75);
+    // 根据scale调整标签大小，确保与3D模型对齐
+    const labelWidth = scale * 2.5;
+    const labelHeight = scale * 0.8;
+    const geometry = new THREE.PlaneGeometry(labelWidth, labelHeight);
     const label = new THREE.Mesh(geometry, material);
+    
+    // 标签始终面向相机
+    label.lookAt(0, 0, 10);
+    
     group.add(label);
     
     return group;
