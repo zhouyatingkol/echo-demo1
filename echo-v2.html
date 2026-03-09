@@ -8672,13 +8672,6 @@ function createHierarchyConnection(fromId, toId, color, thickness = 1) {
         baseOpacity: 0.4
     };
     hierarchyScene.add(tube);
-    hierarchyConnections.push({ 
-        mesh: tube, 
-        coreMesh: coreTube,
-        from: fromId, 
-        to: toId, 
-        curve: curve 
-    });
     
     // 添加核心高亮管道（更亮更细）
     const coreTubeGeometry = new THREE.TubeGeometry(curve, 64, tubeRadius * 0.4, 8, false);
@@ -8690,6 +8683,14 @@ function createHierarchyConnection(fromId, toId, color, thickness = 1) {
     });
     const coreTube = new THREE.Mesh(coreTubeGeometry, coreTubeMaterial);
     hierarchyScene.add(coreTube);
+    
+    hierarchyConnections.push({ 
+        mesh: tube, 
+        coreMesh: coreTube,
+        from: fromId, 
+        to: toId, 
+        curve: curve 
+    });
     
     // 添加流动粒子效果（更多粒子，更明显的流动）
     createFlowParticlesAlongCurve(curve, color, thickness * 2);
