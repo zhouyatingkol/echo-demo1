@@ -7781,149 +7781,63 @@ function initHierarchy3D() {
     const canvas = document.getElementById('hierarchyCanvas');
     if (!canvas) return;
     
-    // 检测WebGL支持
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    if (!gl) {
-        console.warn('WebGL not supported, falling back to Canvas 2D');
-        initHierarchy2D();
-        return;
-    }
+    // 清理前面的WebGL资源
+    cleanupPreviousWebGL();
     
-    try {
-        hierarchyScene = new THREE.Scene();
-        hierarchyScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
-        
-        hierarchyCamera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-        hierarchyCamera.position.set(0, 40, 80);
-        hierarchyCamera.lookAt(0, 0, 0);
-        
-        hierarchyRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        hierarchyRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
-        hierarchyRenderer.setPixelRatio(window.devicePixelRatio);
-        
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        hierarchyScene.add(ambientLight);
-        
-        const pointLight = new THREE.PointLight(0xffd700, 1.0, 150);
-        pointLight.position.set(20, 40, 20);
-        hierarchyScene.add(pointLight);
-        
-        const pointLight2 = new THREE.PointLight(0x00f0ff, 0.8, 150);
-        pointLight2.position.set(-20, 20, -20);
-        hierarchyScene.add(pointLight2);
-        
-        buildHierarchyTree();
-        
-        canvas.addEventListener('mousedown', onHierarchyMouseDown);
-        canvas.addEventListener('mousemove', onHierarchyMouseMove);
-        canvas.addEventListener('mouseup', onHierarchyMouseUp);
-        canvas.addEventListener('wheel', onHierarchyWheel);
-        canvas.addEventListener('click', onHierarchyClick);
-        
-        animateHierarchy3D();
-    } catch (e) {
-        console.error('WebGL initialization failed:', e);
-        initHierarchy2D();
-    }
+    hierarchyScene = new THREE.Scene();
+    hierarchyScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
+    
+    hierarchyCamera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    hierarchyCamera.position.set(0, 40, 80);
+    hierarchyCamera.lookAt(0, 0, 0);
+    
+    hierarchyRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    hierarchyRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    hierarchyRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    hierarchyScene.add(ambientLight);
+    
+    const pointLight = new THREE.PointLight(0xffd700, 1.0, 150);
+    pointLight.position.set(20, 40, 20);
+    hierarchyScene.add(pointLight);
+    
+    const pointLight2 = new THREE.PointLight(0x00f0ff, 0.8, 150);
+    pointLight2.position.set(-20, 20, -20);
+    hierarchyScene.add(pointLight2);
+    
+    buildHierarchyTree();
+    
+    canvas.addEventListener('mousedown', onHierarchyMouseDown);
+    canvas.addEventListener('mousemove', onHierarchyMouseMove);
+    canvas.addEventListener('mouseup', onHierarchyMouseUp);
+    canvas.addEventListener('wheel', onHierarchyWheel);
+    canvas.addEventListener('click', onHierarchyClick);
+    
+    animateHierarchy3D();
 }
 
-// Canvas 2D 回退方案
-function initHierarchy2D() {
-    const canvas = document.getElementById('hierarchyCanvas');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    let rotation = 0;
-    let autoRotate = true;
-    
-    // 节点数据
-    const nodes = [
-        { id: 'ai-pharma', label: 'AI制药资产', level: 1, color: '#ffd700', x: 0, y: -100, size: 40 },
-        { id: 'screening', label: '结构筛选', level: 2, color: '#00d2ff', x: -120, y: 50, size: 30 },
-        { id: 'optimization', label: '化学优化', level: 2, color: '#00ff88', x: 120, y: 50, size: 30 },
-        { id: 'candidate', label: '临床候选', level: 2, color: '#ff9500', x: 0, y: 80, size: 30 }
-    ];
-    
-    // 连接关系
-    const connections = [
-        { from: 'ai-pharma', to: 'screening' },
-        { from: 'ai-pharma', to: 'optimization' },
-        { from: 'ai-pharma', to: 'candidate' }
-    ];
-    
-    function draw() {
-        const width = canvas.width = canvas.clientWidth;
-        const height = canvas.height = canvas.clientHeight;
-        const centerX = width / 2;
-        const centerY = height / 2;
-        
-        ctx.clearRect(0, 0, width, height);
-        
-        // 自动旋转
-        if (autoRotate) {
-            rotation += 0.005;
-        }
-        
-        // 绘制连接线
-        ctx.strokeStyle = 'rgba(100, 150, 200, 0.3)';
-        ctx.lineWidth = 2;
-        connections.forEach(conn => {
-            const fromNode = nodes.find(n => n.id === conn.from);
-            const toNode = nodes.find(n => n.id === conn.to);
-            if (fromNode && toNode) {
-                const fx = centerX + fromNode.x * Math.cos(rotation) - fromNode.y * Math.sin(rotation);
-                const fy = centerY + fromNode.x * Math.sin(rotation) + fromNode.y * Math.cos(rotation);
-                const tx = centerX + toNode.x * Math.cos(rotation) - toNode.y * Math.sin(rotation);
-                const ty = centerY + toNode.x * Math.sin(rotation) + toNode.y * Math.cos(rotation);
-                
-                ctx.beginPath();
-                ctx.moveTo(fx, fy);
-                ctx.quadraticCurveTo(centerX, centerY + 50, tx, ty);
-                ctx.stroke();
-            }
-        });
-        
-        // 绘制节点
-        nodes.forEach(node => {
-            const x = centerX + node.x * Math.cos(rotation) - node.y * Math.sin(rotation);
-            const y = centerY + node.x * Math.sin(rotation) + node.y * Math.cos(rotation);
-            
-            // 光晕
-            const gradient = ctx.createRadialGradient(x, y, 0, x, y, node.size * 1.5);
-            gradient.addColorStop(0, node.color + '66');
-            gradient.addColorStop(1, 'transparent');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(x, y, node.size * 1.5, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // 节点本体
-            ctx.fillStyle = node.color;
-            ctx.beginPath();
-            ctx.arc(x, y, node.size, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // 边框
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // 标签
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '12px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(node.label, x, y + node.size + 20);
-        });
-        
-        requestAnimationFrame(draw);
+// 清理前面阶段的WebGL资源
+function cleanupPreviousWebGL() {
+    // 清理铸造场景的渲染器
+    if (previewRenderer) {
+        previewRenderer.dispose();
+        previewRenderer = null;
+    }
+    if (poolRenderer) {
+        poolRenderer.dispose();
+        poolRenderer = null;
     }
     
-    draw();
+    // 清理卡片渲染器
+    cardRenderers.forEach(renderer => renderer.dispose());
+    cardRenderers.clear();
+    cardScenes.clear();
+    cardMolecules.clear();
+    cardCameras.clear();
     
-    // 点击切换自动旋转
-    canvas.addEventListener('click', () => {
-        autoRotate = !autoRotate;
-    });
+    // 强制垃圾回收提示
+    if (window.gc) window.gc();
 }
 
 function buildHierarchyTree() {
