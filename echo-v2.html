@@ -7781,8 +7781,11 @@ function initHierarchy3D() {
     const canvas = document.getElementById('hierarchyCanvas');
     if (!canvas) return;
     
-    // 强制清理所有WebGL资源
-    forceCleanupAllWebGL();
+    // 如果已经有渲染器，先清理
+    if (hierarchyRenderer) {
+        hierarchyRenderer.dispose();
+        hierarchyRenderer = null;
+    }
     
     hierarchyScene = new THREE.Scene();
     hierarchyScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
@@ -7791,35 +7794,49 @@ function initHierarchy3D() {
     hierarchyCamera.position.set(0, 40, 80);
     hierarchyCamera.lookAt(0, 0, 0);
     
-    hierarchyRenderer = new THREE.WebGLRenderer({ 
-        canvas: canvas, 
-        alpha: true, 
-        antialias: true,
-        powerPreference: "high-performance"
-    });
-    hierarchyRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
-    hierarchyRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    hierarchyScene.add(ambientLight);
-    
-    const pointLight = new THREE.PointLight(0xffd700, 1.0, 150);
-    pointLight.position.set(20, 40, 20);
-    hierarchyScene.add(pointLight);
-    
-    const pointLight2 = new THREE.PointLight(0x00f0ff, 0.8, 150);
-    pointLight2.position.set(-20, 20, -20);
-    hierarchyScene.add(pointLight2);
-    
-    buildHierarchyTree();
-    
-    canvas.addEventListener('mousedown', onHierarchyMouseDown);
-    canvas.addEventListener('mousemove', onHierarchyMouseMove);
-    canvas.addEventListener('mouseup', onHierarchyMouseUp);
-    canvas.addEventListener('wheel', onHierarchyWheel);
-    canvas.addEventListener('click', onHierarchyClick);
-    
-    animateHierarchy3D();
+    // 尝试创建WebGL渲染器
+    try {
+        hierarchyRenderer = new THREE.WebGLRenderer({ 
+            canvas: canvas, 
+            alpha: true, 
+            antialias: true,
+            powerPreference: "high-performance",
+            failIfMajorPerformanceCaveat: false
+        });
+        hierarchyRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        hierarchyRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        hierarchyScene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0xffd700, 1.0, 150);
+        pointLight.position.set(20, 40, 20);
+        hierarchyScene.add(pointLight);
+        
+        const pointLight2 = new THREE.PointLight(0x00f0ff, 0.8, 150);
+        pointLight2.position.set(-20, 20, -20);
+        hierarchyScene.add(pointLight2);
+        
+        buildHierarchyTree();
+        
+        canvas.addEventListener('mousedown', onHierarchyMouseDown);
+        canvas.addEventListener('mousemove', onHierarchyMouseMove);
+        canvas.addEventListener('mouseup', onHierarchyMouseUp);
+        canvas.addEventListener('wheel', onHierarchyWheel);
+        canvas.addEventListener('click', onHierarchyClick);
+        
+        animateHierarchy3D();
+    } catch (e) {
+        console.error('WebGL初始化失败:', e);
+        // 显示错误信息在canvas上
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.fillStyle = '#ff0000';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('WebGL初始化失败，请刷新页面', canvas.width/2, canvas.height/2);
+        }
+    }
 }
 
 // 强制清理所有WebGL资源
