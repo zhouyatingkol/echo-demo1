@@ -4566,22 +4566,65 @@
         let modalScene, modalCamera, modalRenderer, modalMolecule;
         let fusionScene, fusionCamera, fusionRenderer, fusionMolecule;
         let poolScene, poolCamera, poolRenderer, poolMolecule;
-        const cardScenes = new Map(), cardRenderers = new Map(), cardMolecules = new Map(), cardCameras = new Map();
         
-        // 清理卡片渲染器，限制数量防止WebGL上下文过多
-        function cleanupCardRenderers(keepCount = 4) {
-            if (cardRenderers.size <= keepCount) return;
+        // 共享 WebGL 渲染器系统（解决上下文限制问题）
+        let sharedCardRenderer = null;
+        let sharedCardCanvas = null;
+        const cardScenes = new Map();
+        const cardMolecules = new Map();
+        const cardCameras = new Map();
+        const cardContexts = new Map(); // 存储每个卡片的 2D context
+        
+        // 初始化共享渲染器
+        function initSharedCardRenderer() {
+            if (sharedCardRenderer) return;
             
-            const entries = Array.from(cardRenderers.entries());
-            const toRemove = entries.slice(0, entries.length - keepCount);
+            // 创建离屏 canvas
+            sharedCardCanvas = document.createElement('canvas');
+            sharedCardCanvas.width = 64;
+            sharedCardCanvas.height = 64;
             
-            toRemove.forEach(([id, renderer]) => {
-                renderer.dispose();
-                cardRenderers.delete(id);
-                cardScenes.delete(id);
-                cardMolecules.delete(id);
-                cardCameras.delete(id);
-            });
+            try {
+                sharedCardRenderer = new THREE.WebGLRenderer({ 
+                    canvas: sharedCardCanvas, 
+                    alpha: true, 
+                    antialias: false,
+                    powerPreference: "low-power"
+                });
+                sharedCardRenderer.setPixelRatio(1);
+            } catch (e) {
+                console.error('无法创建共享渲染器:', e);
+            }
+        }
+        
+        // 清理所有卡片场景
+        function cleanupAllCardRenderers() {
+            stopCardAnimation();
+            cardScenes.clear();
+            cardMolecules.clear();
+            cardCameras.clear();
+            cardContexts.clear();
+            if (sharedCardRenderer) {
+                sharedCardRenderer.dispose();
+                sharedCardRenderer = null;
+            }
+            sharedCardCanvas = null;
+        }
+        
+        // 显示图标回退
+        function showIconFallback(asset, container) {
+            if (!container) return;
+            container.innerHTML = `
+                <div style="
+                    width: 100%; 
+                    height: 100%; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    font-size: 32px;
+                    color: ${asset.color};
+                ">${asset.icon}</div>
+            `;
         }
 
         // ===== 创建3D分子（不同形状）=====
@@ -5193,147 +5236,80 @@
             }
         }
 
-        // 初始化卡片3D场景（带错误处理和上下文检查）
+        // 初始化卡片3D场景（使用共享渲染器方案，解决上下文限制）
         function initCardScene(asset, canvas, container) {
-            // 如果已经有太多渲染器，直接显示图标
-            if (cardRenderers.size >= 8) {
+            // 确保共享渲染器已初始化
+            initSharedCardRenderer();
+            if (!sharedCardRenderer) {
                 showIconFallback(asset, container);
                 return;
             }
             
-            // 确保canvas尺寸正确
-            const containerWidth = container.clientWidth || 60;
-            const containerHeight = container.clientHeight || 60;
-            
-            try {
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-                camera.position.z = 5;
-                
-                // 尝试创建渲染器，使用保守参数
-                const renderer = new THREE.WebGLRenderer({ 
-                    canvas: canvas, 
-                    alpha: true, 
-                    antialias: false,
-                    powerPreference: "low-power",
-                    failIfMajorPerformanceCaveat: false
-                });
-                renderer.setSize(containerWidth, containerHeight);
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
-                
-                // 验证 WebGL 上下文是否成功创建
-                const gl = renderer.getContext();
-                if (!gl || gl.isContextLost()) {
-                    throw new Error('WebGL context not available');
-                }
-                
-                scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-                const pl = new THREE.PointLight(asset.colorHex, 1, 100);
-                pl.position.set(5, 5, 5);
-                scene.add(pl);
-                
-                // 调整分子大小以适应容器
-                const scale = Math.min(containerWidth, containerHeight) / 90 * 0.65;
-                const molecule = createMolecule(asset.type, asset.colorHex, scale);
-                scene.add(molecule);
-                
-                cardScenes.set(asset.id, scene);
-                cardRenderers.set(asset.id, renderer);
-                cardMolecules.set(asset.id, molecule);
-                cardCameras.set(asset.id, camera);
-                
-                // 标记初始化时间，用于后续清理
-                canvas.dataset.initTime = Date.now();
-                
-            } catch (e) {
-                console.warn('无法初始化卡片3D场景:', asset.id, e);
+            // 获取 2D context 用于复制渲染结果
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
                 showIconFallback(asset, container);
+                return;
             }
-        }
-        
-        // 显示图标回退
-        function showIconFallback(asset, container) {
-            if (!container) return;
-            container.innerHTML = `
-                <div style="
-                    width: 100%; 
-                    height: 100%; 
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center; 
-                    font-size: 32px;
-                ">${asset.icon}</div>
-            `;
-        }
-        
-        // 清理最旧的卡片渲染器
-        function cleanupOldestCardRenderer() {
-            let oldestId = null;
-            let oldestTime = Infinity;
+            cardContexts.set(asset.id, ctx);
             
-            // 找到最旧的渲染器
-            cardRenderers.forEach((renderer, id) => {
-                const canvas = renderer.domElement;
-                const initTime = parseInt(canvas.dataset.initTime || '0');
-                if (initTime < oldestTime) {
-                    oldestTime = initTime;
-                    oldestId = id;
-                }
-            });
+            // 创建场景
+            const scene = new THREE.Scene();
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const pl = new THREE.PointLight(asset.colorHex, 1, 100);
+            pl.position.set(5, 5, 5);
+            scene.add(pl);
             
-            if (oldestId) {
-                const renderer = cardRenderers.get(oldestId);
-                if (renderer) {
-                    renderer.dispose();
-                }
-                cardScenes.delete(oldestId);
-                cardRenderers.delete(oldestId);
-                cardMolecules.delete(oldestId);
-                cardCameras.delete(oldestId);
-            }
+            // 创建相机
+            const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            camera.position.z = 5;
+            
+            // 创建分子
+            const scale = 0.5;
+            const molecule = createMolecule(asset.type, asset.colorHex, scale);
+            scene.add(molecule);
+            
+            // 存储引用
+            cardScenes.set(asset.id, scene);
+            cardMolecules.set(asset.id, molecule);
+            cardCameras.set(asset.id, camera);
         }
         
-        // 清理所有卡片渲染器（进入其他阶段时调用）
-        function cleanupAllCardRenderers() {
-            cardRenderers.forEach((renderer, id) => {
-                try {
-                    renderer.dispose();
-                } catch (e) {}
-            });
-            cardScenes.clear();
-            cardRenderers.clear();
-            cardMolecules.clear();
-            cardCameras.clear();
-        }
-
-        // 渲染卡片动画（限制渲染器数量，防止WebGL上下文过多）
-        let cardRenderCount = 0;
+        // 渲染所有卡片（使用共享渲染器轮流渲染）
+        let cardAnimationId = null;
         function animateCards() {
-            // 限制同时渲染的卡片数量
-            const maxCardsToRender = 8;
-            let rendered = 0;
+            if (!sharedCardRenderer || cardScenes.size === 0) return;
             
-            cardMolecules.forEach((molecule, id) => {
-                if (rendered >= maxCardsToRender) return;
-                
-                molecule.rotation.y += 0.012;
-                molecule.rotation.x += 0.006;
-                
-                const scene = cardScenes.get(id);
-                const renderer = cardRenderers.get(id);
+            cardScenes.forEach((scene, id) => {
+                const molecule = cardMolecules.get(id);
                 const camera = cardCameras.get(id);
+                const ctx = cardContexts.get(id);
                 
-                if (renderer && scene && camera) {
-                    try {
-                        renderer.render(scene, camera);
-                        rendered++;
-                    } catch (e) {
-                        // 忽略渲染错误
-                    }
+                if (molecule) {
+                    molecule.rotation.y += 0.012;
+                    molecule.rotation.x += 0.006;
+                }
+                
+                if (scene && camera && ctx) {
+                    // 设置共享渲染器大小
+                    sharedCardRenderer.setSize(64, 64);
+                    // 渲染到共享 canvas
+                    sharedCardRenderer.render(scene, camera);
+                    // 复制到目标 canvas
+                    ctx.clearRect(0, 0, 64, 64);
+                    ctx.drawImage(sharedCardCanvas, 0, 0, 64, 64);
                 }
             });
             
-            requestAnimationFrame(animateCards);
+            cardAnimationId = requestAnimationFrame(animateCards);
+        }
+        
+        // 停止卡片动画
+        function stopCardAnimation() {
+            if (cardAnimationId) {
+                cancelAnimationFrame(cardAnimationId);
+                cardAnimationId = null;
+            }
         }
 
         // 生成资产卡片（使用新的过滤渲染函数）
