@@ -8333,66 +8333,6 @@ function createHierarchyNode(nodeData) {
         fusionGroup.add(glow);
         
         group.add(fusionGroup);
-            
-            // 下半 - 蓝色
-            const bottomSphere = new THREE.Mesh(
-                new THREE.SphereGeometry(0.5 * bigMolScale, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
-                new THREE.MeshStandardMaterial({
-                    color: color,
-                    roughness: 0.3,
-                    metalness: 0.2
-                })
-            );
-            bottomSphere.position.y = -0.25 * bigMolScale;
-            capsuleGroup.add(bottomSphere);
-            
-            fusionGroup.add(capsuleGroup);
-            
-            // 环绕的分子环（代表保护机制）
-            for (let i = 0; i < 8; i++) {
-                const angle = (i / 8) * Math.PI * 2;
-                const ringAtom = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.12 * bigMolScale, 10, 10),
-                    new THREE.MeshStandardMaterial({
-                        color: 0xffffff,
-                        emissive: color,
-                        emissiveIntensity: 0.3
-                    })
-                );
-                ringAtom.position.set(
-                    Math.cos(angle) * 0.75 * bigMolScale,
-                    Math.sin(angle * 3) * 0.15 * bigMolScale,
-                    Math.sin(angle) * 0.75 * bigMolScale
-                );
-                fusionGroup.add(ringAtom);
-            }
-            
-        } else {
-            // 默认融合 - 环面结（更光滑）
-            const defaultMat = new THREE.MeshStandardMaterial({
-                color: color,
-                roughness: 0.35,
-                metalness: 0.1
-            });
-            fusionGroup.add(new THREE.Mesh(
-                new THREE.TorusKnotGeometry(0.6 * bigMolScale, 0.2 * bigMolScale, 64, 12, 2, 3),
-                defaultMat
-            ));
-        }
-        
-        // 柔和光晕（减少干扰）
-        const glow = new THREE.Mesh(
-            new THREE.SphereGeometry(1.2 * scale, 16, 16),
-            new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: 0.08,
-                blending: THREE.AdditiveBlending
-            })
-        );
-        fusionGroup.add(glow);
-        
-        group.add(fusionGroup);
         
     // ===== Level 3: 分子资产 - 8种对应的精细模型 =====
     } else {
