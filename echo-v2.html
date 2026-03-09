@@ -5200,6 +5200,10 @@
                 cleanupOldestCardRenderer();
             }
             
+            // 确保canvas尺寸正确
+            const containerWidth = container.parentElement.clientWidth || 60;
+            const containerHeight = container.parentElement.clientHeight || 60;
+            
             try {
                 const scene = new THREE.Scene();
                 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
@@ -5212,15 +5216,23 @@
                     antialias: false,  // 关闭抗锯齿节省资源
                     powerPreference: "low-power"  // 使用低功耗模式
                 });
-                renderer.setSize(90, 90);
+                renderer.setSize(containerWidth, containerHeight);
                 renderer.setPixelRatio(1);  // 限制像素比
+                
+                // 验证 WebGL 上下文是否成功创建
+                const gl = renderer.getContext();
+                if (!gl) {
+                    throw new Error('WebGL context not available');
+                }
                 
                 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
                 const pl = new THREE.PointLight(asset.colorHex, 1, 100);
                 pl.position.set(5, 5, 5);
                 scene.add(pl);
                 
-                const molecule = createMolecule(asset.type, asset.colorHex, 0.65);
+                // 调整分子大小以适应容器
+                const scale = Math.min(containerWidth, containerHeight) / 90 * 0.65;
+                const molecule = createMolecule(asset.type, asset.colorHex, scale);
                 scene.add(molecule);
                 
                 cardScenes.set(asset.id, scene);
@@ -5232,14 +5244,15 @@
                 container.dataset.initTime = Date.now();
                 
             } catch (e) {
-                console.warn('无法初始化卡片3D场景:', e);
+                console.warn('无法初始化卡片3D场景:', asset.id, e);
                 // 显示备用图标
                 container.style.display = 'none';
                 const iconDiv = document.createElement('div');
                 iconDiv.textContent = asset.icon;
-                iconDiv.style.fontSize = '40px';
+                iconDiv.style.fontSize = Math.min(containerWidth, containerHeight) * 0.5 + 'px';
                 iconDiv.style.textAlign = 'center';
-                iconDiv.style.lineHeight = '90px';
+                iconDiv.style.lineHeight = containerHeight + 'px';
+                iconDiv.style.color = asset.color;
                 container.parentNode.appendChild(iconDiv);
             }
         }
@@ -5476,10 +5489,13 @@
                 card.addEventListener('dblclick', () => quickMint(asset));
 
                 grid.appendChild(card);
-                setTimeout(() => {
-                    const canvas = document.getElementById(`canvas-${asset.id}`);
-                    if (canvas) initCardScene(asset, canvas);
-                }, index * 50);
+                // 延迟初始化以确保DOM已渲染
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        const canvas = document.getElementById(`canvas-${asset.id}`);
+                        if (canvas) initCardScene(asset, canvas);
+                    }, 100 + index * 30);
+                });
             });
 
             setTimeout(() => animateCards(), 500);
