@@ -7942,81 +7942,83 @@ function createHierarchyNode(nodeData) {
         shininess: 120 
     });
     
-    // ===== Level 1: AI新药资产 - 高级科技胶囊 =====
+    // ===== Level 1: AI新药资产 - 专业药物胶囊 =====
     if (nodeData.level === 1) {
         const drugGroup = new THREE.Group();
+        const capsuleScale = scale * 0.85;
         
-        // 外壳 - 透明保护罩
+        // 胶囊主体 - 使用圆柱+半球组合（兼容r128）
+        // 上半：温暖金色半球（代表活性有效成分）
+        const topHalf = new THREE.Mesh(
+            new THREE.SphereGeometry(0.5 * capsuleScale, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+            new THREE.MeshStandardMaterial({ 
+                color: 0xf5c842,
+                roughness: 0.35,
+                metalness: 0.1
+            })
+        );
+        topHalf.position.y = 0.6 * capsuleScale;
+        drugGroup.add(topHalf);
+        
+        // 上半圆柱
+        const topCylinder = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.5 * capsuleScale, 0.5 * capsuleScale, 0.6 * capsuleScale, 24, 1, true),
+            new THREE.MeshStandardMaterial({ 
+                color: 0xf5c842,
+                roughness: 0.35,
+                metalness: 0.1
+            })
+        );
+        topCylinder.position.y = 0.3 * capsuleScale;
+        drugGroup.add(topCylinder);
+        
+        // 下半：乳白色半球（代表辅料/载体）
+        const bottomHalf = new THREE.Mesh(
+            new THREE.SphereGeometry(0.5 * capsuleScale, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+            new THREE.MeshStandardMaterial({ 
+                color: 0xf5f5f5,
+                roughness: 0.4,
+                metalness: 0.0
+            })
+        );
+        bottomHalf.position.y = -0.6 * capsuleScale;
+        drugGroup.add(bottomHalf);
+        
+        // 下半圆柱
+        const bottomCylinder = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.5 * capsuleScale, 0.5 * capsuleScale, 0.6 * capsuleScale, 24, 1, true),
+            new THREE.MeshStandardMaterial({ 
+                color: 0xf5f5f5,
+                roughness: 0.4,
+                metalness: 0.0
+            })
+        );
+        bottomCylinder.position.y = -0.3 * capsuleScale;
+        drugGroup.add(bottomCylinder);
+        
+        // 接缝线 - 真实胶囊压痕
+        const seamLine = new THREE.Mesh(
+            new THREE.TorusGeometry(0.505 * capsuleScale, 0.012 * capsuleScale, 6, 32),
+            new THREE.MeshStandardMaterial({ 
+                color: 0xcccccc,
+                roughness: 0.5
+            })
+        );
+        seamLine.rotation.x = Math.PI / 2;
+        drugGroup.add(seamLine);
+        
+        // 微弱外壳 - 极淡的存在感
         const shell = new THREE.Mesh(
-            new THREE.SphereGeometry(1.0 * scale, 32, 32),
+            new THREE.SphereGeometry(1.0 * scale, 24, 24),
             new THREE.MeshPhongMaterial({ 
                 color: color,
                 transparent: true,
-                opacity: 0.12,
-                shininess: 100,
+                opacity: 0.04,
+                shininess: 60,
                 side: THREE.DoubleSide
             })
         );
         drugGroup.add(shell);
-        
-        // 内部核心 - 精致胶囊
-        const coreGroup = new THREE.Group();
-        
-        // 上半 - 金色发光
-        const topHalf = new THREE.Mesh(
-            new THREE.SphereGeometry(0.55 * scale, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2),
-            new THREE.MeshPhongMaterial({ 
-                color: 0xffd700,
-                emissive: 0xffaa00,
-                emissiveIntensity: 0.6,
-                shininess: 150
-            })
-        );
-        topHalf.position.y = 0.28 * scale;
-        coreGroup.add(topHalf);
-        
-        // 下半 - 科技蓝光
-        const bottomHalf = new THREE.Mesh(
-            new THREE.SphereGeometry(0.55 * scale, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
-            new THREE.MeshPhongMaterial({ 
-                color: 0x00f0ff,
-                emissive: 0x00aaff,
-                emissiveIntensity: 0.6,
-                shininess: 150
-            })
-        );
-        bottomHalf.position.y = -0.28 * scale;
-        coreGroup.add(bottomHalf);
-        
-        // 中间发光环
-        const glowRing = new THREE.Mesh(
-            new THREE.TorusGeometry(0.55 * scale, 0.06 * scale, 10, 40),
-            new THREE.MeshBasicMaterial({ 
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.7,
-                blending: THREE.AdditiveBlending
-            })
-        );
-        glowRing.rotation.x = Math.PI / 2;
-        coreGroup.add(glowRing);
-        
-        drugGroup.add(coreGroup);
-        
-        // 外圈能量纹路
-        for (let i = 0; i < 3; i++) {
-            const ring = new THREE.Mesh(
-                new THREE.TorusGeometry(1.15 * scale + i * 0.12, 0.015 * scale, 6, 40),
-                new THREE.MeshBasicMaterial({ 
-                    color: color,
-                    transparent: true,
-                    opacity: 0.15 - i * 0.04
-                })
-            );
-            ring.rotation.x = Math.PI / 2;
-            ring.rotation.y = i * 0.4;
-            drugGroup.add(ring);
-        }
         
         group.add(drugGroup);
         
