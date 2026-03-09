@@ -5868,7 +5868,7 @@
                 <div class="asset-card" ${draggableAttr} data-id="${asset.id}" style="border-color:${asset.color}50;position:relative;">
                     ${fusionBadge}
                     <div class="mol-canvas-container">
-                        <canvas class="mol-canvas" id="fcanvas-${asset.id}"></canvas>
+                        <canvas class="mol-canvas" id="fcanvas-${asset.id}" width="64" height="64"></canvas>
                     </div>
                     <div class="asset-id" style="color:${asset.color};text-shadow:0 0 10px ${asset.color}80;">${asset.id}</div>
                     <div class="asset-name">${asset.name}</div>
@@ -5879,7 +5879,8 @@
             minted.forEach(asset => {
                 const canvas = document.getElementById(`fcanvas-${asset.id}`);
                 if (canvas && !cardScenes.has(`f-${asset.id}`)) {
-                    initCardScene({...asset, id: `f-${asset.id}`}, canvas);
+                    const container = canvas.parentElement;
+                    initCardScene({...asset, id: `f-${asset.id}`}, canvas, container);
                 }
             });
             
