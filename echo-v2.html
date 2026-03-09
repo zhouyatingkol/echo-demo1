@@ -2842,7 +2842,6 @@
         .fusion-center-id {
             font-size: 12px;
             color: rgba(150,170,200,0.7);
-        }
             position: absolute;
             display: flex;
             flex-direction: column;
@@ -8388,9 +8387,9 @@ function createHierarchyNode(nodeData) {
     const light = new THREE.PointLight(color, nodeData.level === 1 ? 2.5 : (nodeData.level === 2 ? 1.5 : 1.0), nodeData.level === 1 ? 80 : 50);
     group.add(light);
     
-    // 添加名字标签
-    const label = createTextLabel(nodeData.name || nodeData.label, color);
-    label.position.y = glowSize * 2.2; // 在光晕上方，与模型对齐
+    // 添加名字标签 - 3D立体效果，放在模型上方
+    const label = createTextLabel(nodeData.name || nodeData.label, color, scale);
+    label.position.y = glowSize * 1.5;
     group.add(label);
     
     // 存储数据
@@ -8399,34 +8398,60 @@ function createHierarchyNode(nodeData) {
     hierarchyNodes.push({ mesh: group, data: nodeData });
 }
 
-// 创建文字标签
-function createTextLabel(text, color) {
+// 创建文字标签 - 3D立体效果
+function createTextLabel(text, color, scale) {
+    const group = new THREE.Group();
+    
+    // 主标签
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     canvas.width = 512;
     canvas.height = 128;
     
-    // 绘制文字 - 更大的字体
-    context.font = 'bold 48px "Orbitron", "Noto Sans SC", sans-serif';
-    context.fillStyle = '#' + color.toString(16).padStart(6, '0');
+    // 绘制背景发光
+    const gradient = context.createLinearGradient(0, 0, 0, 128);
+    gradient.addColorStop(0, 'rgba(0,0,0,0.8)');
+    gradient.addColorStop(1, 'rgba(0,0,0,0.4)');
+    context.fillStyle = gradient;
+    context.roundRect(10, 10, 492, 108, 20);
+    context.fill();
+    
+    // 绘制边框
+    context.strokeStyle = '#' + color.toString(16).padStart(6, '0');
+    context.lineWidth = 3;
+    context.roundRect(10, 10, 492, 108, 20);
+    context.stroke();
+    
+    // 绘制文字
+    context.font = 'bold 52px "Orbitron", "Noto Sans SC", sans-serif';
+    context.fillStyle = '#ffffff';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    
-    // 添加文字阴影
-    context.shadowColor = '#' + color.toString(16).padStart(6, '0');
-    context.shadowBlur = 20;
     context.fillText(text, 256, 64);
     
+    // 绘制副标题
+    context.font = '24px "Orbitron", "Noto Sans SC", sans-serif';
+    context.fillStyle = '#' + color.toString(16).padStart(6, '0');
+    context.fillText(text === 'AI制药资产' ? '终极资产' : 
+                     text === '结构筛选' ? '融合资产' :
+                     text === '化学优化' ? '融合资产' :
+                     text === '临床候选' ? '融合资产' : '分子资产', 256, 100);
+    
     const texture = new THREE.CanvasTexture(canvas);
-    const material = new THREE.SpriteMaterial({ 
+    const material = new THREE.MeshBasicMaterial({ 
         map: texture, 
         transparent: true,
-        opacity: 0.9
+        opacity: 0.95,
+        side: THREE.DoubleSide
     });
-    const sprite = new THREE.Sprite(material);
-    sprite.scale.set(10, 2.5, 1);
     
-    return sprite;
+    const geometry = new THREE.PlaneGeometry(scale * 3, scale * 0.75);
+    const label = new THREE.Mesh(geometry, material);
+    group.add(label);
+    
+    return group;
+
+
 }
 
 
