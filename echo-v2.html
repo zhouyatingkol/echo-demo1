@@ -9884,8 +9884,13 @@ function showValueNodeDetail(nodeData) {
 
         // 初始化
         window.addEventListener('load', () => {
-            initBackground();
-            initPreviewScene();
+            // 延迟初始化WebGL场景，避免占用过多WebGL上下文
+            // initBackground(); // 移到stage0显示时初始化
+            // initPreviewScene(); // 移到stage1显示时初始化
+            
+            // 初始化背景（纯CSS/Canvas 2D，不占用WebGL）
+            initBackground2D();
+            
             generateAssetCards();
             
             // 首页隐藏底部导航
@@ -9896,6 +9901,46 @@ function showValueNodeDetail(nodeData) {
             gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
             gsap.from('.preview-area', { y: 30, opacity: 0, duration: 0.8, delay: 0.4 });
         });
+        
+        // 纯2D背景初始化（不占用WebGL上下文）
+        function initBackground2D() {
+            const canvas = document.getElementById('bg-canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // 绘制星空背景
+            const stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 0.5
+                });
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#020208';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                stars.forEach(star => {
+                    star.y += star.speed;
+                    if (star.y > canvas.height) star.y = 0;
+                    
+                    ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})`;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                requestAnimationFrame(draw);
+            }
+            
+            draw();
+        }
     </script>
 </body>
 </html>
