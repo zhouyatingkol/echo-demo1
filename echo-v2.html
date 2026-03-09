@@ -7781,8 +7781,8 @@ function initHierarchy3D() {
     const canvas = document.getElementById('hierarchyCanvas');
     if (!canvas) return;
     
-    // 清理前面的WebGL资源
-    cleanupPreviousWebGL();
+    // 强制清理所有WebGL资源
+    forceCleanupAllWebGL();
     
     hierarchyScene = new THREE.Scene();
     hierarchyScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
@@ -7791,7 +7791,12 @@ function initHierarchy3D() {
     hierarchyCamera.position.set(0, 40, 80);
     hierarchyCamera.lookAt(0, 0, 0);
     
-    hierarchyRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    hierarchyRenderer = new THREE.WebGLRenderer({ 
+        canvas: canvas, 
+        alpha: true, 
+        antialias: true,
+        powerPreference: "high-performance"
+    });
     hierarchyRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
     hierarchyRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
@@ -7817,27 +7822,67 @@ function initHierarchy3D() {
     animateHierarchy3D();
 }
 
-// 清理前面阶段的WebGL资源
-function cleanupPreviousWebGL() {
-    // 清理铸造场景的渲染器
-    if (previewRenderer) {
-        previewRenderer.dispose();
-        previewRenderer = null;
-    }
-    if (poolRenderer) {
-        poolRenderer.dispose();
-        poolRenderer = null;
-    }
+// 强制清理所有WebGL资源
+function forceCleanupAllWebGL() {
+    console.log('Force cleaning up all WebGL resources...');
     
-    // 清理卡片渲染器
-    cardRenderers.forEach(renderer => renderer.dispose());
+    // 清理所有卡片渲染器
+    cardRenderers.forEach((renderer, id) => {
+        try {
+            renderer.dispose();
+            const canvas = renderer.domElement;
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const loseContext = gl.getExtension('WEBGL_lose_context');
+                if (loseContext) loseContext.loseContext();
+            }
+        } catch (e) {
+            console.warn('Error disposing renderer:', e);
+        }
+    });
     cardRenderers.clear();
     cardScenes.clear();
     cardMolecules.clear();
     cardCameras.clear();
     
-    // 强制垃圾回收提示
-    if (window.gc) window.gc();
+    // 清理预览渲染器
+    if (previewRenderer) {
+        try {
+            previewRenderer.dispose();
+            const canvas = previewRenderer.domElement;
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const loseContext = gl.getExtension('WEBGL_lose_context');
+                if (loseContext) loseContext.loseContext();
+            }
+        } catch (e) {}
+        previewRenderer = null;
+    }
+    previewScene = null;
+    
+    // 清理池渲染器
+    if (poolRenderer) {
+        try {
+            poolRenderer.dispose();
+            const canvas = poolRenderer.domElement;
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const loseContext = gl.getExtension('WEBGL_lose_context');
+                if (loseContext) loseContext.loseContext();
+            }
+        } catch (e) {}
+        poolRenderer = null;
+    }
+    poolScene = null;
+    
+    // 清理其他场景
+    modalRenderer = null;
+    modalScene = null;
+    fusionRenderer = null;
+    fusionScene = null;
+    
+    // 等待一小段时间让资源释放
+    console.log('WebGL cleanup complete');
 }
 
 function buildHierarchyTree() {
