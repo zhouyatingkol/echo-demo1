@@ -7821,6 +7821,11 @@ function buildHierarchyTree() {
         if (c.mesh) hierarchyScene.remove(c.mesh);
         if (c.coreMesh) hierarchyScene.remove(c.coreMesh);
     });
+    // 清理流动粒子
+    if (hierarchyParticles) {
+        hierarchyParticles.forEach(p => hierarchyScene.remove(p));
+        hierarchyParticles = [];
+    }
     hierarchyNodes = [];
     hierarchyConnections = [];
     
@@ -8228,9 +8233,14 @@ function createHierarchyNode(nodeData) {
             
         } else {
             // 默认融合 - 环面结（更光滑）
+            const defaultMat = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.35,
+                metalness: 0.1
+            });
             fusionGroup.add(new THREE.Mesh(
                 new THREE.TorusKnotGeometry(0.6 * bigMolScale, 0.2 * bigMolScale, 64, 12, 2, 3),
-                mat
+                defaultMat
             ));
         }
         
