@@ -7817,7 +7817,10 @@ function initHierarchy3D() {
 function buildHierarchyTree() {
     // 清理旧节点
     hierarchyNodes.forEach(n => hierarchyScene.remove(n.mesh));
-    hierarchyConnections.forEach(c => hierarchyScene.remove(c.line));
+    hierarchyConnections.forEach(c => {
+        if (c.mesh) hierarchyScene.remove(c.mesh);
+        if (c.coreMesh) hierarchyScene.remove(c.coreMesh);
+    });
     hierarchyNodes = [];
     hierarchyConnections = [];
     
@@ -8669,7 +8672,13 @@ function createHierarchyConnection(fromId, toId, color, thickness = 1) {
         baseOpacity: 0.4
     };
     hierarchyScene.add(tube);
-    hierarchyConnections.push({ mesh: tube, from: fromId, to: toId, curve: curve });
+    hierarchyConnections.push({ 
+        mesh: tube, 
+        coreMesh: coreTube,
+        from: fromId, 
+        to: toId, 
+        curve: curve 
+    });
     
     // 添加核心高亮管道（更亮更细）
     const coreTubeGeometry = new THREE.TubeGeometry(curve, 64, tubeRadius * 0.4, 8, false);
