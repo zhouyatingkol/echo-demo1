@@ -4611,6 +4611,32 @@
             sharedCardCanvas = null;
         }
         
+        // 清理卡片渲染器（保留指定数量）
+        function cleanupCardRenderers(keepCount) {
+            const total = cardRenderers.size;
+            if (total <= keepCount) return;
+            
+            // 按时间排序，清理最旧的
+            const sorted = [];
+            cardRenderers.forEach((renderer, id) => {
+                const canvas = renderer.domElement;
+                const initTime = parseInt(canvas.dataset.initTime || '0');
+                sorted.push({ id, initTime });
+            });
+            sorted.sort((a, b) => a.initTime - b.initTime);
+            
+            // 清理多余的
+            const toRemove = sorted.slice(0, total - keepCount);
+            toRemove.forEach(item => {
+                const renderer = cardRenderers.get(item.id);
+                if (renderer) renderer.dispose();
+                cardScenes.delete(item.id);
+                cardRenderers.delete(item.id);
+                cardMolecules.delete(item.id);
+                cardCameras.delete(item.id);
+            });
+        }
+        
         // 显示图标回退
         function showIconFallback(asset, container) {
             if (!container) return;
