@@ -3745,7 +3745,7 @@
                         <div class="fusion-result-info">
                             <div class="fusion-result-name">NeuroBlok</div>
                             <div class="fusion-result-meta">融合资产 v2.0</div>
-                            <div class="fusion-result-value">估值: <span id="resultValue">0</span> ETH</div>
+                            <div class="fusion-result-value">估值: <span id="resultValue">0</span>ECHO</div>
                         </div>
                         
                         <!-- 整合的权属详情 -->
@@ -3845,7 +3845,7 @@
                     <div class="asset-detail-label">元数据</div>
                     <div class="asset-detail-value">
                         <div>创建时间: <span id="assetDetailCreated">--</span></div>
-                        <div>估值: <span id="assetDetailValue">--</span> ETH</div>
+                        <div>估值: <span id="assetDetailValue">--</span>ECHO</div>
                         <div>状态: <span id="assetDetailStatus">--</span></div>
                     </div>
                 </div>
@@ -3946,11 +3946,11 @@
                 <div class="stats-panel">
                     <div class="stat-row">
                         <span class="stat-label">总资产价值</span>
-                        <span class="stat-value" id="totalValue">0 ETH</span>
+                        <span class="stat-value" id="totalValue">0ECHO</span>
                     </div>
                     <div class="stat-row">
                         <span class="stat-label">可融资额度</span>
-                        <span class="stat-value" style="color: #ffd700;" id="availableCredit">0 ETH</span>
+                        <span class="stat-value" style="color: #ffd700;" id="availableCredit">0ECHO</span>
                     </div>
                 </div>
             </div>
@@ -4010,7 +4010,7 @@
                             <div class="finance-slider-group" style="margin-bottom: 25px;">
                                 <div class="slider-label" style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
                                     <span style="color: rgba(200,220,240,0.9);">融资金额</span>
-                                    <span class="slider-value" id="amountValue" style="color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 16px;">0.5 ETH</span>
+                                    <span class="slider-value" id="amountValue" style="color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 16px;">0.5ECHO</span>
                                 </div>
                                 <input type="range" class="finance-slider" id="amountSlider" min="0.1" max="10" step="0.1" value="0.5"
                                     oninput="updateFinanceAmount(this.value)" style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none;">
@@ -4028,7 +4028,7 @@
                             <div class="finance-stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                                 <div class="finance-stat-box" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center;">
                                     <div class="finance-stat-label" style="font-size: 11px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">融资估值</div>
-                                    <div class="finance-stat-value" id="valuationDisplay" style="font-size: 18px; color: #ffd700; font-family: 'Orbitron';">2.5 ETH</div>
+                                    <div class="finance-stat-value" id="valuationDisplay" style="font-size: 18px; color: #ffd700; font-family: 'Orbitron';">2.5ECHO</div>
                                 </div>
                                 <div class="finance-stat-box" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center;">
                                     <div class="finance-stat-label" style="font-size: 11px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">保留所有权</div>
@@ -4185,7 +4185,7 @@
                 <div class="stats-dashboard" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,240,255,0.2); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
                     <div style="text-align: center; margin-bottom: 15px;">
                         <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-bottom: 5px;">⬡ 资产网络总览</div>
-                        <div style="font-size: 24px; color: #ffd700; font-family: 'Orbitron', sans-serif;" id="totalNetworkValue">0 ETH</div>
+                        <div style="font-size: 24px; color: #ffd700; font-family: 'Orbitron', sans-serif;" id="totalNetworkValue">0ECHO</div>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                         <div style="text-align: center; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 10px;">
@@ -4208,7 +4208,7 @@
                     <div class="detail-level-badge level-1" id="detailLevelBadge">终极资产</div>
                     <div style="font-size: 36px; margin: 15px 0;" id="sidebarIcon">💊</div>
                     <div style="font-size: 18px; color: #ffd700; margin-bottom: 5px;" id="sidebarTitle">AI制药资产</div>
-                    <div style="font-size: 14px; color: #00f0ff; font-family: 'Orbitron';" id="sidebarValue">价值 100 ETH</div>
+                    <div style="font-size: 14px; color: #00f0ff; font-family: 'Orbitron';" id="sidebarValue">价值 100ECHO</div>
                 </div>
                 
                 <!-- 收益分配 -->
@@ -5390,27 +5390,40 @@
                 const card = document.createElement('div');
                 card.className = 'asset-card' + (asset.minted ? ' minted' : '');
                 card.dataset.id = asset.id;
+                card.style.cursor = 'pointer';
                 card.innerHTML = `
-                    <div class="mol-canvas-container">
-                        <canvas class="mol-canvas" id="canvas-${asset.id}"></canvas>
+                    <div class="mol-canvas-container" style="width:80px;height:80px;">
+                        <canvas class="mol-canvas" id="canvas-${asset.id}" width="80" height="80"></canvas>
                     </div>
                     <div class="asset-id">${asset.id}</div>
                     <div class="asset-name">${asset.name}</div>
                 `;
 
-                // 点击选择
-                card.addEventListener('click', (e) => handleAssetClick(asset, e));
-                // 双击快捷铸造
-                card.addEventListener('dblclick', () => quickMint(asset));
+                // 整个卡片点击选择
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleAssetClick(asset, e);
+                });
+                
+                // 双击快捷铸造 - 整个卡片区域都可双击
+                card.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    if (!asset.minted) {
+                        selectAsset(asset);
+                        setTimeout(() => openMintModal(), 100);
+                    }
+                });
 
                 grid.appendChild(card);
-                setTimeout(() => {
-                    const canvas = document.getElementById(`canvas-${asset.id}`);
-                    if (canvas) initCardScene(asset, canvas);
-                }, index * 50);
+                
+                // 延迟初始化以确保DOM已渲染
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        const canvas = document.getElementById(`canvas-${asset.id}`);
+                        if (canvas) initCardScene(asset, canvas);
+                    }, index * 30);
+                });
             });
-
-            setTimeout(() => animateCards(), 500);
         }
 
         // 对比模式
@@ -5467,7 +5480,7 @@
                     </div>
                     <div class="compare-item-name" style="color: ${asset1.color};">${asset1.name}</div>
                     <div class="compare-item-id">${asset1.id}</div>
-                    <div class="compare-item-value">${asset1.value} ETH</div>
+                    <div class="compare-item-value">${asset1.value}ECHO</div>
                     <div style="margin-top: 15px; font-size: 11px; color: rgba(150,170,200,0.7);">
                         <div>类型: ${asset1.type}</div>
                         <div>权重: ${asset1.weight}</div>
@@ -5480,7 +5493,7 @@
                     </div>
                     <div class="compare-item-name" style="color: ${asset2.color};">${asset2.name}</div>
                     <div class="compare-item-id">${asset2.id}</div>
-                    <div class="compare-item-value">${asset2.value} ETH</div>
+                    <div class="compare-item-value">${asset2.value}ECHO</div>
                     <div style="margin-top: 15px; font-size: 11px; color: rgba(150,170,200,0.7);">
                         <div>类型: ${asset2.type}</div>
                         <div>权重: ${asset2.weight}</div>
@@ -7188,8 +7201,8 @@
             const minted = assets.filter(a => a.minted);
             
             const totalValue = minted.reduce((s, a) => s + a.value, 0);
-            document.getElementById('totalValue').textContent = totalValue.toFixed(1) + ' ETH';
-            document.getElementById('availableCredit').textContent = (totalValue * 0.7).toFixed(1) + ' ETH';
+            document.getElementById('totalValue').textContent = totalValue.toFixed(1) + 'ECHO';
+            document.getElementById('availableCredit').textContent = (totalValue * 0.7).toFixed(1) + 'ECHO';
             
             if (minted.length === 0) {
                 grid.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(150,170,200,0.5)">请先铸造或融合资产</div>';
@@ -7205,7 +7218,7 @@
                     <div class="mol-canvas-container" style="display:flex;align-items:center;justify-content:center;font-size:40px;color:${asset.color};">${asset.icon}</div>
                     <div class="asset-id" style="color:${asset.color};text-shadow:0 0 10px ${asset.color}80;">${asset.id}</div>
                     <div class="asset-name">${asset.name}</div>
-                    <div style="font-size:10px;color:#ffd700;margin-top:4px;">${asset.value} ETH</div>
+                    <div style="font-size:10px;color:#ffd700;margin-top:4px;">${asset.value}ECHO</div>
                 </div>
             `;
             }).join('');
@@ -7234,7 +7247,7 @@
             document.getElementById('previewIcon').style.color = a.color;
             document.getElementById('previewName').textContent = a.name;
             document.getElementById('previewName').style.color = a.color;
-            document.getElementById('previewId').textContent = `${a.id} | 估值 ${a.value} ETH`;
+            document.getElementById('previewId').textContent = `${a.id} | 估值 ${a.value}ECHO`;
             
             // 更新滑块值和最大值
             const shareSlider = document.getElementById('shareSlider');
@@ -7267,9 +7280,9 @@
             financeAmount = parseFloat(val);
             const amountValue = document.getElementById('amountValue');
             const valuationDisplay = document.getElementById('valuationDisplay');
-            if (amountValue) amountValue.textContent = financeAmount.toFixed(1) + ' ETH';
+            if (amountValue) amountValue.textContent = financeAmount.toFixed(1) + 'ECHO';
             if (valuationDisplay && financeShare > 0) {
-                valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + ' ETH';
+                valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + 'ECHO';
             }
             updateDealPreview();
             updateCharts();
@@ -7284,7 +7297,7 @@
             const ownershipDisplay = document.getElementById('ownershipDisplay');
             if (shareValue) shareValue.textContent = financeShare + '%';
             if (valuationDisplay && financeShare > 0) {
-                valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + ' ETH';
+                valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + 'ECHO';
             }
             if (ownershipDisplay) ownershipDisplay.textContent = (100 - financeShare) + '%';
             updateDealPreview();
@@ -7337,7 +7350,7 @@
                         <div class="dist-info">
                             <div class="dist-name">${selectedFinanceAsset.name}</div>
                         </div>
-                        <div class="dist-share">${selectedFinanceAsset.value} ETH</div>
+                        <div class="dist-share">${selectedFinanceAsset.value}ECHO</div>
                     </div>
                 </div>
                 
@@ -7346,7 +7359,7 @@
                     <div class="meta-list">
                         <div class="meta-item">
                             <span class="meta-label">融资金额</span>
-                            <span class="meta-value">${financeAmount.toFixed(1)} ETH</span>
+                            <span class="meta-value">${financeAmount.toFixed(1)}ECHO</span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">出让收益权</span>
@@ -7354,7 +7367,7 @@
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">融资估值</span>
-                            <span class="meta-value">${(financeAmount / (financeShare/100)).toFixed(1)} ETH</span>
+                            <span class="meta-value">${(financeAmount / (financeShare/100)).toFixed(1)}ECHO</span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">代币数量</span>
@@ -7403,7 +7416,7 @@
                 </div>
                 <div class="deal-summary-item">
                     <span class="deal-summary-label">融资额</span>
-                    <span class="deal-summary-value">${financeAmount.toFixed(1)} ETH</span>
+                    <span class="deal-summary-value">${financeAmount.toFixed(1)}ECHO</span>
                 </div>
                 <div class="deal-summary-item">
                     <span class="deal-summary-label">代币</span>
@@ -8646,7 +8659,7 @@ function showHierarchyDetail(nodeData) {
     title.style.color = '#' + nodeData.color.toString(16).padStart(6, '0');
     
     // 更新价值显示
-    document.getElementById('sidebarValue').textContent = `价值 ${nodeData.value} ETH`;
+    document.getElementById('sidebarValue').textContent = `价值 ${nodeData.value}ECHO`;
     
     // 更新收益分配
     updateValueDistribution(nodeData);
@@ -8762,7 +8775,7 @@ function updateHierarchyStats() {
     document.getElementById('statLevel1').textContent = level1;
     document.getElementById('statLevel2').textContent = level2;
     document.getElementById('statLevel3').textContent = level3;
-    document.getElementById('totalNetworkValue').textContent = totalValue.toFixed(1) + ' ETH';
+    document.getElementById('totalNetworkValue').textContent = totalValue.toFixed(1) + 'ECHO';
 }
 
 function resetHierarchyView() {
