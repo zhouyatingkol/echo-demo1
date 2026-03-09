@@ -166,13 +166,32 @@
             gap: 15px;
             background: transparent;
             z-index: 1;
-            justify-content: center;
+            justify-content: space-between;
         }
 
-        /* 阶段2布局优化 - 防止右侧被截断 */
+        /* 阶段2与阶段一保持相同布局 */
         #stage2 .main-container {
             gap: 10px;
-            padding: 0 10px 20px;
+            padding: 0 15px 20px;
+        }
+        #stage2 .asset-library {
+            width: 390px;
+            min-width: 390px;
+            flex-shrink: 0;
+        }
+        
+        /* 阶段2中间融合区域 */
+        #stage2 .fusion-area {
+            flex: 1;
+            min-width: 0;
+            max-width: calc(100vw - 830px);
+        }
+        
+        /* 阶段2的右侧面板 - 与阶段一相同 */
+        #stage2 .ownership-panel {
+            width: 390px;
+            min-width: 390px;
+            padding: 25px;
         }
 
         /* 顶部导航 */
@@ -293,7 +312,9 @@
 
         /* 左侧资产库 */
         .asset-library {
-            width: 320px;
+            width: 390px;
+            min-width: 390px;
+            flex-shrink: 0;
             height: 100%;
             background: rgba(10, 15, 30, 0.6);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -305,70 +326,31 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
-        /* 阶段2的左侧资产库 */
-        #stage2 .asset-library {
-            width: 280px;
-            min-width: 280px;
-            padding: 20px;
-            flex-shrink: 0;
-            overflow-y: auto;
-        }
-        #stage2 .asset-card {
-            min-height: 120px;
-            padding: 10px 6px 8px;
-        }
-        #stage2 .mol-canvas-container {
-            width: 60px;
-            height: 60px;
-        }
-        #stage2 .asset-card .asset-id {
-            font-size: 11px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 95%;
-            padding: 0 2px;
-        }
-        #stage2 .asset-card .asset-name {
-            font-size: 10px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 95%;
-            padding: 0 2px;
+        /* 阶段2与阶段一保持相同布局 */
+        #stage2 .main-container {
+            gap: 15px;
+            padding: 0 20px 20px;
         }
 
-        /* 阶段3布局优化 - 填满空间 */
+        /* 阶段3与阶段一保持相同布局 */
         #stage3 .main-container {
-            width: 100%;
-            max-width: none;
+            gap: 10px;
             padding: 0 15px 20px;
-            gap: 15px;
         }
         #stage3 .asset-library {
-            width: 340px;
-            min-width: 340px;
+            width: 390px;
+            min-width: 390px;
             flex-shrink: 0;
         }
         #stage3 .finance-center {
             flex: 1;
             min-width: 0;
+            max-width: calc(100vw - 830px);
         }
         #stage3 .ownership-panel {
-            width: 300px;
-            min-width: 300px;
-            flex-shrink: 0;
-        }
-        #stage3 .asset-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        #stage3 .asset-card {
-            min-height: 130px;
-        }
-        #stage3 .mol-canvas-container {
-            width: 70px;
-            height: 70px;
+            width: 390px;
+            min-width: 390px;
+            padding: 25px;
         }
         .library-header {
             margin-bottom: 15px;
@@ -389,7 +371,7 @@
         }
         .asset-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 160px 160px;
             gap: 12px;
             flex: 1;
             overflow-y: auto;
@@ -414,6 +396,8 @@
             align-items: center;
             user-select: none;
             min-height: 150px;
+            width: 100%;
+            box-sizing: border-box;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
@@ -969,12 +953,6 @@
             flex-shrink: 0;
         }
 
-        /* 阶段2的右侧面板更窄 */
-        #stage2 .ownership-panel {
-            width: 240px;
-            min-width: 240px;
-            padding: 15px;
-        }
         .ownership-panel::-webkit-scrollbar { width: 4px; }
         .ownership-panel::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
         .ownership-panel::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.3); border-radius: 2px; }
@@ -1166,7 +1144,8 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            min-width: 350px;
+            min-width: 400px;
+            max-width: calc(100vw - 560px);
         }
 
         .fusion-pool {
@@ -5499,21 +5478,37 @@
         // 显示图标回退
         function showIconFallback(asset, container) {
             if (!container) return;
-            container.innerHTML = `
-                <div style="
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 32px;
-                    color: ${asset.color};
-                ">${asset.icon}</div>
-            `;
+            // 如果容器已经有图标（通过 innerHTML 设置），保持现状
+            // 否则设置图标样式
+            container.style.display = 'flex';
+            container.style.alignItems = 'center';
+            container.style.justifyContent = 'center';
+            container.style.fontSize = '40px';
+            container.style.color = asset.color;
+            // 如果容器内容为空，设置图标
+            if (!container.textContent || container.textContent.trim() === '') {
+                container.textContent = asset.icon;
+            }
+        }
+
+        // 检查 WebGL 支持
+        function isWebGLAvailable() {
+            try {
+                const canvas = document.createElement('canvas');
+                return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            } catch (e) {
+                return false;
+            }
         }
 
         // 初始化卡片3D场景（使用共享渲染器）
         function initCardScene(asset, canvas) {
+            // 先检查 WebGL 支持
+            if (!isWebGLAvailable()) {
+                showIconFallback(asset, canvas.parentElement);
+                return;
+            }
+            
             // 确保共享渲染器已初始化
             initSharedCardRenderer();
             if (!sharedCardRenderer) {
@@ -5553,6 +5548,13 @@
             cardScenes.set(asset.id, scene);
             cardMolecules.set(asset.id, molecule);
             cardCameras.set(asset.id, camera);
+            
+            // 3D渲染成功，显示canvas并隐藏图标
+            canvas.style.opacity = '1';
+            const container = canvas.parentElement;
+            if (container) {
+                container.style.color = 'transparent';
+            }
         }
 
         // 渲染所有卡片（使用共享渲染器轮流渲染）
@@ -5764,8 +5766,9 @@
 
                 card.innerHTML = `
                     ${clickHint}
-                    <div class="mol-canvas-container" style="width:80px;height:80px; pointer-events: none;">
-                        <canvas class="mol-canvas" id="canvas-${asset.id}" width="80" height="80"></canvas>
+                    <div class="mol-canvas-container" id="mol-container-${asset.id}" style="width:80px;height:80px; pointer-events: none; display:flex;align-items:center;justify-content:center;font-size:40px;color:${asset.color};">
+                        ${asset.icon}
+                        <canvas class="mol-canvas" id="canvas-${asset.id}" width="80" height="80" style="position:absolute;top:0;left:0;opacity:0;transition:opacity 0.3s;"></canvas>
                     </div>
                     <div class="asset-id">${asset.id}</div>
                     <div class="asset-name">${asset.name}</div>
@@ -7994,6 +7997,7 @@
                     }
                     initPreviewScene();
                     generateAssetCards();
+                    animateCards(); // 启动卡片3D动画
                 }, 50);
             }
             if (index === 2) {
