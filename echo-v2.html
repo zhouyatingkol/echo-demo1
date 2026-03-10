@@ -98,6 +98,36 @@
             transform: translateY(-2px);
         }
 
+        /* 快捷键提示 */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: rgba(10, 15, 30, 0.7);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .keyboard-hint.visible {
+            opacity: 1;
+        }
+        .keyboard-hint kbd {
+            display: inline-block;
+            padding: 2px 6px;
+            background: rgba(0, 240, 255, 0.15);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 4px;
+            font-family: monospace;
+            color: #00f0ff;
+            margin: 0 2px;
+        }
+
         /* ===== STAGE 0: 开场 ===== */
         .stage-0-content {
             display: flex;
@@ -5017,6 +5047,12 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- 快捷键提示 -->
+    <div class="keyboard-hint" id="keyboardHint">
+        <div><kbd>←</kbd> <kbd>→</kbd> 切换阶段</div>
+        <div style="margin-top: 4px;"><kbd>滚轮</kbd> 快速导航</div>
+    </div>
+
     <script>
         // 资产数据
         const assets = [
@@ -8535,6 +8571,21 @@
             });
         }
 
+        // 显示快捷键提示
+        function showKeyboardHint() {
+            const hint = document.getElementById('keyboardHint');
+            if (hint) {
+                hint.classList.add('visible');
+                // 5秒后自动隐藏
+                setTimeout(() => {
+                    hint.classList.remove('visible');
+                }, 5000);
+            }
+        }
+
+        // 页面加载后显示快捷键提示
+        setTimeout(showKeyboardHint, 2000);
+
         // 背景粒子
         function initBackground() {
             const canvas = document.getElementById('bg-canvas');
@@ -10386,6 +10437,80 @@ function onValueMouseMove(event) {
 function onValueMouseUp() {
     isDragging = false;
 }
+
+// ===== 键盘快捷键 =====
+document.addEventListener('keydown', (e) => {
+    // 忽略输入框中的按键
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    
+    switch(e.key) {
+        case 'ArrowRight':
+            // 切换到下一阶段
+            if (currentStage < 4) {
+                goToNext();
+            }
+            break;
+        case 'ArrowLeft':
+            // 切换到上一阶段
+            if (currentStage > 0) {
+                goToPrev();
+            }
+            break;
+        case ' ':
+            // 空格键：阶段3暂停/恢复自动旋转
+            if (currentStage === 3) {
+                e.preventDefault();
+                // 可以添加暂停逻辑
+            } else if (currentStage === 4) {
+                // 阶段4暂停/恢复自动旋转
+                e.preventDefault();
+                toggleAutoRotate();
+            }
+            break;
+        case 'Escape':
+            // ESC关闭弹窗
+            closeAllModals();
+            break;
+    }
+});
+
+// 关闭所有弹窗
+function closeAllModals() {
+    document.getElementById('mintModal')?.classList.remove('active');
+    document.getElementById('fusionModal')?.classList.remove('active');
+    document.getElementById('fusionSuccessModal')?.classList.remove('active');
+    document.getElementById('dealModal')?.classList.remove('active');
+    document.getElementById('dealSuccessModal')?.classList.remove('active');
+}
+
+// 滚轮切换阶段
+document.addEventListener('wheel', (e) => {
+    // 忽略在可滚动区域内的滚轮事件
+    if (e.target.closest('.asset-library') || 
+        e.target.closest('.hierarchy-sidebar') ||
+        e.target.closest('.ownership-panel')) {
+        return;
+    }
+    
+    // 防止快速滚动导致连续切换
+    if (window.wheelLock) return;
+    
+    if (e.deltaY > 50) {
+        // 向下滚动 - 下一阶段
+        if (currentStage < 4) {
+            window.wheelLock = true;
+            goToNext();
+            setTimeout(() => window.wheelLock = false, 800);
+        }
+    } else if (e.deltaY < -50) {
+        // 向上滚动 - 上一阶段
+        if (currentStage > 0) {
+            window.wheelLock = true;
+            goToPrev();
+            setTimeout(() => window.wheelLock = false, 800);
+        }
+    }
+}, { passive: true });
 
 function onValueWheel(event) {
     event.preventDefault();
