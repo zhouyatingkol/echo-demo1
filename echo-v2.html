@@ -8008,6 +8008,11 @@
                     indicator.classList.remove('active', 'completed');
                 }
             }
+            
+            // 更新底部导航（阶段3步骤切换时）
+            if (currentStage === 3) {
+                updateBottomNav();
+            }
         }
 
         // 切换到指定融资步骤
@@ -8842,20 +8847,55 @@
             const nextBtn = document.getElementById('nextPageBtn');
             const bottomNav = document.getElementById('bottomNav');
             
-            // Stage 0 和 Stage 2.5 隐藏底部导航
-            if (currentStage === 0 || currentStage === 2.5) {
+            // Stage 0, 2, 2.5 隐藏底部导航
+            if (currentStage === 0 || currentStage === 2 || currentStage === 2.5) {
                 if (bottomNav) bottomNav.style.display = 'none';
                 return;
             }
             
-            // 其他阶段显示底部导航
-            if (bottomNav) bottomNav.style.display = 'block';
-            
-            if (prevBtn) {
-                prevBtn.style.display = currentStage > 1 ? 'inline-block' : 'none';
+            // Stage 3 融资阶段：步骤1显示"返回协作池"，其他步骤隐藏
+            if (currentStage === 3) {
+                // 检查是否在步骤1（wizardStep1显示）
+                const wizardStep1 = document.getElementById('wizardStep1');
+                const isStep1 = wizardStep1 && wizardStep1.style.display !== 'none';
+                
+                if (isStep1) {
+                    if (bottomNav) bottomNav.style.display = 'block';
+                    if (prevBtn) {
+                        prevBtn.style.display = 'inline-block';
+                        prevBtn.textContent = '← 返回协作池';
+                        prevBtn.onclick = function() { goTo(2); };
+                    }
+                    if (nextBtn) nextBtn.style.display = 'none';
+                } else {
+                    // 步骤2-4隐藏底部导航
+                    if (bottomNav) bottomNav.style.display = 'none';
+                }
+                return;
             }
-            if (nextBtn) {
-                nextBtn.style.display = currentStage < 4 && currentStage !== 2.5 ? 'inline-block' : 'none';
+            
+            // Stage 1 资产铸造：显示"进入协作池"
+            if (currentStage === 1) {
+                if (bottomNav) bottomNav.style.display = 'block';
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (nextBtn) {
+                    nextBtn.style.display = 'inline-block';
+                    nextBtn.textContent = '进入协作池 →';
+                    nextBtn.onclick = function() { goTo(2); };
+                }
+                return;
+            }
+            
+            // Stage 4 价值分配：显示"返回融资"
+            if (currentStage === 4) {
+                if (bottomNav) bottomNav.style.display = 'block';
+                if (prevBtn) {
+                    prevBtn.style.display = 'inline-block';
+                    prevBtn.textContent = '← 返回融资';
+                    prevBtn.onclick = function() { goTo(3); };
+                }
+                if (nextBtn) nextBtn.style.display = 'none';
+                return;
             }
         }
 
