@@ -8942,35 +8942,6 @@
                 return;
             }
         }
-                    if (bottomNav) bottomNav.style.display = 'none';
-                }
-                return;
-            }
-            
-            // Stage 1 资产铸造：显示"进入协作池"
-            if (currentStage === 1) {
-                if (bottomNav) bottomNav.style.display = 'block';
-                if (prevBtn) prevBtn.style.display = 'none';
-                if (nextBtn) {
-                    nextBtn.style.display = 'inline-block';
-                    nextBtn.textContent = '进入协作池 →';
-                    nextBtn.onclick = function() { goTo(2); };
-                }
-                return;
-            }
-            
-            // Stage 4 价值分配：显示"返回融资"
-            if (currentStage === 4) {
-                if (bottomNav) bottomNav.style.display = 'block';
-                if (prevBtn) {
-                    prevBtn.style.display = 'inline-block';
-                    prevBtn.textContent = '← 返回融资';
-                    prevBtn.onclick = function() { goTo(3); };
-                }
-                if (nextBtn) nextBtn.style.display = 'none';
-                return;
-            }
-        }
 
         // 添加按钮点击反馈
         function addButtonFeedback() {
