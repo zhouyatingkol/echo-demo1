@@ -8199,9 +8199,16 @@
             
             getTextCoordinates();
             
-            // 创建粒子
+            // 创建粒子 - 使用金色和青色搭配
             for (let i = 0; i < particleCount; i++) {
                 const target = textCoordinates.length > 0 ? textCoordinates[Math.floor(Math.random() * textCoordinates.length)] : { x: canvas.width / 2, y: canvas.height / 2 };
+                
+                // 随机分配颜色：60%青色，40%金色
+                const isCyan = Math.random() > 0.4;
+                const hue = isCyan ? (170 + Math.random() * 20) : (45 + Math.random() * 15); // 青色170-190, 金色45-60
+                const saturation = isCyan ? '100%' : '90%';
+                const lightness = isCyan ? '60%' : '65%';
+                
                 particles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
@@ -8209,9 +8216,11 @@
                     vy: 0,
                     targetX: target.x,
                     targetY: target.y,
-                    size: Math.random() * 2 + 1,
-                    color: `hsl(${180 + Math.random() * 60}, 100%, 50%)`,
-                    speed: Math.random() * 0.02 + 0.01
+                    size: Math.random() * 2 + 0.8,
+                    color: `hsl(${hue}, ${saturation}, ${lightness})`,
+                    baseHue: hue,
+                    isCyan: isCyan,
+                    speed: Math.random() * 0.02 + 0.015
                 });
             }
             
@@ -8244,13 +8253,27 @@
                         p.y = p.targetY;
                     }
                     
-                    // 绘制粒子
+                    // 绘制粒子 - 汇聚后使用呼吸光效
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fillStyle = converged ? `hsl(${180 + Math.sin(frameCount * 0.01 + index * 0.1) * 30}, 100%, 70%)` : p.color;
-                    ctx.fill();
                     
-                    // 绘制连线（汇聚后）
+                    if (converged) {
+                        // 汇聚后：青色和金色交替呼吸
+                        const breathe = Math.sin(frameCount * 0.03 + index * 0.05) * 0.3 + 0.7;
+                        const hue = p.isCyan ? 175 : 50;
+                        const sat = p.isCyan ? '100%' : '90%';
+                        ctx.fillStyle = `hsl(${hue}, ${sat}, ${60 + breathe * 20}%)`;
+                        ctx.shadowBlur = 10 * breathe;
+                        ctx.shadowColor = p.isCyan ? '#00f0ff' : '#ffd700';
+                    } else {
+                        ctx.fillStyle = p.color;
+                        ctx.shadowBlur = 0;
+                    }
+                    
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    
+                    // 绘制连线（汇聚后）- 使用半透明白色
                     if (converged && index % 20 === 0) {
                         const neighbor = particles[(index + 1) % particles.length];
                         const dist = Math.sqrt((p.x - neighbor.x) ** 2 + (p.y - neighbor.y) ** 2);
@@ -8258,7 +8281,9 @@
                             ctx.beginPath();
                             ctx.moveTo(p.x, p.y);
                             ctx.lineTo(neighbor.x, neighbor.y);
-                            ctx.strokeStyle = `rgba(0, 240, 255, ${0.1 * Math.sin(frameCount * 0.02)})`;
+                            const alpha = 0.15 * Math.sin(frameCount * 0.02);
+                            ctx.strokeStyle = `rgba(0, 240, 255, ${Math.abs(alpha)})`;
+                            ctx.lineWidth = 0.5;
                             ctx.stroke();
                         }
                     }
@@ -8266,9 +8291,9 @@
                 
                 if (allConverged && !converged) {
                     converged = true;
-                    // 汇聚完成后添加发光效果
+                    // 汇聚完成后添加青金色发光效果
                     setTimeout(() => {
-                        canvas.style.filter = 'drop-shadow(0 0 30px rgba(0, 240, 255, 0.6))';
+                        canvas.style.filter = 'drop-shadow(0 0 25px rgba(0, 240, 255, 0.5)) drop-shadow(0 0 50px rgba(255, 215, 0, 0.3))';
                     }, 300);
                 }
                 
