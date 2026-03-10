@@ -3572,12 +3572,13 @@
         /* ===== STAGE 4: 价值分配层级树 ===== */
         .hierarchy-tree-container {
             position: fixed;
-            top: 80px;
+            top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             display: flex;
             overflow: hidden;
+            padding-top: 60px;
         }
 
         .hierarchy-canvas-wrapper {
@@ -3600,11 +3601,15 @@
 
         .hierarchy-header {
             position: absolute;
-            top: 20px;
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
             z-index: 10;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 30px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
         }
 
         .hierarchy-title {
