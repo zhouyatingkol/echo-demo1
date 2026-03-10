@@ -10136,18 +10136,6 @@ function showValueNodeDetail(nodeData) {
 
         // ========== 阶段3优化：融资功能 ==========
 
-        // 更新融资步骤
-        function updateFinanceStep(step) {
-            document.querySelectorAll('.finance-step').forEach((el, index) => {
-                el.classList.remove('active', 'completed');
-                if (index + 1 < step) {
-                    el.classList.add('completed');
-                } else if (index + 1 === step) {
-                    el.classList.add('active');
-                }
-            });
-        }
-
         // 应用融资模板
         function applyTemplate(type) {
             document.querySelectorAll('.template-btn').forEach(btn => btn.classList.remove('active'));
