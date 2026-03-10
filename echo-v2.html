@@ -8122,26 +8122,60 @@
             updateRightPanelPreview();
         }
 
+        // 数字滚动动画
+        function animateNumber(element, startValue, endValue, duration, suffix = '') {
+            const startTime = performance.now();
+            const difference = endValue - startValue;
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                const currentValue = startValue + difference * easeProgress;
+                
+                if (element) {
+                    if (suffix === '%') {
+                        element.textContent = Math.round(currentValue) + suffix;
+                    } else if (suffix.includes('ECHO')) {
+                        element.textContent = currentValue.toFixed(2) + suffix;
+                    } else {
+                        element.textContent = Math.floor(currentValue) + suffix;
+                    }
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
         function updateFinanceAmount(val) {
+            const oldValue = financeAmount;
             financeAmount = parseFloat(val);
             const amountValue = document.getElementById('amountValue');
             const valuationDisplay = document.getElementById('valuationDisplay');
             const slider = document.getElementById('amountSlider');
             const trackFill = document.getElementById('amountTrackFill');
 
-            // 更新滑块轨道填充
             if (slider && trackFill) {
                 const percent = ((val - slider.min) / (slider.max - slider.min)) * 100;
                 trackFill.style.width = percent + '%';
             }
 
-            if (amountValue) amountValue.textContent = financeAmount.toFixed(1) + 'ECHO';
+            if (amountValue) {
+                animateNumber(amountValue, oldValue, financeAmount, 300, 'ECHO');
+            }
             if (valuationDisplay && financeShare > 0) {
-                valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + 'ECHO';
+                const oldValuation = oldValue / (financeShare / 100);
+                const newValuation = financeAmount / (financeShare / 100);
+                animateNumber(valuationDisplay, oldValuation, newValuation, 300, 'ECHO');
             }
         }
 
         function updateFinanceShare(val) {
+            const oldValue = financeShare;
             financeShare = parseInt(val);
             const shareValue = document.getElementById('shareValue');
             const valuationDisplay = document.getElementById('valuationDisplay');
@@ -8149,17 +8183,22 @@
             const slider = document.getElementById('shareSlider');
             const trackFill = document.getElementById('shareTrackFill');
 
-            // 更新滑块轨道填充
             if (slider && trackFill) {
                 const percent = ((val - slider.min) / (slider.max - slider.min)) * 100;
                 trackFill.style.width = percent + '%';
             }
 
-            if (shareValue) shareValue.textContent = financeShare + '%';
-            if (valuationDisplay && financeShare > 0) {
-                valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + 'ECHO';
+            if (shareValue) {
+                animateNumber(shareValue, oldValue, financeShare, 300, '%');
             }
-            if (ownershipDisplay) ownershipDisplay.textContent = (100 - financeShare) + '%';
+            if (valuationDisplay && financeShare > 0) {
+                const oldValuation = financeAmount / (oldValue / 100);
+                const newValuation = financeAmount / (financeShare / 100);
+                animateNumber(valuationDisplay, oldValuation, newValuation, 300, 'ECHO');
+            }
+            if (ownershipDisplay) {
+                animateNumber(ownershipDisplay, 100 - oldValue, 100 - financeShare, 300, '%');
+            }
         }
 
         // 更新右侧面板预览
