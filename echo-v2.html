@@ -3601,15 +3601,19 @@
 
         .hierarchy-header {
             position: absolute;
-            top: 80px;
+            top: 120px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
             z-index: 10;
-            background: rgba(0,0,0,0.5);
-            padding: 10px 30px;
+        }
+
+        .hierarchy-header-bg {
+            background: rgba(10, 15, 30, 0.6);
+            padding: 12px 40px;
             border-radius: 30px;
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(5px);
         }
 
         .hierarchy-title {
@@ -4547,8 +4551,10 @@
             <!-- 左侧3D层级树 -->
             <div class="hierarchy-canvas-wrapper">
                 <div class="hierarchy-header">
-                    <div class="hierarchy-title">⬡ AI制药资产层级结构</div>
-                    <div class="hierarchy-subtitle">三层架构：终极资产 → 融合资产 → 分子资产</div>
+                    <div class="hierarchy-header-bg">
+                        <div class="hierarchy-title">⬡ AI制药资产层级结构</div>
+                        <div class="hierarchy-subtitle">三层架构：终极资产 → 融合资产 → 分子资产</div>
+                    </div>
                 </div>
                 <canvas id="hierarchyCanvas"></canvas>
 
