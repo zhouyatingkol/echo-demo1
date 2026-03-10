@@ -71,91 +71,11 @@
         /* 语言切换按钮 */
         .lang-switcher {
             position: fixed;
-            top: 20px;
-            right: 100px;
+            bottom: 80px;
+            left: 20px;
             z-index: 1000;
             display: flex;
             gap: 8px;
-        }
-
-        /* 主题切换按钮 */
-        .theme-switcher {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        .theme-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(10, 15, 30, 0.8);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            color: #00f0ff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .theme-btn:hover {
-            background: rgba(0, 240, 255, 0.2);
-            border-color: rgba(0, 240, 255, 0.6);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-            transform: rotate(15deg);
-        }
-
-        /* 浅色主题覆盖 */
-        body.light-theme {
-            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
-        }
-        body.light-theme .stage {
-            color: #1a202c;
-        }
-        body.light-theme .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-color: rgba(0, 240, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        body.light-theme .main-title {
-            color: #00a0b0;
-            text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
-        }
-        body.light-theme .subtitle {
-            color: #4a5568;
-        }
-        body.light-theme .asset-library,
-        body.light-theme .ownership-panel {
-            background: rgba(255, 255, 255, 0.85);
-            border-color: rgba(0, 240, 255, 0.2);
-        }
-        body.light-theme .library-title,
-        body.light-theme .panel-title {
-            color: #00a0b0;
-        }
-        body.light-theme .btn {
-            background: rgba(255, 255, 255, 0.9);
-            color: #00a0b0;
-            border-color: rgba(0, 240, 255, 0.4);
-        }
-        body.light-theme .btn-gold {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
-            color: #b8860b;
-            border-color: rgba(255, 215, 0, 0.5);
-        }
-        body.light-theme .finance-config {
-            background: rgba(255, 255, 255, 0.85);
-            border-color: rgba(0, 240, 255, 0.2);
-        }
-        body.light-theme .hierarchy-sidebar {
-            background: rgba(255, 255, 255, 0.9);
-            border-color: rgba(0, 240, 255, 0.2);
-        }
-        body.light-theme .lang-btn,
-        body.light-theme .theme-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border-color: rgba(0, 240, 255, 0.3);
         }
         .lang-btn {
             padding: 8px 16px;
@@ -4031,11 +3951,6 @@
     <div class="lang-switcher" id="langSwitcher">
         <button class="lang-btn active" onclick="switchLang('zh')" data-lang="zh">中文</button>
         <button class="lang-btn" onclick="switchLang('en')" data-lang="en">EN</button>
-    </div>
-
-    <!-- 主题切换 -->
-    <div class="theme-switcher" id="themeSwitcher">
-        <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
     </div>
 
     <!-- 3D背景 -->
@@ -8797,38 +8712,6 @@
             });
         }
 
-        // 主题切换
-        function toggleTheme() {
-            const body = document.body;
-            const btn = document.getElementById('themeBtn');
-            const isLight = body.classList.toggle('light-theme');
-            
-            // 更新按钮图标
-            btn.textContent = isLight ? '☀️' : '🌙';
-            
-            // 保存到 localStorage
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            
-            // 显示提示
-            const msg = isLight 
-                ? (currentLang === 'zh' ? '已切换到浅色模式' : 'Switched to light mode')
-                : (currentLang === 'zh' ? '已切换到深色模式' : 'Switched to dark mode');
-            showToast('info', currentLang === 'zh' ? '主题切换' : 'Theme', msg);
-        }
-
-        // 初始化主题
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-theme');
-                const btn = document.getElementById('themeBtn');
-                if (btn) btn.textContent = '☀️';
-            }
-        }
-
-        // 页面加载时初始化主题
-        window.addEventListener('load', initTheme);
-
         // 多语言数据
         const i18n = {
             zh: {
@@ -9184,12 +9067,22 @@
         function updateBottomNav() {
             const prevBtn = document.getElementById('prevPageBtn');
             const nextBtn = document.getElementById('nextPageBtn');
+            const bottomNav = document.getElementById('bottomNav');
+            
+            // Stage 0 和 Stage 2.5 隐藏底部导航
+            if (currentStage === 0 || currentStage === 2.5) {
+                if (bottomNav) bottomNav.style.display = 'none';
+                return;
+            }
+            
+            // 其他阶段显示底部导航
+            if (bottomNav) bottomNav.style.display = 'block';
             
             if (prevBtn) {
-                prevBtn.style.display = currentStage > 0 ? 'inline-block' : 'none';
+                prevBtn.style.display = currentStage > 1 ? 'inline-block' : 'none';
             }
             if (nextBtn) {
-                nextBtn.style.display = currentStage < 4 ? 'inline-block' : 'none';
+                nextBtn.style.display = currentStage < 4 && currentStage !== 2.5 ? 'inline-block' : 'none';
             }
         }
 
@@ -11196,9 +11089,9 @@ function showValueNodeDetail(nodeData) {
             generateAssetCards();
             initParticleTextAnimation();
 
-            // 首页隐藏底部导航
-            const nextBtn = document.getElementById('nextPageBtn');
-            if (nextBtn) nextBtn.style.display = 'none';
+            // 确保底部导航初始状态正确
+            currentStage = 0;
+            updateBottomNav();
 
             gsap.from('.asset-library', { x: -50, opacity: 0, duration: 0.8, delay: 0.2 });
             gsap.from('.ownership-panel', { x: 50, opacity: 0, duration: 0.8, delay: 0.2 });
