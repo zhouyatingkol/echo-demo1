@@ -7853,9 +7853,13 @@
             document.querySelectorAll('#financeGrid .asset-card').forEach(c => c.classList.remove('selected'));
             
             // 重置步骤1显示
-            document.getElementById('step1Empty').style.display = 'block';
-            document.getElementById('step1Selected').style.display = 'none';
-            document.getElementById('step1NextBtn').disabled = true;
+            const step1Empty = document.getElementById('step1Empty');
+            const step1Selected = document.getElementById('step1Selected');
+            const step1NextBtn = document.getElementById('step1NextBtn');
+            
+            if (step1Empty) step1Empty.style.display = 'block';
+            if (step1Selected) step1Selected.style.display = 'none';
+            if (step1NextBtn) step1NextBtn.disabled = true;
             
             updateFinanceStep(1);
         }
@@ -7872,19 +7876,33 @@
             financeShare = 20;
 
             // 更新步骤1的显示
-            document.getElementById('step1Empty').style.display = 'none';
-            document.getElementById('step1Selected').style.display = 'block';
-            document.getElementById('step1Icon').textContent = a.icon;
-            document.getElementById('step1Icon').style.color = a.color || '#00f0ff';
-            document.getElementById('step1Name').textContent = a.name;
-            document.getElementById('step1Id').textContent = a.id;
-            document.getElementById('step1Value').textContent = a.value + 'ECHO';
-            document.getElementById('step1NextBtn').disabled = false;
+            const step1Empty = document.getElementById('step1Empty');
+            const step1Selected = document.getElementById('step1Selected');
+            const step1Icon = document.getElementById('step1Icon');
+            const step1Name = document.getElementById('step1Name');
+            const step1Id = document.getElementById('step1Id');
+            const step1Value = document.getElementById('step1Value');
+            const step1NextBtn = document.getElementById('step1NextBtn');
+            
+            if (step1Empty) step1Empty.style.display = 'none';
+            if (step1Selected) step1Selected.style.display = 'block';
+            if (step1Icon) {
+                step1Icon.textContent = a.icon;
+                step1Icon.style.color = a.color || '#00f0ff';
+            }
+            if (step1Name) step1Name.textContent = a.name;
+            if (step1Id) step1Id.textContent = a.id;
+            if (step1Value) step1Value.textContent = a.value + 'ECHO';
+            if (step1NextBtn) step1NextBtn.disabled = false;
 
             // 为步骤2准备数据
-            document.getElementById('step2Icon').textContent = a.icon;
-            document.getElementById('step2Icon').style.color = a.color || '#00f0ff';
-            document.getElementById('step2Name').textContent = a.name;
+            const step2Icon = document.getElementById('step2Icon');
+            const step2Name = document.getElementById('step2Name');
+            if (step2Icon) {
+                step2Icon.textContent = a.icon;
+                step2Icon.style.color = a.color || '#00f0ff';
+            }
+            if (step2Name) step2Name.textContent = a.name;
 
             // 更新滑块值和最大值
             const shareSlider = document.getElementById('shareSlider');
