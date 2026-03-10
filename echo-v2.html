@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ECHO Protocol - 完整演示</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,9 +12,39 @@
         body {
             background: #020208;
             color: #fff;
-            font-family: 'Orbitron', 'Noto+Sans+SC', sans-serif;
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
             overflow: hidden;
             height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* 标题字体 - 科技感 */
+        h1, h2, h3, .main-title, .stage-title, .library-title, .fusion-title {
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        /* 按钮和标签 - 清晰现代 */
+        .btn, .next-page-btn, .transition-btn, .fuse-btn, .action-btn {
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        /* 数据和高亮文字 - 等宽字体 */
+        .token-value, .price-value, .percentage, .stat-value, .data-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+        }
+
+        /* 正文和描述 - 易读 */
+        .subtitle, .desc-text, .guide-text, .info-text {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
         }
 
         /* ===== 多页容器 ===== */
@@ -210,29 +240,6 @@
         }
 
         /* 阶段引导条 */
-        .stage-guide-bar {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(10, 15, 30, 0.9);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 30px;
-            padding: 15px 30px;
-            text-align: center;
-            z-index: 10;
-            max-width: 800px;
-        }
-        .stage-guide-text {
-            font-size: 14px;
-            color: rgba(200, 220, 240, 0.9);
-            line-height: 1.6;
-        }
-        .stage-guide-highlight {
-            color: #00f0ff;
-            font-weight: 500;
-        }
-
         /* ===== 主容器 ===== */
         .main-container {
             position: fixed;
@@ -3990,13 +3997,6 @@
 
     <!-- STAGE 2: 资产铸造（原stage1） -->
     <div class="stage" id="stage2">
-        <!-- 阶段引导条 -->
-        <div class="stage-guide-bar">
-            <div class="stage-guide-text">
-                💡 <span class="stage-guide-highlight">铸造资产</span> = 把你的研发成果变成数字种子。每个种子都有五瓣：根属于你，果实能卖钱，种子还能长出新树。
-            </div>
-        </div>
-
         <div class="main-container">
             <!-- 左侧资产库 -->
             <div class="asset-library">
@@ -4142,13 +4142,6 @@
 
     <!-- STAGE 4: 协作衍生（原stage2） -->
     <div class="stage" id="stage4">
-        <!-- 阶段引导条 -->
-        <div class="stage-guide-bar" style="top: 70px;">
-            <div class="stage-guide-text">
-                💡 <span class="stage-guide-highlight">融合资产</span> = 多颗种子合起来长成一棵树。树的果子更值钱，还能单独卖。
-            </div>
-        </div>
-
         <!-- 光粒子背景 -->
         <div class="stage2-particles" id="stage2Particles"></div>
 
