@@ -9145,14 +9145,20 @@
         }
 
         function goToNext() {
-            if (currentStage < 4) {
-                goTo(currentStage + 1);
+            // 定义正确的导航顺序: 0 -> 0.5 -> 1 -> 1.5 -> 2 -> 3 -> 4
+            const navigationOrder = [0, 0.5, 1, 1.5, 2, 3, 4];
+            const currentIndex = navigationOrder.indexOf(currentStage);
+            if (currentIndex < navigationOrder.length - 1) {
+                goTo(navigationOrder[currentIndex + 1]);
             }
         }
 
         function goToPrev() {
-            if (currentStage > 0) {
-                goTo(currentStage - 1);
+            // 定义正确的导航顺序: 0 -> 0.5 -> 1 -> 1.5 -> 2 -> 3 -> 4
+            const navigationOrder = [0, 0.5, 1, 1.5, 2, 3, 4];
+            const currentIndex = navigationOrder.indexOf(currentStage);
+            if (currentIndex > 0) {
+                goTo(navigationOrder[currentIndex - 1]);
             }
         }
 
