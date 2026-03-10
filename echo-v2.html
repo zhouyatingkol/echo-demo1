@@ -2659,10 +2659,6 @@
         .finance-step.completed {
             color: #00ff88;
         }
-        .finance-step.completed .step-number {
-            background: rgba(0, 255, 136, 0.3);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        }
         .step-number {
             width: 24px;
             height: 24px;
@@ -4328,25 +4324,10 @@
                             </div>
                         </div>
 
-                        <!-- 步骤1：选择资产 -->
-                        <div class="wizard-step" id="wizardStep1">
-                            <div class="empty-state">
-                                <div class="empty-icon">⬡</div>
-                                <div class="empty-text" id="step1Text">选择左侧资产开始配置融资方案</div>
-                            </div>
-                            <div id="selectedAssetDisplay" style="display: none; text-align: center; padding: 40px 20px;">
-                                <div style="font-size: 60px; margin-bottom: 20px;" id="step1Icon">💊</div>
-                                <div style="font-size: 22px; color: #00f0ff; margin-bottom: 10px;" id="step1Name">--</div>
-                                <div style="font-size: 12px; color: rgba(150,170,200,0.7);" id="step1Id">--</div>
-                                <div style="margin-top: 20px; padding: 15px; background: rgba(0,240,255,0.05); border-radius: 12px;">
-                                    <div style="font-size: 12px; color: rgba(150,170,200,0.6);">预计估值</div>
-                                    <div style="font-size: 24px; color: #ffd700; font-family: 'Orbitron';" id="step1Value">--</div>
-                                </div>
-                            </div>
+                        <div class="empty-state" id="financeEmptyState">
+                            <div class="empty-icon">⬡</div>
+                            <div class="empty-text">选择左侧资产开始配置融资方案</div>
                         </div>
-
-                        <!-- 步骤2：配置方案 -->
-                        <div class="wizard-step" id="wizardStep2" style="display: none;">
 
                         <!-- 融资配置详情（初始隐藏） -->
                         <div id="financeConfigDetails" style="display: none;">
@@ -4479,67 +4460,13 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- 步骤3：预览确认 -->
-                        <div class="wizard-step" id="wizardStep3" style="display: none;">
-                            <div style="text-align: center; padding: 30px 20px;">
-                                <div style="font-size: 14px; color: rgba(150,170,200,0.7); margin-bottom: 10px;">⬡ 方案摘要</div>
-                                <div style="font-size: 22px; color: #00f0ff; margin-bottom: 25px;" id="step3Title">AI制药资产</div>
-                                
-                                <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                        <span style="color: rgba(200,220,240,0.8);">融资金额</span>
-                                        <span style="color: #ffd700; font-family: 'Orbitron';" id="step3Amount">0.5ECHO</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                        <span style="color: rgba(200,220,240,0.8);">出让收益权</span>
-                                        <span style="color: #00f0ff; font-family: 'Orbitron';" id="step3Share">20%</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                        <span style="color: rgba(200,220,240,0.8);">融资估值</span>
-                                        <span style="color: #ffd700; font-family: 'Orbitron';" id="step3Valuation">2.5ECHO</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between;">
-                                        <span style="color: rgba(200,220,240,0.8);">代币数量</span>
-                                        <span style="color: #00ff88; font-family: 'Orbitron';" id="step3Tokens">500</span>
-                                    </div>
-                                </div>
-
-                                <div style="background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 15px;">
-                                    <div style="font-size: 12px; color: #ffd700; margin-bottom: 10px;">📋 智能合约条款</div>
-                                    <ul style="font-size: 12px; color: rgba(200,220,240,0.8); line-height: 1.8; margin: 0; padding-left: 18px; text-align: left;">
-                                        <li>收益权代币永久可交易</li>
-                                        <li>所有权始终归原始创建者</li>
-                                        <li>代币持有者享有收益分配权</li>
-                                        <li>里程碑达成自动触发收益结算</li>
-                                    </ul>
-                                </div>
+                            <!-- 生成融资方案按钮 -->
+                            <div class="config-actions" id="configActions" style="display: none; margin-top: 25px; padding: 20px 0; border-top: 1px solid rgba(0,240,255,0.1); text-align: right;">
+                                <button class="btn" onclick="resetFinance()" style="padding: 12px 30px; margin-right: 15px;">重置</button>
+                                <button class="btn btn-gold" onclick="previewDeal()" style="padding: 12px 40px; font-size: 14px;">生成融资方案</button>
                             </div>
                         </div>
-
-                        <!-- 步骤4：融资成功 -->
-                        <div class="wizard-step" id="wizardStep4" style="display: none;">
-                            <div style="text-align: center; padding: 40px 20px;">
-                                <div style="font-size: 80px; margin-bottom: 20px; animation: bounce 1s ease infinite;">💰</div>
-                                <div style="font-size: 26px; color: #00f0ff; margin-bottom: 10px; font-family: 'Orbitron'; text-shadow: 0 0 20px rgba(0,240,255,0.5);">融资成功！</div>
-                                <div style="font-size: 13px; color: rgba(150,170,200,0.8); margin-bottom: 30px;">收益权代币已铸造并上链</div>
-                                
-                                <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
-                                    <div style="font-size: 12px; color: rgba(150,170,200,0.7); margin-bottom: 10px;">获得代币</div>
-                                    <div style="font-size: 36px; color: #ffd700; font-family: 'Orbitron'; margin-bottom: 5px;" id="step4Tokens">500</div>
-                                    <div style="font-size: 12px; color: rgba(150,170,200,0.6);">ECHO-Tokens</div>
-                                </div>
-
-                                <div style="display: flex; gap: 15px; justify-content: center;">
-                                    <button class="btn" onclick="resetFinanceWizard()" style="padding: 12px 30px;">融资其他资产</button>
-                                    <button class="btn btn-gold" onclick="goTo(4)" style="padding: 12px 40px;">进入价值分配 →</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
                     </div>
                 </div>
             </div>
@@ -4548,33 +4475,9 @@
             <div class="ownership-panel" id="dealPanel">
                 <div class="panel-title">⬡ 融资条款预览</div>
                 <div id="dealContent">
-                    <!-- 步骤1右侧内容 -->
-                    <div id="dealStep1" class="deal-step-content">
-                        <div class="empty-state">
-                            <div class="empty-icon">⬡</div>
-                            <div class="empty-text">请配置融资参数</div>
-                        </div>
-                    </div>
-                    <!-- 步骤2/3右侧内容 -->
-                    <div id="dealStep2" class="deal-step-content" style="display: none;">
-                        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-                            <div style="font-size: 12px; color: rgba(150,170,200,0.6); margin-bottom: 10px;">实时预览</div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                <span style="color: rgba(200,220,240,0.8); font-size: 13px;">融资金额</span>
-                                <span style="color: #ffd700; font-family: 'Orbitron'; font-size: 14px;" id="rightAmount">0.5ECHO</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                <span style="color: rgba(200,220,240,0.8); font-size: 13px;">出让收益权</span>
-                                <span style="color: #00f0ff; font-family: 'Orbitron'; font-size: 14px;" id="rightShare">20%</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: rgba(200,220,240,0.8); font-size: 13px;">保留所有权</span>
-                                <span style="color: #00ff88; font-family: 'Orbitron'; font-size: 14px;" id="rightOwnership">80%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: rgba(150,170,200,0.6); text-align: center; padding: 20px;">
-                            调整左侧参数实时预览条款
-                        </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">⬡</div>
+                        <div class="empty-text">配置融资方案后查看条款</div>
                     </div>
                 </div>
             </div>
@@ -7848,148 +7751,6 @@
             }).join('');
         }
 
-        // 当前融资向导步骤
-        let currentFinanceStep = 1;
-
-        // 更新融资向导步骤
-        function updateFinanceStep(step) {
-            currentFinanceStep = step;
-            
-            // 隐藏所有步骤
-            document.getElementById('wizardStep1').style.display = 'none';
-            document.getElementById('wizardStep2').style.display = 'none';
-            document.getElementById('wizardStep3').style.display = 'none';
-            document.getElementById('wizardStep4').style.display = 'none';
-            
-            // 显示当前步骤
-            document.getElementById('wizardStep' + step).style.display = 'block';
-            
-            // 更新步骤指示器
-            document.querySelectorAll('.finance-step').forEach((el, idx) => {
-                if (idx < step) {
-                    el.classList.add('completed');
-                    el.classList.remove('active');
-                } else if (idx === step - 1) {
-                    el.classList.add('active');
-                    el.classList.remove('completed');
-                } else {
-                    el.classList.remove('active', 'completed');
-                }
-            });
-            
-            // 获取三栏元素
-            const leftPanel = document.querySelector('#stage3 .asset-library');
-            const rightPanel = document.getElementById('dealPanel');
-            const centerPanel = document.querySelector('#stage3 .finance-center');
-            
-            // 步骤4（融资成功）时隐藏左右面板
-            if (step === 4) {
-                if (leftPanel) leftPanel.style.display = 'none';
-                if (rightPanel) rightPanel.style.display = 'none';
-                if (centerPanel) {
-                    centerPanel.style.width = '100%';
-                    centerPanel.style.maxWidth = '800px';
-                    centerPanel.style.margin = '0 auto';
-                }
-            } else {
-                // 其他步骤恢复三栏布局
-                if (leftPanel) leftPanel.style.display = '';
-                if (rightPanel) rightPanel.style.display = '';
-                if (centerPanel) {
-                    centerPanel.style.width = '';
-                    centerPanel.style.maxWidth = '';
-                    centerPanel.style.margin = '';
-                }
-            }
-            
-            // 更新右侧内容
-            if (step === 1) {
-                document.getElementById('dealStep1').style.display = 'block';
-                document.getElementById('dealStep2').style.display = 'none';
-            } else if (step === 2 || step === 3) {
-                document.getElementById('dealStep1').style.display = 'none';
-                document.getElementById('dealStep2').style.display = 'block';
-            }
-            
-            // 更新阶段3底部按钮
-            updateStage3Buttons();
-        }
-
-        // 更新阶段3底部按钮
-        function updateStage3Buttons() {
-            const bottomNav = document.getElementById('bottomNav');
-            if (!bottomNav || currentStage !== 3) return;
-            
-            // 步骤4（融资成功）在内部有自己的按钮，不需要底部导航
-            if (currentFinanceStep === 4) {
-                bottomNav.innerHTML = '';
-                return;
-            }
-            
-            let html = '';
-            
-            // 上一页按钮
-            html += '<button class="btn" onclick="goToPrev()" style="margin-right: 15px;">← 上一页</button>';
-            
-            // 下一步/生成/确认按钮
-            if (currentFinanceStep === 1) {
-                const disabled = !selectedFinanceAsset ? 'disabled' : '';
-                html += `<button class="btn btn-gold" onclick="goToFinanceStep(2)" ${disabled}>下一步：配置方案 →</button>`;
-            } else if (currentFinanceStep === 2) {
-                html += '<button class="btn btn-gold" onclick="goToFinanceStep(3)">生成融资方案</button>';
-            } else if (currentFinanceStep === 3) {
-                html += '<button class="btn btn-gold" onclick="confirmFinanceDeal()">确认融资</button>';
-            }
-            
-            bottomNav.innerHTML = html;
-        }
-
-        // 切换到指定融资步骤
-        function goToFinanceStep(step) {
-            if (step === 2 && !selectedFinanceAsset) {
-                showToast('warning', '请先选择资产', '在左侧选择一个资产后再继续');
-                return;
-            }
-            
-            if (step === 3) {
-                // 更新步骤3的数据
-                updateStep3Data();
-            }
-            
-            updateFinanceStep(step);
-        }
-
-        // 更新步骤3数据
-        function updateStep3Data() {
-            const a = selectedFinanceAsset;
-            if (!a) return;
-            
-            document.getElementById('step3Title').textContent = a.name;
-            document.getElementById('step3Amount').textContent = financeAmount.toFixed(2) + 'ECHO';
-            document.getElementById('step3Share').textContent = financeShare + '%';
-            document.getElementById('step3Valuation').textContent = (financeAmount / (financeShare / 100)).toFixed(2) + 'ECHO';
-            document.getElementById('step3Tokens').textContent = Math.floor(financeAmount * 1000);
-        }
-
-        // 确认融资
-        function confirmFinanceDeal() {
-            // 更新步骤4数据
-            document.getElementById('step4Tokens').textContent = Math.floor(financeAmount * 1000);
-            updateFinanceStep(4);
-        }
-
-        // 重置融资向导
-        function resetFinanceWizard() {
-            selectedFinanceAsset = null;
-            financeAmount = 0.5;
-            financeShare = 20;
-            
-            // 清除选中状态
-            document.querySelectorAll('#financeGrid .asset-card').forEach(c => c.classList.remove('selected'));
-            
-            updateFinanceStep(1);
-        }
-
         function selectFinanceAsset(id) {
             const a = assets.find(x => x.id === id);
             if (!a) return;
@@ -8001,19 +7762,14 @@
             financeAmount = a.value * 0.5;
             financeShare = 20;
 
-            // 更新步骤1的显示
-            document.getElementById('step1Text').style.display = 'none';
-            document.getElementById('selectedAssetDisplay').style.display = 'block';
-            document.getElementById('step1Icon').textContent = a.icon;
-            document.getElementById('step1Icon').style.color = a.color;
-            document.getElementById('step1Name').textContent = a.name;
-            document.getElementById('step1Id').textContent = a.id;
-            document.getElementById('step1Value').textContent = a.value + 'ECHO';
+            // 更新步骤到第2步
+            updateFinanceStep(2);
 
-            // 更新底部按钮（启用下一步按钮）
-            updateStage3Buttons();
+            // 隐藏空状态，显示配置详情
+            document.getElementById('financeEmptyState').style.display = 'none';
+            document.getElementById('financeConfigDetails').style.display = 'block';
 
-            // 更新资产预览信息（为步骤2准备）
+            // 更新资产预览信息
             document.getElementById('previewIcon').textContent = a.icon;
             document.getElementById('previewIcon').style.color = a.color;
             document.getElementById('previewName').textContent = a.name;
@@ -8043,6 +7799,7 @@
                 updateDealDimensions();
             }, 100);
 
+            document.getElementById('configActions').style.display = 'flex';
             updateDealPreview();
         }
 
@@ -8063,11 +7820,6 @@
             if (valuationDisplay && financeShare > 0) {
                 valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + 'ECHO';
             }
-            
-            // 更新右侧预览
-            const rightAmount = document.getElementById('rightAmount');
-            if (rightAmount) rightAmount.textContent = financeAmount.toFixed(2) + 'ECHO';
-            
             updateDealPreview();
             updateCharts();
             updateCalculator();
@@ -8093,13 +7845,6 @@
                 valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + 'ECHO';
             }
             if (ownershipDisplay) ownershipDisplay.textContent = (100 - financeShare) + '%';
-            
-            // 更新右侧预览
-            const rightShare = document.getElementById('rightShare');
-            const rightOwnership = document.getElementById('rightOwnership');
-            if (rightShare) rightShare.textContent = financeShare + '%';
-            if (rightOwnership) rightOwnership.textContent = (100 - financeShare) + '%';
-            
             updateDealPreview();
             updateCharts();
             updateCalculator();
@@ -8319,39 +8064,47 @@
             });
         }
 
-        // 多页切换
+        // 多页切换 - 添加过渡动画
         function goTo(index) {
             if (index < 0 || index > 4) return;
 
-            // 隐藏所有 stage
-            document.querySelectorAll('.stage').forEach(s => {
-                s.classList.remove('active');
-                s.style.opacity = '';
-                s.style.transform = '';
-                s.style.transition = '';
-            });
-
-            // 处理阶段2.5（过渡页）
-            if (index === 2.5) {
-                document.getElementById('stage2_5').classList.add('active');
-                currentStage = 2.5;
-            } else {
-                document.getElementById('stage' + index).classList.add('active');
-                currentStage = index;
+            // 添加退出动画
+            const currentStageEl = document.querySelector('.stage.active');
+            if (currentStageEl) {
+                currentStageEl.style.opacity = '0';
+                currentStageEl.style.transform = 'translateY(-20px)';
             }
 
-            handleStageTransition(index);
+            setTimeout(() => {
+                document.querySelectorAll('.stage').forEach(s => {
+                    s.classList.remove('active');
+                    s.style.opacity = '';
+                    s.style.transform = '';
+                });
 
-                // 恢复底部导航为默认状态（用于非阶段3、非阶段2.5的页面）
-                if (index !== 3 && index !== 2.5) {
-                    const bottomNav = document.getElementById('bottomNav');
-                    if (bottomNav) {
-                        bottomNav.innerHTML = `
-                            <button class="btn" id="prevPageBtn" onclick="goToPrev()" style="margin-right: 15px;">← 上一页</button>
-                            <button class="next-page-btn" id="nextPageBtn" onclick="goToNext()">下一页 →</button>
-                        `;
-                    }
+                // 处理阶段2.5（过渡页）
+                if (index === 2.5) {
+                    document.getElementById('stage2_5').classList.add('active');
+                    currentStage = 2.5;
+                } else {
+                    document.getElementById('stage' + index).classList.add('active');
+                    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+                    currentStage = index;
                 }
+
+                // 添加入场动画
+                const newStageEl = document.querySelector('.stage.active');
+                if (newStageEl) {
+                    newStageEl.style.opacity = '0';
+                    newStageEl.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        newStageEl.style.transition = 'all 0.5s ease';
+                        newStageEl.style.opacity = '1';
+                        newStageEl.style.transform = 'translateY(0)';
+                    }, 50);
+                }
+
+                handleStageTransition(index);
 
                 // 更新底部导航按钮显示
                 updateBottomNav();
@@ -8421,10 +8174,6 @@
                 // 清理卡片渲染器
                 cleanupCardRenderers(4);
 
-                // 初始化融资向导到第1步
-                updateFinanceStep(1);
-                selectedFinanceAsset = null;
-
                 renderFinanceGrid();
                 setTimeout(() => {
                     animateCards();
@@ -8469,19 +8218,6 @@
 
         // 更新底部导航按钮显示
         function updateBottomNav() {
-            // 阶段3使用自定义向导按钮
-            if (currentStage === 3) {
-                updateStage3Buttons();
-                return;
-            }
-            
-            // 阶段2.5（融合成功页）有自己的按钮，不需要底部导航
-            if (currentStage === 2.5) {
-                const bottomNav = document.getElementById('bottomNav');
-                if (bottomNav) bottomNav.innerHTML = '';
-                return;
-            }
-            
             const prevBtn = document.getElementById('prevPageBtn');
             const nextBtn = document.getElementById('nextPageBtn');
             
