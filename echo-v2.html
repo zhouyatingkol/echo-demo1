@@ -2805,91 +2805,167 @@
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
-        /* 自定义滑块样式 */
+        /* ===== 重新设计的滑块样式 - 更精致高级 ===== */
+        .finance-slider-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: rgba(200, 220, 240, 0.9);
+        }
+
+        .slider-label span:first-child {
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .slider-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            font-weight: 600;
+        }
+
+        /* 滑块容器 - 包含刻度 */
+        .slider-container {
+            position: relative;
+            padding: 0 12px;
+        }
+
+        /* 滑块轨道底层 */
+        .slider-track-bg {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            right: 12px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            transform: translateY(-50%);
+        }
+
+        /* 滑块轨道填充 - 动态宽度 */
+        .slider-track-fill {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            height: 4px;
+            background: linear-gradient(90deg, #00f0ff, #00d4ff);
+            border-radius: 2px;
+            transform: translateY(-50%);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transition: width 0.1s ease;
+        }
+
+        /* 主滑块样式 */
         input[type="range"].finance-slider {
             -webkit-appearance: none;
             width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg,
-                rgba(0, 240, 255, 0.1) 0%,
-                rgba(0, 240, 255, 0.3) 50%,
-                rgba(0, 240, 255, 0.1) 100%);
-            border-radius: 4px;
+            height: 4px;
+            background: transparent;
+            border-radius: 2px;
             outline: none;
             cursor: pointer;
             position: relative;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            margin: 15px 0;
         }
 
-        /* 滑块轨道填充效果 */
-        input[type="range"].finance-slider::-webkit-slider-runnable-track {
-            height: 8px;
-            border-radius: 4px;
-            background: linear-gradient(90deg,
-                #00f0ff 0%,
-                #00f0ff var(--value-percent, 50%),
-                rgba(255, 255, 255, 0.1) var(--value-percent, 50%),
-                rgba(255, 255, 255, 0.1) 100%);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-        }
-
-        /* 滑块 thumb */
+        /* 滑块 thumb - 双环发光设计 */
         input[type="range"].finance-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #00f0ff, #0088ff);
-            border: 3px solid rgba(255, 255, 255, 0.8);
+            background: #00f0ff;
+            border: 2px solid #fff;
             box-shadow:
-                0 0 15px rgba(0, 240, 255, 0.6),
-                0 4px 10px rgba(0, 0, 0, 0.3),
-                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+                0 0 0 4px rgba(0, 240, 255, 0.3),
+                0 0 0 8px rgba(0, 240, 255, 0.1),
+                0 0 20px rgba(0, 240, 255, 0.6),
+                0 4px 8px rgba(0, 0, 0, 0.3);
             cursor: grab;
             margin-top: -8px;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         input[type="range"].finance-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
+            transform: scale(1.15);
             box-shadow:
-                0 0 25px rgba(0, 240, 255, 0.8),
-                0 6px 15px rgba(0, 0, 0, 0.4),
-                inset 0 2px 4px rgba(255, 255, 255, 0.4);
+                0 0 0 6px rgba(0, 240, 255, 0.3),
+                0 0 0 12px rgba(0, 240, 255, 0.1),
+                0 0 30px rgba(0, 240, 255, 0.8),
+                0 6px 12px rgba(0, 0, 0, 0.4);
         }
 
         input[type="range"].finance-slider::-webkit-slider-thumb:active {
             cursor: grabbing;
-            transform: scale(1.1);
+            transform: scale(1.05);
             box-shadow:
-                0 0 30px rgba(0, 240, 255, 1),
-                0 8px 20px rgba(0, 0, 0, 0.5);
+                0 0 0 4px rgba(0, 240, 255, 0.4),
+                0 0 0 8px rgba(0, 240, 255, 0.15),
+                0 0 25px rgba(0, 240, 255, 0.9),
+                0 8px 16px rgba(0, 0, 0, 0.5);
         }
 
         /* Firefox 滑块样式 */
         input[type="range"].finance-slider::-moz-range-track {
-            height: 8px;
-            border-radius: 4px;
-            background: linear-gradient(90deg,
-                #00f0ff 0%,
-                #00f0ff var(--value-percent, 50%),
-                rgba(255, 255, 255, 0.1) var(--value-percent, 50%),
-                rgba(255, 255, 255, 0.1) 100%);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+            height: 4px;
+            background: transparent;
+            border-radius: 2px;
         }
 
         input[type="range"].finance-slider::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #00f0ff, #0088ff);
-            border: 3px solid rgba(255, 255, 255, 0.8);
+            background: #00f0ff;
+            border: 2px solid #fff;
             box-shadow:
-                0 0 15px rgba(0, 240, 255, 0.6),
-                0 4px 10px rgba(0, 0, 0, 0.3);
+                0 0 0 4px rgba(0, 240, 255, 0.3),
+                0 0 0 8px rgba(0, 240, 255, 0.1),
+                0 0 20px rgba(0, 240, 255, 0.6),
+                0 4px 8px rgba(0, 0, 0, 0.3);
             cursor: grab;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 刻度标记 */
+        .slider-marks {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 12px;
+            position: relative;
+        }
+        .slider-mark {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .slider-mark.active {
+            background: #00f0ff;
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+        }
+
+        /* 刻度标签 */
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 8px;
+            font-size: 11px;
+            color: rgba(150, 170, 200, 0.6);
         }
 
         /* 滑块刻度标记 */
@@ -4296,22 +4372,58 @@
                             </div>
 
                             <!-- 滑块控制 -->
-                            <div class="finance-slider-group" style="margin-bottom: 25px;">
-                                <div class="slider-label" style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                                    <span style="color: rgba(200,220,240,0.9);">融资金额</span>
-                                    <span class="slider-value" id="amountValue" style="color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 16px;">0.5ECHO</span>
+                            <div class="finance-slider-group">
+                                <div class="slider-label">
+                                    <span>融资金额</span>
+                                    <span class="slider-value" id="amountValue">0.5ECHO</span>
                                 </div>
-                                <input type="range" class="finance-slider" id="amountSlider" min="0.1" max="10" step="0.1" value="0.5"
-                                    oninput="updateFinanceAmount(this.value)" style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none;">
+                                <div class="slider-container">
+                                    <div class="slider-track-bg"></div>
+                                    <div class="slider-track-fill" id="amountTrackFill" style="width: 5%;"></div>
+                                    <input type="range" class="finance-slider" id="amountSlider" min="0.1" max="10" step="0.1" value="0.5"
+                                        oninput="updateFinanceAmount(this.value)">
+                                </div>
+                                <div class="slider-marks">
+                                    <div class="slider-mark active"></div>
+                                    <div class="slider-mark"></div>
+                                    <div class="slider-mark"></div>
+                                    <div class="slider-mark"></div>
+                                    <div class="slider-mark"></div>
+                                </div>
+                                <div class="slider-labels">
+                                    <span>0</span>
+                                    <span>2.5</span>
+                                    <span>5</span>
+                                    <span>7.5</span>
+                                    <span>10</span>
+                                </div>
                             </div>
 
-                            <div class="finance-slider-group" style="margin-bottom: 25px;">
-                                <div class="slider-label" style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                                    <span style="color: rgba(200,220,240,0.9);">出让收益权比例</span>
-                                    <span class="slider-value" id="shareValue" style="color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 16px;">20%</span>
+                            <div class="finance-slider-group">
+                                <div class="slider-label">
+                                    <span>出让收益权比例</span>
+                                    <span class="slider-value" id="shareValue">20%</span>
                                 </div>
-                                <input type="range" class="finance-slider" id="shareSlider" min="5" max="50" step="1" value="20"
-                                    oninput="updateFinanceShare(this.value)" style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none;">
+                                <div class="slider-container">
+                                    <div class="slider-track-bg"></div>
+                                    <div class="slider-track-fill" id="shareTrackFill" style="width: 33%;"></div>
+                                    <input type="range" class="finance-slider" id="shareSlider" min="5" max="50" step="1" value="20"
+                                        oninput="updateFinanceShare(this.value)">
+                                </div>
+                                <div class="slider-marks">
+                                    <div class="slider-mark active"></div>
+                                    <div class="slider-mark"></div>
+                                    <div class="slider-mark"></div>
+                                    <div class="slider-mark"></div>
+                                    <div class="slider-mark"></div>
+                                </div>
+                                <div class="slider-labels">
+                                    <span>5%</span>
+                                    <span>16%</span>
+                                    <span>27%</span>
+                                    <span>38%</span>
+                                    <span>50%</span>
+                                </div>
                             </div>
 
                             <div class="finance-stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
@@ -7729,11 +7841,12 @@
             const amountValue = document.getElementById('amountValue');
             const valuationDisplay = document.getElementById('valuationDisplay');
             const slider = document.getElementById('amountSlider');
+            const trackFill = document.getElementById('amountTrackFill');
 
             // 更新滑块轨道填充
-            if (slider) {
+            if (slider && trackFill) {
                 const percent = ((val - slider.min) / (slider.max - slider.min)) * 100;
-                slider.style.setProperty('--value-percent', percent + '%');
+                trackFill.style.width = percent + '%';
             }
 
             if (amountValue) amountValue.textContent = financeAmount.toFixed(1) + 'ECHO';
@@ -7752,11 +7865,12 @@
             const valuationDisplay = document.getElementById('valuationDisplay');
             const ownershipDisplay = document.getElementById('ownershipDisplay');
             const slider = document.getElementById('shareSlider');
+            const trackFill = document.getElementById('shareTrackFill');
 
             // 更新滑块轨道填充
-            if (slider) {
+            if (slider && trackFill) {
                 const percent = ((val - slider.min) / (slider.max - slider.min)) * 100;
-                slider.style.setProperty('--value-percent', percent + '%');
+                trackFill.style.width = percent + '%';
             }
 
             if (shareValue) shareValue.textContent = financeShare + '%';
