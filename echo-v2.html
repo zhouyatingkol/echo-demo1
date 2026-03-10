@@ -7895,6 +7895,12 @@
             const bottomNav = document.getElementById('bottomNav');
             if (!bottomNav || currentStage !== 3) return;
             
+            // 步骤4（融资成功）在内部有自己的按钮，不需要底部导航
+            if (currentFinanceStep === 4) {
+                bottomNav.innerHTML = '';
+                return;
+            }
+            
             let html = '';
             
             // 上一页按钮
@@ -7908,8 +7914,6 @@
                 html += '<button class="btn btn-gold" onclick="goToFinanceStep(3)">生成融资方案</button>';
             } else if (currentFinanceStep === 3) {
                 html += '<button class="btn btn-gold" onclick="confirmFinanceDeal()">确认融资</button>';
-            } else if (currentFinanceStep === 4) {
-                // 步骤4在内部有自己的按钮
             }
             
             bottomNav.innerHTML = html;
@@ -8332,8 +8336,8 @@
 
                 handleStageTransition(index);
 
-                // 恢复底部导航为默认状态（用于非阶段3的页面）
-                if (index !== 3) {
+                // 恢复底部导航为默认状态（用于非阶段3、非阶段2.5的页面）
+                if (index !== 3 && index !== 2.5) {
                     const bottomNav = document.getElementById('bottomNav');
                     if (bottomNav) {
                         bottomNav.innerHTML = `
@@ -8459,9 +8463,16 @@
 
         // 更新底部导航按钮显示
         function updateBottomNav() {
+            // 阶段3使用自定义向导按钮
             if (currentStage === 3) {
-                // 阶段3使用自定义向导按钮
                 updateStage3Buttons();
+                return;
+            }
+            
+            // 阶段2.5（融合成功页）有自己的按钮，不需要底部导航
+            if (currentStage === 2.5) {
+                const bottomNav = document.getElementById('bottomNav');
+                if (bottomNav) bottomNav.innerHTML = '';
                 return;
             }
             
