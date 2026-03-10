@@ -7900,6 +7900,9 @@
             // 更新显示
             updateFinanceAmount(financeAmount);
             updateFinanceShare(financeShare);
+            
+            // 更新右侧预览
+            updateRightPanelPreview();
         }
 
         function updateFinanceAmount(val) {
@@ -7919,10 +7922,6 @@
             if (valuationDisplay && financeShare > 0) {
                 valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + 'ECHO';
             }
-            updateDealPreview();
-            updateCharts();
-            updateCalculator();
-            updateDealDimensions();
         }
 
         function updateFinanceShare(val) {
@@ -7944,10 +7943,17 @@
                 valuationDisplay.textContent = (financeAmount / (financeShare/100)).toFixed(1) + 'ECHO';
             }
             if (ownershipDisplay) ownershipDisplay.textContent = (100 - financeShare) + '%';
-            updateDealPreview();
-            updateCharts();
-            updateCalculator();
-            updateDealDimensions();
+        }
+
+        // 更新右侧面板预览
+        function updateRightPanelPreview() {
+            const rightAmount = document.getElementById('rightAmount');
+            const rightShare = document.getElementById('rightShare');
+            const rightOwnership = document.getElementById('rightOwnership');
+            
+            if (rightAmount) rightAmount.textContent = financeAmount.toFixed(2) + 'ECHO';
+            if (rightShare) rightShare.textContent = financeShare + '%';
+            if (rightOwnership) rightOwnership.textContent = (100 - financeShare) + '%';
         }
 
         // 初始化滑块样式
