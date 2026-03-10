@@ -10576,6 +10576,11 @@ function closeAllModals() {
 
 // 滚轮切换阶段
 document.addEventListener('wheel', (e) => {
+    // 阶段四禁用滚轮导航（避免与3D模型拖拽冲突）
+    if (currentStage === 4) {
+        return;
+    }
+    
     // 忽略在可滚动区域内的滚轮事件
     if (e.target.closest('.asset-library') || 
         e.target.closest('.hierarchy-sidebar') ||
