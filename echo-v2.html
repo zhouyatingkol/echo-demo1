@@ -8439,8 +8439,8 @@ function initHierarchy3D() {
     hierarchyScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
 
     hierarchyCamera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    hierarchyCamera.position.set(0, 30, 80);
-    hierarchyCamera.lookAt(0, 5, 0);
+    hierarchyCamera.position.set(0, 35, 80);
+    hierarchyCamera.lookAt(0, 0, 0);
 
     hierarchyRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
     hierarchyRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
