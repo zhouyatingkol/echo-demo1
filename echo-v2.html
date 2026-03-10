@@ -380,7 +380,51 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        .asset-grid::-webkit-scrollbar { display: none; }
+        /* 隐藏 asset-grid 的滚动条 */
+        .asset-grid::-webkit-scrollbar { 
+            display: none; 
+        }
+
+        /* ===== 全局滚动条美化 - 科技感细滚动条 ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(0, 240, 255, 0.5), rgba(0, 160, 200, 0.5));
+            border-radius: 3px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(0, 240, 255, 0.7), rgba(0, 180, 220, 0.7));
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+        
+        /* 右侧面板滚动条 - 金色主题 */
+        .ownership-panel::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        .ownership-panel::-webkit-scrollbar-track { 
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 3px;
+        }
+        .ownership-panel::-webkit-scrollbar-thumb { 
+            background: linear-gradient(180deg, rgba(255, 215, 0, 0.5), rgba(200, 160, 0, 0.5));
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        .ownership-panel::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(255, 215, 0, 0.7), rgba(220, 180, 0, 0.7));
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
 
         /* 资产卡片 */
         .asset-card {
