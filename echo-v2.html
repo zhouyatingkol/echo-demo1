@@ -334,14 +334,188 @@
         .transition-btn:hover::before {
             left: 100%;
         }
-        .transition-particles {
+        /* ===== 过渡页 - 沉浸式全屏 ===== */
+        .transition-page {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #020208;
+            overflow: hidden;
+        }
+        .transition-page::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 30% 70%, rgba(0, 240, 255, 0.05) 0%, transparent 50%);
+            animation: transition-breathe 8s ease-in-out infinite;
+        }
+        @keyframes transition-breathe {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+        .transition-visual {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 1;
+        }
+        .transition-visual canvas {
+            width: 500px;
+            height: 500px;
+            opacity: 0.6;
+        }
+        .transition-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+        .transition-glow.alt {
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.12) 0%, transparent 70%);
+        }
+        @keyframes glow-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+        .transition-overlay {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 700px;
+            padding: 60px;
+            background: rgba(10, 15, 30, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 24px;
+            box-shadow:
+                0 0 80px rgba(0, 240, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .transition-page-alt .transition-overlay {
+            border-color: rgba(255, 215, 0, 0.15);
+            box-shadow:
+                0 0 80px rgba(255, 215, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .transition-label {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #00f0ff;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+        .transition-label.alt {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+        }
+        .transition-title {
+            font-size: 56px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+        .transition-text {
+            font-size: 18px;
+            color: rgba(200, 210, 230, 0.9);
+            line-height: 1.9;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+        .transition-text strong {
+            color: #00f0ff;
+            font-weight: 500;
+        }
+        .transition-page-alt .transition-text strong {
+            color: #ffd700;
+        }
+        .transition-traits {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        .transition-traits .trait {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 30px;
+            font-size: 13px;
+            color: rgba(200, 210, 230, 0.9);
+        }
+        .transition-page-alt .transition-traits .trait {
+            background: rgba(255, 215, 0, 0.05);
+            border-color: rgba(255, 215, 0, 0.15);
+        }
+        .transition-action {
+            padding: 18px 60px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(0, 100, 200, 0.1));
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            border-radius: 30px;
+            color: #00f0ff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .transition-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        .transition-action:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(0, 100, 200, 0.2));
+            border-color: rgba(0, 240, 255, 0.6);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        .transition-action:hover::before {
+            left: 100%;
+        }
+        .transition-action.alt {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(200, 150, 0, 0.08));
+            border-color: rgba(255, 215, 0, 0.4);
+            color: #ffd700;
+        }
+        .transition-action.alt:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(200, 150, 0, 0.15));
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
         }
 
         /* ===== STAGE 0: 开场 ===== */
@@ -4165,94 +4339,24 @@
     </div>
 
     <!-- 过渡页 Stage 1: 铸造说明 -->
-    <div class="stage" id="stage1">
-        <div class="main-container">
-            <!-- 左侧说明面板 -->
-            <div class="asset-library" style="width: 380px;">
-                <div class="library-header">
-                    <div class="library-title">⬡ 铸造说明</div>
-                    <div class="library-subtitle">Step 01 / 资产数字化</div>
-                </div>
-                <div style="padding: 20px;">
-                    <div style="font-size: 15px; color: rgba(200,220,240,0.9); line-height: 2; margin-bottom: 25px;">
-                        你的研发成果是一颗<strong style="color: #00f0ff;">数字种子</strong>。
-                        通过 ECHO 协议，将其铸造为可溯源、可分割、可交易的数字资产。
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15); border-radius: 12px; margin-bottom: 12px;">
-                            <div style="width: 40px; height: 40px; background: rgba(0,240,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🔐</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500; color: #fff;">所有权确认</div>
-                                <div style="font-size: 11px; color: rgba(150,170,200,0.7);">根永远属于你</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15); border-radius: 12px; margin-bottom: 12px;">
-                            <div style="width: 40px; height: 40px; background: rgba(0,240,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🤝</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500; color: #fff;">使用权流转</div>
-                                <div style="font-size: 11px; color: rgba(150,170,200,0.7);">叶子可以借给别人</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15); border-radius: 12px;">
-                            <div style="width: 40px; height: 40px; background: rgba(0,240,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">💰</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500; color: #fff;">收益权交易</div>
-                                <div style="font-size: 11px; color: rgba(150,170,200,0.7);">果实能卖钱</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="stats-panel" style="margin-top: auto;">
-                    <div style="padding: 15px; text-align: center;">
-                        <div style="font-size: 12px; color: rgba(150,170,200,0.6); margin-bottom: 10px;">准备铸造</div>
-                        <button class="btn btn-gold" onclick="goTo(2)" style="width: 100%;">开始铸造 →</button>
-                    </div>
-                </div>
+    <div class="stage transition-page" id="stage1">
+        <div class="transition-visual">
+            <canvas id="transition1-canvas"></canvas>
+            <div class="transition-glow"></div>
+        </div>
+        <div class="transition-overlay">
+            <div class="transition-label">Step 01 — 资产铸造</div>
+            <h1 class="transition-title">数字种子</h1>
+            <p class="transition-text">
+                你的研发成果是一颗<strong>数字种子</strong>。<br>
+                通过 ECHO 协议，将其铸造为可溯源、可分割、可交易的数字资产。
+            </p>
+            <div class="transition-traits">
+                <span class="trait">🔐 根属于你</span>
+                <span class="trait">🤝 叶可借用</span>
+                <span class="trait">💰 果实交易</span>
             </div>
-
-            <!-- 中央预览区 -->
-            <div class="preview-area">
-                <div class="preview-container">
-                    <div class="platform-rings">
-                        <div class="platform-ring"></div>
-                        <div class="platform-ring"></div>
-                        <div class="platform-ring"></div>
-                    </div>
-                    <canvas id="transition1-canvas"></canvas>
-                    <div class="preview-hint">🌱 数字种子概念模型</div>
-                </div>
-                <div class="preview-info">
-                    <div class="preview-id">五维权利分离</div>
-                    <div class="preview-type">根 · 叶 · 果实 · 种子 · 花</div>
-                </div>
-            </div>
-
-            <!-- 右侧进度面板 -->
-            <div class="ownership-panel" style="width: 300px;">
-                <div class="panel-title">⬡ 流程进度</div>
-                <div style="padding: 20px;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; opacity: 0.4;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">✓</div>
-                        <div style="font-size: 13px;">开场介绍</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.3); border: 1px solid rgba(0,240,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #00f0ff;">02</div>
-                        <div style="font-size: 13px; color: #00f0ff; font-weight: 500;">铸造说明</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; opacity: 0.4;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">03</div>
-                        <div style="font-size: 13px;">资产铸造</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; opacity: 0.4;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">04</div>
-                        <div style="font-size: 13px;">协作融合</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; opacity: 0.4;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">05</div>
-                        <div style="font-size: 13px;">价值网络</div>
-                    </div>
-                </div>
-            </div>
+            <button class="transition-action" onclick="goTo(2)">开始铸造</button>
         </div>
     </div>
 
@@ -4388,94 +4492,25 @@
     </div>
 
     <!-- 过渡页 Stage 3: 融合说明 -->
-    <div class="stage" id="stage3">
-        <div class="main-container">
-            <!-- 左侧说明面板 -->
-            <div class="asset-library" style="width: 380px;">
-                <div class="library-header">
-                    <div class="library-title">⬡ 融合说明</div>
-                    <div class="library-subtitle">Step 02 / 资产协作</div>
-                </div>
-                <div style="padding: 20px;">
-                    <div style="font-size: 15px; color: rgba(200,220,240,0.9); line-height: 2; margin-bottom: 25px;">
-                        一颗种子力量小，多颗种子合起来就是<strong style="color: #00f0ff;">融合资产</strong>。
-                        融合后的资产价值倍增，更容易获得融资。
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15); border-radius: 12px; margin-bottom: 12px;">
-                            <div style="width: 40px; height: 40px; background: rgba(0,240,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🔗</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500; color: #fff;">资产组合</div>
-                                <div style="font-size: 11px; color: rgba(150,170,200,0.7);">多颗种子合起来</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15); border-radius: 12px; margin-bottom: 12px;">
-                            <div style="width: 40px; height: 40px; background: rgba(0,240,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">⚡</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500; color: #fff;">价值倍增</div>
-                                <div style="font-size: 11px; color: rgba(150,170,200,0.7);">树的果子更值钱</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15); border-radius: 12px;">
-                            <div style="width: 40px; height: 40px; background: rgba(0,240,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;">🎯</div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 500; color: #fff;">精准融资</div>
-                                <div style="font-size: 11px; color: rgba(150,170,200,0.7);">还能单独卖</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="stats-panel" style="margin-top: auto;">
-                    <div style="padding: 15px; text-align: center;">
-                        <div style="font-size: 12px; color: rgba(150,170,200,0.6); margin-bottom: 10px;">准备融合</div>
-                        <button class="btn btn-gold" onclick="goTo(4)" style="width: 100%;">进入协作池 →</button>
-                    </div>
-                </div>
+    <div class="stage transition-page transition-page-alt" id="stage3">
+        <div class="transition-visual">
+            <canvas id="transition3-canvas"></canvas>
+            <div class="transition-glow alt"></div>
+        </div>
+        
+        <div class="transition-overlay">
+            <div class="transition-label alt">Step 02 — 资产协作</div>
+            <h1 class="transition-title">融合资产</h1>
+            <p class="transition-text">
+                一颗种子力量小，多颗种子合起来就是<strong>融合资产</strong>。<br>
+                融合后的资产价值倍增，更容易获得融资。
+            </p>
+            <div class="transition-traits">
+                <span class="trait">🔗 资产组合</span>
+                <span class="trait">⚡ 价值倍增</span>
+                <span class="trait">🎯 精准融资</span>
             </div>
-
-            <!-- 中央预览区 -->
-            <div class="preview-area">
-                <div class="preview-container">
-                    <div class="platform-rings">
-                        <div class="platform-ring"></div>
-                        <div class="platform-ring"></div>
-                        <div class="platform-ring"></div>
-                    </div>
-                    <canvas id="transition3-canvas"></canvas>
-                    <div class="preview-hint">🌳 融合资产概念模型</div>
-                </div>
-                <div class="preview-info">
-                    <div class="preview-id">价值倍增</div>
-                    <div class="preview-type">多资产融合 · 协同增值</div>
-                </div>
-            </div>
-
-            <!-- 右侧进度面板 -->
-            <div class="ownership-panel" style="width: 300px;">
-                <div class="panel-title">⬡ 流程进度</div>
-                <div style="padding: 20px;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; opacity: 0.4;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">✓</div>
-                        <div style="font-size: 13px;">开场介绍</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; opacity: 0.4;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">✓</div>
-                        <div style="font-size: 13px;">铸造说明</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; opacity: 0.4;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">✓</div>
-                        <div style="font-size: 13px;">资产铸造</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.3); border: 1px solid rgba(0,240,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #00f0ff;">04</div>
-                        <div style="font-size: 13px; color: #00f0ff; font-weight: 500;">融合说明</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 12px; opacity: 0.4;">
-                        <div style="width: 32px; height: 32px; background: rgba(0,240,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">05</div>
-                        <div style="font-size: 13px;">价值网络</div>
-                    </div>
-                </div>
-            </div>
+            <button class="transition-action alt" onclick="goTo(4)">进入协作池</button>
         </div>
     </div>
 
