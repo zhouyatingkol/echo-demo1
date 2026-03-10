@@ -3931,7 +3931,62 @@
 
         .detail-level-badge.level-1 { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
         .detail-level-badge.level-2 { background: rgba(0, 240, 255, 0.2); color: #00f0ff; }
-        .detail-level-badge.level-3 { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+                .detail-level-badge.level-3 { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+
+        /* 简单过渡页 */
+        .simple-transition {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(2, 2, 8, 0.95);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        .simple-transition.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .transition-box {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+        }
+        .transition-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .transition-title {
+            font-size: 24px;
+            color: #00f0ff;
+            margin-bottom: 15px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .transition-desc {
+            font-size: 16px;
+            color: rgba(200, 220, 240, 0.9);
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .transition-btn {
+            padding: 12px 40px;
+            background: transparent;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 25px;
+            color: #ffd700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .transition-btn:hover {
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
 
         .hierarchy-tree-info {
             background: rgba(0, 0, 0, 0.4);
@@ -4008,6 +4063,33 @@
     </style>
 </head>
 <body>
+    <!-- 简单过渡页：开场到阶段一 -->
+    <div class="simple-transition" id="trans0to1">
+        <div class="transition-box">
+            <div class="transition-icon">🌱</div>
+            <div class="transition-title">五维权利分离</div>
+            <div class="transition-desc">
+                你的研发成果是一颗种子。<br>
+                根永远属于你，叶子可以借给别人，<br>
+                果实能卖钱，种子能长出新树。
+            </div>
+            <button class="transition-btn" onclick="continueToStage(1)">明白了，开始铸造 →</button>
+        </div>
+    </div>
+
+    <!-- 简单过渡页：阶段一到阶段二 -->
+    <div class="simple-transition" id="trans1to2">
+        <div class="transition-box">
+            <div class="transition-icon">🌳</div>
+            <div class="transition-title">融合资产</div>
+            <div class="transition-desc">
+                一颗种子力量小，多颗种子合起来就是一棵树。<br>
+                树的果子更值钱，还能单独卖。
+            </div>
+            <button class="transition-btn" onclick="continueToStage(2)">明白了，去协作池 →</button>
+        </div>
+    </div>
+
     <!-- 3D背景 -->
     <canvas id="bg-canvas"></canvas>
 
@@ -8837,8 +8919,36 @@
         }
 
         // 多页切换 - 添加过渡动画
+        // 显示过渡页
+        function showTransition(transId) {
+            const trans = document.getElementById(transId);
+            if (trans) {
+                trans.classList.add('active');
+            }
+        }
+
+        // 继续到指定阶段
+        function continueToStage(stageNum) {
+            // 隐藏所有过渡页
+            document.querySelectorAll('.simple-transition').forEach(t => {
+                t.classList.remove('active');
+            });
+            // 跳转
+            goTo(stageNum);
+        }
+
         function goTo(index) {
             if (index < 0 || index > 4) return;
+            
+            // 显示简单过渡页
+            if (index === 1) {
+                showTransition('trans0to1');
+                return;
+            }
+            if (index === 2 && currentStage === 1) {
+                showTransition('trans1to2');
+                return;
+            }
 
             // 添加退出动画
             const currentStageEl = document.querySelector('.stage.active');
