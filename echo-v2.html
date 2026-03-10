@@ -3578,7 +3578,6 @@
             bottom: 0;
             display: flex;
             overflow: hidden;
-            padding-top: 60px;
         }
 
         .hierarchy-canvas-wrapper {
@@ -3589,8 +3588,6 @@
         #hierarchyCanvas {
             width: 100%;
             height: 100%;
-            padding-top: 40px;
-            box-sizing: border-box;
         }
 
         .hierarchy-sidebar {
@@ -3603,9 +3600,10 @@
 
         .hierarchy-header {
             position: absolute;
-            bottom: 100px;
-            left: 30px;
-            text-align: left;
+            top: 20px;
+            right: 400px;
+            left: auto;
+            text-align: right;
             z-index: 10;
         }
 
@@ -3632,7 +3630,7 @@
 
         .hierarchy-legend {
             position: absolute;
-            bottom: 30px;
+            bottom: 80px;
             left: 30px;
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -3669,8 +3667,8 @@
 
         .hierarchy-controls {
             position: absolute;
-            bottom: 30px;
-            right: 410px;
+            top: 20px;
+            left: 20px;
             display: flex;
             gap: 10px;
             z-index: 10;
