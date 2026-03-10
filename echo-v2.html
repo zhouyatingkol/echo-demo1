@@ -8901,7 +8901,10 @@
                     // 汇聚完成后添加青金色发光效果
                     setTimeout(() => {
                         canvas.style.filter = 'drop-shadow(0 0 25px rgba(0, 240, 255, 0.5)) drop-shadow(0 0 50px rgba(255, 215, 0, 0.3))';
-                        // 等待用户点击"开始探索"
+                        // 3秒后自动跳转到过渡页1
+                        setTimeout(() => {
+                            goTo(0.5);
+                        }, 3000);
                     }, 300);
                 }
                 
