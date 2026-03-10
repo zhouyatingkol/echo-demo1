@@ -8925,14 +8925,53 @@
             }
         }
 
-        // 继续到指定阶段
+        // 继续到指定阶段（跳过过渡页检查）
         function continueToStage(stageNum) {
             // 隐藏所有过渡页
             document.querySelectorAll('.simple-transition').forEach(t => {
                 t.classList.remove('active');
             });
-            // 跳转
-            goTo(stageNum);
+            // 直接跳转，不检查过渡页
+            goToDirect(stageNum);
+        }
+
+        // 直接跳转（不显示过渡页）
+        function goToDirect(index) {
+            if (index < 0 || index > 4) return;
+
+            // 添加退出动画
+            const currentStageEl = document.querySelector('.stage.active');
+            if (currentStageEl) {
+                currentStageEl.style.opacity = '0';
+                currentStageEl.style.transform = 'translateY(-20px)';
+            }
+
+            setTimeout(() => {
+                document.querySelectorAll('.stage').forEach(s => {
+                    s.classList.remove('active');
+                    s.style.opacity = '';
+                    s.style.transform = '';
+                });
+
+                document.getElementById('stage' + index).classList.add('active');
+                document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+                currentStage = index;
+
+                // 添加入场动画
+                const newStageEl = document.querySelector('.stage.active');
+                if (newStageEl) {
+                    newStageEl.style.opacity = '0';
+                    newStageEl.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        newStageEl.style.transition = 'all 0.5s ease';
+                        newStageEl.style.opacity = '1';
+                        newStageEl.style.transform = 'translateY(0)';
+                    }, 50);
+                }
+
+                handleStageTransition(index);
+                updateBottomNav();
+            }, 300);
         }
 
         function goTo(index) {
