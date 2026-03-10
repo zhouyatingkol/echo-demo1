@@ -68,40 +68,15 @@
             display: none;
         }
 
-        /* 语言切换按钮 */
-        .lang-switcher {
-            position: fixed;
-            bottom: 80px;
-            left: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 8px;
-        }
-        .lang-btn {
-            padding: 8px 16px;
-            background: rgba(10, 15, 30, 0.8);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            border-radius: 20px;
-            color: rgba(150, 170, 200, 0.8);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Orbitron', sans-serif;
-        }
-        .lang-btn:hover, .lang-btn.active {
-            background: rgba(0, 240, 255, 0.2);
-            border-color: rgba(0, 240, 255, 0.6);
-            color: #00f0ff;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-        }
-
         /* 底部导航 */
         .bottom-nav {
             position: fixed;
             bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 100;
+            z-index: 10000;
+            display: flex;
+            gap: 10px;
         }
 
         /* 进入下一页按钮 */
@@ -3947,12 +3922,6 @@
     </style>
 </head>
 <body>
-    <!-- 语言切换 -->
-    <div class="lang-switcher" id="langSwitcher">
-        <button class="lang-btn active" onclick="switchLang('zh')" data-lang="zh">中文</button>
-        <button class="lang-btn" onclick="switchLang('en')" data-lang="en">EN</button>
-    </div>
-
     <!-- 3D背景 -->
     <canvas id="bg-canvas"></canvas>
 
@@ -8710,202 +8679,6 @@
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
-        }
-
-        // 多语言数据
-        const i18n = {
-            zh: {
-                stage0: {
-                    title: 'ECHO PROTOCOL',
-                    subtitle: '价值溯源：一款新药的数字旅程',
-                    start: '开始探索'
-                },
-                stage1: {
-                    title: '⬡ 资产分子库',
-                    subtitle: '点击卡片铸造 · 双击快捷铸造 · Ctrl+点击对比',
-                    totalAssets: '总资产',
-                    minted: '已铸造',
-                    selectFirst: '请先选择资产'
-                },
-                stage2: {
-                    title: '⬡ 已铸造资产',
-                    subtitle: '拖拽资产到协作池 · 双击查看详情',
-                    poolHint: '协作池',
-                    poolSub: '拖拽左侧资产到此处开始融合',
-                    startFusion: '✨ 开始融合',
-                    fusionRules: '融合规则'
-                },
-                stage3: {
-                    title: '⬡ 可融资资产',
-                    subtitle: '选择资产进行融资',
-                    totalValue: '总资产价值',
-                    credit: '可融资额度',
-                    configTitle: '⬡ 融资配置',
-                    configSub: '所有权与收益权分离',
-                    selectAsset: '选择资产',
-                    configPlan: '配置方案',
-                    previewTerms: '预览条款',
-                    confirmFinance: '确认融资',
-                    nextStep: '下一步：配置方案 →',
-                    prevStep: '← 上一步',
-                    generatePlan: '生成融资方案',
-                    confirm: '确认融资',
-                    financeSuccess: '融资成功！',
-                    gotTokens: '获得代币',
-                    financeOther: '融资其他资产',
-                    goToValue: '进入价值分配 →'
-                },
-                stage4: {
-                    title: '⬡ AI制药资产层级结构',
-                    subtitle: '三层架构：终极资产 → 融合资产 → 分子资产',
-                    networkOverview: '⬡ 资产网络总览',
-                    level1: '终极资产',
-                    level2: '融合资产',
-                    level3: '分子资产',
-                    valueDistribution: '💰 收益分配流向',
-                    contributors: '👥 主要贡献者',
-                    tips: '💡 操作提示',
-                    tip1: '• 点击3D节点查看详情',
-                    tip2: '• 拖拽旋转视角',
-                    tip3: '• 滚轮缩放视图'
-                },
-                nav: {
-                    prev: '← 上一页',
-                    next: '下一页 →'
-                }
-            },
-            en: {
-                stage0: {
-                    title: 'ECHO PROTOCOL',
-                    subtitle: 'Value Traceability: Digital Journey of a New Drug',
-                    start: 'Start Exploring'
-                },
-                stage1: {
-                    title: '⬡ Asset Library',
-                    subtitle: 'Click to mint · Double-click quick mint · Ctrl+click compare',
-                    totalAssets: 'Total Assets',
-                    minted: 'Minted',
-                    selectFirst: 'Please select an asset first'
-                },
-                stage2: {
-                    title: '⬡ Minted Assets',
-                    subtitle: 'Drag to pool · Double-click for details',
-                    poolHint: 'Fusion Pool',
-                    poolSub: 'Drag assets here to start fusion',
-                    startFusion: '✨ Start Fusion',
-                    fusionRules: 'Fusion Rules'
-                },
-                stage3: {
-                    title: '⬡ Financeable Assets',
-                    subtitle: 'Select asset for financing',
-                    totalValue: 'Total Asset Value',
-                    credit: 'Available Credit',
-                    configTitle: '⬡ Financing Config',
-                    configSub: 'Ownership & Revenue Separation',
-                    selectAsset: 'Select Asset',
-                    configPlan: 'Configure Plan',
-                    previewTerms: 'Preview Terms',
-                    confirmFinance: 'Confirm Financing',
-                    nextStep: 'Next: Configure →',
-                    prevStep: '← Back',
-                    generatePlan: 'Generate Plan',
-                    confirm: 'Confirm',
-                    financeSuccess: 'Financing Successful!',
-                    gotTokens: 'Tokens Received',
-                    financeOther: 'Finance Another',
-                    goToValue: 'Go to Value →'
-                },
-                stage4: {
-                    title: '⬡ AI Pharma Asset Hierarchy',
-                    subtitle: 'Three Layers: Ultimate → Fusion → Molecular',
-                    networkOverview: '⬡ Network Overview',
-                    level1: 'Ultimate',
-                    level2: 'Fusion',
-                    level3: 'Molecular',
-                    valueDistribution: '💰 Value Distribution',
-                    contributors: '👥 Contributors',
-                    tips: '💡 Tips',
-                    tip1: '• Click nodes for details',
-                    tip2: '• Drag to rotate view',
-                    tip3: '• Scroll to zoom'
-                },
-                nav: {
-                    prev: '← Prev',
-                    next: 'Next →'
-                }
-            }
-        };
-
-        // 当前语言
-        let currentLang = 'zh';
-
-        // 语言切换函数
-        function switchLang(lang) {
-            if (lang === currentLang) return;
-            currentLang = lang;
-            
-            // 更新按钮状态
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.lang === lang);
-            });
-            
-            // 更新所有文本
-            updateAllText();
-            
-            // 显示提示
-            showToast('info', lang === 'zh' ? '语言已切换' : 'Language switched', 
-                      lang === 'zh' ? '已切换到中文' : 'Switched to English');
-        }
-
-        // 更新所有文本
-        function updateAllText() {
-            const t = i18n[currentLang];
-            
-            // Stage 0
-            const s0Subtitle = document.querySelector('#stage0 .subtitle');
-            const s0Btn = document.querySelector('#stage0 .btn-gold');
-            if (s0Subtitle) s0Subtitle.textContent = t.stage0.subtitle;
-            if (s0Btn) s0Btn.textContent = t.stage0.start;
-            
-            // Stage 1
-            const s1Title = document.querySelector('#stage1 .library-title');
-            const s1Subtitle = document.querySelector('#stage1 .library-subtitle');
-            if (s1Title) s1Title.textContent = t.stage1.title;
-            if (s1Subtitle) s1Subtitle.textContent = t.stage1.subtitle;
-            
-            // Stage 2
-            const s2Title = document.querySelector('#stage2 .library-title');
-            const s2Subtitle = document.querySelector('#stage2 .library-subtitle');
-            const poolHint = document.querySelector('#poolHint .pool-hint-text');
-            const poolSub = document.querySelector('#poolHint .pool-hint-sub');
-            const fuseBtn = document.getElementById('fuseBtn');
-            if (s2Title) s2Title.textContent = t.stage2.title;
-            if (s2Subtitle) s2Subtitle.textContent = t.stage2.subtitle;
-            if (poolHint) poolHint.textContent = t.stage2.poolHint;
-            if (poolSub) poolSub.textContent = t.stage2.poolSub;
-            if (fuseBtn) fuseBtn.textContent = t.stage2.startFusion;
-            
-            // Stage 3
-            const s3Title = document.querySelector('#stage3 .library-title');
-            const s3Subtitle = document.querySelector('#stage3 .library-subtitle');
-            const configTitle = document.querySelector('.config-title');
-            const configSub = document.querySelector('.config-subtitle');
-            if (s3Title) s3Title.textContent = t.stage3.title;
-            if (s3Subtitle) s3Subtitle.textContent = t.stage3.subtitle;
-            if (configTitle) configTitle.textContent = t.stage3.configTitle;
-            if (configSub) configSub.textContent = t.stage3.configSub;
-            
-            // Stage 4
-            const s4Title = document.querySelector('.hierarchy-title');
-            const s4Sub = document.querySelector('.hierarchy-subtitle');
-            if (s4Title) s4Title.textContent = t.stage4.title;
-            if (s4Sub) s4Sub.textContent = t.stage4.subtitle;
-            
-            // 导航按钮
-            const prevBtn = document.getElementById('prevPageBtn');
-            const nextBtn = document.getElementById('nextPageBtn');
-            if (prevBtn) prevBtn.textContent = t.nav.prev;
-            if (nextBtn && nextBtn.style.display !== 'none') nextBtn.textContent = t.nav.next;
         }
 
         // 多页切换 - 添加过渡动画
