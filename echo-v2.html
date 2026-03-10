@@ -3806,6 +3806,9 @@
 
     <!-- STAGE 0: 开场 -->
     <div class="stage active" id="stage0">
+        <!-- 粒子文字 Canvas -->
+        <canvas id="particle-text-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;"></canvas>
+        
         <div class="stage-0-content">
             <div class="glass-card">
                 <h1 class="main-title">ECHO PROTOCOL</h1>
@@ -8156,6 +8159,133 @@
             goTo(4);
         }
 
+        // 粒子文字动画
+        function initParticleTextAnimation() {
+            const canvas = document.getElementById('particle-text-canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const particleCount = 600;
+            const text = "ECHO PROTOCOL";
+            let textCoordinates = [];
+            
+            // 获取文字坐标
+            function getTextCoordinates() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = 'bold 80px Orbitron, sans-serif';
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, canvas.width / 2, canvas.height / 2 - 50);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                textCoordinates = [];
+                
+                for (let y = 0; y < canvas.height; y += 4) {
+                    for (let x = 0; x < canvas.width; x += 4) {
+                        const index = (y * canvas.width + x) * 4;
+                        if (data[index + 3] > 128) {
+                            textCoordinates.push({ x, y });
+                        }
+                    }
+                }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            getTextCoordinates();
+            
+            // 创建粒子
+            for (let i = 0; i < particleCount; i++) {
+                const target = textCoordinates.length > 0 ? textCoordinates[Math.floor(Math.random() * textCoordinates.length)] : { x: canvas.width / 2, y: canvas.height / 2 };
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: 0,
+                    vy: 0,
+                    targetX: target.x,
+                    targetY: target.y,
+                    size: Math.random() * 2 + 1,
+                    color: `hsl(${180 + Math.random() * 60}, 100%, 50%)`,
+                    speed: Math.random() * 0.02 + 0.01
+                });
+            }
+            
+            let animationId;
+            let converged = false;
+            let frameCount = 0;
+            
+            function animate() {
+                ctx.fillStyle = 'rgba(2, 2, 8, 0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                let allConverged = true;
+                
+                particles.forEach((p, index) => {
+                    // 计算到目标的距离
+                    const dx = p.targetX - p.x;
+                    const dy = p.targetY - p.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 3) {
+                        allConverged = false;
+                        p.vx += dx * p.speed * 0.03;
+                        p.vy += dy * p.speed * 0.03;
+                        p.vx *= 0.96;
+                        p.vy *= 0.96;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                    } else {
+                        p.x = p.targetX;
+                        p.y = p.targetY;
+                    }
+                    
+                    // 绘制粒子
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = converged ? `hsl(${180 + Math.sin(frameCount * 0.01 + index * 0.1) * 30}, 100%, 70%)` : p.color;
+                    ctx.fill();
+                    
+                    // 绘制连线（汇聚后）
+                    if (converged && index % 20 === 0) {
+                        const neighbor = particles[(index + 1) % particles.length];
+                        const dist = Math.sqrt((p.x - neighbor.x) ** 2 + (p.y - neighbor.y) ** 2);
+                        if (dist < 30) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(neighbor.x, neighbor.y);
+                            ctx.strokeStyle = `rgba(0, 240, 255, ${0.1 * Math.sin(frameCount * 0.02)})`;
+                            ctx.stroke();
+                        }
+                    }
+                });
+                
+                if (allConverged && !converged) {
+                    converged = true;
+                    // 汇聚完成后添加发光效果
+                    setTimeout(() => {
+                        canvas.style.filter = 'drop-shadow(0 0 30px rgba(0, 240, 255, 0.6))';
+                    }, 300);
+                }
+                
+                frameCount++;
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            animate();
+            
+            // 响应窗口大小变化
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                getTextCoordinates();
+            });
+        }
+
         // 背景粒子
         function initBackground() {
             const canvas = document.getElementById('bg-canvas');
@@ -10305,6 +10435,7 @@ function showValueNodeDetail(nodeData) {
             initBackground();
             initPreviewScene();
             generateAssetCards();
+            initParticleTextAnimation();
 
             // 首页隐藏底部导航
             const nextBtn = document.getElementById('nextPageBtn');
