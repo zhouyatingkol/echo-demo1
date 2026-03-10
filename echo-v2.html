@@ -1754,12 +1754,31 @@
 
         /* 融合动画 */
         .fusion-animating .pool-asset {
-            animation: mergeToCenter 1s ease-in-out forwards;
+            animation: mergeToCenter 1.2s ease-in-out forwards;
+            filter: brightness(1.5);
         }
         @keyframes mergeToCenter {
-            0% { transform: translate(var(--tx), var(--ty)) scale(1); }
-            50% { transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(0.8); }
-            100% { transform: translate(0, 0) scale(0); opacity: 0; }
+            0% { transform: translate(var(--tx), var(--ty)) scale(1); filter: brightness(1.5); }
+            30% { transform: translate(calc(var(--tx) * 0.7), calc(var(--ty) * 0.7)) scale(1.1); filter: brightness(2); box-shadow: 0 0 60px currentColor; }
+            60% { transform: translate(calc(var(--tx) * 0.3), calc(var(--ty) * 0.3)) scale(0.9); filter: brightness(2.5); box-shadow: 0 0 100px currentColor, 0 0 150px white; }
+            100% { transform: translate(0, 0) scale(0); opacity: 0; filter: brightness(3); }
+        }
+
+        /* 能量光线连接 */
+        .fusion-energy-beam {
+            position: absolute;
+            top: 50%; left: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.9), rgba(0,240,255,0.9), transparent);
+            box-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(0,240,255,0.5);
+            transform-origin: left center;
+            animation: energyBeam 1s ease-in-out forwards;
+            pointer-events: none;
+        }
+        @keyframes energyBeam {
+            0% { width: 0; opacity: 0; }
+            50% { width: var(--beam-length); opacity: 1; }
+            100% { width: var(--beam-length); opacity: 0; }
         }
 
         .fusion-burst {
@@ -1768,26 +1787,42 @@
             transform: translate(-50%, -50%);
             width: 0; height: 0;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, transparent 70%);
-            animation: burstEffect 0.8s ease-out forwards;
+            background: radial-gradient(circle, rgba(255,215,0,0.9) 0%, rgba(0,240,255,0.6) 30%, transparent 70%);
+            box-shadow: 0 0 100px rgba(255,215,0,0.8), 0 0 200px rgba(0,240,255,0.4);
+            animation: burstEffect 1s ease-out forwards;
             pointer-events: none;
         }
         @keyframes burstEffect {
             0% { width: 0; height: 0; opacity: 1; }
-            50% { width: 400px; height: 400px; opacity: 0.8; }
-            100% { width: 600px; height: 600px; opacity: 0; }
+            40% { width: 300px; height: 300px; opacity: 1; }
+            100% { width: 800px; height: 800px; opacity: 0; }
+        }
+
+        /* 汇聚粒子 */
+        .fusion-particle-stream {
+            position: absolute;
+            width: 6px; height: 6px;
+            background: radial-gradient(circle, #ffd700, #00f0ff);
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffd700, 0 0 20px #00f0ff;
+            animation: particleStream 0.8s ease-in forwards;
+            pointer-events: none;
+        }
+        @keyframes particleStream {
+            0% { transform: translate(var(--start-x), var(--start-y)) scale(1); opacity: 1; }
+            100% { transform: translate(0, 0) scale(0.3); opacity: 0; }
         }
 
         .new-asset-birth {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            animation: assetBirth 0.6s ease-out forwards;
+            animation: assetBirth 0.8s ease-out forwards;
         }
         @keyframes assetBirth {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; filter: brightness(3); }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; filter: brightness(2); box-shadow: 0 0 100px currentColor; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: brightness(1); }
         }
 
         /* 权益环形图 */
@@ -7618,23 +7653,60 @@
             const poolContent = document.getElementById('poolContent');
             poolContent.classList.add('fusion-animating');
 
-            // 添加爆发光效
-            const burst = document.createElement('div');
-            burst.className = 'fusion-burst';
-            poolContent.appendChild(burst);
-
-            // 计算每个资产的相对位置
+            // 添加能量光线连接
             const poolAssetElements = document.querySelectorAll('.pool-asset');
-            poolAssetElements.forEach(asset => {
+            const poolRect = poolContent.getBoundingClientRect();
+            const centerX = poolRect.width / 2;
+            const centerY = poolRect.height / 2;
+            
+            poolAssetElements.forEach((asset, index) => {
                 const rect = asset.getBoundingClientRect();
-                const poolRect = poolContent.getBoundingClientRect();
-                const centerX = poolRect.width / 2;
-                const centerY = poolRect.height / 2;
-                const assetX = parseFloat(asset.style.left) + 50;
-                const assetY = parseFloat(asset.style.top) + 50;
-                asset.style.setProperty('--tx', (assetX - centerX) + 'px');
-                asset.style.setProperty('--ty', (assetY - centerY) + 'px');
+                const assetCenterX = rect.left - poolRect.left + rect.width / 2;
+                const assetCenterY = rect.top - poolRect.top + rect.height / 2;
+                
+                // 设置CSS变量用于动画
+                const tx = assetCenterX - centerX;
+                const ty = assetCenterY - centerY;
+                asset.style.setProperty('--tx', tx + 'px');
+                asset.style.setProperty('--ty', ty + 'px');
+                
+                // 创建能量光线
+                const beam = document.createElement('div');
+                beam.className = 'fusion-energy-beam';
+                const distance = Math.sqrt(tx * tx + ty * ty);
+                const angle = Math.atan2(ty, tx) * 180 / Math.PI;
+                beam.style.width = distance + 'px';
+                beam.style.transform = `rotate(${angle}deg)`;
+                beam.style.left = centerX + 'px';
+                beam.style.top = centerY + 'px';
+                beam.style.setProperty('--beam-length', distance + 'px');
+                poolContent.appendChild(beam);
+                
+                // 创建汇聚粒子流
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'fusion-particle-stream';
+                        particle.style.setProperty('--start-x', tx + 'px');
+                        particle.style.setProperty('--start-y', ty + 'px');
+                        particle.style.left = centerX + 'px';
+                        particle.style.top = centerY + 'px';
+                        poolContent.appendChild(particle);
+                        setTimeout(() => particle.remove(), 800);
+                    }, i * 100);
+                }
+                
+                // 移除能量光线
+                setTimeout(() => beam.remove(), 1000);
             });
+
+            // 添加爆发光效
+            setTimeout(() => {
+                const burst = document.createElement('div');
+                burst.className = 'fusion-burst';
+                poolContent.appendChild(burst);
+                setTimeout(() => burst.remove(), 1000);
+            }, 600);
 
             setTimeout(() => {
                 // 标记对应的融合资产为已生成
@@ -7650,8 +7722,6 @@
                 // 清空协作池
                 clearPool();
 
-                // 移除爆发效果
-                burst.remove();
                 poolContent.classList.remove('fusion-animating');
 
                 // 显示融合结果在右侧面板
@@ -7661,7 +7731,7 @@
                 if (fusionAsset) {
                     showFusionSuccessModal(fusionAsset);
                 }
-            }, 1000);
+            }, 1200);
         }
 
         // 显示融合结果
