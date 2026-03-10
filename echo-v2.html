@@ -8904,60 +8904,6 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
         }
-
-        // 多页切换 - 添加过渡动画
-        function goTo(index) {
-            if (index < 0 || index > 4) return;
-
-            // 添加退出动画
-            const currentStageEl = document.querySelector('.stage.active');
-            if (currentStageEl) {
-                currentStageEl.style.opacity = '0';
-                currentStageEl.style.transform = 'translateY(-20px)';
-            }
-
-            setTimeout(() => {
-                document.querySelectorAll('.stage').forEach(s => {
-                    s.classList.remove('active');
-                    s.style.opacity = '';
-                    s.style.transform = '';
-                });
-
-                // 处理阶段2.5（过渡页）
-                if (index === 2.5) {
-                    document.getElementById('stage2_5').classList.add('active');
-                    currentStage = 2.5;
-                } else {
-                    document.getElementById('stage' + index).classList.add('active');
-                    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
-                    currentStage = index;
-                }
-
-                // 添加入场动画
-                const newStageEl = document.querySelector('.stage.active');
-                if (newStageEl) {
-                    newStageEl.style.opacity = '0';
-                    newStageEl.style.transform = 'translateY(20px)';
-                    setTimeout(() => {
-                        newStageEl.style.transition = 'all 0.5s ease';
-                        newStageEl.style.opacity = '1';
-                        newStageEl.style.transform = 'translateY(0)';
-                    }, 50);
-                }
-
-                handleStageTransition(index);
-
-                // 更新底部导航按钮显示
-                updateBottomNav();
-            }, 300);
-        }
-
-        // 处理阶段切换的资源管理
-        function handleStageTransition(index) {
-            if (index === 1) {
-                // 清理阶段2的资源
-                if (poolRenderer) poolRenderer.dispose();
-                poolRenderer = null;
                 poolScene = null;
                 poolMolecule = null;
 
