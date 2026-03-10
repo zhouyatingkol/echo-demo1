@@ -157,7 +157,7 @@
         /* ===== 主容器 ===== */
         .main-container {
             position: fixed;
-            top: 20px;
+            top: 0;
             left: 0;
             right: 0;
             bottom: 0;
@@ -194,29 +194,6 @@
             padding: 25px;
         }
 
-        /* 顶部导航 */
-        .top-nav {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 30px;
-            z-index: 100;
-            background: rgba(10, 15, 30, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 12px 30px;
-            border-radius: 30px;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-        }
-        .nav-item {
-            font-size: 12px;
-            color: rgba(150, 170, 200, 0.7);
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .nav-item:hover, .nav-item.active { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
 
         /* ===== 页面过渡动画 ===== */
         .stage {
@@ -1482,7 +1459,7 @@
         /* Toast 提示系统 */
         .toast-container {
             position: fixed;
-            top: 20px;
+            top: 0;
             right: 20px;
             z-index: 10000;
             display: flex;
@@ -3633,7 +3610,7 @@
 
         .hierarchy-header {
             position: absolute;
-            top: 20px;
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -3817,13 +3794,9 @@
 
     <!-- 底部导航 -->
     <div class="bottom-nav" id="bottomNav">
-        <div class="nav-dots" style="display:none;">
-            <div class="dot active" onclick="goTo(0)"></div>
-            <div class="dot" onclick="goTo(1)"></div>
-            <div class="dot" onclick="goTo(2)"></div>
-            <div class="dot" onclick="goTo(3)"></div>
-            <div class="dot" onclick="goTo(4)"></div>
-        </div>
+        <button class="btn" id="prevPageBtn" onclick="goToPrev()" style="margin-right: 15px; display: none;">
+            ← 上一页
+        </button>
         <button class="next-page-btn" id="nextPageBtn" onclick="goToNext()">
             进入下一页 →
         </button>
@@ -3842,8 +3815,6 @@
 
     <!-- STAGE 1: 资产铸造 -->
     <div class="stage" id="stage1">
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
             <div class="nav-item active">资产铸造</div>
             <div class="nav-item" onclick="goTo(2)">协作衍生</div>
             <div class="nav-item" onclick="goTo(3)">融资决策</div>
@@ -3984,8 +3955,6 @@
         <!-- 光粒子背景 -->
         <div class="stage2-particles" id="stage2Particles"></div>
 
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
             <div class="nav-item" onclick="goTo(1)">资产铸造</div>
             <div class="nav-item active">协作衍生</div>
             <div class="nav-item" onclick="goTo(3)">融资决策</div>
@@ -4278,8 +4247,6 @@
 
     <!-- STAGE 2.5: 融资引导过渡页（已废弃，保留代码以备后用）-->
     <div class="stage" id="stage2_5">
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
             <div class="nav-item" onclick="goTo(1)">资产铸造</div>
             <div class="nav-item" onclick="goTo(2)">协作衍生</div>
             <div class="nav-item active">融资决策</div>
@@ -4336,8 +4303,6 @@
 
     <!-- STAGE 3: 融资决策（完整版） -->
     <div class="stage" id="stage3">
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
             <div class="nav-item" onclick="goTo(1)">资产铸造</div>
             <div class="nav-item" onclick="goTo(2)">协作衍生</div>
             <div class="nav-item active">融资决策</div>
@@ -4583,8 +4548,6 @@
 
     <!-- STAGE 4: AI制药资产层级树 -->
     <div class="stage" id="stage4">
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
             <div class="nav-item" onclick="goTo(1)">资产铸造</div>
             <div class="nav-item" onclick="goTo(2)">协作衍生</div>
             <div class="nav-item" onclick="goTo(3)">融资决策</div>
@@ -4711,7 +4674,7 @@
 
             .value-3d-header {
                 position: absolute;
-                top: 20px;
+                top: 0;
                 left: 50%;
                 transform: translateX(-50%);
                 text-align: center;
@@ -4785,7 +4748,7 @@
 
             .total-revenue-3d {
                 position: absolute;
-                top: 20px;
+                top: 0;
                 left: 40px;
                 background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
                 border: 1px solid rgba(255, 215, 0, 0.3);
@@ -4818,7 +4781,7 @@
             .value-detail-3d {
                 position: absolute;
                 right: 40px;
-                top: 20px;
+                top: 0;
                 width: 340px;
                 background: rgba(10, 15, 30, 0.9);
                 border: 1px solid rgba(255, 215, 0, 0.2);
@@ -4909,8 +4872,8 @@
             }
 
             .detail-3d-total {
-                margin-top: 20px;
-                padding-top: 20px;
+                margin-top: 0;
+                padding-top: 0;
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
                 display: flex;
                 justify-content: space-between;
@@ -8182,6 +8145,7 @@
                 }
 
                 handleStageTransition(index);
+                updateBottomNav();
 
                 // 更新底部按钮显示
                 const nextBtn = document.getElementById('nextPageBtn');
@@ -8291,6 +8255,26 @@
         function goToNext() {
             if (currentStage < 4) {
                 goTo(currentStage + 1);
+            }
+        }
+
+        function goToPrev() {
+            if (currentStage > 0) {
+                goTo(currentStage - 1);
+            }
+        }
+
+        // 更新底部导航按钮显示状态
+        function updateBottomNav() {
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            
+            if (prevBtn) {
+                prevBtn.style.display = currentStage > 0 ? 'inline-block' : 'none';
+            }
+            if (nextBtn) {
+                nextBtn.style.display = currentStage < 4 ? 'inline-block' : 'none';
+                nextBtn.textContent = currentStage === 0 ? '开始探索 →' : '进入下一页 →';
             }
         }
 
