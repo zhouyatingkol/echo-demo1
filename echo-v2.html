@@ -209,15 +209,6 @@
             border-radius: 30px;
             border: 1px solid rgba(0, 240, 255, 0.2);
         }
-        .nav-item {
-            font-size: 12px;
-            color: rgba(150, 170, 200, 0.7);
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .nav-item:hover, .nav-item.active { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
-
         /* ===== 页面过渡动画 ===== */
         .stage {
             opacity: 0;
@@ -3817,13 +3808,9 @@
 
     <!-- 底部导航 -->
     <div class="bottom-nav" id="bottomNav">
-        <div class="nav-dots" style="display:none;">
-            <div class="dot active" onclick="goTo(0)"></div>
-            <div class="dot" onclick="goTo(1)"></div>
-            <div class="dot" onclick="goTo(2)"></div>
-            <div class="dot" onclick="goTo(3)"></div>
-            <div class="dot" onclick="goTo(4)"></div>
-        </div>
+        <button class="btn" id="prevPageBtn" onclick="goToPrev()" style="margin-right: 15px; display: none;">
+            ← 上一页
+        </button>
         <button class="next-page-btn" id="nextPageBtn" onclick="goToNext()">
             进入下一页 →
         </button>
@@ -3842,14 +3829,6 @@
 
     <!-- STAGE 1: 资产铸造 -->
     <div class="stage" id="stage1">
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
-            <div class="nav-item active">资产铸造</div>
-            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
-            <div class="nav-item" onclick="goTo(3)">融资决策</div>
-            <div class="nav-item" onclick="goTo(4)">价值分配</div>
-        </div>
-
         <div class="main-container">
             <!-- 左侧资产库 -->
             <div class="asset-library">
@@ -3984,12 +3963,6 @@
         <!-- 光粒子背景 -->
         <div class="stage2-particles" id="stage2Particles"></div>
 
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
-            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
-            <div class="nav-item active">协作衍生</div>
-            <div class="nav-item" onclick="goTo(3)">融资决策</div>
-            <div class="nav-item" onclick="goTo(4)">价值分配</div>
         </div>
 
         <div class="main-container">
@@ -4278,12 +4251,6 @@
 
     <!-- STAGE 2.5: 融资引导过渡页（已废弃，保留代码以备后用）-->
     <div class="stage" id="stage2_5">
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
-            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
-            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
-            <div class="nav-item active">融资决策</div>
-            <div class="nav-item" onclick="goTo(4)">价值分配</div>
         </div>
 
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 120px); padding: 40px;">
@@ -4336,12 +4303,6 @@
 
     <!-- STAGE 3: 融资决策（完整版） -->
     <div class="stage" id="stage3">
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
-            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
-            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
-            <div class="nav-item active">融资决策</div>
-            <div class="nav-item" onclick="goTo(4)">价值分配</div>
         </div>
 
         <div class="main-container">
@@ -4583,12 +4544,6 @@
 
     <!-- STAGE 4: AI制药资产层级树 -->
     <div class="stage" id="stage4">
-        <div class="top-nav">
-            <div class="nav-item" onclick="goTo(0)">开场</div>
-            <div class="nav-item" onclick="goTo(1)">资产铸造</div>
-            <div class="nav-item" onclick="goTo(2)">协作衍生</div>
-            <div class="nav-item" onclick="goTo(3)">融资决策</div>
-            <div class="nav-item active">价值分配</div>
         </div>
 
         <div class="hierarchy-tree-container">
@@ -8183,15 +8138,8 @@
 
                 handleStageTransition(index);
 
-                // 更新底部按钮显示
-                const nextBtn = document.getElementById('nextPageBtn');
-                if (nextBtn) {
-                    if (index === 0 || index === 4) {
-                        nextBtn.style.display = 'none';
-                    } else {
-                        nextBtn.style.display = 'block';
-                    }
-                }
+                // 更新底部导航按钮显示
+                updateBottomNav();
             }, 300);
         }
 
@@ -8291,6 +8239,25 @@
         function goToNext() {
             if (currentStage < 4) {
                 goTo(currentStage + 1);
+            }
+        }
+
+        function goToPrev() {
+            if (currentStage > 0) {
+                goTo(currentStage - 1);
+            }
+        }
+
+        // 更新底部导航按钮显示
+        function updateBottomNav() {
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            
+            if (prevBtn) {
+                prevBtn.style.display = currentStage > 0 ? 'inline-block' : 'none';
+            }
+            if (nextBtn) {
+                nextBtn.style.display = currentStage < 4 ? 'inline-block' : 'none';
             }
         }
 
