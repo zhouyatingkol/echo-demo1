@@ -3605,7 +3605,7 @@
         .hierarchy-header {
             position: absolute;
             top: 20px;
-            right: 460px;
+            right: 300px;
             left: auto;
             text-align: right;
             z-index: 10;
@@ -8439,8 +8439,8 @@ function initHierarchy3D() {
     hierarchyScene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
 
     hierarchyCamera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    hierarchyCamera.position.set(0, 40, 80);
-    hierarchyCamera.lookAt(0, 0, 0);
+    hierarchyCamera.position.set(0, 20, 80);
+    hierarchyCamera.lookAt(0, -10, 0);
 
     hierarchyRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
     hierarchyRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
@@ -9204,7 +9204,7 @@ function createHierarchyNode(nodeData) {
     // 层级1: 终极资产，模型较大，标签需要更高
     // 层级2: 融合资产，模型中等
     // 层级3: 分子资产，模型较小
-    const labelHeight = nodeData.level === 1 ? 8.5 : (nodeData.level === 2 ? 6.5 : 4.5);
+    const labelHeight = nodeData.level === 1 ? 12 : (nodeData.level === 2 ? 9 : 6);
     label.position.y = labelHeight;
 
     // 在动画循环中更新标签朝向，使其始终面向相机
