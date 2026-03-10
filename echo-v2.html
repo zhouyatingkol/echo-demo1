@@ -4046,35 +4046,7 @@
                     <div class="guide-label">终极资产</div>
                 </div>
             </div>
-            <button class="btn btn-gold" onclick="closeGuide('guide0to1', 1)">明白了，开始铸造 →</button>
-        </div>
-    </div>
-
-    <!-- 阶段一到阶段二过渡引导 -->
-    <div class="transition-guide" id="guide1to2">
-        <div class="guide-card">
-            <div class="guide-title">⬡ 融合资产</div>
-            <div class="guide-text">
-                一颗种子力量小，多颗种子合起来就是一棵树。<br>
-                树的果子更值钱，还能单独卖。
-            </div>
-            <div class="guide-illustration">
-                <div class="guide-item">
-                    <div class="guide-icon">🌱</div>
-                    <div class="guide-label">分子资产</div>
-                </div>
-                <div style="display: flex; align-items: center; color: #00f0ff;">+</div>
-                <div class="guide-item">
-                    <div class="guide-icon">🌱</div>
-                    <div class="guide-label">分子资产</div>
-                </div>
-                <div style="display: flex; align-items: center; color: #ffd700;">→</div>
-                <div class="guide-item">
-                    <div class="guide-icon">🌳</div>
-                    <div class="guide-label">融合资产</div>
-                </div>
-            </div>
-            <button class="btn btn-gold" onclick="closeGuide('guide1to2', 2)">明白了，去协作池 →</button>
+            <button class="btn btn-gold" onclick="closeGuide('guide0to1')">明白了，开始铸造 →</button>
         </div>
     </div>
 
@@ -4087,13 +4059,20 @@
             <div class="glass-card">
                 <h1 class="main-title">ECHO PROTOCOL</h1>
                 <div class="subtitle">价值溯源：一款新药的数字旅程</div>
-                <button class="btn btn-gold" onclick="goTo(1)">开始探索</button>
+                <button class="btn btn-gold" onclick="showGuide('guide0to1', 1)">开始探索</button>
             </div>
         </div>
     </div>
 
     <!-- STAGE 1: 资产铸造 -->
     <div class="stage" id="stage1">
+        <!-- 阶段引导条 -->
+        <div class="stage-guide-bar">
+            <div class="stage-guide-text">
+                💡 <span class="stage-guide-highlight">铸造资产</span> = 把你的研发成果变成数字种子。每个种子都有五瓣：根属于你，果实能卖钱，种子还能长出新树。
+            </div>
+        </div>
+
         <div class="main-container">
             <!-- 左侧资产库 -->
             <div class="asset-library">
@@ -4225,6 +4204,13 @@
 
     <!-- STAGE 2: 协作衍生（优化版） -->
     <div class="stage" id="stage2">
+        <!-- 阶段引导条 -->
+        <div class="stage-guide-bar" style="top: 70px;">
+            <div class="stage-guide-text">
+                💡 <span class="stage-guide-highlight">融合资产</span> = 多颗种子合起来长成一棵树。树的果子更值钱，还能单独卖。
+            </div>
+        </div>
+
         <!-- 光粒子背景 -->
         <div class="stage2-particles" id="stage2Particles"></div>
 
@@ -8761,90 +8747,35 @@
         }
 
         // 显示引导
-        function showGuide(guideId) {
+        function showGuide(guideId, nextStage) {
             const guide = document.getElementById(guideId);
             if (guide) {
                 guide.classList.add('active');
+                guide.dataset.nextStage = nextStage;
             }
         }
 
-        // 关闭引导并继续
-        function closeGuide(guideId, nextStage) {
+        // 关闭引导
+        function closeGuide(guideId) {
             const guide = document.getElementById(guideId);
             if (guide) {
                 guide.classList.remove('active');
-                if (nextStage !== undefined) {
-                    goToDirect(nextStage);
+                const nextStage = guide.dataset.nextStage;
+                if (nextStage) {
+                    setTimeout(() => goTo(parseInt(nextStage)), 300);
                 }
             }
         }
 
-        // 直接跳转（不显示引导）
-        function goToDirect(index) {
-            if (index < 0 || index > 4) return;
-
-            // 添加退出动画
-            const currentStageEl = document.querySelector('.stage.active');
-            if (currentStageEl) {
-                currentStageEl.style.opacity = '0';
-                currentStageEl.style.transform = 'translateY(-20px)';
-            }
-
-            setTimeout(() => {
-                document.querySelectorAll('.stage').forEach(s => {
-                    s.classList.remove('active');
-                    s.style.opacity = '';
-                    s.style.transform = '';
-                });
-
-                // 处理阶段2.5（过渡页）
-                if (index === 2.5) {
-                    document.getElementById('stage2_5').classList.add('active');
-                    currentStage = 2.5;
-                } else {
-                    document.getElementById('stage' + index).classList.add('active');
-                    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
-                    currentStage = index;
-                }
-
-                // 添加入场动画
-                const newStageEl = document.querySelector('.stage.active');
-                if (newStageEl) {
-                    newStageEl.style.opacity = '0';
-                    newStageEl.style.transform = 'translateY(20px)';
-                    setTimeout(() => {
-                        newStageEl.style.transition = 'all 0.5s ease';
-                        newStageEl.style.opacity = '1';
-                        newStageEl.style.transform = 'translateY(0)';
-                    }, 50);
-                }
-
-                handleStageTransition(index);
-
-                // 更新底部导航按钮显示
-                updateBottomNav();
-            }, 300);
-        }
-
-        // 多页切换 - 添加过渡动画
-        function goTo(index) {
-            if (index < 0 || index > 4) return;
-            
-            // 阶段一显示过渡引导
-            if (index === 1) {
-                showGuide('guide0to1');
-                return;
-            }
-            
-            // 阶段一进入阶段二显示过渡引导
-            if (index === 2 && currentStage === 1) {
-                showGuide('guide1to2');
-                return;
-            }
-            
-            // 其他阶段直接跳转
-            goToDirect(index);
-        }
+        // 显示快捷键提示
+        function showKeyboardHint() {
+            const hint = document.getElementById('keyboardHint');
+            if (hint) {
+                hint.classList.add('visible');
+                // 5秒后自动隐藏
+                setTimeout(() => {
+                    hint.classList.remove('visible');
+                }, 5000);
             }
         }
 
@@ -8904,6 +8835,60 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
         }
+
+        // 多页切换 - 添加过渡动画
+        function goTo(index) {
+            if (index < 0 || index > 4) return;
+
+            // 添加退出动画
+            const currentStageEl = document.querySelector('.stage.active');
+            if (currentStageEl) {
+                currentStageEl.style.opacity = '0';
+                currentStageEl.style.transform = 'translateY(-20px)';
+            }
+
+            setTimeout(() => {
+                document.querySelectorAll('.stage').forEach(s => {
+                    s.classList.remove('active');
+                    s.style.opacity = '';
+                    s.style.transform = '';
+                });
+
+                // 处理阶段2.5（过渡页）
+                if (index === 2.5) {
+                    document.getElementById('stage2_5').classList.add('active');
+                    currentStage = 2.5;
+                } else {
+                    document.getElementById('stage' + index).classList.add('active');
+                    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+                    currentStage = index;
+                }
+
+                // 添加入场动画
+                const newStageEl = document.querySelector('.stage.active');
+                if (newStageEl) {
+                    newStageEl.style.opacity = '0';
+                    newStageEl.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        newStageEl.style.transition = 'all 0.5s ease';
+                        newStageEl.style.opacity = '1';
+                        newStageEl.style.transform = 'translateY(0)';
+                    }, 50);
+                }
+
+                handleStageTransition(index);
+
+                // 更新底部导航按钮显示
+                updateBottomNav();
+            }, 300);
+        }
+
+        // 处理阶段切换的资源管理
+        function handleStageTransition(index) {
+            if (index === 1) {
+                // 清理阶段2的资源
+                if (poolRenderer) poolRenderer.dispose();
+                poolRenderer = null;
                 poolScene = null;
                 poolMolecule = null;
 
