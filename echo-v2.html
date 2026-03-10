@@ -7785,14 +7785,14 @@
 
         // ========== 键盘快捷键（全局） ==========
         document.addEventListener('keydown', (e) => {
-            // 左右箭头切换页面
+            // 左右箭头切换页面（协作衍生 stage4 和融资决策 stage5 禁用，因为有拖拽和滑块）
             if (e.key === 'ArrowRight') {
-                if (currentStage === 2) goTo(3);
-                else goTo(currentStage + 1);
+                if (currentStage === 4 || currentStage === 5) return;
+                goTo(currentStage + 1);
             }
             if (e.key === 'ArrowLeft') {
-                if (currentStage === 3) goTo(2);
-                else goTo(currentStage - 1);
+                if (currentStage === 4 || currentStage === 5) return;
+                goTo(currentStage - 1);
             }
 
             // 只在阶段2的快捷键
@@ -10999,15 +10999,19 @@ function closeAllModals() {
 
 // 滚轮切换阶段
 document.addEventListener('wheel', (e) => {
-    // 阶段四禁用滚轮导航（避免与3D模型拖拽冲突）
-    if (currentStage === 4) {
+    // 阶段4（协作衍生）和阶段5（融资决策）禁用滚轮导航
+    // - 阶段4有拖拽操作，避免冲突
+    // - 阶段5有滑块控件，避免冲突
+    if (currentStage === 4 || currentStage === 5) {
         return;
     }
     
     // 忽略在可滚动区域内的滚轮事件
     if (e.target.closest('.asset-library') || 
         e.target.closest('.hierarchy-sidebar') ||
-        e.target.closest('.ownership-panel')) {
+        e.target.closest('.ownership-panel') ||
+        e.target.closest('.share-list-scrollable') ||
+        e.target.closest('.slider-container')) {
         return;
     }
     
