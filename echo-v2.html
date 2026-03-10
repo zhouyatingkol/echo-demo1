@@ -156,6 +156,27 @@
             cursor: not-allowed;
         }
 
+        /* 开场页按钮呼吸光效 */
+        @keyframes breathe-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 215, 0, 0.2), 0 0 80px rgba(0, 240, 255, 0.1);
+                transform: scale(1.02);
+            }
+        }
+
+        .stage-0-content .btn-gold {
+            animation: breathe-glow 2s ease-in-out infinite;
+        }
+
+        .stage-0-content .btn-gold:hover {
+            animation: none;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+        }
+
         /* ===== 主容器 ===== */
         .main-container {
             position: fixed;
@@ -8173,6 +8194,27 @@
             const text = "ECHO PROTOCOL";
             let textCoordinates = [];
             
+            // 流星数组
+            const meteors = [];
+            const meteorCount = 3;
+            
+            // 初始化流星
+            function initMeteors() {
+                for (let i = 0; i < meteorCount; i++) {
+                    meteors.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height * 0.5,
+                        length: Math.random() * 80 + 50,
+                        speed: Math.random() * 3 + 2,
+                        angle: Math.random() * 0.3 + 0.2,
+                        opacity: 0,
+                        active: false,
+                        delay: Math.random() * 200
+                    });
+                }
+            }
+            initMeteors();
+            
             // 获取文字坐标
             function getTextCoordinates() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -8228,9 +8270,71 @@
             let converged = false;
             let frameCount = 0;
             
+            // 绘制流星
+            function drawMeteors() {
+                meteors.forEach((meteor, index) => {
+                    // 延迟启动
+                    if (!meteor.active && frameCount > meteor.delay) {
+                        if (Math.random() < 0.02) {
+                            meteor.active = true;
+                            meteor.opacity = 1;
+                        }
+                    }
+                    
+                    if (!meteor.active) return;
+                    
+                    // 更新位置
+                    meteor.x -= meteor.speed * Math.cos(meteor.angle);
+                    meteor.y += meteor.speed * Math.sin(meteor.angle);
+                    meteor.opacity -= 0.015;
+                    
+                    // 重置流星
+                    if (meteor.opacity <= 0 || meteor.x < -meteor.length || meteor.y > canvas.height + meteor.length) {
+                        meteor.x = Math.random() * canvas.width + 200;
+                        meteor.y = Math.random() * canvas.height * 0.3 - 100;
+                        meteor.active = false;
+                        meteor.delay = frameCount + Math.random() * 100;
+                        meteor.opacity = 0;
+                        return;
+                    }
+                    
+                    // 绘制流星尾迹
+                    const gradient = ctx.createLinearGradient(
+                        meteor.x, meteor.y,
+                        meteor.x + meteor.length * Math.cos(meteor.angle),
+                        meteor.y - meteor.length * Math.sin(meteor.angle)
+                    );
+                    gradient.addColorStop(0, `rgba(255, 215, 0, ${meteor.opacity})`);
+                    gradient.addColorStop(0.5, `rgba(0, 240, 255, ${meteor.opacity * 0.5})`);
+                    gradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(meteor.x, meteor.y);
+                    ctx.lineTo(
+                        meteor.x + meteor.length * Math.cos(meteor.angle),
+                        meteor.y - meteor.length * Math.sin(meteor.angle)
+                    );
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // 流星头部光点
+                    ctx.beginPath();
+                    ctx.arc(meteor.x, meteor.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${meteor.opacity})`;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#00f0ff';
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                });
+            }
+            
             function animate() {
                 ctx.fillStyle = 'rgba(2, 2, 8, 0.15)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制流星（在粒子下方）
+                drawMeteors();
                 
                 let allConverged = true;
                 
@@ -8294,6 +8398,10 @@
                     // 汇聚完成后添加青金色发光效果
                     setTimeout(() => {
                         canvas.style.filter = 'drop-shadow(0 0 25px rgba(0, 240, 255, 0.5)) drop-shadow(0 0 50px rgba(255, 215, 0, 0.3))';
+                        // 3秒后自动跳转
+                        setTimeout(() => {
+                            goTo(1);
+                        }, 3000);
                     }, 300);
                 }
                 
