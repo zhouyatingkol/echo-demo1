@@ -7877,11 +7877,36 @@
                 }
             });
             
+            // 获取三栏元素
+            const leftPanel = document.querySelector('#stage3 .asset-library');
+            const rightPanel = document.getElementById('dealPanel');
+            const centerPanel = document.querySelector('#stage3 .finance-center');
+            
+            // 步骤4（融资成功）时隐藏左右面板
+            if (step === 4) {
+                if (leftPanel) leftPanel.style.display = 'none';
+                if (rightPanel) rightPanel.style.display = 'none';
+                if (centerPanel) {
+                    centerPanel.style.width = '100%';
+                    centerPanel.style.maxWidth = '800px';
+                    centerPanel.style.margin = '0 auto';
+                }
+            } else {
+                // 其他步骤恢复三栏布局
+                if (leftPanel) leftPanel.style.display = '';
+                if (rightPanel) rightPanel.style.display = '';
+                if (centerPanel) {
+                    centerPanel.style.width = '';
+                    centerPanel.style.maxWidth = '';
+                    centerPanel.style.margin = '';
+                }
+            }
+            
             // 更新右侧内容
             if (step === 1) {
                 document.getElementById('dealStep1').style.display = 'block';
                 document.getElementById('dealStep2').style.display = 'none';
-            } else {
+            } else if (step === 2 || step === 3) {
                 document.getElementById('dealStep1').style.display = 'none';
                 document.getElementById('dealStep2').style.display = 'block';
             }
@@ -8294,47 +8319,28 @@
             });
         }
 
-        // 多页切换 - 添加过渡动画
+        // 多页切换
         function goTo(index) {
             if (index < 0 || index > 4) return;
 
-            // 添加退出动画
-            const currentStageEl = document.querySelector('.stage.active');
-            if (currentStageEl) {
-                currentStageEl.style.opacity = '0';
-                currentStageEl.style.transform = 'translateY(-20px)';
+            // 隐藏所有 stage
+            document.querySelectorAll('.stage').forEach(s => {
+                s.classList.remove('active');
+                s.style.opacity = '';
+                s.style.transform = '';
+                s.style.transition = '';
+            });
+
+            // 处理阶段2.5（过渡页）
+            if (index === 2.5) {
+                document.getElementById('stage2_5').classList.add('active');
+                currentStage = 2.5;
+            } else {
+                document.getElementById('stage' + index).classList.add('active');
+                currentStage = index;
             }
 
-            setTimeout(() => {
-                document.querySelectorAll('.stage').forEach(s => {
-                    s.classList.remove('active');
-                    s.style.opacity = '';
-                    s.style.transform = '';
-                });
-
-                // 处理阶段2.5（过渡页）
-                if (index === 2.5) {
-                    document.getElementById('stage2_5').classList.add('active');
-                    currentStage = 2.5;
-                } else {
-                    document.getElementById('stage' + index).classList.add('active');
-                    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
-                    currentStage = index;
-                }
-
-                // 添加入场动画
-                const newStageEl = document.querySelector('.stage.active');
-                if (newStageEl) {
-                    newStageEl.style.opacity = '0';
-                    newStageEl.style.transform = 'translateY(20px)';
-                    setTimeout(() => {
-                        newStageEl.style.transition = 'all 0.5s ease';
-                        newStageEl.style.opacity = '1';
-                        newStageEl.style.transform = 'translateY(0)';
-                    }, 50);
-                }
-
-                handleStageTransition(index);
+            handleStageTransition(index);
 
                 // 恢复底部导航为默认状态（用于非阶段3、非阶段2.5的页面）
                 if (index !== 3 && index !== 2.5) {
