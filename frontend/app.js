@@ -26,17 +26,16 @@ const QITMEER_TESTNET = {
   blockExplorerUrls: ['https://testnet-qng.qitmeer.io'],
 };
 
-// 合约ABI (简化版，只包含常用函数)
+// V2 合约 ABI
 const CONTRACT_ABI = [
-  "function mintECHO(string memory name, string memory description, string memory assetType, string memory uri, tuple(address usageOwner, address derivativeOwner, address extensionOwner, address revenueOwner, uint256 usageFee, uint256 derivativeFee, uint256 revenueShare) memory rights) public returns (uint256)",
-  "function getAssetInfo(uint256 tokenId) public view returns (tuple(string name, string description, string assetType, string uri, uint256 createdAt) memory metadata, tuple(address usageOwner, address derivativeOwner, address extensionOwner, address revenueOwner, uint256 usageFee, uint256 derivativeFee, uint256 revenueShare) memory rights, address creator)",
-  "function ownerOf(uint256 tokenId) public view returns (address)",
-  "function getCurrentTokenId() public view returns (uint256)",
-  "event AssetMinted(uint256 indexed tokenId, address indexed creator, string name, string assetType)"
+  "function mintECHO(string name, string description, string assetType, string uri, bytes32 contentHash, tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue) blueprint) returns (uint256)",
+  "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
+  "function ownerOf(uint256 tokenId) view returns (address)",
+  "function getCurrentTokenId() view returns (uint256)"
 ];
 
-// 合约地址 (部署后更新)
-let CONTRACT_ADDRESS = localStorage.getItem('echoContractAddress') || '0x5f5AAe09BB85f561b21845729B79E840AB026148';
+// 合约地址 - V2 合约
+let CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
 
 // 全局变量
 let provider = null;
