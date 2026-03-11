@@ -2,6 +2,20 @@
 
 ECHO Protocol 在 Qitmeer 网络上的演示项目。
 
+## 🆕 V2 版本已发布！
+
+**V2 合约地址**: `0x319148d9b9265D75858c508E445d65B649036f75`
+
+### V2 新增功能
+- ✅ **权属蓝图** - 详细的使用条款配置
+- ✅ **版本控制** - 资产内容可更新，历史可追溯
+- ✅ **内容验证** - 链上哈希防篡改验证
+- ✅ **衍生作品** - 自动收益分润给父资产
+
+[V2 快速上手指南](./USER_GUIDE_V2.md) | [V2 测试报告](./TEST_REPORT_V2.md)
+
+---
+
 ## 什么是 ECHO 资产？
 
 ECHO 资产是一种**四权分离**的数字资产：
@@ -83,10 +97,16 @@ python3 -m http.server 8080
 
 ## 合约地址
 
-部署后更新：
-
+### V2 合约（最新）
 ```
-ECHOAsset: 0x...
+ECHOAssetV2: 0x319148d9b9265D75858c508E445d65B649036f75
+区块浏览器: https://qng.qitmeer.io/address/0x319148d9b9265D75858c508E445d65B649036f75
+```
+
+### V1 合约（旧版）
+```
+ECHOAsset: 0xCFAa24a24f6E6C408b38E95EB3adCbd259a395e0
+ECHOFusion: 0x9C99CB51495Ce85FEa1C5E7d5dFb68F6F1e6F45f
 ```
 
 ## 项目结构
@@ -94,15 +114,30 @@ ECHOAsset: 0x...
 ```
 echo-demo/
 ├── contracts/
-│   └── ECHOAsset.sol      # 智能合约
+│   ├── ECHOAsset.sol        # V1 智能合约
+│   ├── ECHOFusion.sol       # V1 融合合约
+│   └── ECHOAssetV2.sol      # V2 智能合约 ⭐
 ├── scripts/
-│   └── deploy.js          # 部署脚本
+│   ├── deploy.js            # V1 部署脚本
+│   └── deploy-v2.js         # V2 部署脚本 ⭐
 ├── frontend/
-│   ├── index.html         # Demo页面
-│   └── app.js             # 前端逻辑
-├── hardhat.config.js      # Hardhat配置
-└── package.json
+│   ├── index.html           # 主页面
+│   ├── app.js               # V1 前端逻辑
+│   ├── mint-v2.html         # V2 铸造界面 ⭐
+│   ├── version-control.html # 版本控制 ⭐
+│   ├── content-verification.html # 内容验证 ⭐
+│   ├── derivative-works.html# 衍生作品 ⭐
+│   └── js/
+│       └── echo-asset-v2.js # V2 合约交互 ⭐
+├── hardhat.config.js
+├── README.md
+├── USER_GUIDE_V2.md         # V2 用户指南 ⭐
+└── TEST_REPORT_V2.md        # V2 测试报告 ⭐
 ```
+
+## 快速访问
+
+直接访问 Demo: https://zhouyatingkol.github.io/echo-demo1/frontend/
 
 ## 下一步
 
