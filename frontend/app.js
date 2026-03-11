@@ -265,20 +265,6 @@ async function mintAsset(e) {
     showStatus('铸造失败: ' + error.message, 'error');
   }
 }
-    } else {
-      showStatus('铸造成功!', 'success');
-    }
-    
-    // 刷新资产列表
-    loadAssets();
-    
-    // 重置表单
-    mintForm.reset();
-    
-  } catch (error) {
-    showStatus('铸造失败: ' + error.message, 'error');
-  }
-}
 
 // 加载资产列表
 async function loadAssets() {
