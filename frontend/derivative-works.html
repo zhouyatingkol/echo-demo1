@@ -17,11 +17,32 @@
         .container { max-width: 1100px; margin: 0 auto; }
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 14px; }
+        
+        /* 钱包连接 */
+        .wallet-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .wallet-btn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .wallet-btn.connected {
+            background: rgba(0,255,0,0.2);
+            border: 1px solid #0f0;
+        }
+        
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -41,12 +62,27 @@
         .feature-icon { font-size: 32px; margin-bottom: 12px; }
         .feature-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
         .feature-desc { font-size: 13px; color: #888; }
+        
         .panel {
             background: rgba(255,255,255,0.05);
             border-radius: 16px;
             padding: 24px;
             border: 1px solid rgba(255,255,255,0.1);
         }
+        .panel-title { font-size: 18px; margin-bottom: 16px; color: #00d4ff; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 6px; font-size: 13px; color: #aaa; }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
         .btn {
             padding: 12px 24px;
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
@@ -54,52 +90,282 @@
             border-radius: 8px;
             color: #fff;
             cursor: pointer;
+            font-size: 14px;
         }
         .btn:hover { opacity: 0.9; }
         .btn-full { width: 100%; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
         .hidden { display: none !important; }
+        
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .status.success { background: rgba(0,255,0,0.1); color: #0f0; }
+        .status.error { background: rgba(255,0,0,0.1); color: #f55; }
+        .status.pending { background: rgba(255,215,0,0.1); color: #ffd700; }
+        
+        .asset-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .asset-card-title { font-weight: bold; margin-bottom: 8px; }
+        .asset-card-meta { font-size: 12px; color: #888; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌱 衍生作品管理</h1>
+        <p class="subtitle">基于父资产创建新作品，自动分配收益</p>
+
+        <!-- 钱包连接 -->
+        <div class="wallet-section">
+            <button class="wallet-btn" id="connectWalletBtn" onclick="connectWallet()">🔌 连接钱包</button>
+        </div>
+
         <div class="feature-grid">
-            <div class="feature-card active" data-feature="create">
+            <div class="feature-card active" data-feature="create" onclick="switchTab('create')">
                 <div class="feature-icon">➕</div>
                 <div class="feature-title">创建衍生作品</div>
                 <div class="feature-desc">基于现有资产创作新作品</div>
-            </div
->
-            <div class="feature-card" data-feature="list">
+            </div>
+            <div class="feature-card" data-feature="list" onclick="switchTab('list')">
                 <div class="feature-icon">📋</div>
                 <div class="feature-title">我的衍生作品</div>
                 <div class="feature-desc">管理您的衍生作品</div>
-            </div
->
-        </div
->
+            </div>
+        </div>
+
+        <!-- 创建衍生作品 -->
         <div class="panel" id="createPanel">
-            <p>功能开发完成，待连接合约...</p>
-            <button class="btn btn-full" onclick="alert('功能开发完成！')">测试</button
->
-        </div
->
+            <div class="panel-title">➕ 创建衍生作品</div>
+            
+            <div class="form-group">
+                <label class="form-label">父资产 Token ID</label>
+                <input type="text" class="form-input" id="parentTokenId" placeholder="输入父资产的 Token ID">
+            </div>
+            
+            <button class="btn" onclick="loadParentAsset()">🔍 查询父资产</button>
+            
+            <div id="parentInfo" class="hidden" style="margin-top: 20px;">
+                <div class="asset-card">
+                    <div class="asset-card-title" id="parentName">--</div>
+                    <div class="asset-card-meta" id="parentMeta">--</div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 16px;">
+                    <label class="form-label">衍生作品名称</label>
+                    <input type="text" class="form-input" id="derivativeName" placeholder="例如：基于XXX的改进版">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">描述</label>
+                    <input type="text" class="form-input" id="derivativeDesc" placeholder="描述您的衍生作品...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">IPFS 地址</label>
+                    <input type="text" class="form-input" id="derivativeUri" placeholder="ipfs://...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">内容哈希</label>
+                    <input type="text" class="form-input" id="derivativeHash" placeholder="0x...">
+                </div>
+                
+                <button class="btn btn-full" onclick="createDerivative()">🚀 创建衍生作品</button>
+            </div>
+            
+            <div id="status"></div>
+        </div>
+
+        <!-- 我的衍生作品 -->
         <div class="panel hidden" id="listPanel">
-            <p>衍生作品列表</p>
-        </div
->
-    </div
->
+            <div class="panel-title">📋 我的衍生作品</div>
+            <div id="derivativeList">
+                <p style="color: #666;">请先连接钱包查看</p>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-                const feature = card.dataset.feature;
-                document.getElementById('createPanel').classList.toggle('hidden', feature !== 'create');
-                document.getElementById('listPanel').classList.toggle('hidden', feature !== 'list');
-            });
-        });
+        const V2_CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+        const V2_ABI = [
+            "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
+            "function createDerivative(uint256 parentId, string name, string description, string assetType, string uri, bytes32 contentHash, tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue) blueprint) payable returns (uint256)"
+        ];
+        
+        let provider, signer, contract, userAddress;
+        let isConnected = false;
+        let currentParentId = null;
+
+        // 切换标签
+        function switchTab(tab) {
+            document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[data-feature="${tab}"]`).classList.add('active');
+            
+            document.getElementById('createPanel').classList.toggle('hidden', tab !== 'create');
+            document.getElementById('listPanel').classList.toggle('hidden', tab !== 'list');
+            
+            if (tab === 'list' && isConnected) {
+                loadMyDerivatives();
+            }
+        }
+
+        // 连接钱包
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showStatus('请先安装 MetaMask 钱包！', 'error');
+                return;
+            }
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length === 0) return;
+                
+                userAddress = accounts[0];
+                isConnected = true;
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, signer);
+                
+                document.getElementById('connectWalletBtn').textContent = 
+                    '已连接: ' + userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                document.getElementById('connectWalletBtn').classList.add('connected');
+                
+                showStatus('✅ 钱包已连接', 'success');
+            } catch (error) {
+                showStatus('连接失败: ' + error.message, 'error');
+            }
+        }
+
+        // 加载父资产信息
+        async function loadParentAsset() {
+            if (!isConnected) {
+                showStatus('请先连接钱包', 'error');
+                return;
+            }
+            
+            const tokenId = document.getElementById('parentTokenId').value;
+            if (!tokenId) {
+                showStatus('请输入 Token ID', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('加载中...', 'pending');
+                const [metadata, blueprint] = await contract.getAssetInfo(tokenId);
+                
+                currentParentId = tokenId;
+                
+                document.getElementById('parentName').textContent = metadata.name;
+                document.getElementById('parentMeta').textContent = 
+                    `类型: ${metadata.assetType} | 衍生费: ${ethers.utils.formatEther(blueprint.derivative.fee)} MEER`;
+                
+                document.getElementById('parentInfo').classList.remove('hidden');
+                showStatus('父资产信息加载成功', 'success');
+            } catch (error) {
+                showStatus('加载失败: ' + error.message, 'error');
+            }
+        }
+
+        // 创建衍生作品
+        async function createDerivative() {
+            if (!isConnected || !currentParentId) {
+                showStatus('请先加载父资产信息', 'error');
+                return;
+            }
+            
+            try {
+                const name = document.getElementById('derivativeName').value;
+                const desc = document.getElementById('derivativeDesc').value;
+                const uri = document.getElementById('derivativeUri').value;
+                const hash = document.getElementById('derivativeHash').value;
+                
+                if (!name || !hash) {
+                    showStatus('请填写完整信息', 'error');
+                    return;
+                }
+                
+                showStatus('创建中...请确认交易', 'pending');
+                
+                // 获取父资产的衍生费
+                const [, parentBlueprint] = await contract.getAssetInfo(currentParentId);
+                const fee = parentBlueprint.derivative.fee;
+                
+                // 简化蓝图
+                const blueprint = {
+                    usage: {
+                        owner: userAddress,
+                        fee: ethers.utils.parseEther('0.001'),
+                        commercialUse: true,
+                        modificationAllowed: true,
+                        allowedScopes: [],
+                        restrictedScopes: [],
+                        maxUsers: 0,
+                        licenseDuration: 0
+                    },
+                    derivative: {
+                        owner: userAddress,
+                        fee: ethers.utils.parseEther('0.01'),
+                        allowDerivatives: true,
+                        revenueShare: 1000,
+                        allowedTypes: []
+                    },
+                    extension: {
+                        owner: userAddress,
+                        fee: 0,
+                        allowExtensions: false,
+                        allowedExtensions: []
+                    },
+                    revenue: {
+                        owner: userAddress,
+                        sharePercentage: 10000,
+                        autoDistribute: true
+                    }
+                };
+                
+                const tx = await contract.createDerivative(
+                    currentParentId, name, desc, 'code', uri, hash, blueprint,
+                    { value: fee }
+                );
+                
+                await tx.wait();
+                
+                showStatus('✅ 衍生作品创建成功！', 'success');
+                
+                // 重置表单
+                document.getElementById('derivativeName').value = '';
+                document.getElementById('derivativeDesc').value = '';
+                document.getElementById('derivativeUri').value = '';
+                document.getElementById('derivativeHash').value = '';
+                
+            } catch (error) {
+                showStatus('创建失败: ' + error.message, 'error');
+            }
+        }
+
+        // 加载我的衍生作品
+        async function loadMyDerivatives() {
+            // 简化实现
+            document.getElementById('derivativeList').innerHTML = 
+                '<p style="color: #666;">功能开发中，敬请期待...</p>';
+        }
+
+        function showStatus(msg, type) {
+            document.getElementById('status').innerHTML = msg ? 
+                `<div class="status ${type}">${msg}</div>` : '';
+        }
     </script>
 </body>
 </html>
