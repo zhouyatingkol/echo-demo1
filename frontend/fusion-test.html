@@ -143,6 +143,8 @@
             <div class="seed-list" id="seedList">
                 <p style="color: #888; text-align: center;">加载中...</p>
             </div>
+            
+            <button class="btn" id="nextToStep3" style="display: none; margin-bottom: 10px;">下一步 →</button>
             <button class="btn btn-secondary" id="refreshSeedsBtn">🔄 刷新列表</button>
         </div>
 
@@ -219,6 +221,7 @@
         const seedList = document.getElementById('seedList');
         const selectedCount = document.getElementById('selectedCount');
         const progressFill = document.getElementById('progressFill');
+        const nextToStep3 = document.getElementById('nextToStep3');
         const refreshSeedsBtn = document.getElementById('refreshSeedsBtn');
         const treeName = document.getElementById('treeName');
         const treeDesc = document.getElementById('treeDesc');
@@ -346,9 +349,11 @@
             
             updateProgress();
             
-            // 如果选择了>=2颗，自动进入下一步
+            // 如果选择了>=2颗，显示下一步按钮
             if (selectedSeeds.length >= 2) {
-                setTimeout(() => showStep(3), 300);
+                nextToStep3.style.display = 'block';
+            } else {
+                nextToStep3.style.display = 'none';
             }
         };
 
@@ -361,6 +366,15 @@
 
         // 刷新种子
         refreshSeedsBtn.addEventListener('click', loadSeeds);
+
+        // 下一步按钮
+        nextToStep3.addEventListener('click', () => {
+            if (selectedSeeds.length >= 2) {
+                showStep(3);
+            } else {
+                showStatus('请至少选择2颗种子', 'error');
+            }
+        });
 
         // 返回步骤2
         document.getElementById('backToStep2').addEventListener('click', () => {
