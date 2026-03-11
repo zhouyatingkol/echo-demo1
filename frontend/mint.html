@@ -2,106 +2,95 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>铸造</title>
+    <title>ECHO铸造</title>
     <script src="ethers.min.js"></script>
     <style>
         body { background: #1a1a2e; color: #fff; font-family: sans-serif; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .btn { width: 100%; padding: 15px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 16px; cursor: pointer; margin: 10px 0; }
-        .log { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 12px; color: #0f0; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .btn { width: 100%; padding: 15px; background: #00d4ff; border: none; border-radius: 8px; color: #000; font-size: 16px; cursor: pointer; margin: 10px 0; font-weight: bold; }
+        .btn:hover { background: #7b2cbf; color: #fff; }
+        .log { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 12px; color: #0f0; white-space: pre-wrap; }
         .error { color: #f55; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>铸造测试</h2>
+        <h2 style="text-align:center;">🌱 ECHO铸造</h2>
         
         <button class="btn" id="connectBtn">连接钱包</button>
         <div id="walletInfo" style="display:none;">
-            <p>地址: <span id="addr"></span></p>
-            <button class="btn" id="mintBtn">铸造资产</button>
+            <p style="word-break:break-all; font-family:monospace; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px;"><span id="addr"></span></p>
+            <button class="btn" id="mintBtn">铸造第一颗种子</button>
         </div>
         
-        <div id="log" class="log">日志:</div>
+        <div id="log" class="log"></div>
     </div>
 
     <script>
         const CONTRACT = '0x5f5AAe09BB85f561b21845729B79E840AB026148';
         let contract, signer, userAddr;
-        
-        function log(msg, isError) {
-            const el = document.getElementById('log');
-            el.innerHTML += '\n' + (isError ? '❌ ' : '✓ ') + msg;
+        const log = (msg, err) => {
+            document.getElementById('log').innerHTML += (err ? '❌ ' : '✓ ') + msg + '\n';
             console.log(msg);
-        }
-        
+        };
+
         document.getElementById('connectBtn').onclick = async () => {
             try {
-                log('连接中...');
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 signer = provider.getSigner();
                 userAddr = await signer.getAddress();
                 
-                log('已连接: ' + userAddr.slice(0, 15) + '...');
-                
-                // 使用简化ABI
-                const abi = [
-                    "function mintECHO(string,string,string,string,(address,address,address,address,uint256,uint256,uint256)) returns (uint256)"
-                ];
+                // 直接从合约artifact加载ABI
+                const abi = [{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"assetType","type":"string"},{"internalType":"string","name":"uri","type":"string"},{"components":[{"internalType":"address","name":"usageOwner","type":"address"},{"internalType":"address","name":"derivativeOwner","type":"address"},{"internalType":"address","name":"extensionOwner","type":"address"},{"internalType":"address","name":"revenueOwner","type":"address"},{"internalType":"uint256","name":"usageFee","type":"uint256"},{"internalType":"uint256","name":"derivativeFee","type":"uint256"},{"internalType":"uint256","name":"revenueShare","type":"uint256"}],"internalType":"struct ECHOAsset.Rights","name":"rights","type":"tuple"}],"name":"mintECHO","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"}];
                 
                 contract = new ethers.Contract(CONTRACT, abi, signer);
-                log('合约初始化成功');
                 
                 document.getElementById('addr').textContent = userAddr;
                 document.getElementById('walletInfo').style.display = 'block';
                 document.getElementById('connectBtn').style.display = 'none';
+                log('已连接: ' + userAddr.slice(0, 10) + '...');
                 
             } catch (e) {
                 log('连接失败: ' + e.message, true);
             }
         };
-        
+
         document.getElementById('mintBtn').onclick = async () => {
             try {
-                log('开始铸造...');
+                log('铸造中...');
                 
-                // 使用对象格式传递rights（而不是数组）
+                // 确保所有地址都是有效的
                 const rights = {
-                    usageOwner: userAddr,
-                    derivativeOwner: userAddr,
-                    extensionOwner: userAddr,
-                    revenueOwner: userAddr,
+                    usageOwner: ethers.utils.getAddress(userAddr),
+                    derivativeOwner: ethers.utils.getAddress(userAddr),
+                    extensionOwner: ethers.utils.getAddress(userAddr),
+                    revenueOwner: ethers.utils.getAddress(userAddr),
                     usageFee: ethers.BigNumber.from('1000000000000000'),
                     derivativeFee: ethers.BigNumber.from('0'),
                     revenueShare: 10000
                 };
                 
-                log('调用合约...');
-                
+                log('发送交易...');
                 const tx = await contract.mintECHO(
-                    "我的数字种子",
-                    "测试铸造",
+                    "数字种子一号",
+                    "我的第一颗种子",
                     "code",
-                    "test-uri",
-                    rights,  // 传递对象
+                    JSON.stringify({name:"数字种子一号"}),
+                    rights,
                     { gasLimit: 500000 }
                 );
                 
-                log('交易已发送: ' + tx.hash.slice(0, 20) + '...');
-                
+                log('等待确认: ' + tx.hash.slice(0, 15) + '...');
                 const receipt = await tx.wait();
                 
                 if (receipt.status === 1) {
-                    log('✅ 铸造成功! 区块: ' + receipt.blockNumber);
+                    log('✅ 铸造成功！');
                 } else {
-                    log('❌ 交易失败 (status=0)', true);
+                    log('❌ 失败', true);
                 }
-                
             } catch (e) {
-                log('铸造失败: ' + e.message, true);
-                log('错误码: ' + (e.code || '无'), true);
-                if (e.reason) log('原因: ' + e.reason, true);
+                log('错误: ' + e.message.slice(0, 100), true);
             }
         };
     </script>
