@@ -549,6 +549,44 @@
       "artifacts": [
         "ReentrancyGuard"
       ]
+    },
+    "/root/.openclaw/workspace/echo-demo/contracts/ECHOAssetV2.sol": {
+      "lastModificationDate": 1773239079788,
+      "contentHash": "cdd8978dacbbdf8ffcb5f192e4bae7f7",
+      "sourceName": "contracts/ECHOAssetV2.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/utils/Counters.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "ECHOAssetV2"
+      ]
     }
   }
 }
