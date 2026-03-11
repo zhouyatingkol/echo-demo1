@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>快速融合</title>
+    <script src="ethers.min.js"></script>
+    <style>
+        body { background: #1a1a2e; color: #fff; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .btn { width: 100%; padding: 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 12px; color: #fff; font-size: 20px; cursor: pointer; margin: 20px 0; font-weight: bold; }
+        .btn:hover { opacity: 0.9; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; margin: 20px 0; }
+        .info { color: #888; font-size: 14px; margin: 10px 0; }
+        .seed { background: rgba(0,212,255,0.1); padding: 10px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #00d4ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align:center;">🌳 快速融合</h1>
+        
+        <div class="card">
+            <p class="info">您有2颗种子:</p>
+            <div class="seed">🌱 Token #1: 数字种子一号 (code)</div>
+            <div class="seed">🌱 Token #2: 数字种子二号 (algorithm)</div>
+        </div>
+
+        <button class="btn" id="connectBtn">1. 连接钱包</button>
+        
+        <button class="btn" id="fuseBtn" style="display:none;">2. 融合成树 🌳</button>
+        
+        <div id="status" style="text-align:center; margin:20px 0; font-size:16px;"></div>
+    </div>
+
+    <script>
+        const FUSION_CONTRACT = '0x3AD441ECfC193fbe7f086b962d0bCfd2Bc2Bac0d';
+        
+        const ABI = [
+            {
+                "inputs": [
+                    {"internalType": "uint256[]", "name": "seedIds", "type": "uint256[]"},
+                    {"internalType": "uint256[]", "name": "weights", "type": "uint256[]"},
+                    {"internalType": "string", "name": "name", "type": "string"},
+                    {"internalType": "string", "name": "description", "type": "string"}
+                ],
+                "name": "fuseTree",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+        
+        let contract, userAddr;
+        const status = document.getElementById('status');
+        
+        function show(msg) {
+            status.innerHTML = msg;
+            console.log(msg);
+        }
+        
+        document.getElementById('connectBtn').onclick = async () => {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                userAddr = await signer.getAddress();
+                
+                contract = new ethers.Contract(FUSION_CONTRACT, ABI, signer);
+                
+                show('✅ 已连接: ' + userAddr.slice(0, 10) + '...');
+                document.getElementById('connectBtn').style.display = 'none';
+                document.getElementById('fuseBtn').style.display = 'block';
+                
+            } catch (e) {
+                show('❌ ' + e.message);
+            }
+        };
+        
+        document.getElementById('fuseBtn').onclick = async () => {
+            try {
+                show('融合中...请确认MetaMask交易');
+                document.getElementById('fuseBtn').disabled = true;
+                
+                const tx = await contract.fuseTree(
+                    [1, 2],           // Token #1 和 #2
+                    [1, 1],           // 权重 1:1
+                    '我的第一棵树',    // 树名
+                    '由两颗种子融合而成', // 描述
+                    { gasLimit: 800000 }
+                );
+                
+                show('交易已发送，等待确认...');
+                const receipt = await tx.wait();
+                
+                if (receipt.status === 1) {
+                    show('🎉 融合成功！您创建了一棵树！');
+                } else {
+                    show('❌ 交易失败');
+                }
+                
+            } catch (e) {
+                show('❌ ' + e.message.slice(0, 100));
+                document.getElementById('fuseBtn').disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
