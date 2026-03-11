@@ -183,18 +183,13 @@ function showMintSection() {
   loadAssets();
 }
 
-// 铸造资产
+// 铸造资产 (V2)
 async function mintAsset(e) {
   e.preventDefault();
   
   if (!contract) {
-    // 如果没有合约地址，提示输入
-    const address = prompt('请输入合约地址:');
-    if (!address) return;
-    
-    CONTRACT_ADDRESS = address;
-    localStorage.setItem('echoContractAddress', address);
-    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    showStatus('合约未初始化', 'error');
+    return;
   }
   
   try {
@@ -203,40 +198,73 @@ async function mintAsset(e) {
     const name = document.getElementById('assetName').value;
     const description = document.getElementById('assetDesc').value;
     const assetType = document.getElementById('assetType').value;
-    const usageOwner = document.getElementById('usageOwner').value;
-    const derivativeOwner = document.getElementById('derivativeOwner').value;
-    const extensionOwner = document.getElementById('extensionOwner').value;
-    const revenueOwner = document.getElementById('revenueOwner').value;
-    const usageFee = document.getElementById('usageFee').value;
+    const uri = document.getElementById('ipfsUri').value || JSON.stringify({name, description, assetType});
+    const contentHash = document.getElementById('contentHash').value;
     
-    // 简化的URI (实际应上传到IPFS)
-    const uri = JSON.stringify({
-      name,
-      description,
-      assetType,
-      createdAt: new Date().toISOString()
-    });
+    if (!contentHash || contentHash.length < 10) {
+      showStatus('请填写内容哈希', 'error');
+      return;
+    }
     
-    const rights = {
-      usageOwner,
-      derivativeOwner,
-      extensionOwner,
-      revenueOwner,
-      usageFee: ethers.BigNumber.from(usageFee),
-      derivativeFee: ethers.BigNumber.from(0),
-      revenueShare: 10000 // 100%
+    const usageOwner = document.getElementById('usageOwner').value || userAddress;
+    const derivativeOwner = document.getElementById('derivativeOwner').value || userAddress;
+    const extensionOwner = document.getElementById('extensionOwner').value || userAddress;
+    const revenueOwner = document.getElementById('revenueOwner').value || userAddress;
+    const usageFee = document.getElementById('usageFee').value || '0';
+    
+    // V2 合约的 blueprint 结构
+    const blueprint = {
+      usage: {
+        owner: usageOwner,
+        fee: ethers.BigNumber.from(usageFee),
+        commercialUse: true,
+        modificationAllowed: true,
+        allowedScopes: [],
+        restrictedScopes: [],
+        maxUsers: 0,
+        licenseDuration: 0
+      },
+      derivative: {
+        owner: derivativeOwner,
+        fee: ethers.BigNumber.from(0),
+        allowDerivatives: true,
+        revenueShare: 1000, // 10%
+        allowedTypes: []
+      },
+      extension: {
+        owner: extensionOwner,
+        fee: ethers.BigNumber.from(0),
+        allowExtensions: false,
+        allowedExtensions: []
+      },
+      revenue: {
+        owner: revenueOwner,
+        sharePercentage: 10000, // 100%
+        autoDistribute: true
+      }
     };
     
-    const tx = await contract.mintECHO(name, description, assetType, uri, rights);
+    console.log('铸造参数:', { name, assetType, contentHash: contentHash.slice(0, 20) + '...' });
+    
+    const tx = await contract.mintECHO(name, description, assetType, uri, contentHash, blueprint);
     showStatus('交易已提交，等待确认...', '');
     
     const receipt = await tx.wait();
     
-    // 查找铸造事件
-    const event = receipt.events.find(e => e.event === 'AssetMinted');
-    if (event) {
-      const tokenId = event.args.tokenId.toString();
-      showStatus(`铸造成功! Token ID: ${tokenId}`, 'success');
+    showStatus('铸造成功!', 'success');
+    console.log('交易收据:', receipt);
+    
+    // 刷新资产列表
+    loadAssets();
+    
+    // 重置表单
+    mintForm.reset();
+    
+  } catch (error) {
+    console.error('铸造失败:', error);
+    showStatus('铸造失败: ' + error.message, 'error');
+  }
+}
     } else {
       showStatus('铸造成功!', 'success');
     }
