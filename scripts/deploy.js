@@ -23,7 +23,7 @@ async function main() {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('合约地址:', address);
   console.log('交易哈希:', echoAsset.deploymentTransaction().hash);
-  console.log('区块浏览器: https://qngexplorer.qitmeer.io/address/' + address);
+  console.log('区块浏览器: https://qng.qitmeer.io/address/' + address);
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   
   // 保存部署信息

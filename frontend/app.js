@@ -10,7 +10,7 @@ const QITMEER_TESTNET = {
     decimals: 18,
   },
   rpcUrls: ['https://testnet-qng.rpc.qitmeer.io'],
-  blockExplorerUrls: ['https://testnet-qngexplorer.qitmeer.io'],
+  blockExplorerUrls: ['https://testnet-qng.qitmeer.io'],
 };
 
 // 合约ABI (简化版，只包含常用函数)
