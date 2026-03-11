@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO四权管理</title>
+    <script src="ethers.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 14px; }
+        
+        /* 导航 */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-tab:hover { background: rgba(255,255,255,0.1); }
+        .nav-tab.active {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            border-color: transparent;
+        }
+        
+        /* 卡片 */
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 资产列表 */
+        .asset-list { display: grid; gap: 12px; }
+        .asset-item {
+            background: rgba(0,0,0,0.2);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .asset-item:hover {
+            border-color: rgba(0,212,255,0.5);
+            background: rgba(0,212,255,0.05);
+        }
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .asset-name { font-weight: bold; font-size: 16px; }
+        .asset-type {
+            padding: 4px 12px;
+            background: rgba(0,212,255,0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #00d4ff;
+        }
+        .asset-id { color: #888; font-size: 12px; }
+        
+        /* 权利网格 */
+        .rights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .right-card {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 3px solid;
+        }
+        .right-card.usage { border-color: #00d4ff; }
+        .right-card.derivative { border-color: #7b2cbf; }
+        .right-card.extension { border-color: #ffd700; }
+        .right-card.revenue { border-color: #0f0; }
+        .right-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .right-owner {
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .right-you {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        
+        /* 按钮 */
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        /* 隐藏 */
+        .hidden { display: none !important; }
+        
+        /* 状态 */
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .status.success { background: rgba(0,255,0,0.1); color: #0f0; }
+        .status.error { background: rgba(255,0,0,0.1); color: #f55; }
+        .status.pending { background: rgba(255,215,0,0.1); color: #ffd700; }
+        
+        /* 弹窗 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #1a1a2e;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title { font-size: 20px; color: #00d4ff; }
+        .close-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* 输入 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #888;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        
+        /* 权利选择 */
+        .right-select {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .right-option {
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .right-option:hover { background: rgba(255,255,255,0.05); }
+        .right-option.selected {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        .right-option-icon { font-size: 24px; margin-bottom: 8px; }
+        .right-option-label { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚖️ ECHO四权管理</h1>
+        <p class="subtitle">查看和管理您的资产权利</p>
+
+        <!-- 连接钱包 -->
+        <div class="card" id="connectCard">
+            <div class="card-title">👛 连接钱包</div>
+            <button class="btn" id="connectBtn" style="width: 100%;">连接 MetaMask</button>
+        </div>
+
+        <!-- 导航 -->
+        <div class="nav-tabs hidden" id="navTabs">
+            <div class="nav-tab active" data-tab="assets">📦 我的资产</div>
+            <div class="nav-tab" data-tab="rights">⚖️ 权利管理</div>
+            <div class="nav-tab" data-tab="transfer">🔄 转让权利</div>
+            <div class="nav-tab" data-tab="usage">🔑 使用授权</div>
+        </div>
+
+        <!-- 资产列表页 -->
+        <div class="card hidden" id="assetsPage">
+            <div class="card-title">📦 我的数字资产</div>
+            <div class="asset-list" id="assetList">
+                <p style="color: #888; text-align: center;">加载中...</p>
+            </div
+>
+        </div
+>
+
+        <!-- 权利管理页 -->
+        <div class="card hidden" id="rightsPage">
+            <div class="card-title">⚖️ 权利详情</div>
+            <div id="rightsDetail">
+                <p style="color: #888;">请在"我的资产"中选择要查看的资产</p>
+            </div
+>
+        </div
+>
+
+        <!-- 权利转让页 -->
+        <div class="card hidden" id="transferPage">
+            <div class="card-title">🔄 转让权利</div>
+            
+            <div class="form-group">
+                <label class="form-label">选择资产</label>
+                <select class="form-input" id="transferAssetSelect">
+                    <option value="">请选择要转让权利的资产</option>
+                </select
+>
+            </div
+>
+
+            <label class="form-label">选择要转让的权利</label>
+            <div class="right-select">
+                <div class="right-option" data-right="usage">
+                    <div class="right-option-icon">🔑</div>
+                    <div class="right-option-label">使用权</div>
+                </div
+>
+                <div class="right-option" data-right="derivative">
+                    <div class="right-option-icon">🌱</div>
+                    <div class="right-option-label">衍生权</div>
+                </div
+>
+                <div class="right-option" data-right="extension">
+                    <div class="right-option-icon">🔧</div>
+                    <div class="right-option-label">扩展权</div>
+                </div
+>
+                <div class="right-option" data-right="revenue">
+                    <div class="right-option-icon">💰</div>
+                    <div class="right-option-label">收益权</div>
+                </div
+>
+            </div
+
+            <div class="form-group">
+                <label class="form-label">接收者地址</label>
+                <input type="text" class="form-input" id="transferToAddress" placeholder="0x...">
+            </div
+>
+
+            <button class="btn" id="confirmTransferBtn" style="width: 100%;">确认转让</button
+>
+        </div
+>
+
+        <!-- 使用授权页 -->
+        <div class="card hidden" id="usagePage">
+            <div class="card-title">🔑 使用授权</div>
+            
+            <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                <h4 style="color: #00d4ff; margin-bottom: 12px;">支付使用费获得使用权</h4>
+                <p style="color: #888; font-size: 14px; margin-bottom: 16px;">
+                    支付使用费后，您可以临时获得该资产的使用权。
+                    使用费将支付给收益权所有者。
+                </p>
+            </div
+>
+
+            <div class="form-group">
+                <label class="form-label">选择要使用的资产</label>
+                <select class="form-input" id="usageAssetSelect">
+                    <option value="">请选择资产</option>
+                </select
+>
+            </div
+>
+
+            <div class="form-group">
+                <label class="form-label">使用天数</label>
+                <input type="number" class="form-input" id="usageDays" value="30" min="1" max="365">
+            </div
+>
+
+            <div class="form-group">
+                <label class="form-label">预估费用</label>
+                <div id="estimatedFee" style="font-size: 24px; color: #00d4ff; font-weight: bold;">-- MEER</div
+>
+            </div
+>
+
+            <button class="btn" id="payUsageBtn" style="width: 100%;">💰 支付使用费</button
+>
+        </div
+>
+
+        <div id="status"></div>
+    </div
+>
+
+    <script>
+        // 合约配置
+        const ECHO_ASSET_CONTRACT = '0x5f5AAe09BB85f561b21845729B79E840AB026148';
+        
+        // ABI
+        const ABI = [
+            {
+                "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+                "name": "getAssetInfo",
+                "outputs": [
+                    {"components": [{"internalType": "string", "name": "name", "type": "string"}, {"internalType": "string", "name": "description", "type": "string"}, {"internalType": "string", "name": "assetType", "type": "string"}, {"internalType": "string", "name": "uri", "type": "string"}, {"internalType": "uint256", "name": "createdAt", "type": "uint256"}], "internalType": "struct ECHOAsset.AssetMetadata", "name": "metadata", "type": "tuple"},
+                    {"components": [{"internalType": "address", "name": "usageOwner", "type": "address"}, {"internalType": "address", "name": "derivativeOwner", "type": "address"}, {"internalType": "address", "name": "extensionOwner", "type": "address"}, {"internalType": "address", "name": "revenueOwner", "type": "address"}, {"internalType": "uint256", "name": "usageFee", "type": "uint256"}, {"internalType": "uint256", "name": "derivativeFee", "type": "uint256"}, {"internalType": "uint256", "name": "revenueShare", "type": "uint256"}], "internalType": "struct ECHOAsset.Rights", "name": "rights", "type": "tuple"},
+                    {"internalType": "address", "name": "creator", "type": "address"}
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+                "name": "ownerOf",
+                "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getCurrentTokenId",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}, {"internalType": "address", "name": "newOwner", "type": "address"}],
+                "name": "transferUsageRight",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}, {"internalType": "address", "name": "newOwner", "type": "address"}],
+                "name": "transferDerivativeRight",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}, {"internalType": "address", "name": "newOwner", "type": "address"}],
+                "name": "transferExtensionRight",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}, {"internalType": "address", "name": "newOwner", "type": "address"}],
+                "name": "transferRevenueRight",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        let provider, signer, userAddress, contract;
+        let userAssets = [];
+        let selectedAsset = null;
+        let selectedRight = null;
+
+        // 初始化
+        document.getElementById('connectBtn').addEventListener('click', connectWallet);
+        
+        // 导航
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                showPage(tabName);
+                
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // 权利选择
+        document.querySelectorAll('.right-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.querySelectorAll('.right-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                selectedRight = opt.dataset.right;
+            });
+        });
+
+        // 连接钱包
+        async function connectWallet() {
+            try {
+                showStatus('连接中...', 'pending');
+                
+                if (!window.ethereum) {
+                    showStatus('❌ 请安装 MetaMask', 'error');
+                    return;
+                }
+
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                contract = new ethers.Contract(ECHO_ASSET_CONTRACT, ABI, signer);
+                
+                showStatus('✅ 连接成功', 'success');
+                
+                document.getElementById('connectCard').classList.add('hidden');
+                document.getElementById('navTabs').classList.remove('hidden');
+                showPage('assets');
+                
+                await loadAssets();
+                
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
+
+        // 加载资产
+        async function loadAssets() {
+            const listEl = document.getElementById('assetList');
+            listEl.innerHTML = '<p style="color: #888; text-align: center;">加载中...</p>';
+            
+            try {
+                const currentId = await contract.getCurrentTokenId();
+                userAssets = [];
+                
+                for (let i = 0; i < currentId; i++) {
+                    try {
+                        const owner = await contract.ownerOf(i);
+                        if (owner.toLowerCase() === userAddress.toLowerCase()) {
+                            const info = await contract.getAssetInfo(i);
+                            userAssets.push({
+                                id: i,
+                                name: info.metadata.name,
+                                type: info.metadata.assetType,
+                                rights: info.rights
+                            });
+                        }
+                    } catch (e) {}
+                }
+                
+                renderAssets(userAssets);
+                updateSelectOptions();
+                
+            } catch (error) {
+                listEl.innerHTML = '<p style="color: #f55; text-align: center;">加载失败</p>';
+            }
+        }
+
+        // 渲染资产列表
+        function renderAssets(assets) {
+            const listEl = document.getElementById('assetList');
+            
+            if (assets.length === 0) {
+                listEl.innerHTML = '<p style="color: #888; text-align: center;">您还没有资产</p>';
+                return;
+            }
+            
+            listEl.innerHTML = assets.map(asset => {
+                const isYou = (addr) => addr.toLowerCase() === userAddress.toLowerCase();
+                
+                return `
+                    <div class="asset-item" data-id="${asset.id}" onclick="selectAsset(${asset.id})">
+                        <div class="asset-header">
+                            <div>
+                                <div class="asset-name">${asset.name}</div>
+                                <div class="asset-id">Token #${asset.id}</div>
+                            </div
+>
+                            <span class="asset-type">${asset.type}</span>
+                        </div
+>
+                        <div class="rights-grid">
+                            <div class="right-card usage">
+                                <div class="right-label">🔑 使用权</div>
+                                <div class="right-owner ${isYou(asset.rights.usageOwner) ? 'right-you' : ''}">
+                                    ${isYou(asset.rights.usageOwner) ? '您' : asset.rights.usageOwner.slice(0, 8) + '...'}
+                                </div>
+                            </div
+>
+                            <div class="right-card derivative">
+                                <div class="right-label">🌱 衍生权</div>
+                                <div class="right-owner ${isYou(asset.rights.derivativeOwner) ? 'right-you' : ''}">
+                                    ${isYou(asset.rights.derivativeOwner) ? '您' : asset.rights.derivativeOwner.slice(0, 8) + '...'}
+                                </div>
+                            </div
+>
+                            <div class="right-card extension">
+                                <div class="right-label">🔧 扩展权</div>
+                                <div class="right-owner ${isYou(asset.rights.extensionOwner) ? 'right-you' : ''}">
+                                    ${isYou(asset.rights.extensionOwner) ? '您' : asset.rights.extensionOwner.slice(0, 8) + '...'}
+                                </div>
+                            </div
+>
+                            <div class="right-card revenue">
+                                <div class="right-label">💰 收益权</div>
+                                <div class="right-owner ${isYou(asset.rights.revenueOwner) ? 'right-you' : ''}">
+                                    ${isYou(asset.rights.revenueOwner) ? '您' : asset.rights.revenueOwner.slice(0, 8) + '...'}
+                                </div>
+                            </div
+>
+                        </div
+>
+                    </div
+>
+                `;
+            }).join('');
+        }
+
+        // 选择资产
+        window.selectAsset = function(id) {
+            selectedAsset = userAssets.find(a => a.id === id);
+            if (selectedAsset) {
+                showRightsDetail(selectedAsset);
+                showPage('rights');
+                document.querySelectorAll('.nav-tab').forEach(t => {
+                    t.classList.toggle('active', t.dataset.tab === 'rights');
+                });
+            }
+        };
+
+        // 显示权利详情
+        function showRightsDetail(asset) {
+            const container = document.getElementById('rightsDetail');
+            const isYou = (addr) => addr.toLowerCase() === userAddress.toLowerCase();
+            
+            container.innerHTML = `
+                <h3 style="margin-bottom: 20px;">${asset.name} (Token #${asset.id})</h3>
+                
+                <div style="display: grid; gap: 16px;">
+                    <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; border-left: 4px solid #00d4ff;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: bold;">🔑 使用权</span>
+                            ${isYou(asset.rights.usageOwner) ? '<span style="color: #0f0; font-size: 12px;">✓ 您拥有</span>' : ''}
+                        </div
+>
+                        <div style="font-family: monospace; font-size: 14px; color: #888;">${asset.rights.usageOwner}</div>
+                        <div style="margin-top: 8px; font-size: 12px; color: #00d4ff;">使用费: ${ethers.utils.formatEther(asset.rights.usageFee)} MEER/天</div>
+                    </div
+>
+
+                    <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; border-left: 4px solid #7b2cbf;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: bold;">🌱 衍生权</span>
+                            ${isYou(asset.rights.derivativeOwner) ? '<span style="color: #0f0; font-size: 12px;">✓ 您拥有</span>' : ''}
+                        </div
+>
+                        <div style="font-family: monospace; font-size: 14px; color: #888;">${asset.rights.derivativeOwner}</div>
+                    </div
+>
+
+                    <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; border-left: 4px solid #ffd700;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: bold;">🔧 扩展权</span>
+                            ${isYou(asset.rights.extensionOwner) ? '<span style="color: #0f0; font-size: 12px;">✓ 您拥有</span>' : ''}
+                        </div
+>
+                        <div style="font-family: monospace; font-size: 14px; color: #888;">${asset.rights.extensionOwner}</div>
+                    </div
+>
+
+                    <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; border-left: 4px solid #0f0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: bold;">💰 收益权</span>
+                            ${isYou(asset.rights.revenueOwner) ? '<span style="color: #0f0; font-size: 12px;">✓ 您拥有</span>' : ''}
+                        </div
+>
+                        <div style="font-family: monospace; font-size: 14px; color: #888;">${asset.rights.revenueOwner}</div>
+                        <div style="margin-top: 8px; font-size: 12px; color: #0f0;">收益分成: ${asset.rights.revenueShare / 100}%</div>
+                    </div
+>
+                </div
+>
+            `;
+        }
+
+        // 更新选择框选项
+        function updateSelectOptions() {
+            const options = userAssets.map(a => `<option value="${a.id}">Token #${a.id} - ${a.name}</option>`).join('');
+            
+            document.getElementById('transferAssetSelect').innerHTML = '<option value="">请选择</option>' + options;
+            document.getElementById('usageAssetSelect').innerHTML = '<option value="">请选择</option>' + options;
+        }
+
+        // 显示页面
+        function showPage(pageName) {
+            ['assets', 'rights', 'transfer', 'usage'].forEach(p => {
+                document.getElementById(p + 'Page').classList.add('hidden');
+            });
+            document.getElementById(pageName + 'Page').classList.remove('hidden');
+        }
+
+        // 显示状态
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = message ? `<div class="status ${type}">${message}</div>` : '';
+        }
+
+        // 确认转让
+        document.getElementById('confirmTransferBtn').addEventListener('click', async () => {
+            const assetId = document.getElementById('transferAssetSelect').value;
+            const toAddress = document.getElementById('transferToAddress').value;
+            
+            if (!assetId || !selectedRight || !toAddress) {
+                showStatus('❌ 请填写完整信息', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('转让中...', 'pending');
+                
+                let tx;
+                switch(selectedRight) {
+                    case 'usage':
+                        tx = await contract.transferUsageRight(assetId, toAddress);
+                        break;
+                    case 'derivative':
+                        tx = await contract.transferDerivativeRight(assetId, toAddress);
+                        break;
+                    case 'extension':
+                        tx = await contract.transferExtensionRight(assetId, toAddress);
+                        break;
+                    case 'revenue':
+                        tx = await contract.transferRevenueRight(assetId, toAddress);
+                        break;
+                }
+                
+                await tx.wait();
+                showStatus('✅ 转让成功！', 'success');
+                
+                // 刷新
+                await loadAssets();
+                
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
