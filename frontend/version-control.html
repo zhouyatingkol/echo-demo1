@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>版本控制 - ECHO V2</title>
+    <script src="ethers.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* 资产选择 */
+        .asset-selector {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* 资产信息卡 */
+        .asset-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .info-item {
+            background: rgba(0,0,0,0.2);
+            padding: 16px;
+            border-radius: 8px;
+        }
+        .info-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .info-value { font-size: 16px; font-weight: bold; }
+        .info-value.hash { font-family: monospace; font-size: 12px; }
+        
+        /* 版本时间轴 */
+        .timeline-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .timeline-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
+        }
+        .version-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .version-item:hover { border-color: rgba(0,212,255,0.3); }
+        .version-item.current {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        .version-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00d4ff;
+            border: 2px solid #1a1a2e;
+        }
+        .version-item.current::before {
+            background: #ffd700;
+            box-shadow: 0 0 10px #ffd700;
+        }
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .version-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        .version-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: #00d4ff;
+            border-radius: 4px;
+            color: #000;
+        }
+        .version-badge.old { background: #666; }
+        .version-time { font-size: 12px; color: #888; }
+        .version-reason { margin-top: 8px; font-size: 14px; }
+        .version-hash {
+            margin-top: 8px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #0f0;
+            background: rgba(0,255,0,0.1);
+            padding: 8px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        .version-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        .version-actions button {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        /* 更新面板 */
+        .update-panel {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+        .update-title { font-size: 16px; margin-bottom: 16px; color: #ffd700; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 6px; font-size: 13px; color: #aaa; }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .form-textarea { min-height: 80px; }
+        
+        /* 对比面板 */
+        .compare-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .compare-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .compare-card.v1 { border-left: 4px solid #00d4ff; }
+        .compare-card.v2 { border-left: 4px solid #7b2cbf; }
+        .compare-title { font-size: 14px; margin-bottom: 12px; }
+        .compare-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+        }
+        .diff-highlight { color: #ffd700; }
+        
+        /* 状态 */
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .status.success { background: rgba(0,255,0,0.1); color: #0f0; }
+        .status.error { background: rgba(255,0,0,0.1); color: #f55; }
+        .status.pending { background: rgba(255,215,0,0.1); color: #ffd700; }
+        
+        .hidden { display: none !important; }
+        
+        /* 验证状态 */
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .verification-badge.valid { background: rgba(0,255,0,0.2); color: #0f0; }
+        .verification-badge.invalid { background: rgba(255,0,0,0.2); color: #f55; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📜 版本控制</h1>
+
+        <!-- 资产选择 -->
+        <div class="asset-selector">
+            <div class="search-box">
+                <input type="text" class="search-input" id="tokenId" placeholder="输入 Token ID 查看版本历史">
+                <button class="btn" onclick="loadAsset()">🔍 查询</button
+>
+            </div
+>
+            
+            <div id="assetInfo" class="asset-info hidden">
+                <div class="info-item">
+                    <div class="info-label">资产名称</div>
+                    <div class="info-value" id="assetName">--</div>
+                </div
+>
+                <div class="info-item">
+                    <div class="info-label">当前版本</div>
+                    <div class="info-value" id="currentVersion">--</div>
+                </div
+>
+                <div class="info-item">
+                    <div class="info-label">创建时间</div>
+                    <div class="info-value" id="createdAt">--</div>
+                </div
+>
+            </div
+>
+        </div
+>
+
+        <!-- 版本时间轴 -->
+        <div class="timeline-container">
+            <div class="timeline-title">🕐 版本历史</div>
+            
+            <div class="timeline" id="timeline">
+                <!-- 动态生成 -->
+                <div class="version-item current">
+                    <div class="version-header">
+                        <span class="version-number">版本 1</span>
+                        <span class="version-badge">当前</span>
+                    </div
+>
+                    <div class="version-time">2026-03-11 14:30:25</div>
+                    <div class="version-reason">初始铸造</div>
+                    <div class="version-hash">0xabc123...def456</div>
+                    <div class="version-actions">
+                        <button class="btn btn-secondary" onclick="viewContent(1)">📄 查看内容</button
+>
+                        <span class="verification-badge valid">✓ 已验证</span>
+                    </div
+>
+                </div
+>
+
+                <div class="version-item">
+                    <div class="version-header">
+                        <span class="version-number">版本 2</span>
+                        <span class="version-badge old">历史</span>
+                    </div
+>
+                    <div class="version-time">2026-03-11 16:45:10</div>
+                    <div class="version-reason">修复算法bug</div>
+                    <div class="version-hash">0x789xyz...uvw123</div>
+                    <div class="version-actions">
+                        <button class="btn btn-secondary" onclick="compareVersion(2)">🔍 对比</button
+>
+                        <button class="btn btn-secondary" onclick="viewContent(2)">📄 查看内容</button
+>
+                    </div
+>
+                </div
+>
+            </div
+>
+
+            <!-- 更新面板 -->
+            <div class="update-panel" id="updatePanel">
+                <div class="update-title">🔄 发布新版本</div>
+                
+                <div class="form-group">
+                    <label class="form-label">新内容 IPFS 地址</label>
+                    <input type="text" class="form-input" id="newUri" placeholder="ipfs://...">
+                </div
+>
+
+                <div class="form-group">
+                    <label class="form-label">新内容哈希</label>
+                    <input type="text" class="form-input" id="newHash" placeholder="0x...">
+                </div
+>
+
+                <div class="form-group">
+                    <label class="form-label">更新原因</label>
+                    <textarea class="form-textarea" id="updateReason" placeholder="描述此次更新的内容..."></textarea>
+                </div
+>
+
+                <button class="btn" onclick="publishUpdate()">🚀 发布新版本</button
+>
+            </div
+>
+
+            <!-- 对比面板 -->
+            <div class="compare-panel hidden" id="comparePanel">
+                <div class="compare-card v1">
+                    <div class="compare-title">版本 1 (当前)</div>
+                    <div class="compare-item">
+                        <span>内容哈希</span>
+                        <span class="diff-highlight">0xabc...</span>
+                    </div
+>
+                    <div class="compare-item">
+                        <span>IPFS</span>
+                        <span>Qm...v1</span>
+                    </div
+>
+                </div
+>
+                <div class="compare-card v2">
+                    <div class="compare-title">版本 2</div>
+                    <div class="compare-item">
+                        <span>内容哈希</span>
+                        <span class="diff-highlight">0x789...</span>
+                    </div
+>
+                    <div class="compare-item">
+                        <span>IPFS</span>
+                        <span>Qm...v2</span>
+                    </div
+>
+                </div
+>
+            </div
+>
+        </div
+>
+
+        <div id="status"></div>
+    </div
+>
+
+    <script>
+        const CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+        const ABI = [
+            "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
+            "function getVersionHistory(uint256 tokenId) view returns (tuple(uint256 version, bytes32 contentHash, string uri, uint256 timestamp, string updateReason)[])",
+            "function currentVersion(uint256 tokenId) view returns (uint256)",
+            "function updateContent(uint256 tokenId, string newUri, bytes32 newContentHash, string updateReason)",
+            "function originalCreator(uint256 tokenId) view returns (address)"
+        ];
+
+        let provider, signer, contract;
+
+        async function init() {
+            if (typeof window.ethereum !== 'undefined') {
+                provider = new ethers.BrowserProvider(window.ethereum);
+                await provider.send('eth_requestAccounts', []);
+                signer = await provider.getSigner();
+                contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+                console.log('✅ 已连接到合约');
+            } else {
+                showStatus('请安装 MetaMask', 'error');
+            }
+        }
+
+        async function loadAsset() {
+            const tokenId = document.getElementById('tokenId').value;
+            if (!tokenId) {
+                showStatus('请输入 Token ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus('加载中...', 'pending');
+                
+                const [metadata, blueprint, creator, version] = await contract.getAssetInfo(tokenId);
+                
+                document.getElementById('assetName').textContent = metadata.name;
+                document.getElementById('currentVersion').textContent = 'v' + version.toString();
+                document.getElementById('createdAt').textContent = new Date(Number(metadata.createdAt) * 1000).toLocaleString();
+                
+                document.getElementById('assetInfo').classList.remove('hidden');
+                
+                // 加载版本历史
+                await loadVersionHistory(tokenId);
+                
+                showStatus('加载成功', 'success');
+            } catch (error) {
+                showStatus('加载失败: ' + error.message, 'error');
+            }
+        }
+
+        async function loadVersionHistory(tokenId) {
+            try {
+                const history = await contract.getVersionHistory(tokenId);
+                const currentVer = await contract.currentVersion(tokenId);
+                
+                let html = '';
+                
+                history.forEach((ver, index) => {
+                    const isCurrent = Number(ver.version) === Number(currentVer);
+                    const date = new Date(Number(ver.timestamp) * 1000).toLocaleString();
+                    
+                    html += `
+                        <div class="version-item ${isCurrent ? 'current' : ''}">
+                            <div class="version-header">
+                                <span class="version-number">版本 ${ver.version}</span>
+                                ${isCurrent ? '<span class="version-badge">当前</span>' : '<span class="version-badge old">历史</span>'}
+                            </div>
+                            <div class="version-time">${date}</div>
+                            <div class="version-reason">${ver.updateReason}</div>
+                            <div class="version-hash">${ver.contentHash.slice(0, 10)}...${ver.contentHash.slice(-8)}</div>
+                            <div class="version-actions">
+                                ${!isCurrent ? `<button class="btn btn-secondary" onclick="compareVersion(${ver.version})">🔍 对比</button>` : ''}
+                                <button class="btn btn-secondary" onclick="viewContent('${ver.uri}')">📄 查看内容</button>
+                                <span class="verification-badge valid">✓ 已验证</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('timeline').innerHTML = html;
+                
+                // 显示更新面板（如果是创作者）
+                const userAddress = await signer.getAddress();
+                const creator = await contract.originalCreator(tokenId);
+                
+                if (userAddress.toLowerCase() === creator.toLowerCase()) {
+                    document.getElementById('updatePanel').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('加载版本历史失败:', error);
+            }
+        }
+
+        function viewContent(uri) {
+            if (uri.startsWith('ipfs://')) {
+                window.open('https://ipfs.io/ipfs/' + uri.slice(7), '_blank');
+            } else {
+                window.open(uri, '_blank');
+            }
+        }
+
+        function compareVersion(version) {
+            document.getElementById('comparePanel').classList.remove('hidden');
+            showStatus(`对比版本 ${version} 与当前版本`, 'pending');
+        }
+
+        async function publishUpdate() {
+            const tokenId = document.getElementById('tokenId').value;
+            const newUri = document.getElementById('newUri').value;
+            const newHash = document.getElementById('newHash').value;
+            const reason = document.getElementById('updateReason').value;
+
+            if (!tokenId || !newUri || !newHash || !reason) {
+                showStatus('请填写所有字段', 'error');
+                return;
+            }
+
+            try {
+                showStatus('发布更新中...', 'pending');
+                
+                const tx = await contract.updateContent(tokenId, newUri, newHash, reason);
+                await tx.wait();
+                
+                showStatus('✅ 新版本发布成功！', 'success');
+                
+                // 刷新版本历史
+                await loadVersionHistory(tokenId);
+                
+                // 清空表单
+                document.getElementById('newUri').value = '';
+                document.getElementById('newHash').value = '';
+                document.getElementById('updateReason').value = '';
+            } catch (error) {
+                showStatus('发布失败: ' + error.message, 'error');
+            }
+        }
+
+        function showStatus(msg, type) {
+            document.getElementById('status').innerHTML = msg ? `<div class="status ${type}">${msg}</div>` : '';
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>
