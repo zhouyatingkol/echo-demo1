@@ -69,7 +69,7 @@ python3 -m http.server 8080
 - **RPC URL**: https://testnet-qng.rpc.qitmeer.io
 - **Chain ID**: 8131
 - **Currency Symbol**: MEER
-- **Block Explorer**: https://testnet-qngexplorer.qitmeer.io
+- **Block Explorer**: https://testnet-qng.qitmeer.io
 
 获取测试币：https://faucet.qitmeer.io
 

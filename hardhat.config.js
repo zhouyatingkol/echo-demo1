@@ -38,7 +38,7 @@ module.exports = {
         chainId: 813,
         urls: {
           apiURL: 'https://qng.rpc.qitmeer.io',
-          browserURL: 'https://qngexplorer.qitmeer.io',
+          browserURL: 'https://qng.qitmeer.io',
         },
       },
     ],
