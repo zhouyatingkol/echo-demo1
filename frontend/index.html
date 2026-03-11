@@ -143,6 +143,31 @@
             border: 1px solid rgba(255,0,0,0.3);
             color: #f55;
         }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+        .nav-tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .nav-tab.active {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            border-color: transparent;
+        }
         .hidden { display: none !important; }
     </style>
 </head>
