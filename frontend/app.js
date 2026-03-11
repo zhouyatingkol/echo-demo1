@@ -1,5 +1,18 @@
 // ECHO Protocol Demo - 前端交互
 
+// Qitmeer 主网配置
+const QITMEER_MAINNET = {
+  chainId: '0x32d', // 813 in hex
+  chainName: 'Qitmeer Mainnet',
+  nativeCurrency: {
+    name: 'MEER',
+    symbol: 'MEER',
+    decimals: 18,
+  },
+  rpcUrls: ['https://qng.rpc.qitmeer.io'],
+  blockExplorerUrls: ['https://qng.qitmeer.io'],
+};
+
 // Qitmeer Testnet 配置
 const QITMEER_TESTNET = {
   chainId: '0x1FC3', // 8131 in hex
@@ -84,19 +97,19 @@ async function connectWallet() {
   }
 }
 
-// 切换到Qitmeer Testnet
+// 切换到Qitmeer主网
 async function switchToQitmeer() {
   try {
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: QITMEER_TESTNET.chainId }],
+      params: [{ chainId: QITMEER_MAINNET.chainId }],
     });
   } catch (switchError) {
     // 如果网络不存在，添加网络
     if (switchError.code === 4902) {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
-        params: [QITMEER_TESTNET],
+        params: [QITMEER_MAINNET],
       });
     }
   }
