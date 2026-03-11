@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐市场 - ECHO Music</title>
+    <script src="ethers.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #00d4ff; }
+        .wallet-btn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+        }
+        .wallet-btn.connected {
+            background: rgba(0,255,0,0.2);
+            border: 1px solid #0f0;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .filter-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .filter-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .filter-tag {
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-tag:hover {
+            border-color: rgba(0,212,255,0.5);
+        }
+        .filter-tag.active {
+            background: rgba(0,212,255,0.2);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* Music Grid */
+        .music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .music-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        .music-card:hover {
+            border-color: rgba(0,212,255,0.3);
+            transform: translateY(-4px);
+        }
+        
+        .music-visual {
+            height: 160px;
+            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .waveform {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 60px;
+        }
+        .wave-bar {
+            width: 4px;
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+        @keyframes wave {
+            0%, 100% { height: 20%; }
+            50% { height: 100%; }
+        }
+        .play-overlay {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .music-card:hover .play-overlay {
+            opacity: 1;
+        }
+        
+        .music-info {
+            padding: 16px;
+        }
+        .music-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .music-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .meta-tag {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: rgba(0,212,255,0.1);
+            border-radius: 4px;
+            color: #00d4ff;
+        }
+        .music-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0f0;
+        }
+        .price-unit {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .buy-btn {
+            padding: 8px 16px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        /* Audio Player Fixed */
+        .player-fixed {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10,10,26,0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 16px 20px;
+            display: none;
+            align-items: center;
+            gap: 16px;
+        }
+        .player-fixed.active {
+            display: flex;
+        }
+        .player-info {
+            flex: 0 0 200px;
+        }
+        .player-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .player-artist {
+            font-size: 12px;
+            color: #888;
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .control-btn.play {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        }
+        .player-progress {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-radius: 2px;
+            width: 0%;
+        }
+        .time {
+            font-size: 12px;
+            color: #888;
+            min-width: 40px;
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎵 ECHO Music</div>
+            <div class="nav-links">
+                <a href="mint-music.html">上传音乐</a>
+                <a href="#" style="color: #00d4ff;">音乐市场</a>
+                <a href="#">我的资产</a>
+            </div>
+            <button class="wallet-btn" id="connectBtn" onclick="connectWallet()">连接钱包</button>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-title">风格筛选</div>
+            <div class="filter-grid" id="genreFilters">
+                <div class="filter-tag active" data-filter="all">全部</div>
+                <div class="filter-tag" data-filter="electronic">电子</div>
+                <div class="filter-tag" data-filter="rock">摇滚</div>
+                <div class="filter-tag" data-filter="classical">古典</div>
+                <div class="filter-tag" data-filter="jazz">爵士</div>
+                <div class="filter-tag" data-filter="pop">流行</div>
+                <div class="filter-tag" data-filter="ambient">氛围</div>
+                <div class="filter-tag" data-filter="hiphop">嘻哈</div>
+                <div class="filter-tag" data-filter="folk">民谣</div>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="搜索音乐...">
+                <button class="wallet-btn" onclick="loadMusicList()">🔍 搜索</button>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="totalMusic">--</span>
+                <span class="stat-label">首音乐</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalCreators">--</span>
+                <span class="stat-label">位创作者</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalTransactions">--</span>
+                <span class="stat-label">次授权</span>
+            </div>
+        </div>
+
+        <div class="music-grid" id="musicGrid">
+            <!-- 动态生成 -->
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #888;">
+                连接钱包后加载音乐列表...
+            </div>
+        </div>
+    </div>
+
+    <!-- 固定播放器 -->
+    <div class="player-fixed" id="fixedPlayer">
+        <div class="player-info">
+            <div class="player-title" id="playerTitle">--</div>
+            <div class="player-artist" id="playerArtist">--</div>
+        </div>
+        
+        <div class="player-controls">
+            <button class="control-btn">⏮</button>
+            <button class="control-btn play" id="playerPlayBtn" onclick="togglePlayer()">▶</button>
+            <button class="control-btn">⏭</button>
+        </div>
+        
+        <div class="player-progress">
+            <span class="time" id="currentTime">0:00</span>
+            <div class="progress-bar" onclick="seekPlayer(event)">
+                <div class="progress-fill" id="playerProgress"></div>
+            </div>
+            <span class="time" id="totalTime">0:00</span>
+        </div>
+        
+        <audio id="audioElement"></audio>
+    </div
+>
+
+    <script>
+        const V2_CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+        const V2_ABI = [
+            "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
+            "function getCurrentTokenId() view returns (uint256)",
+            "function payForUsage(uint256 tokenId, uint256 durationDays) payable"
+        ];
+        
+        let provider, signer, contract, userAddress;
+        let isConnected = false;
+        let currentFilter = 'all';
+        let musicList = [];
+        
+        // 筛选标签点击
+        document.querySelectorAll('#genreFilters .filter-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                document.querySelectorAll('#genreFilters .filter-tag').forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+                currentFilter = tag.dataset.filter;
+                renderMusicList();
+            });
+        });
+        
+        // 连接钱包
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('请先安装 MetaMask 钱包！');
+                return;
+            }
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                isConnected = true;
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, signer);
+                
+                document.getElementById('connectBtn').textContent = 
+                    userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                document.getElementById('connectBtn').classList.add('connected');
+                
+                loadMusicList();
+            } catch (error) {
+                console.error('连接失败:', error);
+            }
+        }
+        
+        // 加载音乐列表
+        async function loadMusicList() {
+            if (!contract) return;
+            
+            try {
+                const currentId = await contract.getCurrentTokenId();
+                musicList = [];
+                const creators = new Set();
+                
+                for (let i = 0; i < currentId.toNumber(); i++) {
+                    try {
+                        const [metadata, blueprint, creator] = await contract.getAssetInfo(i);
+                        
+                        // 只显示音乐类型
+                        if (metadata.assetType && metadata.assetType.startsWith('music_')) {
+                            musicList.push({
+                                tokenId: i,
+                                name: metadata.name,
+                                genre: metadata.assetType.replace('music_', ''),
+                                creator: creator,
+                                price: ethers.utils.formatEther(blueprint.usage.fee),
+                                uri: metadata.uri
+                            });
+                            creators.add(creator);
+                        }
+                    } catch (e) {
+                        // 跳过错误
+                    }
+                }
+                
+                // 更新统计
+                document.getElementById('totalMusic').textContent = musicList.length;
+                document.getElementById('totalCreators').textContent = creators.size;
+                document.getElementById('totalTransactions').textContent = '--';
+                
+                renderMusicList();
+            } catch (error) {
+                console.error('加载失败:', error);
+            }
+        }
+        
+        // 渲染音乐列表
+        function renderMusicList() {
+            const grid = document.getElementById('musicGrid');
+            
+            let filtered = musicList;
+            if (currentFilter !== 'all') {
+                filtered = musicList.filter(m => m.genre === currentFilter);
+            }
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #888;">暂无音乐</div>';
+                return;
+            }
+            
+            grid.innerHTML = filtered.map(music => `
+                <div class="music-card">
+                    <div class="music-visual">
+                        <div class="waveform">
+                            ${Array(20).fill(0).map(() => `
+                                <div class="wave-bar" style="height: ${Math.random() * 80 + 20}%; animation-delay: ${Math.random()}s"></div>
+                            `).join('')}
+                        </div>
+                        <div class="play-overlay" onclick="playMusic(${music.tokenId})">▶</div>
+                    </div>
+                    <div class="music-info">
+                        <div class="music-title">${music.name}</div>
+                        <div class="music-meta">
+                            <span class="meta-tag">${getGenreLabel(music.genre)}</span>
+                            <span class="meta-tag">Token #${music.tokenId}</span>
+                        </div>
+                        <div class="music-stats">
+                            <div class="price">
+                                ${music.price}
+                                <span class="price-unit">MEER/次</span>
+                            </div>
+                            <button class="buy-btn" onclick="buyLicense(${music.tokenId}, '${music.price}')">购买授权</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 获取风格中文
+        function getGenreLabel(genre) {
+            const labels = {
+                electronic: '电子',
+                rock: '摇滚',
+                classical: '古典',
+                jazz: '爵士',
+                pop: '流行',
+                ambient: '氛围',
+                hiphop: '嘻哈',
+                folk: '民谣'
+            };
+            return labels[genre] || genre;
+        }
+        
+        // 播放音乐（模拟）
+        function playMusic(tokenId) {
+            const music = musicList.find(m => m.tokenId === tokenId);
+            if (!music) return;
+            
+            document.getElementById('playerTitle').textContent = music.name;
+            document.getElementById('playerArtist').textContent = '创作者: ' + music.creator.slice(0, 6) + '...';
+            document.getElementById('fixedPlayer').classList.add('active');
+            
+            // 实际应该从 IPFS 加载音频
+            // 这里只是演示
+        }
+        
+        // 播放器控制
+        function togglePlayer() {
+            const btn = document.getElementById('playerPlayBtn');
+            btn.textContent = btn.textContent === '▶' ? '⏸' : '▶';
+        }
+        
+        function seekPlayer(event) {
+            const bar = event.currentTarget;
+            const clickX = event.offsetX;
+            const width = bar.offsetWidth;
+            const percent = clickX / width;
+            document.getElementById('playerProgress').style.width = (percent * 100) + '%';
+        }
+        
+        // 购买授权
+        async function buyLicense(tokenId, price) {
+            if (!isConnected) {
+                alert('请先连接钱包');
+                return;
+            }
+            
+            try {
+                const priceWei = ethers.utils.parseEther(price);
+                const tx = await contract.payForUsage(tokenId, 1, { value: priceWei });
+                await tx.wait();
+                alert('✅ 购买成功！');
+            } catch (error) {
+                alert('购买失败: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
