@@ -45,34 +45,9 @@
                 
                 log('已连接: ' + userAddr.slice(0, 15) + '...');
                 
-                // 使用JSON ABI
+                // 使用简化ABI
                 const abi = [
-                    {
-                        "inputs": [
-                            {"internalType": "string", "name": "_name", "type": "string"},
-                            {"internalType": "string", "name": "_description", "type": "string"},
-                            {"internalType": "string", "name": "_assetType", "type": "string"},
-                            {"internalType": "string", "name": "_uri", "type": "string"},
-                            {
-                                "components": [
-                                    {"internalType": "address", "name": "usageOwner", "type": "address"},
-                                    {"internalType": "address", "name": "derivativeOwner", "type": "address"},
-                                    {"internalType": "address", "name": "extensionOwner", "type": "address"},
-                                    {"internalType": "address", "name": "revenueOwner", "type": "address"},
-                                    {"internalType": "uint256", "name": "usageFee", "type": "uint256"},
-                                    {"internalType": "uint256", "name": "derivativeFee", "type": "uint256"},
-                                    {"internalType": "uint256", "name": "revenueShare", "type": "uint256"}
-                                ],
-                                "internalType": "struct ECHOAsset.Rights",
-                                "name": "_rights",
-                                "type": "tuple"
-                            }
-                        ],
-                        "name": "mintECHO",
-                        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                        "stateMutability": "nonpayable",
-                        "type": "function"
-                    }
+                    "function mintECHO(string,string,string,string,(address,address,address,address,uint256,uint256,uint256)) returns (uint256)"
                 ];
                 
                 contract = new ethers.Contract(CONTRACT, abi, signer);
@@ -91,42 +66,42 @@
             try {
                 log('开始铸造...');
                 
-                // 确保地址有效
-                log('检查地址: ' + userAddr);
+                // 使用对象格式传递rights（而不是数组）
+                const rights = {
+                    usageOwner: userAddr,
+                    derivativeOwner: userAddr,
+                    extensionOwner: userAddr,
+                    revenueOwner: userAddr,
+                    usageFee: ethers.BigNumber.from('1000000000000000'),
+                    derivativeFee: ethers.BigNumber.from('0'),
+                    revenueShare: 10000
+                };
                 
-                const rights = [
-                    userAddr,  // usageOwner
-                    userAddr,  // derivativeOwner
-                    userAddr,  // extensionOwner
-                    userAddr,  // revenueOwner
-                    ethers.BigNumber.from('1000000000000000'),  // usageFee
-                    ethers.BigNumber.from('0'),                 // derivativeFee
-                    10000                                       // revenueShare
-                ];
-                
-                log('rights数组: ' + JSON.stringify(rights.map(r => r.toString ? r.toString() : r)));
-                
-                log('准备调用合约...');
+                log('调用合约...');
                 
                 const tx = await contract.mintECHO(
-                    "我的数字种子",      // _name
-                    "第一颗种子",        // _description
-                    "code",              // _assetType
-                    "test-uri",          // _uri
-                    rights,              // _rights (作为数组传递)
+                    "我的数字种子",
+                    "测试铸造",
+                    "code",
+                    "test-uri",
+                    rights,  // 传递对象
                     { gasLimit: 500000 }
                 );
                 
                 log('交易已发送: ' + tx.hash.slice(0, 20) + '...');
                 
                 const receipt = await tx.wait();
-                log('✅ 铸造成功! 区块: ' + receipt.blockNumber);
+                
+                if (receipt.status === 1) {
+                    log('✅ 铸造成功! 区块: ' + receipt.blockNumber);
+                } else {
+                    log('❌ 交易失败 (status=0)', true);
+                }
                 
             } catch (e) {
                 log('铸造失败: ' + e.message, true);
-                if (e.code) log('错误码: ' + e.code, true);
+                log('错误码: ' + (e.code || '无'), true);
                 if (e.reason) log('原因: ' + e.reason, true);
-                console.error(e);
             }
         };
     </script>
