@@ -2,27 +2,25 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>铸造测试</title>
+    <title>铸造</title>
     <script src="ethers.min.js"></script>
     <style>
         body { background: #1a1a2e; color: #fff; font-family: sans-serif; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; }
         .btn { width: 100%; padding: 15px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 16px; cursor: pointer; margin: 10px 0; }
-        .log { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 12px; color: #0f0; white-space: pre-wrap; }
+        .log { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 12px; color: #0f0; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
         .error { color: #f55; }
-        .success { color: #0f0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>ECHO 铸造测试</h2>
+        <h2>铸造测试</h2>
         
-        <button class="btn" id="connectBtn">1. 连接钱包</button>
+        <button class="btn" id="connectBtn">连接钱包</button>
         <div id="walletInfo" style="display:none;">
             <p>地址: <span id="addr"></span></p>
+            <button class="btn" id="mintBtn">铸造资产</button>
         </div>
-        
-        <button class="btn" id="mintBtn" style="display:none;">2. 铸造资产</button>
         
         <div id="log" class="log">日志:</div>
     </div>
@@ -33,54 +31,40 @@
         
         function log(msg, isError) {
             const el = document.getElementById('log');
-            el.innerHTML += '\n' + (isError ? '[错误] ' : '[信息] ') + msg;
+            el.innerHTML += '\n' + (isError ? '❌ ' : '✓ ') + msg;
             console.log(msg);
         }
         
-        // 连接
         document.getElementById('connectBtn').onclick = async () => {
             try {
-                log('开始连接...');
-                
-                if (!window.ethereum) {
-                    log('未检测到MetaMask', true);
-                    return;
-                }
-                
-                log('请求账户...');
+                log('连接中...');
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
-                
-                log('创建ethers provider...');
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
-                
-                log('获取signer...');
                 signer = provider.getSigner();
-                
-                log('获取地址...');
                 userAddr = await signer.getAddress();
-                log('地址: ' + userAddr.slice(0, 10) + '...');
                 
-                log('创建合约...');
-                // 极简ABI
-                const abi = ["function mintECHO(string,string,string,string,tuple(address,address,address,address,uint256,uint256,uint256))"];
+                log('已连接: ' + userAddr.slice(0, 15) + '...');
+                
+                // 使用完整的ABI
+                const abi = [
+                    "function mintECHO(string memory name, string memory description, string memory assetType, string memory uri, tuple(address usageOwner, address derivativeOwner, address extensionOwner, address revenueOwner, uint256 usageFee, uint256 derivativeFee, uint256 revenueShare) memory rights) public returns (uint256)"
+                ];
+                
                 contract = new ethers.Contract(CONTRACT, abi, signer);
-                log('合约创建成功!');
+                log('合约初始化成功');
                 
-                // 显示UI
                 document.getElementById('addr').textContent = userAddr;
                 document.getElementById('walletInfo').style.display = 'block';
                 document.getElementById('connectBtn').style.display = 'none';
-                document.getElementById('mintBtn').style.display = 'block';
                 
             } catch (e) {
                 log('连接失败: ' + e.message, true);
             }
         };
         
-        // 铸造
         document.getElementById('mintBtn').onclick = async () => {
             try {
-                log('===== 开始铸造 =====');
+                log('开始铸造...');
                 
                 const rights = {
                     usageOwner: userAddr,
@@ -88,30 +72,35 @@
                     extensionOwner: userAddr,
                     revenueOwner: userAddr,
                     usageFee: ethers.BigNumber.from('1000000000000000'),
-                    derivativeFee: 0,
+                    derivativeFee: ethers.BigNumber.from('0'),
                     revenueShare: 10000
                 };
                 
-                log('调用 mintECHO...');
-                log('请查看MetaMask是否有弹窗!');
+                log('准备发送交易（手动设置gas）...');
                 
+                // 手动设置gas限制，避免估算失败
                 const tx = await contract.mintECHO(
-                    '测试种子',
-                    '测试描述',
+                    '我的种子',
+                    '测试铸造',
                     'code',
-                    '{}',
-                    rights
+                    'uri',
+                    rights,
+                    { gasLimit: 500000 }  // 手动设置gas限制
                 );
                 
                 log('交易已发送: ' + tx.hash.slice(0, 20) + '...');
                 
                 const receipt = await tx.wait();
-                log('✅ 成功! 区块: ' + receipt.blockNumber);
+                log('✅ 铸造成功! 区块: ' + receipt.blockNumber);
                 
             } catch (e) {
                 log('铸造失败: ' + e.message, true);
-                log('错误类型: ' + e.code, true);
-                if (e.data) log('错误数据: ' + e.data, true);
+                log('错误码: ' + (e.code || '无'), true);
+                
+                // 尝试获取更详细的错误
+                if (e.error && e.error.message) {
+                    log('详细错误: ' + e.error.message, true);
+                }
             }
         };
     </script>
