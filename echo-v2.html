@@ -36,8 +36,6 @@
             width: 100%; height: 100%;
             z-index: -1;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
 
         /* 导航点 */
@@ -139,8 +137,6 @@
             justify-content: center;
             height: 100vh;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             overflow: hidden;
         }
         .transition-stage::before {
@@ -158,8 +154,6 @@
                 transparent 70%
             );
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             animation: ambientPulse 4s ease-in-out infinite;
         }
         @keyframes ambientPulse {
@@ -174,7 +168,6 @@
             width: 600px;
             height: 600px;
             pointer-events: none;
-            z-index: 1;
             z-index: 1;
         }
         .transition-particle {
@@ -192,7 +185,6 @@
         }
         .glass-card--ceremony {
             position: relative;
-            z-index: 2;
             z-index: 2;
             padding: 70px 90px;
             text-align: center;
@@ -297,8 +289,6 @@
             height: 200px;
             margin: 0 auto 30px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             animation: modelFloat 3s ease-in-out infinite;
         }
         @keyframes modelFloat {
@@ -336,8 +326,6 @@
             color: var(--stage-accent-color, #00f0ff);
             font-weight: 500;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
         .concept-description strong::after {
             content: '';
@@ -366,8 +354,6 @@
             color: var(--stage-accent-color, #00f0ff);
             border-radius: 14px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -442,8 +428,6 @@
             width: 100%;
             height: 100%;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -463,8 +447,6 @@
                 0 0 80px rgba(0, 240, 255, 0.3),
                 inset -5px -5px 10px rgba(0, 0, 0, 0.3);
             position: relative;
-            z-index: 2;
-            z-index: 2;
             animation: seedPulse 2s ease-in-out infinite;
         }
         @keyframes seedPulse {
@@ -497,8 +479,6 @@
             width: 100%;
             height: 100%;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -513,8 +493,6 @@
             );
             border-radius: 10px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
         }
         .tree-crown {
@@ -765,8 +743,6 @@
         /* ===== 闪光边框效果 ===== */
         .shimmer-border {
             position: relative;
-            z-index: 2;
-            z-index: 2;
             overflow: hidden;
         }
         .shimmer-border::before {
@@ -783,8 +759,6 @@
         /* ===== 按钮动画 ===== */
         .btn-animated {
             position: relative;
-            z-index: 2;
-            z-index: 2;
             overflow: hidden;
         }
         .btn-animated::after {
@@ -929,8 +903,6 @@
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            z-index: 2;
-            z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1044,8 +1016,6 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             z-index: 9999;
         }
         .success-particle {
@@ -1067,8 +1037,6 @@
             background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
             opacity: 0;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             z-index: 9998;
             animation: flashEffect 0.5s ease-out;
         }
@@ -1090,8 +1058,6 @@
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             transition: opacity 0.3s;
         }
         .mint-progress-overlay.active {
@@ -1191,8 +1157,6 @@
             z-index: 10000;
             opacity: 0;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             transition: all 0.3s;
         }
         .compare-panel.active {
@@ -1341,8 +1305,6 @@
         .mol-canvas-container {
             width: 80px; height: 80px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             margin-bottom: 8px;
             flex-shrink: 0;
         }
@@ -1367,8 +1329,6 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             background:
                 radial-gradient(circle at 30% 30%, rgba(0,240,255,0.05) 0%, transparent 50%),
                 radial-gradient(circle at 70% 70%, rgba(255,215,0,0.05) 0%, transparent 50%);
@@ -1383,14 +1343,10 @@
             border: 1px solid rgba(0, 240, 255, 0.08);
             border-radius: 24px;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
         .preview-container {
             width: 480px; height: 480px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1499,8 +1455,6 @@
             transition: all 0.3s;
             opacity: 0.4;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
         .next-stage-btn.active {
             opacity: 1;
@@ -1723,8 +1677,6 @@
             flex: 1;
             width: 100%;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             border: 2px dashed rgba(255, 215, 0, 0.3);
             border-radius: 24px;
             background: transparent;
@@ -1745,8 +1697,6 @@
             border-radius: 50%;
             animation: energyPulse 3s ease-out infinite;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
 
         .fusion-pool::after {
@@ -1759,8 +1709,6 @@
             border-radius: 50%;
             animation: energyPulse 3s ease-out infinite 1s;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
 
         @keyframes energyPulse {
@@ -1778,8 +1726,6 @@
             border-radius: 50%;
             opacity: 0;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
         .pool-ripple.active {
             animation: rippleEffect 0.8s ease-out;
@@ -1807,8 +1753,6 @@
 
         .pool-content {
             position: relative;
-            z-index: 2;
-            z-index: 2;
             width: 100%;
             height: 100%;
             display: flex;
@@ -1879,8 +1823,6 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             background: transparent !important;
         }
 
@@ -1906,8 +1848,6 @@
             background: linear-gradient(90deg, transparent, rgba(255,215,0,0.8), transparent);
             transform-origin: left center;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             animation: pulseLine 2s infinite, drawLine 0.5s ease-out;
         }
 
@@ -1946,8 +1886,6 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             z-index: 1;
             overflow: hidden;
         }
@@ -2005,8 +1943,6 @@
             width: 150px; height: 150px;
             z-index: 5;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -2127,8 +2063,6 @@
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             transition: opacity 0.3s;
         }
         .asset-detail-modal.active {
@@ -2143,8 +2077,6 @@
             border-radius: 24px;
             padding: 30px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             transform: scale(0.9);
             transition: transform 0.3s;
             overflow-y: auto;
@@ -2322,8 +2254,6 @@
             transform-origin: left center;
             animation: energyBeam 1s ease-in-out forwards;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
         @keyframes energyBeam {
             0% { width: 0; opacity: 0; }
@@ -2341,8 +2271,6 @@
             box-shadow: 0 0 100px rgba(255,215,0,0.8), 0 0 200px rgba(0,240,255,0.4);
             animation: burstEffect 1s ease-out forwards;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
         @keyframes burstEffect {
             0% { width: 0; height: 0; opacity: 1; }
@@ -2359,8 +2287,6 @@
             box-shadow: 0 0 10px #ffd700, 0 0 20px #00f0ff;
             animation: particleStream 0.8s ease-in forwards;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
         @keyframes particleStream {
             0% { transform: translate(var(--start-x), var(--start-y)) scale(1); opacity: 1; }
@@ -2382,8 +2308,6 @@
         /* 权益环形图 */
         .share-chart-container {
             position: relative;
-            z-index: 2;
-            z-index: 2;
             width: 120px;
             height: 120px;
             margin: 20px auto;
@@ -2440,8 +2364,6 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             z-index: 0;
             overflow: hidden;
         }
@@ -2494,8 +2416,6 @@
             border-radius: 3px;
             transition: width 0.5s ease;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
         .share-progress-fill::after {
             content: '';
@@ -2516,8 +2436,6 @@
             text-align: center;
             color: rgba(150,170,200,0.4);
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             transition: all 0.3s;
         }
         .fusion-pool.drag-over .pool-hint {
@@ -2542,8 +2460,6 @@
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
         .fusion-control::before {
             content: '';
@@ -2602,8 +2518,6 @@
             margin-bottom: 15px;
             overflow: hidden;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
         .preview-placeholder {
             color: rgba(150,170,200,0.5);
@@ -2794,8 +2708,6 @@
             text-align: center;
             transition: all 0.3s ease;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
         .fusion-flow-card:hover {
             transform: translateY(-5px);
@@ -3145,8 +3057,6 @@
             padding: 4px 0;
             padding-left: 16px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
 
         .fusion-rules-list li::before {
@@ -3290,8 +3200,6 @@
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             z-index: 2000;
             opacity: 0;
         }
@@ -3362,8 +3270,6 @@
             border-radius: 16px;
             padding: 20px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
         .chart-title {
             font-size: 12px;
@@ -3375,8 +3281,6 @@
             width: 100%;
             height: 150px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
 
         /* 智能收益计算器 */
@@ -3470,8 +3374,6 @@
         /* ===== 高级滑块样式 ===== */
         .finance-slider-group {
             position: relative;
-            z-index: 2;
-            z-index: 2;
             margin-bottom: 30px;
         }
         .slider-label {
@@ -3496,8 +3398,6 @@
         /* ===== 重新设计的滑块样式 - 更精致高级 ===== */
         .finance-slider-group {
             position: relative;
-            z-index: 2;
-            z-index: 2;
             margin-bottom: 30px;
         }
 
@@ -3526,8 +3426,6 @@
         /* 滑块容器 - 包含刻度 */
         .slider-container {
             position: relative;
-            z-index: 2;
-            z-index: 2;
             padding: 0 12px;
         }
 
@@ -3566,8 +3464,6 @@
             outline: none;
             cursor: pointer;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             z-index: 2;
             margin: 15px 0;
         }
@@ -3639,8 +3535,6 @@
             margin-top: 8px;
             padding: 0 12px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
         .slider-mark {
             width: 6px;
@@ -3691,8 +3585,6 @@
             border-radius: 16px;
             margin-bottom: 20px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             overflow: hidden;
         }
         .deal-3d-canvas {
@@ -3727,8 +3619,6 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             overflow-y: auto;
         }
 
@@ -3836,8 +3726,6 @@
             border-radius: 16px;
             padding: 20px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -3905,8 +3793,6 @@
             background: linear-gradient(90deg, transparent, rgba(255,215,0,0.6), transparent);
             transform-origin: left center;
             pointer-events: none;
-            z-index: 1;
-            z-index: 1;
         }
 
         .fusion-line::after {
@@ -3935,8 +3821,6 @@
             background: rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
 
         .fusion-flow-item::after {
@@ -4278,8 +4162,6 @@
         .hierarchy-canvas-wrapper {
             flex: 1;
             position: relative;
-            z-index: 2;
-            z-index: 2;
         }
 
         #hierarchyCanvas {
@@ -5459,8 +5341,6 @@
                 text-align: center;
                 z-index: 10;
                 pointer-events: none;
-            z-index: 1;
-            z-index: 1;
             }
 
             .value-3d-title {
@@ -5503,8 +5383,6 @@
                 padding: 15px 20px;
                 text-align: center;
                 pointer-events: none;
-            z-index: 1;
-            z-index: 1;
                 transform: translate(-50%, -120%);
                 box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
                 backdrop-filter: blur(10px);
@@ -6717,8 +6595,6 @@
                         opacity: 0;
                         transition: opacity 0.3s;
                         pointer-events: none;
-            z-index: 1;
-            z-index: 1;
                         z-index: 5;
                     ">点击铸造</div>
                 `;
@@ -9579,8 +9455,6 @@
                         transform: scale(0);
                         animation: ripple-effect 0.6s ease-out;
                         pointer-events: none;
-            z-index: 1;
-            z-index: 1;
                     `;
 
                     const rect = this.getBoundingClientRect();
