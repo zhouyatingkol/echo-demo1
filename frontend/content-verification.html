@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容验证 - ECHO V2</title>
+    <script src="ethers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; }
+        
+        /* 验证方式选择 */
+        .method-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .method-tab {
+            flex: 1;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .method-tab:hover { border-color: rgba(0,212,255,0.3); }
+        .method-tab.active {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        .method-icon { font-size: 28px; margin-bottom: 8px; }
+        .method-name { font-weight: bold; }
+        .method-desc { font-size: 12px; color: #888; margin-top: 4px; }
+        
+        /* 卡片 */
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 文件上传 */
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.05);
+        }
+        .upload-area.dragover {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        .upload-icon { font-size: 48px; margin-bottom: 16px; }
+        .upload-text { color: #aaa; }
+        .upload-hint { font-size: 12px; color: #666; margin-top: 8px; }
+        #fileInput { display: none; }
+        
+        /* 表单 */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-size: 14px; color: #aaa; }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        
+        /* 按钮 */
+        .btn {
+            padding: 14px 28px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-full { width: 100%; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* 验证结果 */
+        .result-card {
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+        .result-card.valid {
+            background: rgba(0,255,0,0.1);
+            border: 2px solid #0f0;
+        }
+        .result-card.invalid {
+            background: rgba(255,0,0,0.1);
+            border: 2px solid #f55;
+        }
+        .result-card.pending {
+            background: rgba(255,215,0,0.1);
+            border: 2px solid #ffd700;
+        }
+        .result-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .result-title {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .result-title.valid { color: #0f0; }
+        .result-title.invalid { color: #f55; }
+        .result-title.pending { color: #ffd700; }
+        
+        /* 哈希对比 */
+        .hash-compare {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-top: 16px;
+        }
+        .hash-box {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .hash-box.onchain { border-left: 4px solid #00d4ff; }
+        .hash-box.local { border-left: 4px solid #7b2cbf; }
+        .hash-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+        .hash-value { color: #fff; }
+        .hash-match {
+            text-align: center;
+            font-size: 32px;
+        }
+        
+        /* 详细信息 */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .detail-item {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .detail-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+        .detail-value { font-size: 14px; }
+        
+        /* 进度条 */
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        /* 验证历史 */
+        .history-list {
+            margin-top: 16px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .history-status { display: flex; align-items: center; gap: 6px; }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .status-dot.valid { background: #0f0; }
+        .status-dot.invalid { background: #f55; }
+        
+        .hidden { display: none !important; }
+        
+        /* 计算哈希按钮 */
+        .calc-hash-btn {
+            margin-top: 12px;
+            padding: 10px 20px;
+            background: rgba(0,212,255,0.2);
+            border: 1px solid #00d4ff;
+            border-radius: 6px;
+            color: #00d4ff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .calc-hash-btn:hover { background: rgba(0,212,255,0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 内容验证</h1>
+        <p class="subtitle">验证资产内容完整性，防篡改</p>
+
+        <!-- 验证方式 -->
+        <div class="method-tabs">
+            <div class="method-tab active" data-method="file">
+                <div class="method-icon">📁</div>
+                <div class="method-name">文件验证</div>
+                <div class="method-desc">上传文件进行哈希比对</div>
+            </div
+>
+            <div class="method-tab" data-method="hash">
+                <div class="method-icon">🔢</div>
+                <div class="method-name">哈希验证</div>
+                <div class="method-desc">直接输入哈希值验证</div>
+            </div
+>
+        </div
+>
+
+        <!-- 文件验证 -->
+        <div class="card" id="fileMethod">
+            <div class="card-title">📁 文件验证</div>
+            
+            <!-- 资产输入 -->
+            <div class="form-group">
+                <label class="form-label">Token ID</label>
+                <input type="text" class="form-input" id="tokenId" placeholder="输入资产 Token ID">
+            </div
+>
+
+            <!-- 文件上传 -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">拖拽文件到此处，或点击上传</div>
+                <div class="upload-hint">支持任意文件类型，文件不会离开您的设备</div>
+                <input type="file" id="fileInput">
+            </div
+>
+
+            <!-- 文件信息 -->
+            <div id="fileInfo" class="hidden">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">文件名</div>
+                        <div class="detail-value" id="fileName">--</div>
+                    </div
+>
+                    <div class="detail-item">
+                        <div class="detail-label">文件大小</div>
+                        <div class="detail-value" id="fileSize">--</div>
+                    </div
+>
+                </div
+>
+
+                <button class="calc-hash-btn" onclick="calculateFileHash()">
+                    🔢 计算文件哈希
+                </button
+>
+
+                <div class="form-group" style="margin-top: 16px;">
+                    <label class="form-label">计算出的哈希</label>
+                    <input type="text" class="form-input" id="calculatedHash" readonly placeholder="点击上方按钮计算">
+                    <div class="progress-bar hidden" id="hashProgress">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div
+>
+                </div
+>
+            </div
+>
+
+            <button class="btn btn-full" onclick="verifyFile()" id="verifyBtn" disabled
+>
+                🔍 验证完整性
+            </button
+>
+        </div
+>
+
+        <!-- 哈希验证 -->
+        <div class="card hidden" id="hashMethod">
+            <div class="card-title">🔢 哈希验证</div>
+            
+            <div class="form-group">
+                <label class="form-label">Token ID</label>
+                <input type="text" class="form-input" id="hashTokenId" placeholder="输入资产 Token ID">
+            </div
+>
+
+            <div class="form-group">
+                <label class="form-label">待验证的哈希值</label>
+                <input type="text" class="form-input" id="inputHash" placeholder="0x...">
+                <small style="color: #666;">输入 keccak256 哈希值（64位十六进制）</small>
+            </div
+>
+
+            <button class="btn btn-full" onclick="verifyHash()"
+>
+                🔍 验证哈希
+            </button
+>
+        </div
+>
+
+        <!-- 验证结果 -->
+        <div id="resultCard" class="hidden">
+            <!-- 动态生成 -->
+        </div
+>
+
+        <!-- 验证历史 -->
+        <div class="card">
+            <div class="card-title">📝 验证历史</div>
+            
+            <div class="history-list" id="historyList">
+                <!-- 动态生成 -->
+                <div class="history-item">
+                    <span>2026-03-11 22:30</span>
+                    <div class="history-status">
+                        <span class="status-dot valid"></span>
+                        <span>Token #1 验证通过</span>
+                    </div
+>
+                </div
+>
+            </div
+>
+        </div
+>
+    </div
+>
+
+    <script>
+        const CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+        const ABI = [
+            "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
+            "function contentHashToToken(bytes32) view returns (uint256)"
+        ];
+
+        let provider, contract;
+        let selectedFile = null;
+        let calculatedHash = '';
+
+        // 验证历史存储
+        let verificationHistory = JSON.parse(localStorage.getItem('echoVerificationHistory') || '[]');
+
+        async function init() {
+            if (typeof window.ethereum !== 'undefined') {
+                provider = new ethers.BrowserProvider(window.ethereum);
+                contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+                console.log('✅ 已连接到合约');
+            }
+            renderHistory();
+        }
+
+        // 方式切换
+        document.querySelectorAll('.method-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const method = tab.dataset.method;
+                document.getElementById('fileMethod').classList.toggle('hidden', method !== 'file');
+                document.getElementById('hashMethod').classList.toggle('hidden', method !== 'hash');
+            });
+        });
+
+        // 文件上传
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        function handleFile(file) {
+            if (!file) return;
+            
+            selectedFile = file;
+            
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('fileInfo').classList.remove('hidden');
+            
+            document.getElementById('calculatedHash').value = '';
+            document.getElementById('verifyBtn').disabled = true;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function calculateFileHash() {
+            if (!selectedFile) return;
+            
+            const progressBar = document.getElementById('hashProgress');
+            const hashInput = document.getElementById('calculatedHash');
+            
+            progressBar.classList.remove('hidden');
+            hashInput.value = '计算中...';
+            
+            try {
+                // 分块读取大文件
+                const chunkSize = 1024 * 1024; // 1MB
+                const chunks = Math.ceil(selectedFile.size / chunkSize);
+                const hash = sha3_256.create();
+                
+                for (let i = 0; i < chunks; i++) {
+                    const start = i * chunkSize;
+                    const end = Math.min(start + chunkSize, selectedFile.size);
+                    const chunk = selectedFile.slice(start, end);
+                    
+                    const arrayBuffer = await chunk.arrayBuffer();
+                    const uint8Array = new Uint8Array(arrayBuffer);
+                    hash.update(uint8Array);
+                    
+                    // 更新进度
+                    const progress = ((i + 1) / chunks) * 100;
+                    progressBar.querySelector('.progress-fill').style.width = progress + '%';
+                }
+                
+                // Keccak256 哈希
+                calculatedHash = '0x' + hash.hex();
+                hashInput.value = calculatedHash;
+                
+                document.getElementById('verifyBtn').disabled = false;
+                progressBar.classList.add('hidden');
+                
+            } catch (error) {
+                hashInput.value = '计算失败: ' + error.message;
+                progressBar.classList.add('hidden');
+            }
+        }
+
+        async function verifyFile() {
+            const tokenId = document.getElementById('tokenId').value;
+            if (!tokenId) {
+                showResult('请输入 Token ID', 'error');
+                return;
+            }
+            
+            try {
+                const [metadata] = await contract.getAssetInfo(tokenId);
+                const onChainHash = metadata.contentHash;
+                
+                const match = onChainHash.toLowerCase() === calculatedHash.toLowerCase();
+                
+                if (match) {
+                    showResult('验证通过 ✓', 'valid', onChainHash, calculatedHash);
+                    addToHistory(tokenId, true);
+                } else {
+                    showResult('验证失败 ✗ 内容不匹配', 'invalid', onChainHash, calculatedHash);
+                    addToHistory(tokenId, false);
+                }
+            } catch (error) {
+                showResult('验证错误: ' + error.message, 'error');
+            }
+        }
+
+        async function verifyHash() {
+            const tokenId = document.getElementById('hashTokenId').value;
+            const inputHash = document.getElementById('inputHash').value;
+            
+            if (!tokenId || !inputHash) {
+                showResult('请填写完整信息', 'error');
+                return;
+            }
+            
+            try {
+                const [metadata] = await contract.getAssetInfo(tokenId);
+                const onChainHash = metadata.contentHash;
+                
+                const match = onChainHash.toLowerCase() === inputHash.toLowerCase();
+                
+                if (match) {
+                    showResult('验证通过 ✓', 'valid', onChainHash, inputHash);
+                    addToHistory(tokenId, true);
+                } else {
+                    showResult('验证失败 ✗ 哈希不匹配', 'invalid', onChainHash, inputHash);
+                    addToHistory(tokenId, false);
+                }
+            } catch (error) {
+                showResult('验证错误: ' + error.message, 'error');
+            }
+        }
+
+        function showResult(title, type, onChainHash = '', localHash = '') {
+            const card = document.getElementById('resultCard');
+            
+            const icons = {
+                valid: '✅',
+                invalid: '❌',
+                error: '⚠️'
+            };
+            
+            const titles = {
+                valid: '验证通过',
+                invalid: '验证失败',
+                error: '验证错误'
+            };
+            
+            card.className = 'result-card ' + type;
+            card.innerHTML = `
+                <div class="result-icon">${icons[type] || '⚠️'}</div>
+                <div class="result-title ${type}">${titles[type] || title}</div>
+                ${onChainHash ? `
+                    <div class="hash-compare">
+                        <div class="hash-box onchain">
+                            <div class="hash-label">链上存储哈希</div>
+                            <div class="hash-value">${onChainHash}</div>
+                        </div>
+                        <div class="hash-match">${type === 'valid' ? '✓' : '✗'}</div>
+                        <div class="hash-box local">
+                            <div class="hash-label">本地计算哈希</div>
+                            <div class="hash-value">${localHash}</div>
+                        </div>
+                    </div>
+                ` : `
+                    <p style="text-align: center; color: #888;">${title}</p>
+                `}
+            `;
+            
+            card.classList.remove('hidden');
+        }
+
+        function addToHistory(tokenId, success) {
+            verificationHistory.unshift({
+                tokenId,
+                success,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 只保留最近20条
+            verificationHistory = verificationHistory.slice(0, 20);
+            localStorage.setItem('echoVerificationHistory', JSON.stringify(verificationHistory));
+            
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            
+            if (verificationHistory.length === 0) {
+                list.innerHTML = '<p style="color: #666; text-align: center;">暂无验证记录</p>';
+                return;
+            }
+            
+            list.innerHTML = verificationHistory.map(item => `
+                <div class="history-item">
+                    <span>${new Date(item.timestamp).toLocaleString()}</span>
+                    <div class="history-status">
+                        <span class="status-dot ${item.success ? 'valid' : 'invalid'}"></span>
+                        <span>Token #${item.tokenId} ${item.success ? '验证通过' : '验证失败'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>
