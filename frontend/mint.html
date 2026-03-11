@@ -1,221 +1,119 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHO Protocol - 铸造</title>
+    <title>铸造测试</title>
     <script src="ethers.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%); color: #fff; min-height: 100vh; padding: 20px; }
+        body { background: #1a1a2e; color: #fff; font-family: sans-serif; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; }
-        h1 { text-align: center; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { text-align: center; color: #888; margin-bottom: 30px; }
-        .card { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .card-title { font-size: 18px; margin-bottom: 16px; color: #00d4ff; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; margin-bottom: 6px; font-size: 14px; color: #aaa; }
-        input, select, textarea { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; }
-        .btn { width: 100%; padding: 14px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 16px; cursor: pointer; }
-        .btn:hover { opacity: 0.9; }
-        .btn:disabled { opacity: 0.5; }
-        .status { padding: 12px; border-radius: 8px; margin-top: 16px; font-size: 14px; }
-        .status.success { background: rgba(0,255,0,0.1); color: #0f0; }
-        .status.error { background: rgba(255,0,0,0.1); color: #f55; }
-        .status.pending { background: rgba(255,215,0,0.1); color: #ffd700; }
-        .hidden { display: none !important; }
-        .address-display { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center; font-family: monospace; word-break: break-all; }
-        #debugLog { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 11px; color: #0f0; font-family: monospace; max-height: 200px; overflow-y: auto; }
+        .btn { width: 100%; padding: 15px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 16px; cursor: pointer; margin: 10px 0; }
+        .log { background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 12px; color: #0f0; white-space: pre-wrap; }
+        .error { color: #f55; }
+        .success { color: #0f0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>ECHO Protocol</h1>
-        <p class="subtitle">铸造您的数字种子</p>
-
-        <div class="card" id="walletCard">
-            <div class="card-title">👛 连接钱包</div>
-            <button class="btn" id="connectBtn">连接 MetaMask</button>
-            <div id="walletInfo" class="hidden">
-                <div class="address-display" id="walletAddress"></div>
-            </div>
+        <h2>ECHO 铸造测试</h2>
+        
+        <button class="btn" id="connectBtn">1. 连接钱包</button>
+        <div id="walletInfo" style="display:none;">
+            <p>地址: <span id="addr"></span></p>
         </div>
-
-        <div class="card hidden" id="mintCard">
-            <div class="card-title">🔨 铸造数字种子</div>
-            
-            <div class="form-group">
-                <label>资产名称 *</label>
-                <input type="text" id="assetName" value="数字种子一号">
-            </div>
-            
-            <div class="form-group">
-                <label>资产描述</label>
-                <textarea id="assetDesc" rows="2">我的第一颗数字种子</textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>资产类型</label>
-                <select id="assetType">
-                    <option value="code" selected>代码</option>
-                    <option value="algorithm">算法</option>
-                    <option value="data">数据</option>
-                    <option value="patent">专利</option>
-                </select>
-            </div>
-            
-            <button class="btn" id="mintBtn">🔨 铸造资产</button>
-            <div id="status"></div>
-            <div id="debugLog"></div>
-        </div>
+        
+        <button class="btn" id="mintBtn" style="display:none;">2. 铸造资产</button>
+        
+        <div id="log" class="log">日志:</div>
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = '0x5f5AAe09BB85f561b21845729B79E840AB026148';
+        const CONTRACT = '0x5f5AAe09BB85f561b21845729B79E840AB026148';
+        let contract, signer, userAddr;
         
-        // 完整ABI
-        const ABI = [
-            {
-                "inputs": [
-                    {"internalType": "string", "name": "name", "type": "string"},
-                    {"internalType": "string", "name": "description", "type": "string"},
-                    {"internalType": "string", "name": "assetType", "type": "string"},
-                    {"internalType": "string", "name": "uri", "type": "string"},
-                    {
-                        "components": [
-                            {"internalType": "address", "name": "usageOwner", "type": "address"},
-                            {"internalType": "address", "name": "derivativeOwner", "type": "address"},
-                            {"internalType": "address", "name": "extensionOwner", "type": "address"},
-                            {"internalType": "address", "name": "revenueOwner", "type": "address"},
-                            {"internalType": "uint256", "name": "usageFee", "type": "uint256"},
-                            {"internalType": "uint256", "name": "derivativeFee", "type": "uint256"},
-                            {"internalType": "uint256", "name": "revenueShare", "type": "uint256"}
-                        ],
-                        "internalType": "struct ECHOAsset.Rights",
-                        "name": "rights",
-                        "type": "tuple"
-                    }
-                ],
-                "name": "mintECHO",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            }
-        ];
-        
-        let provider, signer, contract, userAddress;
-        
-        function log(msg) {
+        function log(msg, isError) {
+            const el = document.getElementById('log');
+            el.innerHTML += '\n' + (isError ? '[错误] ' : '[信息] ') + msg;
             console.log(msg);
-            document.getElementById('debugLog').innerHTML += new Date().toLocaleTimeString() + ': ' + msg + '<br>';
         }
         
-        function showStatus(msg, type) {
-            document.getElementById('status').innerHTML = msg ? '<div class="status ' + type + '">' + msg + '</div>' : '';
-        }
-        
-        // 连接钱包
-        document.getElementById('connectBtn').addEventListener('click', async function() {
-            log('点击连接按钮');
-            
-            if (!window.ethereum) {
-                showStatus('❌ 请安装 MetaMask', 'error');
-                return;
-            }
-            
+        // 连接
+        document.getElementById('connectBtn').onclick = async () => {
             try {
+                log('开始连接...');
+                
+                if (!window.ethereum) {
+                    log('未检测到MetaMask', true);
+                    return;
+                }
+                
                 log('请求账户...');
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 
-                log('创建provider...');
-                provider = new ethers.providers.Web3Provider(window.ethereum);
+                log('创建ethers provider...');
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
                 
                 log('获取signer...');
                 signer = provider.getSigner();
                 
                 log('获取地址...');
-                userAddress = await signer.getAddress();
-                log('地址: ' + userAddress);
+                userAddr = await signer.getAddress();
+                log('地址: ' + userAddr.slice(0, 10) + '...');
                 
-                log('创建合约实例...');
-                contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-                log('合约创建成功');
+                log('创建合约...');
+                // 极简ABI
+                const abi = ["function mintECHO(string,string,string,string,tuple(address,address,address,address,uint256,uint256,uint256))"];
+                contract = new ethers.Contract(CONTRACT, abi, signer);
+                log('合约创建成功!');
                 
-                // 更新UI
-                document.getElementById('walletAddress').textContent = userAddress;
-                document.getElementById('walletInfo').classList.remove('hidden');
-                document.getElementById('connectBtn').classList.add('hidden');
-                document.getElementById('mintCard').classList.remove('hidden');
-                
-                showStatus('✅ 连接成功', 'success');
+                // 显示UI
+                document.getElementById('addr').textContent = userAddr;
+                document.getElementById('walletInfo').style.display = 'block';
+                document.getElementById('connectBtn').style.display = 'none';
+                document.getElementById('mintBtn').style.display = 'block';
                 
             } catch (e) {
-                log('连接错误: ' + e.message);
-                showStatus('❌ ' + e.message, 'error');
+                log('连接失败: ' + e.message, true);
             }
-        });
+        };
         
         // 铸造
-        document.getElementById('mintBtn').addEventListener('click', async function() {
-            log('===== 点击铸造按钮 =====');
-            
-            if (!contract) {
-                log('错误: 合约未初始化');
-                showStatus('❌ 请先连接钱包', 'error');
-                return;
-            }
-            
+        document.getElementById('mintBtn').onclick = async () => {
             try {
-                const name = document.getElementById('assetName').value.trim();
-                const description = document.getElementById('assetDesc').value.trim();
-                const assetType = document.getElementById('assetType').value;
-                
-                log('名称: ' + name);
-                log('描述: ' + description);
-                log('类型: ' + assetType);
-                
-                if (!name) {
-                    log('错误: 名称为空');
-                    showStatus('❌ 请输入名称', 'error');
-                    return;
-                }
+                log('===== 开始铸造 =====');
                 
                 const rights = {
-                    usageOwner: userAddress,
-                    derivativeOwner: userAddress,
-                    extensionOwner: userAddress,
-                    revenueOwner: userAddress,
+                    usageOwner: userAddr,
+                    derivativeOwner: userAddr,
+                    extensionOwner: userAddr,
+                    revenueOwner: userAddr,
                     usageFee: ethers.BigNumber.from('1000000000000000'),
-                    derivativeFee: ethers.BigNumber.from('0'),
+                    derivativeFee: 0,
                     revenueShare: 10000
                 };
                 
-                const uri = JSON.stringify({ name, description, assetType, timestamp: Date.now() });
-                log('URI: ' + uri);
+                log('调用 mintECHO...');
+                log('请查看MetaMask是否有弹窗!');
                 
-                log('准备调用合约...');
-                document.getElementById('mintBtn').disabled = true;
-                showStatus('请查看MetaMask确认交易...', 'pending');
+                const tx = await contract.mintECHO(
+                    '测试种子',
+                    '测试描述',
+                    'code',
+                    '{}',
+                    rights
+                );
                 
-                // 发送交易
-                log('发送交易...');
-                const tx = await contract.mintECHO(name, description, assetType, uri, rights);
-                log('交易已发送: ' + tx.hash);
+                log('交易已发送: ' + tx.hash.slice(0, 20) + '...');
                 
-                showStatus('等待确认...', 'pending');
                 const receipt = await tx.wait();
-                log('交易已确认，区块: ' + receipt.blockNumber);
-                
-                showStatus('✅ 铸造成功！Token ID: ' + (receipt.events?.[0]?.args?.tokenId || '未知'), 'success');
+                log('✅ 成功! 区块: ' + receipt.blockNumber);
                 
             } catch (e) {
-                log('铸造错误: ' + e.message);
-                log('错误详情: ' + JSON.stringify(e));
-                showStatus('❌ ' + e.message, 'error');
-            } finally {
-                document.getElementById('mintBtn').disabled = false;
+                log('铸造失败: ' + e.message, true);
+                log('错误类型: ' + e.code, true);
+                if (e.data) log('错误数据: ' + e.data, true);
             }
-        });
+        };
     </script>
 </body>
 </html>
