@@ -45,27 +45,37 @@ let contract = null;
 let userAddress = null;
 
 // DOM元素
-const connectBtn = document.getElementById('connectBtn');
-const walletSection = document.getElementById('walletSection');
-const walletInfo = document.getElementById('walletInfo');
-const walletAddress = document.getElementById('walletAddress');
-const networkName = document.getElementById('networkName');
-const mintSection = document.getElementById('mintSection');
-const mintForm = document.getElementById('mintForm');
-const assetsSection = document.getElementById('assetsSection');
-const assetList = document.getElementById('assetList');
-const refreshBtn = document.getElementById('refreshBtn');
-const mintStatus = document.getElementById('mintStatus');
+let connectBtn, walletSection, walletInfo, walletAddress, networkName;
+let mintSection, mintForm, assetsSection, assetList, refreshBtn, mintStatus;
+
+// 初始化 DOM 元素引用
+function initDOMElements() {
+  connectBtn = document.getElementById('connectBtn');
+  walletSection = document.getElementById('walletSection');
+  walletInfo = document.getElementById('walletInfo');
+  walletAddress = document.getElementById('walletAddress');
+  networkName = document.getElementById('networkName');
+  mintSection = document.getElementById('mintSection');
+  mintForm = document.getElementById('mintForm');
+  assetsSection = document.getElementById('assetsSection');
+  assetList = document.getElementById('assetList');
+  refreshBtn = document.getElementById('refreshBtn');
+  mintStatus = document.getElementById('mintStatus');
+}
 
 // 连接钱包
 async function connectWallet() {
+  console.log('🔍 连接钱包...');
+  
   if (!window.ethereum) {
     showStatus('请先安装 MetaMask 或其他 Web3 钱包', 'error');
+    alert('请先安装 MetaMask 钱包！\n官网: https://metamask.io');
     return;
   }
 
   try {
     // 请求连接
+    showStatus('正在请求连接...', '');
     await window.ethereum.request({ method: 'eth_requestAccounts' });
     
     // 创建provider
@@ -73,15 +83,21 @@ async function connectWallet() {
     signer = provider.getSigner();
     userAddress = await signer.getAddress();
     
+    console.log('✅ 钱包已连接:', userAddress);
+    
     // 检查网络
     const network = await provider.getNetwork();
-    if (network.chainId !== 8131) {
+    console.log('当前网络:', network.chainId);
+    
+    if (network.chainId !== 813 && network.chainId !== 8131) {
+      showStatus('正在切换网络...', '');
       await switchToQitmeer();
     }
     
     // 初始化合约
     if (CONTRACT_ADDRESS) {
       contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      console.log('✅ 合约已连接:', CONTRACT_ADDRESS);
     }
     
     // 更新UI
@@ -92,7 +108,10 @@ async function connectWallet() {
     window.ethereum.on('accountsChanged', handleAccountsChanged);
     window.ethereum.on('chainChanged', () => window.location.reload());
     
+    showStatus('连接成功！', 'success');
+    
   } catch (error) {
+    console.error('❌ 连接失败:', error);
     showStatus('连接失败: ' + error.message, 'error');
   }
 }
@@ -144,7 +163,7 @@ function updateWalletUI() {
   walletSection.classList.add('hidden');
   walletInfo.classList.remove('hidden');
   walletAddress.textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
-  networkName.textContent = 'Qitmeer Testnet';
+  networkName.textContent = 'Qitmeer Mainnet';
 }
 
 // 显示铸造区域
@@ -314,15 +333,39 @@ function formatAddress(address) {
 
 // 显示状态
 function showStatus(message, type) {
+  if (!mintStatus) return;
   mintStatus.innerHTML = message ? `<div class="status ${type}">${message}</div>` : '';
 }
 
-// 事件监听
-connectBtn.addEventListener('click', connectWallet);
-mintForm.addEventListener('submit', mintAsset);
-refreshBtn.addEventListener('click', loadAssets);
-
-// 检查是否已连接
-if (window.ethereum && window.ethereum.selectedAddress) {
-  connectWallet();
-}
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 ECHO Protocol 加载完成');
+  
+  // 初始化 DOM 元素
+  initDOMElements();
+  
+  // 检查元素是否存在
+  if (!connectBtn) {
+    console.error('❌ 未找到连接按钮');
+    return;
+  }
+  
+  // 绑定事件
+  connectBtn.addEventListener('click', connectWallet);
+  
+  if (mintForm) {
+    mintForm.addEventListener('submit', mintAsset);
+  }
+  
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', loadAssets);
+  }
+  
+  console.log('✅ 事件绑定完成');
+  
+  // 检查是否已连接
+  if (window.ethereum && window.ethereum.selectedAddress) {
+    console.log('🔄 检测到已连接钱包，自动连接...');
+    connectWallet();
+  }
+});
