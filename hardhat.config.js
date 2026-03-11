@@ -12,28 +12,33 @@ module.exports = {
     },
   },
   networks: {
-    // Qitmeer Testnet (QNG)
+    // Qitmeer 主网
+    qitmeer: {
+      url: 'https://qng.rpc.qitmeer.io',
+      chainId: 813,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
+    // Qitmeer Testnet
     qitmeerTestnet: {
       url: 'https://testnet-qng.rpc.qitmeer.io',
       chainId: 8131,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
-    // 本地开发
     localhost: {
       url: 'http://127.0.0.1:8545',
     },
   },
   etherscan: {
     apiKey: {
-      qitmeerTestnet: 'your-api-key',
+      qitmeer: 'no-api-key-needed',
     },
     customChains: [
       {
-        network: 'qitmeerTestnet',
-        chainId: 8131,
+        network: 'qitmeer',
+        chainId: 813,
         urls: {
-          apiURL: 'https://testnet-qng.rpc.qitmeer.io',
-          browserURL: 'https://testnet-qngexplorer.qitmeer.io',
+          apiURL: 'https://qng.rpc.qitmeer.io',
+          browserURL: 'https://qngexplorer.qitmeer.io',
         },
       },
     ],

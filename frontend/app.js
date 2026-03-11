@@ -23,7 +23,7 @@ const CONTRACT_ABI = [
 ];
 
 // 合约地址 (部署后更新)
-let CONTRACT_ADDRESS = localStorage.getItem('echoContractAddress') || '';
+let CONTRACT_ADDRESS = localStorage.getItem('echoContractAddress') || '0x5f5AAe09BB85f561b21845729B79E840AB026148';
 
 // 全局变量
 let provider = null;

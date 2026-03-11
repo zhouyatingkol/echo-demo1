@@ -2,8 +2,6 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
@@ -16,7 +14,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  * - 扩展权 (Extension): 扩展资产功能的权利
  * - 收益权 (Revenue): 获得资产收益的权利
  */
-contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
+contract ECHOAsset is ERC721 {
     using Counters for Counters.Counter;
     
     Counters.Counter private _tokenIdCounter;
@@ -29,7 +27,6 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
         address revenueOwner;    // 收益权所有者
         
         uint256 usageFee;        // 使用费 (wei)
-        uint256 derivativeFee;   // 衍生授权费
         uint256 revenueShare;    // 收益分成比例 (0-10000, 10000=100%)
     }
     
@@ -45,7 +42,7 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
     // 存储映射
     mapping(uint256 => Rights) public assetRights;
     mapping(uint256 => AssetMetadata) public assetMetadata;
-    mapping(uint256 => address) public originalCreator; // 原始创作者
+    mapping(uint256 => address) public originalCreator;
     
     // 使用权授权记录 (tokenId => user => expiryTime)
     mapping(uint256 => mapping(address => uint256)) public usageAuthorization;
@@ -84,16 +81,11 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
         address indexed user,
         uint256 amount
     );
-    
+
     constructor() ERC721("ECHO Asset", "ECHO") {}
     
     /**
      * @dev 铸造新的ECHO资产
-     * @param name 资产名称
-     * @param description 资产描述
-     * @param assetType 资产类型 (code/algorithm/data/patent)
-     * @param uri 元数据URI
-     * @param rights 四权配置
      */
     function mintECHO(
         string memory name,
@@ -107,7 +99,6 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
         
         _safeMint(msg.sender, tokenId);
         
-        // 存储元数据
         assetMetadata[tokenId] = AssetMetadata({
             name: name,
             description: description,
@@ -116,7 +107,6 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
             createdAt: block.timestamp
         });
         
-        // 存储权利配置
         assetRights[tokenId] = rights;
         originalCreator[tokenId] = msg.sender;
         
@@ -137,10 +127,7 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
      */
     function transferUsageRight(uint256 tokenId, address newOwner) public {
         require(_exists(tokenId), "Asset does not exist");
-        require(
-            assetRights[tokenId].usageOwner == msg.sender,
-            "Not usage owner"
-        );
+        require(assetRights[tokenId].usageOwner == msg.sender, "Not usage owner");
         
         address oldOwner = assetRights[tokenId].usageOwner;
         assetRights[tokenId].usageOwner = newOwner;
@@ -153,10 +140,7 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
      */
     function transferDerivativeRight(uint256 tokenId, address newOwner) public {
         require(_exists(tokenId), "Asset does not exist");
-        require(
-            assetRights[tokenId].derivativeOwner == msg.sender,
-            "Not derivative owner"
-        );
+        require(assetRights[tokenId].derivativeOwner == msg.sender, "Not derivative owner");
         
         address oldOwner = assetRights[tokenId].derivativeOwner;
         assetRights[tokenId].derivativeOwner = newOwner;
@@ -169,10 +153,7 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
      */
     function transferExtensionRight(uint256 tokenId, address newOwner) public {
         require(_exists(tokenId), "Asset does not exist");
-        require(
-            assetRights[tokenId].extensionOwner == msg.sender,
-            "Not extension owner"
-        );
+        require(assetRights[tokenId].extensionOwner == msg.sender, "Not extension owner");
         
         address oldOwner = assetRights[tokenId].extensionOwner;
         assetRights[tokenId].extensionOwner = newOwner;
@@ -185,10 +166,7 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
      */
     function transferRevenueRight(uint256 tokenId, address newOwner) public {
         require(_exists(tokenId), "Asset does not exist");
-        require(
-            assetRights[tokenId].revenueOwner == msg.sender,
-            "Not revenue owner"
-        );
+        require(assetRights[tokenId].revenueOwner == msg.sender, "Not revenue owner");
         
         address oldOwner = assetRights[tokenId].revenueOwner;
         assetRights[tokenId].revenueOwner = newOwner;
@@ -222,11 +200,9 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
      * @dev 检查用户是否有使用权
      */
     function hasUsageRight(uint256 tokenId, address user) public view returns (bool) {
-        // 使用权所有者永远有使用权
         if (assetRights[tokenId].usageOwner == user) {
             return true;
         }
-        // 检查临时授权
         return usageAuthorization[tokenId][user] > block.timestamp;
     }
     
@@ -251,24 +227,5 @@ contract ECHOAsset is ERC721, ERC721Enumerable, Ownable {
      */
     function getCurrentTokenId() public view returns (uint256) {
         return _tokenIdCounter.current();
-    }
-    
-    // Override required functions
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 batchSize
-    ) internal override(ERC721, ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
-    }
-    
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721Enumerable)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
     }
 }
