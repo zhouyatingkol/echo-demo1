@@ -513,27 +513,42 @@
     </div
 >
 
+    <script src="ethers.min.js"></script>
     <script>
+        // V2 合约配置
+        const V2_CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+        
+        const V2_ABI = [
+            "function mintECHO(string name, string description, string assetType, string uri, bytes32 contentHash, tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue) blueprint) returns (uint256)"
+        ];
+        
+        let provider, signer, contract;
         let currentStep = 1;
+
+        // 初始化
+        async function init() {
+            if (typeof window.ethereum !== 'undefined') {
+                provider = new ethers.BrowserProvider(window.ethereum);
+                await provider.send('eth_requestAccounts', []);
+                signer = await provider.getSigner();
+                contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, signer);
+                console.log('✅ V2 合约已连接');
+            }
+        }
 
         // 步骤导航
         function goToStep(step) {
-            // 隐藏所有步骤
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step3').classList.add('hidden');
-            
-            // 显示目标步骤
             document.getElementById('step' + step).classList.remove('hidden');
             
-            // 更新步骤指示器
             document.getElementById('step1Indicator').classList.toggle('active', step >= 1);
             document.getElementById('step2Indicator').classList.toggle('active', step >= 2);
             document.getElementById('step3Indicator').classList.toggle('active', step >= 3);
             
             currentStep = step;
             
-            // 如果是第3步，更新预览
             if (step === 3) {
                 updatePreview();
             }
@@ -543,7 +558,8 @@
         function updatePreview() {
             document.getElementById('previewName').textContent = document.getElementById('assetName').value || '--';
             document.getElementById('previewType').textContent = document.getElementById('assetType').value || '--';
-            document.getElementById('previewHash').textContent = document.getElementById('contentHash').value.slice(0, 10) + '...' || '--';
+            const hash = document.getElementById('contentHash').value;
+            document.getElementById('previewHash').textContent = hash ? hash.slice(0, 10) + '...' : '--';
             document.getElementById('previewUsageFee').textContent = document.getElementById('usageFee').value + ' MEER/天';
             document.getElementById('previewDerivativeFee').textContent = document.getElementById('derivativeFee').value + ' MEER';
         }
@@ -553,57 +569,140 @@
             card.addEventListener('click', () => {
                 document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
-                
-                // 应用模板预设
-                const template = card.dataset.template;
-                applyTemplate(template);
+                applyTemplate(card.dataset.template);
             });
         });
 
         function applyTemplate(template) {
             switch(template) {
                 case 'open':
-                    document.getElementById('commercialUse').classList.add('active');
-                    document.getElementById('allowModify').classList.add('active');
+                    setToggle('commercialUse', true);
+                    setToggle('allowModify', true);
                     document.getElementById('usageFee').value = '0';
-                    document.getElementById('allowDerivative').classList.add('active');
+                    setToggle('allowDerivative', true);
                     document.getElementById('derivativeFee').value = '0';
                     document.getElementById('parentShare').value = '0';
                     break;
                 case 'commercial':
-                    document.getElementById('commercialUse').classList.add('active');
-                    document.getElementById('allowModify').classList.remove('active');
+                    setToggle('commercialUse', true);
+                    setToggle('allowModify', false);
                     document.getElementById('usageFee').value = '0.01';
-                    document.getElementById('allowDerivative').classList.add('active');
+                    setToggle('allowDerivative', true);
                     document.getElementById('derivativeFee').value = '0.05';
                     document.getElementById('parentShare').value = '10';
                     break;
                 case 'education':
-                    document.getElementById('commercialUse').classList.remove('active');
-                    document.getElementById('allowModify').classList.add('active');
+                    setToggle('commercialUse', false);
+                    setToggle('allowModify', true);
                     document.getElementById('usageFee').value = '0';
-                    document.getElementById('allowDerivative').classList.add('active');
+                    setToggle('allowDerivative', true);
                     document.getElementById('derivativeFee').value = '0';
                     document.getElementById('parentShare').value = '5';
                     break;
             }
         }
 
+        function setToggle(id, active) {
+            const el = document.getElementById(id);
+            if (active) el.classList.add('active');
+            else el.classList.remove('active');
+        }
+
         // 开关切换
         document.querySelectorAll('.toggle').forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                toggle.classList.toggle('active');
-            });
+            toggle.addEventListener('click', () => toggle.classList.toggle('active'));
         });
 
-        // 铸造函数（占位）
-        function mintAsset() {
-            showStatus('功能开发中...', 'pending');
+        // 铸造函数
+        async function mintAsset() {
+            if (!contract) {
+                showStatus('请先连接钱包', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('铸造中...请确认交易', 'pending');
+                
+                const userAddress = await signer.getAddress();
+                
+                // 获取表单数据
+                const name = document.getElementById('assetName').value;
+                const description = document.getElementById('assetDesc').value;
+                const assetType = document.getElementById('assetType').value;
+                const uri = document.getElementById('ipfsUri').value || JSON.stringify({name, description, assetType});
+                const contentHash = document.getElementById('contentHash').value;
+                
+                if (!contentHash || contentHash.length < 10) {
+                    showStatus('请填写内容哈希', 'error');
+                    return;
+                }
+                
+                const usageFee = ethers.parseEther(document.getElementById('usageFee').value || '0');
+                const derivativeFee = ethers.parseEther(document.getElementById('derivativeFee').value || '0');
+                const parentShare = Math.floor((parseFloat(document.getElementById('parentShare').value) || 0) * 100);
+                
+                // 构建蓝图
+                const blueprint = {
+                    usage: {
+                        owner: userAddress,
+                        fee: usageFee,
+                        commercialUse: document.getElementById('commercialUse').classList.contains('active'),
+                        modificationAllowed: document.getElementById('allowModify').classList.contains('active'),
+                        allowedScopes: [],
+                        restrictedScopes: [],
+                        maxUsers: 0,
+                        licenseDuration: 0
+                    },
+                    derivative: {
+                        owner: userAddress,
+                        fee: derivativeFee,
+                        allowDerivatives: document.getElementById('allowDerivative').classList.contains('active'),
+                        revenueShare: parentShare,
+                        allowedTypes: []
+                    },
+                    extension: {
+                        owner: userAddress,
+                        fee: 0,
+                        allowExtensions: document.getElementById('allowExtension')?.classList.contains('active') || false,
+                        allowedExtensions: []
+                    },
+                    revenue: {
+                        owner: userAddress,
+                        sharePercentage: 10000,
+                        autoDistribute: true
+                    }
+                };
+                
+                console.log('铸造参数:', { name, assetType, contentHash: contentHash.slice(0, 20) + '...' });
+                
+                // 发送交易
+                const tx = await contract.mintECHO(name, description, assetType, uri, contentHash, blueprint);
+                showStatus('交易已提交，等待确认...', 'pending');
+                
+                const receipt = await tx.wait();
+                
+                showStatus('✅ 铸造成功！Token ID: ' + (receipt.logs[0]?.topics[1] || '未知'), 'success');
+                
+                // 3秒后返回第一步
+                setTimeout(() => {
+                    goToStep(1);
+                    document.getElementById('assetName').value = '';
+                    document.getElementById('assetDesc').value = '';
+                    document.getElementById('contentHash').value = '';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('铸造失败:', error);
+                showStatus('铸造失败: ' + error.message, 'error');
+            }
         }
 
         function showStatus(msg, type) {
             document.getElementById('status').innerHTML = msg ? `<div class="status ${type}">${msg}</div>` : '';
         }
+
+        // 初始化
+        init();
     </script>
 </body>
 </html>
