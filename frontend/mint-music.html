@@ -978,15 +978,10 @@
             }));
         }
         
-        // 简单的 SHA3-256 实现
+        // 简单的 SHA3-256 实现 - 使用 ethers.js keccak256
         function sha3_256(data) {
-            // 使用 js-sha3 库
-            if (typeof sha3_256_lib !== 'undefined') {
-                return sha3_256_lib(data);
-            }
-            // 简化：返回一个模拟的哈希值
-            // 实际应该使用 sha3.js 库
-            return '0'.repeat(64);
+            // 使用 ethers.js 的 keccak256
+            return ethers.utils.keccak256(data).slice(2); // 去掉 '0x' 前缀
         }
         
         function showStatus(msg, type) {
