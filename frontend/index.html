@@ -1,293 +1,450 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>ECHO Protocol Demo</title>
-    <script src="ethers.min.js?v=2"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container { max-width: 800px; margin: 0 auto; }
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .card-title {
-            font-size: 18px;
-            margin-bottom: 16px;
-            color: #00d4ff;
-        }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #aaa;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #00d4ff;
-        }
-        .btn {
-            padding: 12px 24px;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        }
-        .btn:hover { opacity: 0.9; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .wallet-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .address {
-            font-family: monospace;
-            background: rgba(0,0,0,0.3);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        .asset-list {
-            display: grid;
-            gap: 12px;
-        }
-        .asset-item {
-            background: rgba(0,0,0,0.2);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .asset-name {
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-        .asset-type {
-            display: inline-block;
-            padding: 2px 8px;
-            background: rgba(0,212,255,0.2);
-            border-radius: 4px;
-            font-size: 12px;
-            color: #00d4ff;
-        }
-        .rights-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 8px;
-        }
-        .right-tag {
-            font-size: 12px;
-            padding: 6px 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 6px;
-        }
-        .right-tag span {
-            color: #888;
-        }
-        .status {
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 16px;
-            font-size: 14px;
-        }
-        .status.success {
-            background: rgba(0,255,0,0.1);
-            border: 1px solid rgba(0,255,0,0.3);
-            color: #0f0;
-        }
-        .status.error {
-            background: rgba(255,0,0,0.1);
-            border: 1px solid rgba(255,0,0,0.3);
-            color: #f55;
-        }
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
-        }
-        .nav-tab {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: #888;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .nav-tab:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-        }
-        .nav-tab.active {
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-            color: #fff;
-            border-color: transparent;
-        }
-        .hidden { display: none !important; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECHO Music - 去中心化音乐授权平台</title>
+  <script src="ethers.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    /* 导航栏 */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,26,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+    .nav-link {
+      padding: 8px 16px;
+      color: #888;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    .nav-link:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+    }
+    .nav-link.active {
+      color: #00d4ff;
+      background: rgba(0,212,255,0.1);
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .wallet-btn {
+      padding: 8px 20px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .notification-bell {
+      position: relative;
+      padding: 8px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    .notification-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 18px;
+      height: 18px;
+      background: #ff4444;
+      border-radius: 50%;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      padding-top: 64px;
+    }
+    
+    /* Hero 区域 */
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+      background: linear-gradient(180deg, rgba(0,212,255,0.1) 0%, transparent 100%);
+    }
+    .hero-title {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 18px;
+      color: #888;
+      margin-bottom: 32px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    .hero-btn {
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .hero-btn.primary {
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border: none;
+      color: #fff;
+    }
+    .hero-btn.secondary {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+    }
+    .hero-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,212,255,0.3);
+    }
+    
+    /* 功能导航卡片 */
+    .feature-nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .section-title {
+      font-size: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.3s;
+      text-decoration: none;
+      color: #fff;
+    }
+    .feature-card:hover {
+      border-color: rgba(0,212,255,0.3);
+      transform: translateY(-4px);
+    }
+    .feature-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+    }
+    .feature-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    .feature-link {
+      color: #00d4ff;
+      font-size: 14px;
+    }
+    
+    /* 快捷入口 */
+    .quick-links {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .quick-item {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      text-decoration: none;
+      color: #888;
+      transition: all 0.3s;
+    }
+    .quick-item:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    .quick-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .quick-label {
+      font-size: 13px;
+    }
+    
+    /* 页脚 */
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 40px 20px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+    .footer-links a {
+      color: #888;
+      text-decoration: none;
+    }
+    .footer-links a:hover {
+      color: #00d4ff;
+    }
+    
+    /* 移动端菜单 */
+    .mobile-menu-btn {
+      display: none;
+      padding: 8px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    @media (max-width: 1024px) {
+      .nav-links {
+        display: none;
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+      .hero-title {
+        font-size: 32px;
+      }
+      .quick-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔷 ECHO Protocol Demo</h1>
-        <p class="subtitle">Qitmeer Testnet · 四权分离数字资产</p>
-
-        <!-- 钱包连接 -->
-        <div class="card">
-            <div class="card-title">👛 钱包连接</div>
-            <div id="walletSection">
-                <button class="btn" id="connectBtn">连接钱包</button>
-            </div>
-            <div id="walletInfo" class="wallet-info hidden">
-                <span class="address" id="walletAddress"></span>
-                <span id="networkName"></span>
-            </div>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        🎵 ECHO Music
+      </a>
+      
+      <div class="nav-links">
+        <a href="discover.html" class="nav-link">发现</a>
+        <a href="music-market.html" class="nav-link">市场</a>
+        <a href="charts.html" class="nav-link">榜单</a>
+        <a href="mint-music.html" class="nav-link">铸造</a>
+        <a href="dashboard.html" class="nav-link">收益</a>
+      </div>
+      
+      <div class="nav-right">
+        <div class="notification-bell" onclick="location.href='notifications-demo.html'">
+          🔔
+          <span class="notification-badge" id="notifBadge" style="display: none;">0</span>
         </div>
-
-        <!-- 铸造资产 -->
-        <div class="card hidden" id="mintSection">
-            <div class="card-title">🔨 铸造 ECHO 资产</div>
-            <form id="mintForm">
-                <div class="form-group">
-                    <label>资产名称</label>
-                    <input type="text" id="assetName" placeholder="例如：智能合约算法V1" required>
-                </div>
-                <div class="form-group">
-                    <label>资产描述</label>
-                    <textarea id="assetDesc" rows="2" placeholder="简要描述资产内容..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>资产类型</label>
-                    <select id="assetType">
-                        <option value="code">代码</option>
-                        <option value="algorithm">算法</option>
-                        <option value="data">数据</option>
-                        <option value="patent">专利</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>IPFS 地址</label>
-                    <input type="text" id="ipfsUri" placeholder="ipfs://... 或 https://...">
-                    <small style="color: #666;">内容上传后的地址</small>
-                </div>
-                <div class="form-group">
-                    <label>内容哈希 (keccak256)</label>
-                    <input type="text" id="contentHash" placeholder="0x..." required>
-                    <small style="color: #666;">文件内容的 keccak256 哈希，用于防篡改验证</small>
-                </div>
-                
-                <div class="card-title" style="font-size: 14px; margin-top: 20px;">⚖️ 四权配置</div>
-                
-                <div class="form-group">
-                    <label>使用权所有者</label>
-                    <input type="text" id="usageOwner" placeholder="0x...">
-                </div>
-                <div class="form-group">
-                    <label>衍生权所有者</label>
-                    <input type="text" id="derivativeOwner" placeholder="0x...">
-                </div>
-                <div class="form-group">
-                    <label>扩展权所有者</label>
-                    <input type="text" id="extensionOwner" placeholder="0x...">
-                </div>
-                <div class="form-group">
-                    <label>收益权所有者</label>
-                    <input type="text" id="revenueOwner" placeholder="0x...">
-                </div>
-                <div class="form-group">
-                    <label>使用费 (wei)</label>
-                    <input type="number" id="usageFee" value="1000000000000000" placeholder="1000000000000000">
-                    <small style="color: #666;">1 MEER = 10^18 wei</small>
-                </div>
-                
-                <button type="submit" class="btn">铸造资产</button>
-            </form>
-            <div id="mintStatus"></div>
-        </div>
-
-        <!-- 资产列表 -->
-        <div class="card hidden" id="assetsSection">
-            <div class="card-title">📦 我的资产</div>
-            <button class="btn btn-secondary" id="refreshBtn" style="margin-bottom: 16px;">刷新列表</button>
-            <div class="asset-list" id="assetList"></div>
-        </div>
-
-        <!-- V2 功能导航 -->
-        <div class="card">
-            <div class="card-title">🚀 V2 新功能</div>
-            <div class="nav-tabs" style="flex-wrap: wrap; border: none; padding: 0;">
-                <a href="mint-v2.html" class="nav-tab" style="text-decoration: none;">🎨 铸造 V2</a>
-                <a href="version-control.html" class="nav-tab" style="text-decoration: none;">📜 版本控制</a>
-                <a href="content-verification.html" class="nav-tab" style="text-decoration: none;">🔐 内容验证</a>
-                <a href="derivative-works.html" class="nav-tab" style="text-decoration: none;">🌱 衍生作品</a>
-            </div>
-            <p style="color: #888; font-size: 12px; margin-top: 10px;">
-                V2 合约: 0x319148d9b9265D75858c508E445d65B649036f75
-            </p>
-        </div>
+        <button class="wallet-btn" id="connectBtn" onclick="connectWallet()">
+          连接钱包
+        </button>
+      </div>
+      
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
     </div>
-
-    <script>
-        // 检查 ethers.js 是否加载成功
-        if (typeof ethers === 'undefined') {
-            document.body.innerHTML = '<div style="padding: 50px; text-align: center;">' +
-                '<h2 style="color: #f55;">⚠️ 加载失败</h2>' +
-                '<p>ethers.js 加载失败，请尝试以下方法：</p>' +
-                '<p>1. <strong>按 Ctrl+Shift+R 强制刷新</strong></p>' +
-                '<p>2. 清除浏览器缓存后重新访问</p>' +
-                '<p>3. 使用无痕模式访问</p>' +
-                '</div>';
-        } else {
-            console.log('✅ ethers.js 加载成功');
-        }
-    </script>
-    <script src="app.js?v=3"></script>
+  </nav>
+  
+  <!-- 主内容 -->
+  <div class="main-content">
+    <!-- Hero 区域 -->
+    <section class="hero">
+      <h1 class="hero-title">将音乐授权给 AI 训练</h1>
+      <p class="hero-subtitle">去中心化音乐授权平台，创作者获得持续收益</p>
+      <div class="hero-actions">
+        <button class="hero-btn primary" onclick="location.href='mint-music.html'">
+          🎵 上传音乐
+        </button>
+        <button class="hero-btn secondary" onclick="location.href='music-market.html'">
+          🛒 浏览市场
+        </button>
+      </div>
+    </section>
+    
+    <!-- 功能导航 -->
+    <section class="feature-nav">
+      <h2 class="section-title">探索功能</h2>
+      <div class="feature-grid">
+        <a href="discover.html" class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-title">发现音乐</div>
+          <div class="feature-desc">个性化推荐、热门榜单、最新上架</div>
+          <span class="feature-link">去探索 →</span>
+        </a>
+        
+        <a href="music-market.html" class="feature-card">
+          <div class="feature-icon">🛒</div>
+          <div class="feature-title">音乐市场</div>
+          <div class="feature-desc">浏览、筛选、购买音乐授权</div>
+          <span class="feature-link">去市场 →</span>
+        </a>
+        
+        <a href="mint-music.html" class="feature-card">
+          <div class="feature-icon">🎵</div>
+          <div class="feature-title">铸造音乐</div>
+          <div class="feature-desc">上传作品，设置授权条款</div>
+          <span class="feature-link">去铸造 →</span>
+        </a>
+        
+        <a href="bulk-mint.html" class="feature-card">
+          <div class="feature-icon">📦</div>
+          <div class="feature-title">批量铸造</div>
+          <div class="feature-desc">一次上传多首音乐，批量铸造</div>
+          <span class="feature-link">去批量铸造 →</span>
+        </a>
+        
+        <a href="dashboard.html" class="feature-card">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">收益面板</div>
+          <div class="feature-desc">查看收益统计、交易明细、提现</div>
+          <span class="feature-link">去查看 →</span>
+        </a>
+        
+        <a href="my-favorites.html" class="feature-card">
+          <div class="feature-icon">❤️</div>
+          <div class="feature-title">我的收藏</div>
+          <div class="feature-desc">收藏的音乐和播放列表</div>
+          <span class="feature-link">去查看 →</span>
+        </a>
+      </div>
+    </section>
+    
+    <!-- 快捷入口 -->
+    <section class="quick-links">
+      <h2 class="section-title">快捷入口</h2>
+      <div class="quick-grid">
+        <a href="charts.html" class="quick-item">
+          <div class="quick-icon">🏆</div>
+          <div class="quick-label">热门榜单</div>
+        </a>
+        <a href="profile.html" class="quick-item">
+          <div class="quick-icon">👤</div>
+          <div class="quick-label">我的主页</div>
+        </a>
+        <a href="my-assets.html" class="quick-item">
+          <div class="quick-icon">🎧</div>
+          <div class="quick-label">我的资产</div>
+        </a>
+        <a href="comments-demo.html" class="quick-item">
+          <div class="quick-icon">💬</div>
+          <div class="quick-label">评论系统</div>
+        </a>
+      </div>
+    </section>
+  </div>
+  
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="https://github.com/zhouyatingkol/echo-demo1" target="_blank">GitHub</a>
+      <a href="#">文档</a>
+      <a href="#">关于</a>
+    </div>
+    <p>ECHO Music - 去中心化音乐授权平台 © 2024</p>
+  </footer>
+  
+  <script>
+    // 连接钱包
+    async function connectWallet() {
+      if (typeof window.ethereum === 'undefined') {
+        alert('请安装 MetaMask');
+        return;
+      }
+      
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const btn = document.getElementById('connectBtn');
+        btn.textContent = accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
+      } catch (error) {
+        console.error('连接失败:', error);
+      }
+    }
+    
+    // 移动端菜单
+    function toggleMobileMenu() {
+      alert('移动端菜单功能开发中');
+    }
+    
+    // 检查通知
+    function checkNotifications() {
+      // 从 localStorage 读取通知数量
+      const notifications = JSON.parse(localStorage.getItem('echo_notifications') || '[]');
+      const unread = notifications.filter(n => !n.read).length;
+      
+      const badge = document.getElementById('notifBadge');
+      if (unread > 0) {
+        badge.textContent = unread;
+        badge.style.display = 'flex';
+      }
+    }
+    
+    // 页面加载时检查
+    window.addEventListener('load', checkNotifications);
+  </script>
 </body>
 </html>
