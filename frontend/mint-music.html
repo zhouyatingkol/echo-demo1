@@ -917,7 +917,7 @@
                     createdAt: new Date().toISOString()
                 };
                 
-                const uri = 'data:application/json;base64,' + btoa(JSON.stringify(metadata));
+                const uri = 'data:application/json;base64,' + utf8ToBase64(JSON.stringify(metadata));
                 
                 // 构建蓝图
                 const usagePrice = ethers.utils.parseEther(document.getElementById('usagePrice').value);
@@ -994,6 +994,13 @@
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+        
+        // Unicode 安全的 base64 编码
+        function utf8ToBase64(str) {
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
         }
         
         // 简单的 SHA3-256 实现
