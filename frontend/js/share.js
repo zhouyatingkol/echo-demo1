@@ -27,7 +27,7 @@ class MusicShare {
      */
     shareToTwitter(music, text) {
         const shareUrl = this.generateShareUrl(music.tokenId);
-        const shareText = text || `🎵 ${music.name} - 来自 ECHO Music NFT 市场，支持 AI 训练授权 #ECHO #MusicNFT`;
+        const shareText = text || `🎵 ${music.name} - 来自 ECHO Music 市场，支持 AI 训练授权 #ECHO #Music`;
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
         window.open(twitterUrl, '_blank', 'width=550,height=420');
     }
