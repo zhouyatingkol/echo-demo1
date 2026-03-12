@@ -1,0 +1,123 @@
+/**
+ * ECHO Music 统一导航栏样式
+ * 所有页面共用，确保一致性
+ */
+
+/* 导航栏容器 */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10,10,26,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+/* Logo */
+.nav-logo {
+  font-size: 24px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 导航链接 */
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-link {
+  padding: 8px 16px;
+  color: #888;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.nav-link:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.nav-link.active {
+  color: #00d4ff;
+  background: rgba(0,212,255,0.1);
+}
+
+/* 右侧控制区 */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-control {
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-control:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+#themeToggle {
+  font-size: 16px;
+}
+
+#langSelect {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  color: #fff;
+  padding: 8px 28px 8px 12px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+#langSelect option {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.wallet-btn {
+  padding: 8px 20px;
+  background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.wallet-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
