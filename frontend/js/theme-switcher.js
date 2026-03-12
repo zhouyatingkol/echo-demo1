@@ -32,8 +32,8 @@ class ThemeManager {
       return 'dark';
     }
 
-    // Default to light
-    return 'light';
+    // Default to dark
+    return 'dark';
   }
 
   setTheme(theme) {
