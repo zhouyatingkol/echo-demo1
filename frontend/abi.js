@@ -539,40 +539,143 @@ const CONTRACT_ABI = [
         "type": "string"
       },
       {
+        "internalType": "bytes32",
+        "name": "contentHash",
+        "type": "bytes32"
+      },
+      {
         "components": [
           {
-            "internalType": "address",
-            "name": "usageOwner",
-            "type": "address"
+            "components": [
+              {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "fee",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bool",
+                "name": "commercialUse",
+                "type": "bool"
+              },
+              {
+                "internalType": "bool",
+                "name": "modificationAllowed",
+                "type": "bool"
+              },
+              {
+                "internalType": "string[]",
+                "name": "allowedScopes",
+                "type": "string[]"
+              },
+              {
+                "internalType": "string[]",
+                "name": "restrictedScopes",
+                "type": "string[]"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maxUsers",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "licenseDuration",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct ECHOAssetV2.UsageRights",
+            "name": "usage",
+            "type": "tuple"
           },
           {
-            "internalType": "address",
-            "name": "derivativeOwner",
-            "type": "address"
+            "components": [
+              {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "fee",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bool",
+                "name": "allowDerivatives",
+                "type": "bool"
+              },
+              {
+                "internalType": "uint256",
+                "name": "revenueShare",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string[]",
+                "name": "allowedTypes",
+                "type": "string[]"
+              }
+            ],
+            "internalType": "struct ECHOAssetV2.DerivativeRights",
+            "name": "derivative",
+            "type": "tuple"
           },
           {
-            "internalType": "address",
-            "name": "extensionOwner",
-            "type": "address"
+            "components": [
+              {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "fee",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bool",
+                "name": "allowExtensions",
+                "type": "bool"
+              },
+              {
+                "internalType": "string[]",
+                "name": "allowedExtensions",
+                "type": "string[]"
+              }
+            ],
+            "internalType": "struct ECHOAssetV2.ExtensionRights",
+            "name": "extension",
+            "type": "tuple"
           },
           {
-            "internalType": "address",
-            "name": "revenueOwner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "usageFee",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "revenueShare",
-            "type": "uint256"
+            "components": [
+              {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "sharePercentage",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bool",
+                "name": "autoDistribute",
+                "type": "bool"
+              }
+            ],
+            "internalType": "struct ECHOAssetV2.RevenueRights",
+            "name": "revenue",
+            "type": "tuple"
           }
         ],
-        "internalType": "struct ECHOAsset.Rights",
-        "name": "rights",
+        "internalType": "struct ECHOAssetV2.RightsBlueprint",
+        "name": "blueprint",
         "type": "tuple"
       }
     ],
