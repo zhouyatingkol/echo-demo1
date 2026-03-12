@@ -105,55 +105,6 @@
             font-size: 14px;
         }
         
-        /* 高级筛选 */
-        .advanced-filters {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .filter-row {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        .filter-group label {
-            display: block;
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 8px;
-        }
-        .bpm-range {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .bpm-range input[type="range"] {
-            flex: 1;
-        }
-        .bpm-value {
-            min-width: 60px;
-            text-align: center;
-            font-size: 14px;
-            color: #00d4ff;
-        }
-        select {
-            width: 100%;
-            padding: 10px 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-        }
-        select option {
-            background: #1a1a2e;
-        }
-        
         /* Stats */
         .stats-bar {
             display: flex;
@@ -551,43 +502,8 @@
             </div>
             
             <div class="search-bar">
-                <input type="text" class="search-input" id="searchInput" placeholder="搜索音乐..." onkeyup="if(event.key==='Enter')applyFilters()">
-                <button class="wallet-btn" onclick="applyFilters()">🔍 搜索</button>
-            </div>
-            
-            <!-- 高级筛选 -->
-            <div class="advanced-filters">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label>BPM 范围: <span id="bpmRangeValue">60 - 180</span></label>
-                        <div class="bpm-range">
-                            <input type="range" id="bpmMin" min="60" max="180" value="60" oninput="updateBPMRange()">
-                            <span class="bpm-value" id="bpmMinVal">60</span>
-                            <span style="color:#888">-</span>
-                            <span class="bpm-value" id="bpmMaxVal">180</span>
-                            <input type="range" id="bpmMax" min="60" max="180" value="180" oninput="updateBPMRange()">
-                        </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label>时长</label>
-                        <select id="durationFilter" onchange="applyFilters()">
-                            <option value="all">全部时长</option>
-                            <option value="short">短 (&lt; 1分钟)</option>
-                            <option value="medium">中 (1-3分钟)</option>
-                            <option value="long">长 (&gt; 3分钟)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label>排序</label>
-                        <select id="sortBy" onchange="applyFilters()">
-                            <option value="newest">最新发布</option>
-                            <option value="price-low">价格: 低到高</option>
-                            <option value="price-high">价格: 高到低</option>
-                        </select>
-                    </div>
-                </div>
+                <input type="text" class="search-input" placeholder="搜索音乐...">
+                <button class="wallet-btn" onclick="loadMusicList()">🔍 搜索</button>
             </div>
         </div>
 
@@ -785,34 +701,13 @@
                         
                         // 只显示音乐类型
                         if (metadata.assetType && metadata.assetType.startsWith('music_')) {
-                            // 尝试从 metadata.uri 解析 BPM 和时长
-                            let bpm = 120; // 默认值
-                            let duration = '0:00';
-                            
-                            if (metadata.uri) {
-                                try {
-                                    // 如果是 data URI，解析 JSON
-                                    if (metadata.uri.startsWith('data:')) {
-                                        const base64Data = metadata.uri.split(',')[1];
-                                        const jsonStr = atob(base64Data);
-                                        const meta = JSON.parse(jsonStr);
-                                        bpm = meta.bpm || 120;
-                                        duration = meta.duration || '0:00';
-                                    }
-                                } catch (e) {
-                                    // 解析失败使用默认值
-                                }
-                            }
-                            
                             musicList.push({
                                 tokenId: i,
                                 name: metadata.name,
                                 genre: metadata.assetType.replace('music_', ''),
                                 creator: creator,
                                 price: ethers.utils.formatEther(blueprint.usage.fee),
-                                uri: metadata.uri,
-                                bpm: bpm,
-                                duration: duration
+                                uri: metadata.uri
                             });
                             creators.add(creator);
                         }
@@ -883,138 +778,6 @@
                             <button class="add-to-playlist-btn" onclick="showPlaylistDropdown(event, ${music.tokenId})">
                                 📋 添加到播放列表
                             </button>
-                        </div>
-                    </div>
-                </div>
-            `}).join('');
-        }
-        
-        // ========== 筛选功能 ==========
-        
-        // 更新BPM范围显示
-        function updateBPMRange() {
-            let min = parseInt(document.getElementById('bpmMin').value);
-            let max = parseInt(document.getElementById('bpmMax').value);
-            
-            // 确保 min <= max
-            if (min > max) {
-                const temp = min;
-                min = max;
-                max = temp;
-                document.getElementById('bpmMin').value = min;
-                document.getElementById('bpmMax').value = max;
-            }
-            
-            document.getElementById('bpmMinVal').textContent = min;
-            document.getElementById('bpmMaxVal').textContent = max;
-            document.getElementById('bpmRangeValue').textContent = min + ' - ' + max;
-        }
-        
-        // 应用所有筛选条件
-        function applyFilters() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
-            const bpmMin = parseInt(document.getElementById('bpmMin').value);
-            const bpmMax = parseInt(document.getElementById('bpmMax').value);
-            const durationFilter = document.getElementById('durationFilter').value;
-            const sortBy = document.getElementById('sortBy').value;
-            
-            let filtered = musicList;
-            
-            // 风格筛选
-            if (currentFilter !== 'all') {
-                filtered = filtered.filter(m => m.genre === currentFilter);
-            }
-            
-            // 关键词搜索
-            if (keyword) {
-                filtered = filtered.filter(m => 
-                    m.name.toLowerCase().includes(keyword) ||
-                    m.creator.toLowerCase().includes(keyword)
-                );
-            }
-            
-            // BPM筛选
-            filtered = filtered.filter(m => {
-                const bpm = m.bpm || 120; // 默认120
-                return bpm >= bpmMin && bpm <= bpmMax;
-            });
-            
-            // 时长筛选
-            if (durationFilter !== 'all') {
-                filtered = filtered.filter(m => {
-                    // 从duration字符串解析秒数，例如 "3:45" -> 225秒
-                    const durationStr = m.duration || '0:00';
-                    const parts = durationStr.split(':');
-                    const seconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-                    
-                    switch(durationFilter) {
-                        case 'short': return seconds < 60;
-                        case 'medium': return seconds >= 60 && seconds <= 180;
-                        case 'long': return seconds > 180;
-                        default: return true;
-                    }
-                });
-            }
-            
-            // 排序
-            switch(sortBy) {
-                case 'price-low':
-                    filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-                    break;
-                case 'price-high':
-                    filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
-                    break;
-                case 'newest':
-                    filtered.sort((a, b) => b.tokenId - a.tokenId);
-                    break;
-            }
-            
-            // 渲染筛选后的结果
-            renderFilteredList(filtered);
-        }
-        
-        // 渲染筛选后的列表
-        function renderFilteredList(filtered) {
-            const grid = document.getElementById('musicGrid');
-            
-            if (filtered.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #888;">没有找到匹配的音乐</div>';
-                return;
-            }
-            
-            const favorites = getFavorites();
-            
-            grid.innerHTML = filtered.map(music => {
-                const isFav = favorites.includes(music.tokenId);
-                return `
-                <div class="music-card">
-                    <div class="music-visual">
-                        <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(${music.tokenId})" title="${isFav ? '取消收藏' : '收藏'}">
-                            ${isFav ? '❤️' : '🤍'}
-                        </button>
-                        <div class="waveform">
-                            ${Array(20).fill(0).map(() => `
-                                <div class="wave-bar" style="height: ${Math.random() * 80 + 20}%; animation-delay: ${Math.random()}s"></div>
-                            `).join('')}
-                        </div>
-                        <div class="play-overlay" onclick="playMusic(${music.tokenId})">▶</div>
-                    </div>
-                    <div class="music-info">
-                        <div class="music-title">${music.name}</div>
-                        <div class="music-meta">
-                            <span class="meta-tag">${getGenreLabel(music.genre)}</span>
-                            ${music.bpm ? `<span class="meta-tag">${music.bpm} BPM</span>` : ''}
-                            <span class="meta-tag">Token #${music.tokenId}</span>
-                        </div>
-                        <div class="music-stats">
-                            <div class="price">
-                                ${music.price}
-                                <span class="price-unit">MEER/次</span>
-                            </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="share-btn" onclick="musicShare.openModal({tokenId: ${music.tokenId}, name: '${music.name}', creator: '${music.creator}'})" title="分享">🔗</button>
-                                <button class="buy-btn" onclick="buyLicense(${music.tokenId}, '${music.price}')">购买授权</button>
-                            </div>
                         </div>
                     </div>
                 </div>
