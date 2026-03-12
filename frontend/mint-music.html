@@ -722,31 +722,6 @@
             document.getElementById('playBtn').textContent = '▶';
         });
         
-        // 步骤导航
-        function goToStep(step) {
-            // 验证
-            if (step === 2 && !audioFile) {
-                showStatus('请先上传音频文件', 'error');
-                return;
-            }
-            if (step === 3) {
-                if (!document.getElementById('musicName').value) {
-                    showStatus('请填写音乐名称', 'error');
-                    return;
-                }
-                if (!selectedGenre) {
-                    showStatus('请选择风格', 'error');
-                    return;
-                }
-                if (!selectedMood) {
-                    showStatus('请选择情绪', 'error');
-                    return;
-                }
-            }
-            if (step === 4) {
-                updatePreview();
-            }
-            
         // 上传到IPFS（使用 Pinata）
         async function uploadToIPFS(file, metadata) {
             // 注意：实际使用时需要配置 Pinata API Key
