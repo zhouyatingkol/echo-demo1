@@ -1,0 +1,239 @@
+<!-- 统一导航组件 -->
+<nav class="main-nav">
+  <div class="nav-container">
+    <a href="index.html" class="nav-brand">
+      <span class="nav-logo">🎵</span>
+      <span class="nav-title">ECHO Music</span>
+    </a>
+    
+    <div class="nav-menu">
+      <div class="nav-section">
+        <span class="nav-section-title">发现</span>
+        <a href="discover.html" class="nav-link" data-page="discover">
+          <span class="link-icon">🎯</span>猜你喜欢
+        </a>
+        <a href="charts.html" class="nav-link" data-page="charts">
+          <span class="link-icon">🏆</span>热门榜单
+        </a>
+        <a href="music-market.html" class="nav-link" data-page="market">
+          <span class="link-icon">🛒</span>音乐市场
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <span class="nav-section-title">创作</span>
+        <a href="mint-music.html" class="nav-link" data-page="mint">
+          <span class="link-icon">🎵</span>铸造音乐
+        </a>
+        <a href="bulk-mint.html" class="nav-link" data-page="bulkmint">
+          <span class="link-icon">📦</span>批量铸造
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <span class="nav-section-title">我的</span>
+        <a href="dashboard.html" class="nav-link" data-page="dashboard">
+          <span class="link-icon">📊</span>收益面板
+        </a>
+        <a href="my-assets.html" class="nav-link" data-page="assets">
+          <span class="link-icon">🎧</span>我的资产
+        </a>
+        <a href="my-favorites.html" class="nav-link" data-page="favorites">
+          <span class="link-icon">❤️</span>我的收藏
+        </a>
+        <a href="profile.html" class="nav-link" data-page="profile">
+          <span class="link-icon">👤</span>个人主页
+        </a>
+      </div>
+    </div>
+    
+    <div class="nav-actions">
+      <a href="notifications-demo.html" class="nav-icon-btn" title="通知">
+        🔔
+        <span class="badge" id="navBadge"></span>
+      </a>
+      <button class="nav-wallet-btn" id="navWalletBtn" onclick="connectWallet()">
+        连接钱包
+      </button>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(10, 10, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    z-index: 1000;
+  }
+  .nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 40px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    font-size: 28px;
+  }
+  .nav-title {
+    font-size: 20px;
+    font-weight: bold;
+    background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .nav-menu {
+    display: flex;
+    gap: 32px;
+    flex: 1;
+  }
+  .nav-section {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .nav-section-title {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 8px;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    color: #aaa;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .nav-link:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+  }
+  .nav-link.active {
+    color: #00d4ff;
+    background: rgba(0,212,255,0.1);
+  }
+  .link-icon {
+    font-size: 16px;
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-icon-btn {
+    position: relative;
+    padding: 8px;
+    font-size: 20px;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .nav-icon-btn:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  .nav-icon-btn .badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: #ff4444;
+    border-radius: 9px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: none;
+  }
+  .nav-icon-btn .badge.show {
+    display: flex;
+  }
+  .nav-wallet-btn {
+    padding: 10px 24px;
+    background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .nav-wallet-btn:hover {
+    opacity: 0.9;
+  }
+  
+  /* 页面内容需要加上 margin-top */
+  body {
+    padding-top: 64px !important;
+  }
+  
+  @media (max-width: 1200px) {
+    .nav-section-title {
+      display: none;
+    }
+    .nav-menu {
+      gap: 16px;
+    }
+  }
+  @media (max-width: 900px) {
+    .nav-menu {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // 高亮当前页面
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+    document.querySelectorAll('.nav-link').forEach(link => {
+      if (link.getAttribute('href').includes(currentPage)) {
+        link.classList.add('active');
+      }
+    });
+    
+    // 检查通知
+    const notifications = JSON.parse(localStorage.getItem('echo_notifications') || '[]');
+    const unread = notifications.filter(n => !n.read).length;
+    if (unread > 0) {
+      const badge = document.getElementById('navBadge');
+      badge.textContent = unread;
+      badge.classList.add('show');
+    }
+  });
+  
+  // 连接钱包
+  async function connectWallet() {
+    if (typeof window.ethereum === 'undefined') {
+      alert('请安装 MetaMask');
+      return;
+    }
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const btn = document.getElementById('navWalletBtn');
+      btn.textContent = accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
+    } catch (e) {}
+  }
+</script>
