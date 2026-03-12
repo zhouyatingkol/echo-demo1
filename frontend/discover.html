@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发现音乐 - ECHO Music</title>
+  <script src="ethers.min.js"></script>
+  <script src="js/recommendation.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links a {
+      color: #888;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .nav-links a:hover { color: #00d4ff; }
+    
+    .section {
+      margin-bottom: 40px;
+    }
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    
+    .music-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .music-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .music-card:hover {
+      border-color: rgba(0,212,255,0.3);
+    }
+    .card-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .card-meta {
+      color: #888;
+      font-size: 13px;
+    }
+    
+    .refresh-btn {
+      padding: 10px 20px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🎯 发现音乐</div>
+      <div class="nav-links">
+        <a href="music-market.html">市场</a>
+        <a href="charts.html">榜单</a>
+        <a href="dashboard.html">收益</a>
+      </div>
+    </div>
+    
+    <!-- 个性化推荐 -->
+    <div class="section">
+      <div class="section-title">🎯 猜你喜欢</div>
+      <div class="section-subtitle">基于你的收听历史为你推荐</div>
+      <div class="music-grid" id="personalized">
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
+          连接钱包后查看个性化推荐...
+        </div>
+      </div>
+      <button class="refresh-btn" onclick="refreshPersonalized()">🔄 换一批</button>
+    </div>
+    
+    <!-- 热门推荐 -->
+    <div class="section">
+      <div class="section-title">🔥 热门推荐</div>
+      <div class="music-grid" id="trending"></div>
+    </div>
+    
+    <!-- 最新上架 -->
+    <div class="section">
+      <div class="section-title">🆕 最新上架</div>
+      <div class="music-grid" id="newReleases"></div>
+    </div>
+  </div>
+  
+  <script>
+    const V2_CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+    const V2_ABI = [
+      "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
+      "function getCurrentTokenId() view returns (uint256)"
+    ];
+    
+    let provider, contract, userAddress;
+    let allMusic = [];
+    
+    async function init() {
+      if (typeof window.ethereum === 'undefined') return;
+      
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userAddress = accounts[0];
+      
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, provider);
+      
+      await loadAllMusic();
+      
+      // 加载个性化推荐
+      loadPersonalized();
+      
+      // 加载热门推荐
+      loadTrending();
+      
+      // 加载最新上架
+      loadNewReleases();
+    }
+    
+    async function loadAllMusic() {
+      const currentId = await contract.getCurrentTokenId();
+      
+      for (let i = 0; i < currentId.toNumber(); i++) {
+        try {
+          const [metadata, blueprint, creator] = await contract.getAssetInfo(i);
+          if (metadata.assetType && metadata.assetType.startsWith('music_')) {
+            allMusic.push({
+              tokenId: i,
+              name: metadata.name,
+              genre: metadata.assetType.replace('music_', ''),
+              creator: creator,
+              price: ethers.utils.formatEther(blueprint.usage.fee),
+              createdAt: metadata.createdAt?.toNumber() || 0
+            });
+          }
+        } catch (e) {}
+      }
+    }
+    
+    function getUserHistory() {
+      return JSON.parse(localStorage.getItem('echoUserHistory') || '[]');
+    }
+    
+    function analyzeUserPreferences(history) {
+      const prefs = { genres: {}, avgBPM: 0 };
+      
+      history.forEach(item => {
+        if (item.genre) prefs.genres[item.genre] = (prefs.genres[item.genre] || 0) + 1;
+      });
+      
+      prefs.topGenres = Object.entries(prefs.genres)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([g]) => g);
+      
+      return prefs;
+    }
+    
+    function loadPersonalized() {
+      const history = getUserHistory();
+      const container = document.getElementById('personalized');
+      
+      if (history.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">多听听音乐，我们会为你推荐相似风格的作品</div>';
+        return;
+      }
+      
+      const prefs = analyzeUserPreferences(history);
+      const playedIds = new Set(history.map(h => h.tokenId));
+      
+      const recommendations = allMusic
+        .filter(m => !playedIds.has(m.tokenId))
+        .filter(m => prefs.topGenres.includes(m.genre))
+        .slice(0, 4);
+      
+      renderMusicGrid(container, recommendations);
+    }
+    
+    function loadTrending() {
+      // 按创建时间排序，新作品更热
+      const trending = [...allMusic]
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, 4);
+      
+      renderMusicGrid(document.getElementById('trending'), trending);
+    }
+    
+    function loadNewReleases() {
+      const newReleases = [...allMusic]
+        .sort((a, b) => b.tokenId - a.tokenId)
+        .slice(0, 4);
+      
+      renderMusicGrid(document.getElementById('newReleases'), newReleases);
+    }
+    
+    function renderMusicGrid(container, musicList) {
+      if (musicList.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">暂无音乐</div>';
+        return;
+      }
+      
+      container.innerHTML = musicList.map(m => `
+        <div class="music-card" onclick="location.href='music-market.html'">
+          <div class="card-title">${m.name}</div>
+          <div class="card-meta">${m.genre} · ${m.price} MEER</div>
+        </div>
+      `).join('');
+    }
+    
+    function refreshPersonalized() {
+      loadPersonalized();
+    }
+    
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>
