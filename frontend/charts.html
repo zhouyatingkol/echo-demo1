@@ -310,7 +310,56 @@
   <script src="js/wallet-state.js" defer></script>
 </head>
 <body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">铸造</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
-  <div class="charts-container">
+<!-- 
+  ECHO Music 统一导航栏
+  将此代码粘贴到每个页面的 <body> 标签后的第一行
+-->
+<nav style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;">
+  <div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;">
+    <!-- Logo -->
+    <a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      🎵 ECHO Music
+    </a>
+    
+    <!-- 导航链接 -->
+    <div style="display: flex; gap: 8px; flex: 1;">
+      <a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
+      <a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
+      <a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
+      <a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">铸造</a>
+      <a href="dashboard-analytics.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">数据</a>
+    </div>
+    
+    <!-- 右侧控制区 -->
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <!-- 主题切换 -->
+      <button id="themeToggle" onclick="toggleTheme()" title="切换主题"
+        style="padding: 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; min-width: 40px; height: 36px;"
+        onmouseover="this.style.background='rgba(255,255,255,0.25)'" 
+        onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+        🌓
+      </button>
+      
+      <!-- 语言切换 -->
+      <select id="langSelect" onchange="changeLanguage(this.value)"
+        style="padding: 8px 28px 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 13px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"%3e%3cpolyline points=\"6 9 12 15 18 9\"%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; height: 36px;">
+        <option value="zh" style="background: #1a1a2e; color: #fff;">中文</option>
+        <option value="en" style="background: #1a1a2e; color: #fff;">EN</option>
+      </select>
+      
+      <!-- 钱包按钮 -->
+      <button id="connectBtn" onclick="if(window.walletManager && walletManager.isWalletConnected()){walletManager.disconnect();}else{walletManager.connect();}"
+        style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; transition: all 0.3s; font-weight: 500; white-space: nowrap; height: 36px;"
+        onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)'" 
+        onmouseout="this.style.opacity='1'; this.style.transform='none'">
+        连接钱包
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- 页面内容顶部留白 -->
+<div style="height: 80px;"></div>  <div class="charts-container">
     <h1>🔥 热门榜单</h1>
     
     <!-- 榜单类型 -->
