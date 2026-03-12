@@ -1,0 +1,63 @@
+{
+  "app": {
+    "name": "ECHO Music",
+    "subtitle": "去中心化音乐授权平台",
+    "description": "全球领先的 ECHO 资产协议"
+  },
+  "nav": {
+    "home": "首页",
+    "discover": "发现",
+    "market": "市场",
+    "charts": "榜单",
+    "mint": "铸造",
+    "revenue": "收益",
+    "profile": "我的"
+  },
+  "hero": {
+    "title": "ECHO Music",
+    "subtitle": "去中心化音乐授权平台",
+    "description": "创作、铸造、交易你的音乐版权",
+    "cta_primary": "开始创作",
+    "cta_secondary": "浏览市场"
+  },
+  "features": {
+    "mint": {
+      "title": "铸造 ECHO",
+      "desc": "将你的音乐作品上链，创建不可篡改的版权证明"
+    },
+    "market": {
+      "title": "版权市场",
+      "desc": "买卖音乐授权，灵活选择使用场景"
+    },
+    "revenue": {
+      "title": "收益中心",
+      "desc": "实时追踪你的作品收益，自动分配"
+    }
+  },
+  "wallet": {
+    "connect": "连接钱包",
+    "connected": "已连接",
+    "disconnect": "断开连接",
+    "balance": "余额"
+  },
+  "license": {
+    "title": "授权商店",
+    "one_time": "买断制",
+    "per_use": "按次计费",
+    "timed": "限时授权",
+    "buy": "购买授权"
+  },
+  "theme": {
+    "dark": "暗黑模式",
+    "light": "明亮模式"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "close": "关闭"
+  }
+}

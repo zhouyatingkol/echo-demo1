@@ -1,0 +1,63 @@
+{
+  "app": {
+    "name": "ECHO Music",
+    "subtitle": "Decentralized Music Licensing Platform",
+    "description": "Global Leading ECHO Asset Protocol"
+  },
+  "nav": {
+    "home": "Home",
+    "discover": "Discover",
+    "market": "Market",
+    "charts": "Charts",
+    "mint": "Mint",
+    "revenue": "Revenue",
+    "profile": "Profile"
+  },
+  "hero": {
+    "title": "ECHO Music",
+    "subtitle": "Decentralized Music Licensing Platform",
+    "description": "Create, mint, and trade your music rights",
+    "cta_primary": "Start Creating",
+    "cta_secondary": "Browse Market"
+  },
+  "features": {
+    "mint": {
+      "title": "Mint ECHO",
+      "desc": "Put your music on chain with immutable copyright proof"
+    },
+    "market": {
+      "title": "Rights Market",
+      "desc": "Buy and sell music licenses with flexible usage options"
+    },
+    "revenue": {
+      "title": "Revenue Center",
+      "desc": "Track your earnings in real-time with auto-distribution"
+    }
+  },
+  "wallet": {
+    "connect": "Connect Wallet",
+    "connected": "Connected",
+    "disconnect": "Disconnect",
+    "balance": "Balance"
+  },
+  "license": {
+    "title": "License Shop",
+    "one_time": "One-time Purchase",
+    "per_use": "Pay Per Use",
+    "timed": "Time-limited",
+    "buy": "Buy License"
+  },
+  "theme": {
+    "dark": "Dark Mode",
+    "light": "Light Mode"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "close": "Close"
+  }
+}
