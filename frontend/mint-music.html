@@ -747,6 +747,123 @@
                 updatePreview();
             }
             
+        // 上传到IPFS（使用 Pinata）
+        async function uploadToIPFS(file, metadata) {
+            // 注意：实际使用时需要配置 Pinata API Key
+            // 这里使用模拟上传，实际应调用 Pinata API
+            
+            showStatus('正在上传音频到 IPFS...', 'pending');
+            
+            // 模拟上传延迟
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // 生成模拟IPFS hash
+            const audioHash = 'Qm' + Math.random().toString(36).substring(2, 15);
+            const metadataHash = 'Qm' + Math.random().toString(36).substring(2, 15);
+            
+            return {
+                audioUrl: `ipfs://${audioHash}`,
+                metadataUrl: `ipfs://${metadataHash}`
+            };
+        }
+        
+        // 实际IPFS上传（需要配置API密钥）
+        async function uploadToIPFSReal(file, metadata) {
+            const PINATA_API_KEY = localStorage.getItem('pinata_api_key') || '';
+            const PINATA_SECRET_KEY = localStorage.getItem('pinata_secret_key') || '';
+            
+            if (!PINATA_API_KEY) {
+                console.warn('未配置 Pinata API，使用模拟上传');
+                return uploadToIPFS(file, metadata);
+            }
+            
+            try {
+                // 1. 上传音频文件
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const audioRes = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+                    method: 'POST',
+                    headers: {
+                        'pinata_api_key': PINATA_API_KEY,
+                        'pinata_secret_api_key': PINATA_SECRET_KEY
+                    },
+                    body: formData
+                });
+                
+                const audioData = await audioRes.json();
+                const audioUrl = `ipfs://${audioData.IpfsHash}`;
+                
+                // 2. 上传元数据
+                const metadataWithAudio = {
+                    ...metadata,
+                    audioUrl: audioUrl,
+                    animation_url: audioUrl
+                };
+                
+                const metadataRes = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'pinata_api_key': PINATA_API_KEY,
+                        'pinata_secret_api_key': PINATA_SECRET_KEY
+                    },
+                    body: JSON.stringify({
+                        pinataContent: metadataWithAudio,
+                        pinataMetadata: { name: metadata.name }
+                    })
+                });
+                
+                const metadataData = await metadataRes.json();
+                
+                return {
+                    audioUrl: audioUrl,
+                    metadataUrl: `ipfs://${metadataData.IpfsHash}`
+                };
+            } catch (error) {
+                console.error('IPFS上传失败:', error);
+                throw error;
+            }
+        }
+        
+        // 显示IPFS配置弹窗
+        function showIPFSConfig() {
+            const apiKey = prompt('请输入 Pinata API Key（可选）:', localStorage.getItem('pinata_api_key') || '');
+            if (apiKey !== null) {
+                localStorage.setItem('pinata_api_key', apiKey);
+            }
+            
+            const secretKey = prompt('请输入 Pinata Secret Key（可选）:', localStorage.getItem('pinata_secret_key') || '');
+            if (secretKey !== null) {
+                localStorage.setItem('pinata_secret_key', secretKey);
+            }
+        }
+        
+        // 步骤导航
+        function goToStep(step) {
+            // 验证
+            if (step === 2 && !audioFile) {
+                showStatus('请先上传音频文件', 'error');
+                return;
+            }
+            if (step === 3) {
+                if (!document.getElementById('musicName').value) {
+                    showStatus('请填写音乐名称', 'error');
+                    return;
+                }
+                if (!selectedGenre) {
+                    showStatus('请选择风格', 'error');
+                    return;
+                }
+                if (!selectedMood) {
+                    showStatus('请选择情绪', 'error');
+                    return;
+                }
+            }
+            if (step === 4) {
+                updatePreview();
+            }
+            
             // 隐藏所有步骤
             for (let i = 1; i <= 4; i++) {
                 document.getElementById('step' + i).classList.add('hidden');
