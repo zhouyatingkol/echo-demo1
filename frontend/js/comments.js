@@ -51,7 +51,7 @@ const COMMENT_CONFIG = {
  * 评论对象结构
  * @typedef {Object} Comment
  * @property {string} id - UUID
- * @property {number} tokenId - NFT Token ID
+ * @property {number} tokenId - ECHO Token ID
  * @property {string} author - 作者地址 (0x...)
  * @property {string} text - 评论内容
  * @property {number} timestamp - 时间戳 (秒)
@@ -376,7 +376,7 @@ class CommentSystem {
 
   /**
    * 加载评论
-   * @param {number} tokenId - NFT Token ID
+   * @param {number} tokenId - ECHO Token ID
    * @returns {Promise<Comment[]>} 评论列表
    */
   async loadComments(tokenId) {
@@ -432,7 +432,7 @@ class CommentSystem {
 
   /**
    * 发表评论
-   * @param {number} tokenId - NFT Token ID
+   * @param {number} tokenId - ECHO Token ID
    * @param {string} text - 评论内容
    * @param {string|null} parentId - 父评论ID (回复功能)
    * @returns {Promise<Comment>} 创建的评论
