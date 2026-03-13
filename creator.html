@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创作中心 — ECHO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Noto Serif SC', 'Cormorant Garamond', 'serif'],
+                        display: ['Cormorant Garamond', 'serif'],
+                    },
+                    colors: {
+                        'ink': '#1a1a1a',
+                        'paper': '#f7f4ed',
+                        'warm': '#f0ece3',
+                        'silk': '#e8e2d6',
+                        'gold': '#c9a86c',
+                        'gold-soft': '#d4b896',
+                        'clay': '#9e8b76',
+                        'stone': '#5a5248',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+            background: #f7f4ed;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 辨识度元素：左侧垂直水印 */
+        .side-mark {
+            position: fixed;
+            left: 5vw;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            font-size: 0.65rem;
+            letter-spacing: 0.8em;
+            color: rgba(26, 26, 26, 0.12);
+            z-index: 0;
+            pointer-events: none;
+            font-weight: 300;
+        }
+        
+        /* 金色光晕 */
+        .glow-soft {
+            position: fixed;
+            top: -35%;
+            right: -10%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, rgba(201, 168, 108, 0.12) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* 纸张纹理 */
+        .paper-texture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.35;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            padding-top: 15vh;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 欢迎区 */
+        .hero-section {
+            padding: 5vh 10vw 8vh;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-title .first-char {
+            color: #c9a86c;
+            font-size: 1.15em;
+        }
+        
+        .hero-subtitle {
+            font-size: 0.9rem;
+            color: #9e8b76;
+            letter-spacing: 0.15em;
+            margin-bottom: 3rem;
+        }
+        
+        /* 创作者信息卡片 */
+        .creator-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem 2.5rem;
+            background: rgba(240, 236, 227, 0.6);
+            border: 0.5px solid rgba(26, 26, 26, 0.06);
+        }
+        
+        .creator-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c9a86c 0%, #d4b896 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #f7f4ed;
+            font-weight: 300;
+            flex-shrink: 0;
+        }
+        
+        .creator-info {
+            text-align: left;
+        }
+        
+        .creator-name {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: #1a1a1a;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+        }
+        
+        .creator-stats {
+            font-size: 0.8rem;
+            color: #9e8b76;
+            letter-spacing: 0.1em;
+        }
+        
+        /* 快捷操作卡片 */
+        .actions-section {
+            padding: 0 10vw 6vh;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 1rem 2.5rem;
+            border: 0.5px solid #c9a86c;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            color: #c9a86c;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #c9a86c;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: -1;
+        }
+        
+        .action-btn:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        .action-btn:hover {
+            color: #f7f4ed;
+        }
+        
+        .action-btn svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .action-btn:hover svg {
+            transform: translateX(3px);
+        }
+        
+        /* 作品管理区 */
+        .works-section {
+            padding: 6vh 10vw;
+            background: #f0ece3;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            color: #c9a86c;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+        
+        .section-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+        
+        /* 作品表格 */
+        .works-table {
+            width: 100%;
+            border-collapse: collapse;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .works-table thead th {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            color: #9e8b76;
+            font-weight: 400;
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+            text-transform: uppercase;
+        }
+        
+        .works-table tbody tr {
+            transition: all 0.4s ease;
+        }
+        
+        .works-table tbody tr:hover {
+            background: rgba(201, 168, 108, 0.03);
+        }
+        
+        .works-table tbody td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.04);
+            font-size: 0.95rem;
+            color: #5a5248;
+        }
+        
+        .work-name {
+            font-weight: 400;
+            color: #1a1a1a;
+            letter-spacing: 0.05em;
+        }
+        
+        .work-type {
+            font-size: 0.8rem;
+            color: #9e8b76;
+        }
+        
+        /* 状态标签 */
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.9rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+        }
+        
+        .status-tag.active {
+            background: rgba(201, 168, 108, 0.12);
+            color: #c9a86c;
+        }
+        
+        .status-tag.inactive {
+            background: rgba(90, 82, 72, 0.08);
+            color: #5a5248;
+        }
+        
+        .status-tag.pending {
+            background: rgba(158, 139, 118, 0.1);
+            color: #9e8b76;
+        }
+        
+        .work-price {
+            font-family: 'Cormorant Garamond', serif;
+            color: #c9a86c;
+            font-size: 1rem;
+        }
+        
+        /* 操作按钮组 */
+        .action-group {
+            display: flex;
+            gap: 0.8rem;
+        }
+        
+        .action-link {
+            font-size: 0.75rem;
+            color: #9e8b76;
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            padding: 0.3rem 0;
+            position: relative;
+        }
+        
+        .action-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: #c9a86c;
+            transition: width 0.3s ease;
+        }
+        
+        .action-link:hover {
+            color: #c9a86c;
+        }
+        
+        .action-link:hover::after {
+            width: 100%;
+        }
+        
+        /* 收益概览区 */
+        .earnings-section {
+            padding: 10vh 10vw;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .earnings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        /* 圆形印章式数据卡片 */
+        .earnings-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .earnings-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 0.5px solid rgba(201, 168, 108, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        
+        .earnings-circle::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 0.5px solid rgba(201, 168, 108, 0.15);
+            border-radius: 50%;
+        }
+        
+        .earnings-card:hover .earnings-circle {
+            border-color: rgba(201, 168, 108, 0.5);
+            box-shadow: 0 0 40px rgba(201, 168, 108, 0.1);
+        }
+        
+        .earnings-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 300;
+            color: #c9a86c;
+            letter-spacing: 0.02em;
+        }
+        
+        .earnings-unit {
+            font-size: 0.75rem;
+            color: #9e8b76;
+            margin-top: 0.3rem;
+        }
+        
+        .earnings-label {
+            font-size: 0.8rem;
+            color: #5a5248;
+            letter-spacing: 0.1em;
+        }
+        
+        /* 流转记录区 */
+        .history-section {
+            padding: 6vh 10vw 10vh;
+            background: #f0ece3;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .history-table thead th {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            color: #9e8b76;
+            font-weight: 400;
+            text-align: left;
+            padding: 1rem 1.2rem;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+            text-transform: uppercase;
+        }
+        
+        .history-table tbody tr {
+            transition: all 0.4s ease;
+        }
+        
+        .history-table tbody tr:hover {
+            background: rgba(201, 168, 108, 0.03);
+        }
+        
+        .history-table tbody td {
+            padding: 1rem 1.2rem;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.04);
+            font-size: 0.9rem;
+            color: #5a5248;
+        }
+        
+        .tx-type {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+        }
+        
+        .tx-type.sale {
+            background: rgba(201, 168, 108, 0.1);
+            color: #c9a86c;
+        }
+        
+        .tx-type.royalty {
+            background: rgba(90, 82, 72, 0.08);
+            color: #5a5248;
+        }
+        
+        .tx-work {
+            color: #1a1a1a;
+            font-weight: 400;
+        }
+        
+        .tx-buyer {
+            font-family: 'Cormorant Garamond', monospace;
+            font-size: 0.8rem;
+            color: #9e8b76;
+        }
+        
+        .tx-price {
+            font-family: 'Cormorant Garamond', serif;
+            color: #c9a86c;
+        }
+        
+        .tx-time {
+            font-size: 0.8rem;
+            color: #9e8b76;
+        }
+        
+        /* 页脚 */
+        .footer {
+            padding: 8vh 10vw;
+            border-top: 0.5px solid rgba(26, 26, 26, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-logo {
+            font-size: 1rem;
+            letter-spacing: 0.4em;
+            font-weight: 300;
+        }
+        
+        .footer-links a {
+            margin-left: 3rem;
+            text-decoration: none;
+            color: #9e8b76;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: #c9a86c;
+            transition: width 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #1a1a1a;
+            letter-spacing: 0.2em;
+        }
+        
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* 动画 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .earnings-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+            }
+            
+            .earnings-circle {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .earnings-value {
+                font-size: 1.6rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .side-mark { display: none; }
+            
+            .hero-section,
+            .actions-section {
+                padding-left: 6vw;
+                padding-right: 6vw;
+            }
+            
+            .works-section,
+            .earnings-section,
+            .history-section {
+                padding-left: 6vw;
+                padding-right: 6vw;
+            }
+            
+            .creator-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+            
+            .creator-info {
+                text-align: center;
+            }
+            
+            .earnings-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            
+            .works-table,
+            .history-table {
+                font-size: 0.85rem;
+            }
+            
+            .works-table thead,
+            .history-table thead {
+                display: none;
+            }
+            
+            .works-table tbody tr,
+            .history-table tbody tr {
+                display: block;
+                margin-bottom: 1.5rem;
+                border: 0.5px solid rgba(26, 26, 26, 0.06);
+                padding: 1rem;
+                background: rgba(247, 244, 237, 0.5);
+            }
+            
+            .works-table tbody td,
+            .history-table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.8rem 0;
+                border-bottom: 0.5px solid rgba(26, 26, 26, 0.04);
+            }
+            
+            .works-table tbody td:last-child,
+            .history-table tbody td:last-child {
+                border-bottom: none;
+            }
+            
+            .works-table tbody td::before,
+            .history-table tbody td::before {
+                content: attr(data-label);
+                font-size: 0.65rem;
+                color: #9e8b76;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+            
+            .action-group {
+                justify-content: flex-end;
+            }
+            
+            .footer {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+            
+            .footer-links a {
+                margin: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-texture"></div>
+    <div class="glow-soft"></div>
+    <div class="side-mark">ECHO</div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">ECHO</a>
+        <div class="nav-links">
+            <a href="market.html" class="nav-link">市场</a>
+            <a href="creator.html" class="nav-link active">创作</a>
+            <a href="docs.html" class="nav-link">文档</a>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 欢迎区 -->
+        <section class="hero-section">
+            <h1 class="hero-title fade-up">
+                <span class="first-char">创</span>作中心
+            </h1>
+            <p class="hero-subtitle fade-up">管理你的数字生命</p>
+            
+            <!-- 创作者信息 -->
+            <div class="creator-card fade-up">
+                <div class="creator-avatar">林</div>
+                <div class="creator-info">
+                    <div class="creator-name">林清风</div>
+                    <div class="creator-stats">已发布作品 · 5件</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快捷操作 -->
+        <section class="actions-section">
+            <a href="mint.html" class="action-btn fade-up">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                铸造新作品
+            </a>
+            <a href="market.html" class="action-btn fade-up">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 3h18v18H3zM9 3v18M15 3v18M3 9h18M3 15h18"/>
+                </svg>
+                查看市场
+            </a>
+        </section>
+
+        <!-- 作品管理 -->
+        <section class="works-section">
+            <div class="section-header">
+                <div class="section-label fade-up">Works</div>
+                <h2 class="section-title fade-up">作品管理</h2>
+            </div>
+            
+            <div class="fade-up">
+                <table class="works-table">
+                    <thead>
+                        <tr>
+                            <th>作品名称</th>
+                            <th>类型</th>
+                            <th>状态</th>
+                            <th>价格</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="作品名称"><span class="work-name">夏日微风</span></td>
+                            <td data-label="类型"><span class="work-type">音乐</span></td>
+                            <td data-label="状态"><span class="status-tag active">已上架</span></td>
+                            <td data-label="价格"><span class="work-price">100 ECHO</span></td>
+                            <td data-label="操作">
+                                <div class="action-group">
+                                    <a href="#" class="action-link">编辑</a>
+                                    <a href="work-detail.html" class="action-link">查看</a>
+                                    <a href="#" class="action-link">下架</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="作品名称"><span class="work-name">城市节拍</span></td>
+                            <td data-label="类型"><span class="work-type">音乐</span></td>
+                            <td data-label="状态"><span class="status-tag active">已上架</span></td>
+                            <td data-label="价格"><span class="work-price">150 ECHO</span></td>
+                            <td data-label="操作">
+                                <div class="action-group">
+                                    <a href="#" class="action-link">编辑</a>
+                                    <a href="#" class="action-link">查看</a>
+                                    <a href="#" class="action-link">下架</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="作品名称"><span class="work-name">山间晨雾</span></td>
+                            <td data-label="类型"><span class="work-type">影像</span></td>
+                            <td data-label="状态"><span class="status-tag pending">审核中</span></td>
+                            <td data-label="价格"><span class="work-price">—</span></td>
+                            <td data-label="操作">
+                                <div class="action-group">
+                                    <a href="#" class="action-link">编辑</a>
+                                    <a href="#" class="action-link">查看</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="作品名称"><span class="work-name">午夜蓝调</span></td>
+                            <td data-label="类型"><span class="work-type">音乐</span></td>
+                            <td data-label="状态"><span class="status-tag inactive">已下架</span></td>
+                            <td data-label="价格"><span class="work-price">—</span></td>
+                            <td data-label="操作">
+                                <div class="action-group">
+                                    <a href="#" class="action-link">编辑</a>
+                                    <a href="#" class="action-link">查看</a>
+                                    <a href="#" class="action-link">上架</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="作品名称"><span class="work-name">光影流动</span></td>
+                            <td data-label="类型"><span class="work-type">影像</span></td>
+                            <td data-label="状态"><span class="status-tag active">已上架</span></td>
+                            <td data-label="价格"><span class="work-price">200 ECHO</span></td>
+                            <td data-label="操作">
+                                <div class="action-group">
+                                    <a href="#" class="action-link">编辑</a>
+                                    <a href="#" class="action-link">查看</a>
+                                    <a href="#" class="action-link">下架</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 收益概览 -->
+        <section class="earnings-section">
+            <div class="section-header">
+                <div class="section-label fade-up">Earnings</div>
+                <h2 class="section-title fade-up">收益概览</h2>
+            </div>
+            
+            <div class="earnings-grid">
+                <div class="earnings-card fade-up">
+                    <div class="earnings-circle">
+                        <div class="earnings-value">2,450</div>
+                        <div class="earnings-unit">ECHO</div>
+                    </div>
+                    <div class="earnings-label">累计收益</div>
+                </div>
+                
+                <div class="earnings-card fade-up">
+                    <div class="earnings-circle">
+                        <div class="earnings-value">380</div>
+                        <div class="earnings-unit">ECHO</div>
+                    </div>
+                    <div class="earnings-label">本月收益</div>
+                </div>
+                
+                <div class="earnings-card fade-up">
+                    <div class="earnings-circle">
+                        <div class="earnings-value">5</div>
+                        <div class="earnings-unit">件</div>
+                    </div>
+                    <div class="earnings-label">作品数量</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 近期流转记录 -->
+        <section class="history-section">
+            <div class="section-header">
+                <div class="section-label fade-up">History</div>
+                <h2 class="section-title fade-up">近期流转</h2>
+            </div>
+            
+            <div class="fade-up">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>作品</th>
+                            <th>买家</th>
+                            <th>价格</th>
+                            <th>时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="类型"><span class="tx-type sale">售出</span></td>
+                            <td data-label="作品"><span class="tx-work">夏日微风</span></td>
+                            <td data-label="买家" class="tx-buyer">0x8a12...b3c4</td>
+                            <td data-label="价格" class="tx-price">100 ECHO</td>
+                            <td data-label="时间" class="tx-time">2024.06.15</td>
+                        </tr>
+                        <tr>
+                            <td data-label="类型"><span class="tx-type royalty">版税</span></td>
+                            <td data-label="作品"><span class="tx-work">城市节拍</span></td>
+                            <td data-label="买家" class="tx-buyer">—</td>
+                            <td data-label="价格" class="tx-price">15 ECHO</td>
+                            <td data-label="时间" class="tx-time">2024.06.12</td>
+                        </tr>
+                        <tr>
+                            <td data-label="类型"><span class="tx-type sale">售出</span></td>
+                            <td data-label="作品"><span class="tx-work">光影流动</span></td>
+                            <td data-label="买家" class="tx-buyer">0x5d67...e8f9</td>
+                            <td data-label="价格" class="tx-price">200 ECHO</td>
+                            <td data-label="时间" class="tx-time">2024.06.08</td>
+                        </tr>
+                        <tr>
+                            <td data-label="类型"><span class="tx-type royalty">版税</span></td>
+                            <td data-label="作品"><span class="tx-work">夏日微风</span></td>
+                            <td data-label="买家" class="tx-buyer">—</td>
+                            <td data-label="价格" class="tx-price">10 ECHO</td>
+                            <td data-label="时间" class="tx-time">2024.06.05</td>
+                        </tr>
+                        <tr>
+                            <td data-label="类型"><span class="tx-type sale">售出</span></td>
+                            <td data-label="作品"><span class="tx-work">城市节拍</span></td>
+                            <td data-label="买家" class="tx-buyer">0x2a34...d5e6</td>
+                            <td data-label="价格" class="tx-price">150 ECHO</td>
+                            <td data-label="时间" class="tx-time">2024.06.01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-logo">ECHO</div>
+        <div class="footer-links">
+            <a href="docs.html">文档</a>
+            <a href="#">GitHub</a>
+        </div>
+    </footer>
+
+    <script>
+        // 滚动淡入动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.fade-up').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
