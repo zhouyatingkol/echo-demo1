@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO — 动态数字生命</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'Noto Serif SC', 'serif'],
+                        display: ['Cormorant Garamond', 'serif'],
+                    },
+                    colors: {
+                        'ink': '#0f0f0f',
+                        'paper': '#f5f0e8',
+                        'warm': '#ebe5db',
+                        'gold': '#d4a84b',
+                        'gold-bright': '#e8c878',
+                        'cinnabar': '#c45c3e',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+            background: #f5f0e8;
+            color: #0f0f0f;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 更强纹理 */
+        .paper-texture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        /* 更强光晕 */
+        .glow-tension {
+            position: fixed;
+            top: -20%;
+            right: -5%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(212, 168, 75, 0.18) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* 装饰线 */
+        .deco-line {
+            position: fixed;
+            left: 5vw;
+            top: 0;
+            width: 1px;
+            height: 100vh;
+            background: linear-gradient(to bottom, transparent, rgba(212, 168, 75, 0.3), transparent);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+        }
+        
+        /* 💥 更有张力的标题 — 更大、更粗 */
+        .hero-title {
+            font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
+            /* 更大 */
+            font-size: clamp(3.5rem, 12vw, 7rem);
+            /* 更粗 */
+            font-weight: 600;
+            /* 更紧凑 */
+            letter-spacing: 0.08em;
+            line-height: 1.3;
+            color: #0f0f0f;
+            text-align: center;
+        }
+        
+        .hero-title span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: charDropIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        /* 更有力的入场 */
+        @keyframes charDropIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 副标题 — 更有存在感 */
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            font-weight: 400;
+            color: #8b7355;
+            margin-top: 2.5rem;
+            font-style: italic;
+            letter-spacing: 0.4em;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 1s forwards, breathe 3s ease-in-out 2s infinite;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        @keyframes breathe {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* 更粗的分隔线 */
+        .divider-bold {
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4a84b, transparent);
+            margin: 3rem auto;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 1.5s forwards;
+        }
+        
+        /* 按钮 — 更有质感 */
+        .enter-btn {
+            margin-top: 3rem;
+            padding: 1.2rem 4rem;
+            border: 2px solid #0f0f0f;
+            background: transparent;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            color: #0f0f0f;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 2s forwards;
+        }
+        
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #d4a84b;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: -1;
+        }
+        
+        .enter-btn:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        .enter-btn:hover {
+            color: #0f0f0f;
+            border-color: #d4a84b;
+        }
+        
+        /* 滚动提示 */
+        .scroll-hint {
+            position: absolute;
+            bottom: 8vh;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 0.8s ease 2.5s forwards;
+        }
+        
+        .scroll-hint span {
+            display: block;
+            font-size: 0.7rem;
+            color: #8b7355;
+            letter-spacing: 0.3em;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .scroll-line {
+            width: 2px;
+            height: 50px;
+            background: linear-gradient(to bottom, #d4a84b, transparent);
+            margin: 0 auto;
+            animation: pulseLine 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulseLine {
+            0%, 100% { opacity: 0.4; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.15); }
+        }
+        
+        .section-poetic {
+            min-height: 80vh;
+            padding: 15vh 10vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.35em;
+            color: #d4a84b;
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        
+        /* 💥 更有力的章节标题 */
+        .section-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 2.5rem;
+            letter-spacing: 0.05em;
+            color: #0f0f0f;
+        }
+        
+        .poetic-text {
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            font-weight: 400;
+            line-height: 2.4;
+            color: #4a4035;
+            max-width: 680px;
+        }
+        
+        .poetic-text p {
+            margin-bottom: 2rem;
+        }
+        
+        /* 💥 朱批强调 */
+        .emphasis {
+            color: #c45c3e;
+            font-weight: 600;
+        }
+        
+        .gold-accent {
+            color: #d4a84b;
+            font-weight: 500;
+        }
+        
+        /* 特点卡片 — 更强hover */
+        .feature-item {
+            padding: 3.5rem 0;
+            border-bottom: 1px solid rgba(15, 15, 15, 0.12);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .feature-item:hover {
+            padding-left: 2.5rem;
+            border-color: #d4a84b;
+            background: linear-gradient(90deg, rgba(212, 168, 75, 0.05), transparent);
+        }
+        
+        .feature-number {
+            font-size: 0.8rem;
+            color: #d4a84b;
+            letter-spacing: 0.25em;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        /* 💥 更有力的特点标题 */
+        .feature-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.05em;
+            transition: color 0.3s ease;
+        }
+        
+        .feature-item:hover .feature-title {
+            color: #d4a84b;
+        }
+        
+        .feature-desc {
+            font-size: 1rem;
+            color: #6a6055;
+            line-height: 1.9;
+            max-width: 480px;
+        }
+        
+        /* 数据 — 更有冲击 */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            border: 2px solid rgba(212, 168, 75, 0.15);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-8px);
+            border-color: rgba(212, 168, 75, 0.4);
+            box-shadow: 0 20px 40px rgba(212, 168, 75, 0.1);
+        }
+        
+        /* 💥 更大的数字 */
+        .stat-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.5rem, 7vw, 5.5rem);
+            font-weight: 500;
+            color: #0f0f0f;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+        
+        .stat-number.gold {
+            color: #d4a84b;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #8b7355;
+            margin-top: 1rem;
+            letter-spacing: 0.2em;
+            font-weight: 500;
+        }
+        
+        /* 作品列表 */
+        .work-row {
+            padding: 2.5rem 0;
+            border-bottom: 1px solid rgba(15, 15, 15, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        
+        .work-row:hover {
+            padding-left: 1.5rem;
+            border-color: #d4a84b;
+            background: linear-gradient(90deg, rgba(212, 168, 75, 0.05), transparent);
+        }
+        
+        .work-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+        
+        .work-row:hover .work-name {
+            color: #d4a84b;
+            letter-spacing: 0.1em;
+        }
+        
+        .work-artist {
+            font-size: 0.85rem;
+            color: #8b7355;
+            margin-top: 0.3rem;
+        }
+        
+        .work-price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: #d4a84b;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+        }
+        
+        .work-row:hover .work-price {
+            transform: translateY(-3px) scale(1.05);
+        }
+        
+        .cta-section {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        
+        .cta-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 2rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .footer {
+            padding: 8vh 10vw;
+            border-top: 1px solid rgba(15, 15, 15, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-logo {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.3rem;
+            letter-spacing: 0.25em;
+            font-weight: 600;
+        }
+        
+        .footer-links a {
+            margin-left: 3rem;
+            text-decoration: none;
+            color: #8b7355;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 500;
+        }
+        
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #d4a84b;
+            transition: width 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #0f0f0f;
+            letter-spacing: 0.2em;
+        }
+        
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* 动画 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .section-poetic {
+                padding: 10vh 6vw;
+            }
+            
+            .deco-line {
+                display: none;
+            }
+            
+            .footer {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+            
+            .footer-links a {
+                margin: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-texture"></div>
+    <div class="glow-tension"></div>
+    <div class="deco-line"></div>
+
+    <section class="hero">
+        <h1 class="hero-title" id="heroTitle">动态数字生命</h1>
+        <p class="hero-subtitle">— ECHO</p>
+        <div class="divider-bold"></div>
+        
+        <button class="enter-btn" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
+            觉醒
+        </button>
+
+        <div class="scroll-hint">
+            <span>SCROLL</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <section id="about" class="section-poetic">
+        <div class="section-label">Awakening</div>
+        <h2 class="section-title">不是 NFT</h2>
+        
+        <div class="poetic-text">
+            <p><span class="emphasis">NFT</span> 是静态的收藏，是被封存的标本。</p>
+            <p><span class="emphasis">ECHO</span> 是<span class="gold-accent">活着</span>的权益，是随使用生长的数字生命。</p>
+            <p>每一次使用，都是一次呼吸。每一次交易，都是一次连接。</p>
+        </div>
+    </section>
+
+    <section class="section-poetic" style="background: #ebe5db;">
+        <div class="section-label">Growth</div>
+        <div style="max-width: 750px;">
+            <div class="feature-item">
+                <div class="feature-number">01 — 动态</div>
+                <h3 class="feature-title">生长</h3>
+                <p class="feature-desc">随使用次数、时间、场景不断进化。价值不是固定的，而是流动的。</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-number">02 — 多权利</div>
+                <h3 class="feature-title">配置</h3>
+                <p class="feature-desc">买断、按次、限时。一件作品，多种可能。</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-number">03 — 实时</div>
+                <h3 class="feature-title">分配</h3>
+                <p class="feature-desc">每次使用自动分配收益。创作者实时获得 MEER。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-poetic">
+        <div class="section-label">Propagation</div>
+        <h2 class="section-title">生生不息</h2>
+        
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-number">1,234</div>
+                <div class="stat-label">音乐作品</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number">5,678</div>
+                <div class="stat-label">ECHO</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number">987</div>
+                <div class="stat-label">创作者</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number gold">45.6K</div>
+                <div class="stat-label">MEER</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-poetic" style="background: #ebe5db;">
+        <div class="section-label">Collection</div>
+        <h2 class="section-title">精选名录</h2>
+        
+        <div style="max-width: 850px;">
+            <div class="work-row">
+                <div>
+                    <div class="work-name">夏日微风</div>
+                    <div class="work-artist">音乐创作者</div>
+                </div>
+                <div class="work-price">100 MEER</div>
+            </div>
+            
+            <div class="work-row">
+                <div>
+                    <div class="work-name">城市节拍</div>
+                    <div class="work-artist">BeatMaker</div>
+                </div>
+                <div class="work-price">150 MEER</div>
+            </div>
+            
+            <div class="work-row">
+                <div>
+                    <div class="work-name">钢琴协奏曲</div>
+                    <div class="work-artist">古典大师</div>
+                </div>
+                <div class="work-price">500 MEER</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="section-label">Evolution</div>
+        <h2 class="cta-title">
+            生成你的 <span class="gold-accent">ECHO</span>
+        </h2>
+        <p style="color: #6a6055; margin-bottom: 3rem; font-size: 1.1rem;">
+            让创作真正属于你，持续进化
+        </p>
+        <button class="enter-btn">开始创作</button>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-logo">ECHO</div>
+        <div style="display: flex; gap: 2rem;">
+            <a href="#">文档</a>
+            <a href="#">GitHub</a>
+            <a href="#">Qitmeer</a>
+        </div>
+    </footer>
+
+    <script>
+        const heroTitle = document.getElementById('heroTitle');
+        const text = heroTitle.textContent;
+        heroTitle.innerHTML = '';
+        
+        [...text].forEach((char, i) => {
+            const span = document.createElement('span');
+            span.textContent = char === ' ' ? '\u00A0' : char;
+            span.style.animationDelay = `${i * 0.06}s`;
+            heroTitle.appendChild(span);
+        });
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        
+        document.querySelectorAll('.section-label, .section-title, .poetic-text, .feature-item, .stat-item').forEach(el => {
+            el.classList.add('fade-up');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
