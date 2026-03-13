@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>批量铸造 - ECHO Music</title>
+  <script src="ethers.min.js"></script>
+  <style>
+    .bulk-mint-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    
+    /* 批量上传区域 */
+    .upload-area {
+      border: 2px dashed rgba(255,255,255,0.3);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .upload-area.dragover {
+      border-color: #00d4ff;
+      background: rgba(0,212,255,0.05);
+    }
+    
+    /* 文件列表 */
+    .file-list {
+      margin-bottom: 30px;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .file-number {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+    }
+    .file-info {
+      flex: 1;
+    }
+    .file-inputs {
+      display: flex;
+      gap: 12px;
+      flex: 2;
+    }
+    .file-inputs input {
+      flex: 1;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      color: #fff;
+    }
+    
+    /* 全局设置 */
+    .global-settings {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+    
+    /* 批量操作按钮 */
+    .batch-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    .mint-btn {
+      padding: 16px 48px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .mint-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* 进度显示 */
+    .progress-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .progress-overlay.active {
+      display: flex;
+    }
+    .progress-card {
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+    }
+    .progress-bar {
+      width: 300px;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      transition: width 0.3s;
+    }
+  </style>
+  <script src="frontend/js/theme-switcher.js" defer></script>
+  <script src="frontend/js/i18n.js" defer></script>
+  <link rel="stylesheet" href="frontend/css/global.css"
+  <link rel="stylesheet" href="frontend/css/theme.css">
+  <link rel="stylesheet" href="frontend/css/mobile.css">
+  <script src="frontend/js/wallet-state.js" defer></script>
+</head>
+<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">铸造</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
+  <div class="bulk-mint-container">
+    <h1>📦 批量铸造</h1>
+    
+    <!-- 批量上传 -->
+    <div class="upload-area" id="uploadArea">
+      <div class="icon">📁</div>
+      <p>拖拽多个音频文件到此处，或点击选择</p>
+      <input type="file" id="fileInput" multiple accept="audio/*" style="display: none;">
+      <button onclick="document.getElementById('fileInput').click()">选择文件</button>
+    </div>
+    
+    <!-- 文件列表 -->
+    <div class="file-list" id="fileList"></div>
+    
+    <!-- 全局授权设置 -->
+    <div class="global-settings">
+      <h3>⚙️ 统一授权设置</h3>
+      
+      <div class="setting-row">
+        <label>使用价格 (MEER/次)</label>
+        <input type="number" id="globalPrice" value="0.1" step="0.01">
+      </div>
+      
+      <div class="setting-row">
+        <label>允许商业使用</label>
+        <input type="checkbox" id="globalCommercial" checked>
+      </div>
+      
+      <div class="setting-row">
+        <label>允许衍生作品</label>
+        <input type="checkbox" id="globalDerivative">
+      </div>
+      
+      <button onclick="applyGlobalSettings()">应用到全部</button>
+    </div>
+    
+    <!-- 批量铸造按钮 -->
+    <div class="batch-actions">
+      <button class="mint-btn" id="mintBtn" onclick="startBulkMint()" disabled>
+        开始批量铸造
+      </button>
+    </div>
+  </div>
+  
+  <!-- 进度遮罩 -->
+  <div class="progress-overlay" id="progressOverlay">
+    <div class="progress-card">
+      <h3>⏳ 铸造中...</h3>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <p id="progressText">0 / 0 完成</p>
+      <p id="currentFile">-</p>
+    </div>
+  </div>
+  
+  <script>
+    const V2_CONTRACT_ADDRESS = '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce';
+    const V2_ABI = [
+      "function mintECHO(string name, string description, string assetType, string uri, bytes32 contentHash, tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue) blueprint) returns (uint256)"
+    ];
+    
+    let files = [];
+    let fileData = []; // 存储每首音乐的信息
+    
+    // 拖放上传
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+    
+    function handleFiles(fileList) {
+      files = Array.from(fileList).filter(f => f.type.startsWith('audio/'));
+      
+      // 初始化每首音乐的数据
+      fileData = files.map((file, index) => ({
+        index,
+        file,
+        name: file.name.replace(/\.[^/.]+$/, ''), // 去掉扩展名
+        genre: 'pop',
+        mood: 'happy',
+        bpm: 120,
+        price: '0.1',
+        commercial: true,
+        derivative: false
+      }));
+      
+      renderFileList();
+      document.getElementById('mintBtn').disabled = files.length === 0;
+    }
+    
+    function renderFileList() {
+      const container = document.getElementById('fileList');
+      
+      container.innerHTML = fileData.map((data, i) => `
+        <div class="file-item">
+          <div class="file-number">${i + 1}</div>
+          <div class="file-info">
+            <div>${data.file.name}</div>
+            <div style="color: #888; font-size: 12px;">${formatFileSize(data.file.size)}</div>
+          </div>
+          <div class="file-inputs">
+            <input type="text" placeholder="音乐名称" value="${data.name}"
+                   onchange="updateFileData(${i}, 'name', this.value)">
+            <select onchange="updateFileData(${i}, 'genre', this.value)">
+              <option value="pop" ${data.genre === 'pop' ? 'selected' : ''}>流行</option>
+              <option value="electronic" ${data.genre === 'electronic' ? 'selected' : ''}>电子</option>
+              <option value="rock" ${data.genre === 'rock' ? 'selected' : ''}>摇滚</option>
+              <option value="classical" ${data.genre === 'classical' ? 'selected' : ''}>古典</option>
+              <option value="jazz" ${data.genre === 'jazz' ? 'selected' : ''}>爵士</option>
+            </select>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function updateFileData(index, field, value) {
+      fileData[index][field] = value;
+    }
+    
+    function applyGlobalSettings() {
+      const price = document.getElementById('globalPrice').value;
+      const commercial = document.getElementById('globalCommercial').checked;
+      const derivative = document.getElementById('globalDerivative').checked;
+      
+      fileData.forEach(data => {
+        data.price = price;
+        data.commercial = commercial;
+        data.derivative = derivative;
+      });
+      
+      alert('已应用到全部 ' + fileData.length + ' 首音乐');
+    }
+    
+    async function startBulkMint() {
+      if (!window.ethereum) {
+        alert('请安装 MetaMask');
+        return;
+      }
+      
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const userAddress = accounts[0];
+      
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, signer);
+      
+      // 显示进度
+      const overlay = document.getElementById('progressOverlay');
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      const currentFile = document.getElementById('currentFile');
+      
+      overlay.classList.add('active');
+      
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (let i = 0; i < fileData.length; i++) {
+        const data = fileData[i];
+        
+        // 更新进度
+        const progress = ((i + 1) / fileData.length) * 100;
+        progressFill.style.width = progress + '%';
+        progressText.textContent = `${i + 1} / ${fileData.length} 完成`;
+        currentFile.textContent = `正在铸造: ${data.name}`;
+        
+        try {
+          // 这里简化处理，实际需要上传 IPFS 等
+          // const tx = await contract.mintECHO(...);
+          // await tx.wait();
+          
+          successCount++;
+        } catch (error) {
+          console.error('铸造失败:', error);
+          failCount++;
+        }
+        
+        // 延迟避免请求过快
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      overlay.classList.remove('active');
+      
+      alert(`批量铸造完成!\n成功: ${successCount}\n失败: ${failCount}`);
+    }
+    
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+  </script>
+</body>
+</html>

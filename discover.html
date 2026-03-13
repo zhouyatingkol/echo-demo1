@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发现音乐 - ECHO Music</title>
+  <script src="ethers.min.js"></script>
+  <script src="frontend/js/recommendation.js"></script>
+  <script src="frontend/js/theme-switcher.js" defer></script>
+  <script src="frontend/js/i18n.js" defer></script>
+  <link rel="stylesheet" href="frontend/css/global.css">
+  <link rel="stylesheet" href="frontend/css/theme.css"
+  <link rel="stylesheet" href="frontend/css/navbar.css">
+  <link rel="stylesheet" href="frontend/css/mobile.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background: #0a0a0a; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links a {
+      color: #888;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .nav-links a:hover { color: #00d4ff; }
+    
+    .section {
+      margin-bottom: 40px;
+    }
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    
+    .music-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .music-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .music-card:hover {
+      border-color: rgba(0,212,255,0.3);
+    }
+    .card-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .card-meta {
+      color: #888;
+      font-size: 13px;
+    }
+    
+    .refresh-btn {
+      padding: 10px 20px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+  </style>
+  <script src="frontend/js/wallet-state.js" defer></script>
+<!-- 
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">🎵 ECHO Music</a>
+    
+    <div class="nav-links">
+      <a href="discover.html" class="nav-link">发现</a>
+      <a href="music-market.html" class="nav-link">市场</a>
+      <a href="charts.html" class="nav-link">榜单</a>
+      <a href="mint-music.html" class="nav-link">铸造</a>
+      <a href="dashboard-analytics.html" class="nav-link">数据</a>
+    </div>
+    
+    <div class="nav-right">
+      <button id="themeToggle" class="nav-control" onclick="toggleTheme()">🌓</button>
+      <select id="langSelect" class="nav-control" onchange="changeLanguage(this.value)">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+      </select>
+      <button id="connectBtn" class="wallet-btn">连接钱包</button>
+    </div>
+  </div>
+</nav><nav style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;">
+  <div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;">
+    <!-- Logo -->
+    <a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      🎵 ECHO Music
+    </a>
+    
+    <!-- 导航链接 -->
+    <div style="display: flex; gap: 8px; flex: 1;">
+      <a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
+      <a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
+      <a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
+      <a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">铸造</a>
+      <a href="dashboard-analytics.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">数据</a>
+    </div>
+    
+    <!-- 右侧控制区 -->
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <!-- 主题切换 -->
+      <button id="themeToggle" onclick="toggleTheme()" title="切换主题"
+        style="padding: 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; min-width: 40px; height: 36px;"
+        onmouseover="this.style.background='rgba(255,255,255,0.25)'" 
+        onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+        🌓
+      </button>
+      
+      <!-- 语言切换 -->
+      <select id="langSelect" onchange="changeLanguage(this.value)"
+        style="padding: 8px 28px 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 13px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"%3e%3cpolyline points=\"6 9 12 15 18 9\"%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; height: 36px;">
+        <option value="zh" style="background: #1a1a2e; color: #fff;">中文</option>
+        <option value="en" style="background: #1a1a2e; color: #fff;">EN</option>
+      </select>
+      
+      <!-- 钱包按钮 -->
+      <button id="connectBtn" onclick="if(window.walletManager && walletManager.isWalletConnected()){walletManager.disconnect();}else{walletManager.connect();}"
+        style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; transition: all 0.3s; font-weight: 500; white-space: nowrap; height: 36px;"
+        onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)'" 
+        onmouseout="this.style.opacity='1'; this.style.transform='none'">
+        连接钱包
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- 页面内容顶部留白 -->
+<div style="height: 80px;"></div>          连接钱包后查看个性化推荐...
+        </div>
+      </div>
+      <button class="refresh-btn" onclick="refreshPersonalized()">🔄 换一批</button>
+    </div>
+    
+    <!-- 热门推荐 -->
+    <div class="section">
+      <div class="section-title">🔥 热门推荐</div>
+      <div class="music-grid" id="trending"></div>
+    </div>
+    
+    <!-- 最新上架 -->
+    <div class="section">
+      <div class="section-title">🆕 最新上架</div>
+      <div class="music-grid" id="newReleases"></div>
+    </div>
+  </div>
+  
+  <script>
+    const V2_CONTRACT_ADDRESS = '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce';
+    const V2_ABI = [
+      "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
+      "function getCurrentTokenId() view returns (uint256)"
+    ];
+    
+    let provider, contract, userAddress;
+    let allMusic = [];
+    
+    async function init() {
+      if (typeof window.ethereum === 'undefined') return;
+      
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userAddress = accounts[0];
+      
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, provider);
+      
+      await loadAllMusic();
+      
+      // 加载个性化推荐
+      loadPersonalized();
+      
+      // 加载热门推荐
+      loadTrending();
+      
+      // 加载最新上架
+      loadNewReleases();
+    }
+    
+    async function loadAllMusic() {
+      const currentId = await contract.getCurrentTokenId();
+      
+      for (let i = 0; i < currentId.toNumber(); i++) {
+        try {
+          const [metadata, blueprint, creator] = await contract.getAssetInfo(i);
+          if (metadata.assetType && metadata.assetType.startsWith('music_')) {
+            allMusic.push({
+              tokenId: i,
+              name: metadata.name,
+              genre: metadata.assetType.replace('music_', ''),
+              creator: creator,
+              price: ethers.utils.formatEther(blueprint.usage.fee),
+              createdAt: metadata.createdAt?.toNumber() || 0
+            });
+          }
+        } catch (e) {}
+      }
+    }
+    
+    function getUserHistory() {
+      return JSON.parse(localStorage.getItem('echoUserHistory') || '[]');
+    }
+    
+    function analyzeUserPreferences(history) {
+      const prefs = { genres: {}, avgBPM: 0 };
+      
+      history.forEach(item => {
+        if (item.genre) prefs.genres[item.genre] = (prefs.genres[item.genre] || 0) + 1;
+      });
+      
+      prefs.topGenres = Object.entries(prefs.genres)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([g]) => g);
+      
+      return prefs;
+    }
+    
+    function loadPersonalized() {
+      const history = getUserHistory();
+      const container = document.getElementById('personalized');
+      
+      if (history.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">多听听音乐，我们会为你推荐相似风格的作品</div>';
+        return;
+      }
+      
+      const prefs = analyzeUserPreferences(history);
+      const playedIds = new Set(history.map(h => h.tokenId));
+      
+      const recommendations = allMusic
+        .filter(m => !playedIds.has(m.tokenId))
+        .filter(m => prefs.topGenres.includes(m.genre))
+        .slice(0, 4);
+      
+      renderMusicGrid(container, recommendations);
+    }
+    
+    function loadTrending() {
+      // 按创建时间排序，新作品更热
+      const trending = [...allMusic]
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, 4);
+      
+      renderMusicGrid(document.getElementById('trending'), trending);
+    }
+    
+    function loadNewReleases() {
+      const newReleases = [...allMusic]
+        .sort((a, b) => b.tokenId - a.tokenId)
+        .slice(0, 4);
+      
+      renderMusicGrid(document.getElementById('newReleases'), newReleases);
+    }
+    
+    function renderMusicGrid(container, musicList) {
+      if (musicList.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">暂无音乐</div>';
+        return;
+      }
+      
+      container.innerHTML = musicList.map(m => `
+        <div class="music-card" onclick="location.href='music-market.html'">
+          <div class="card-title">${m.name}</div>
+          <div class="card-meta">${m.genre} · ${m.price} MEER</div>
+        </div>
+      `).join('');
+    }
+    
+    function refreshPersonalized() {
+      loadPersonalized();
+    }
+    
+    window.addEventListener('load', init);
+    
+    // 主题切换
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+    
+    // 语言切换
+    function changeLanguage(lang) {
+      localStorage.setItem('language', lang);
+      window.location.reload();
+    }
+    
+    // 初始化设置
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</body>
+</html>
