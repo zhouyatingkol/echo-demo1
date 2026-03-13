@@ -187,7 +187,7 @@ assert(licenseShop.contractManager === null);
    - 选择使用场景
    - 点击购买
    - 确认交易
-   - 验证 License NFT
+   - 验证 License ECHO
 
 2. **错误处理测试**
    - 网络断开

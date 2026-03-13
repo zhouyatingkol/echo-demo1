@@ -276,8 +276,8 @@ const SENSITIVE_OPERATIONS = {
   },
   SET_APPROVAL_FOR_ALL: {
     requiresConfirmation: true,
-    confirmationMessage: '确认授权 {operator} 管理您的所有 NFT',
-    warningMessage: '⚠️ 危险操作！这将授权对方转移您的所有 NFT',
+    confirmationMessage: '确认授权 {operator} 管理您的所有 ECHO',
+    warningMessage: '⚠️ 危险操作！这将授权对方转移您的所有 ECHO',
     requirePassword: true
   }
 };
