@@ -18,9 +18,9 @@ const CONTRACT_CONFIG = {
             abi: 'ECHOAssetV2V3'
         },
         ECHOFusion: {
-            address: '0x31Cd483Ee827A272816808AD49b90c71B1c82E11',
-            version: '3.0.0',
-            abi: 'ECHOFusion'
+            address: '0x8Eb7a29C41478a3f32015C1330DFf7cc683d0952',
+            version: '2.0.0',
+            abi: 'ECHOFusionV2'
         },
         LicenseNFT: {
             address: '0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23',
