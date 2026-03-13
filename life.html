@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO — 动态数字生命</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'Noto Sans SC', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        'life': '#00d4ff',
+                        'grow': '#22c55e',
+                        'void': '#0a0a0a',
+                        'cell': '#f0fdf4',
+                    },
+                    animation: {
+                        'breathe': 'breathe 4s ease-in-out infinite',
+                        'flow': 'flow 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            background: #0a0a0a;
+            color: #f0fdf4;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        /* 自定义光标 */
+        .cursor {
+            width: 12px;
+            height: 12px;
+            background: #00d4ff;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        
+        .cursor.hover {
+            transform: scale(3);
+            opacity: 0.5;
+        }
+        
+        /* 呼吸动画 */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.02); opacity: 1; }
+        }
+        
+        /* 流动线条 */
+        @keyframes flow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* 脉冲发光 */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.6); }
+        }
+        
+        /* 漂浮 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* 文字逐字生长 */
+        .grow-text span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: growIn 0.6s ease forwards;
+        }
+        
+        @keyframes growIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 选中文字样式 */
+        ::selection {
+            background: #00d4ff;
+            color: #0a0a0a;
+        }
+        
+        /* 滚动条 - 像DNA链条 */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #00d4ff, #22c55e);
+            border-radius: 2px;
+        }
+        
+        /* 流动背景线条 */
+        .flow-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.1;
+        }
+        
+        .flow-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            animation: flow 8s linear infinite;
+        }
+        
+        /* 细胞按钮 */
+        .cell-btn {
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            background: transparent;
+            color: #00d4ff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cell-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.3), transparent);
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+            border-radius: 50%;
+        }
+        
+        .cell-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .cell-btn:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        /* 生命卡片 */
+        .life-card {
+            padding: 3rem;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 20px;
+            background: rgba(0, 212, 255, 0.02);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .life-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .life-card:hover::before {
+            opacity: 1;
+        }
+        
+        .life-card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        /* 数据数字 */
+        .life-number {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 300;
+            background: linear-gradient(135deg, #00d4ff, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: breathe 4s ease-in-out infinite;
+        }
+        
+        /* DNA分割线 */
+        .dna-divider {
+            height: 1px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 212, 255, 0.3) 10px,
+                rgba(0, 212, 255, 0.3) 20px
+            );
+            margin: 3rem 0;
+        }
+        
+        /* 生命脉动背景 */
+        .pulse-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(34, 197, 94, 0.03) 0%, transparent 50%);
+            animation: breathe 8s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- 自定义光标 -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- 生命脉动背景 -->
+    <div class="pulse-bg"></div>
+
+    <!-- 流动线条 -->
+    <div class="flow-lines" id="flowLines"></div>
+
+    <!-- 诞生：首页 — 纯黑宇宙 -->
+    <section class="h-screen flex flex-col justify-center items-center relative">
+        <!-- 生命光点 -->
+        <div class="absolute w-2 h-2 bg-life rounded-full animate-pulse-glow"></div>
+        
+        <div class="text-center z-10">
+            <!-- 主标题 — 逐字生长 -->
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-light tracking-wider mb-8 grow-text" id="mainTitle">
+                动态数字生命
+            </h1>
+            
+            <!-- 副标题 — 呼吸效果 -->
+            <p class="text-xl md:text-2xl text-life/60 font-light tracking-[0.3em] animate-breathe">
+                ECHO
+            </p>
+            
+            <!-- 进入按钮 — 细胞形态 -->
+            <button class="cell-btn mt-16" onclick="document.getElementById('awaken').scrollIntoView({behavior: 'smooth'})">
+                觉醒
+            </button>
+        </div>
+
+        <!-- 滚动提示 -->
+        <div class="absolute bottom-10 flex flex-col items-center gap-4">
+            <span class="text-xs tracking-[0.3em] text-life/30">SCROLL TO EVOLVE</span>
+            <div class="w-px h-16 bg-gradient-to-b from-life/50 to-transparent"></div>
+        </div>
+    </section>
+
+    <!-- 觉醒：不是NFT — 第一缕光 -->
+    <section id="awaken" class="min-h-screen flex items-center justify-center px-6">
+        <div class="max-w-4xl text-center">
+            <div class="dna-divider"></div>
+            
+            <p class="text-lg md:text-xl text-life/40 mb-6 tracking-widest">AWAKENING</p>
+            
+            <h2 class="text-4xl md:text-6xl font-light mb-12 leading-relaxed">
+                不是 <span class="text-life">NFT</span>
+            </h2>
+            
+            <p class="text-lg md:text-xl text-cell/60 leading-loose max-w-2xl mx-auto">
+                NFT 是静态的收藏，<br>
+                ECHO 是<span class="text-life">活着</span>的权益。
+            </p>
+            
+            <div class="dna-divider"></div>
+        </div>
+    </section>
+
+    <!-- 生长：三个特点 — 绿色出现 -->
+    <section class="min-h-screen flex items-center py-20 px-6">
+        <div class="max-w-6xl mx-auto w-full">
+            <p class="text-sm text-grow/40 tracking-[0.3em] mb-16 text-center">GROWTH</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 特点1 -->
+                <div class="life-card">
+                    <div class="text-4xl mb-6">🌱</div>
+                    <h3 class="text-2xl font-light mb-4 text-life">动态生长</h3>
+                    <p class="text-cell/50 leading-relaxed">
+                        随使用次数、时间、场景不断进化。
+                        价值不是固定的，而是流动的。
+                    </p>
+                </div>
+
+                <!-- 特点2 -->
+                <div class="life-card">
+                    <div class="text-4xl mb-6">🔀</div>
+                    <h3 class="text-2xl font-light mb-4 text-life">多权利配置</h3>
+                    <p class="text-cell/50 leading-relaxed">
+                        买断、按次、限时。
+                        一件作品，多种可能。
+                    </p>
+                </div>
+
+                <!-- 特点3 -->
+                <div class="life-card">
+                    <div class="text-4xl mb-6">⚡</div>
+                    <h3 class="text-2xl font-light mb-4 text-life">实时分配</h3>
+                    <p class="text-cell/50 leading-relaxed">
+                        每次使用自动分配。
+                        创作者实时获得 MEER。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 繁衍：数据 — 生命爆发 -->
+    <section class="min-h-screen flex items-center py-20 px-6 relative overflow-hidden">
+        <!-- 背景光晕 -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-life/5 rounded-full blur-[100px] animate-breathe"></div>
+        
+        <div class="max-w-6xl mx-auto w-full relative z-10">
+            <p class="text-sm text-life/40 tracking-[0.3em] mb-20 text-center">PROPAGATION</p>
+            
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+                <div class="text-center">
+                    <div class="life-number">1,234</div>
+                    <div class="text-sm text-cell/40 mt-4 tracking-widest">音乐作品</div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="life-number">5,678</div>
+                    <div class="text-sm text-cell/40 mt-4 tracking-widest">ECHO</div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="life-number">987</div>
+                    <div class="text-sm text-cell/40 mt-4 tracking-widest">创作者</div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="life-number">45.6K</div>
+                    <div class="text-sm text-cell/40 mt-4 tracking-widest">MEER</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 作品列表 — 生命体展示 -->
+    <section class="py-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <p class="text-sm text-life/40 tracking-[0.3em] mb-16 text-center">COLLECTION</p>
+            
+            
+            <div class="space-y-1">
+                <!-- 作品1 -->
+                <div class="group flex justify-between items-center py-8 border-b border-life/10 hover:border-life/30 transition-all cursor-pointer">
+                    <div class="flex items-center gap-8">
+                        <div class="w-12 h-12 rounded-full border border-life/20 flex items-center justify-center group-hover:bg-life/10 transition-all">
+                            <svg class="w-5 h-5 text-life" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"></path>
+                            </svg>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-light group-hover:text-life transition-colors">夏日微风</h3>
+                            <p class="text-sm text-cell/40">音乐创作者</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-life">100 MEER</div>
+                </div>
+
+                <!-- 作品2 -->
+                <div class="group flex justify-between items-center py-8 border-b border-life/10 hover:border-life/30 transition-all cursor-pointer">
+                    <div class="flex items-center gap-8">
+                        <div class="w-12 h-12 rounded-full border border-life/20 flex items-center justify-center group-hover:bg-life/10 transition-all">
+                            <svg class="w-5 h-5 text-life" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"></path>
+                            </svg>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-light group-hover:text-life transition-colors">城市节拍</h3>
+                            <p class="text-sm text-cell/40">BeatMaker</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-life">150 MEER</div>
+                </div>
+
+                <!-- 作品3 -->
+                <div class="group flex justify-between items-center py-8 border-b border-life/10 hover:border-life/30 transition-all cursor-pointer">
+                    <div class="flex items-center gap-8">
+                        <div class="w-12 h-12 rounded-full border border-life/20 flex items-center justify-center group-hover:bg-life/10 transition-all">
+                            <svg class="w-5 h-5 text-life" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"></path>
+                            </svg>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-light group-hover:text-life transition-colors">钢琴协奏曲</h3>
+                            <p class="text-sm text-cell/40">古典大师</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-life">500 MEER</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 进化：CTA — 金色升华 -->
+    <section class="min-h-screen flex flex-col justify-center items-center px-6 relative">
+        <!-- 金色光晕 -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-life/10 to-grow/10 rounded-full blur-[150px]"></div>
+        
+        <div class="text-center relative z-10">
+            <p class="text-sm text-life/40 tracking-[0.3em] mb-8">EVOLUTION</p>
+            
+            <h2 class="text-4xl md:text-6xl font-light mb-6">
+                生成你的 <span class="text-transparent bg-clip-text bg-gradient-to-r from-life to-grow">ECHO</span>
+            </h2>
+            
+            <p class="text-lg text-cell/50 mb-12">让创作真正属于你，持续进化</p>
+            
+            <button class="cell-btn text-lg px-12 py-4 border-grow text-grow hover:shadow-[0_0_40px_rgba(34,197,94,0.4)]">
+                开始创作
+            </button>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="py-12 px-6 border-t border-life/10">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-2xl font-light tracking-widest text-life">ECHO</div>
+            
+            <div class="flex gap-8">
+                <a href="#" class="text-sm text-cell/40 hover:text-life transition-colors">文档</a>
+                <a href="#" class="text-sm text-cell/40 hover:text-life transition-colors">GitHub</a>
+                <a href="#" class="text-sm text-cell/40 hover:text-life transition-colors">Qitmeer</a>
+            </div>
+            
+            <div class="text-xs text-cell/20">© 2026 ECHO Protocol</div>
+        </div>
+    </footer>
+
+    <script>
+        // 自定义光标
+        const cursor = document.getElementById('cursor');
+        const interactiveElements = document.querySelectorAll('a, button, .cursor-pointer');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+        
+        // 文字逐字生长动画
+        function animateText(elementId, delay = 100) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            element.innerHTML = '';
+            
+            [...text].forEach((char, index) => {
+                const span = document.createElement('span');
+                span.textContent = char === ' ' ? '\u00A0' : char;
+                span.style.animationDelay = `${index * delay}ms`;
+                element.appendChild(span);
+            });
+        }
+        
+        animateText('mainTitle', 80);
+        
+        // 生成流动线条
+        const flowLines = document.getElementById('flowLines');
+        for (let i = 0; i < 5; i++) {
+            const line = document.createElement('div');
+            line.className = 'flow-line';
+            line.style.top = `${20 + i * 15}%`;
+            line.style.width = '30%';
+            line.style.animationDelay = `${i * 2}s`;
+            flowLines.appendChild(line);
+        }
+        
+        // 滚动触发动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.life-card, .life-number').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.8s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
