@@ -1,151 +1,185 @@
-# ECHO Protocol Demo
+# ECHO Protocol 🌳
 
-ECHO Protocol 在 Qitmeer 网络上的演示项目。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Qitmeer](https://img.shields.io/badge/Powered%20by-Qitmeer-blue)](https://qitmeer.io)
 
-## 🆕 V2 版本已发布！
+> 保护创作者的数字权益 - 一个去中心化的音乐版权授权协议
 
-**V2 合约地址**: `0x319148d9b9265D75858c508E445d65B649036f75`
+## 📖 项目简介
 
-### V2 新增功能
-- ✅ **权属蓝图** - 详细的使用条款配置
-- ✅ **版本控制** - 资产内容可更新，历史可追溯
-- ✅ **内容验证** - 链上哈希防篡改验证
-- ✅ **衍生作品** - 自动收益分润给父资产
+ECHO Protocol 是一个构建在 Qitmeer 区块链上的去中心化音乐版权授权平台。它允许音乐创作者：
 
-[V2 快速上手指南](./USER_GUIDE_V2.md) | [V2 测试报告](./TEST_REPORT_V2.md)
+- 🎵 **铸造音乐资产** - 将作品上链，获得唯一数字身份
+- 📜 **灵活授权** - 支持买断制、按次计费、限时授权三种模式
+- 💰 **自动收益分配** - 智能合约自动执行版税分配
+- 🔗 **AI 友好** - 为 AI 训练数据提供合法授权渠道
 
----
+## 🚀 快速开始
 
-## 什么是 ECHO 资产？
+### 环境要求
 
-ECHO 资产是一种**四权分离**的数字资产：
+- Node.js v18+
+- npm 或 yarn
+- Qitmeer 钱包（推荐 [Qitmeer Mask](https://mask.qitmeer.io)）
 
-| 权利 | 说明 |
-|-----|------|
-| **使用权** | 使用资产的权利 |
-| **衍生权** | 基于资产创建新作品的权利 |
-| **扩展权** | 扩展资产功能的权利 |
-| **收益权** | 获得资产收益的权利 |
-
-传统 NFT：所有权 = 使用权 + 收益权（捆绑）
-ECHO 资产：四种权利可独立流转
-
-## 技术栈
-
-- **区块链**: Qitmeer Network (MeerEVM 兼容)
-- **智能合约**: Solidity + OpenZeppelin
-- **前端**: HTML + ethers.js
-- **开发工具**: Hardhat
-
-## 快速开始
-
-### 1. 安装依赖
+### 安装
 
 ```bash
-cd echo-demo
+# 克隆项目
+git clone https://github.com/zhouyatingkol/echo-demo1.git
+cd echo-demo1
+
+# 安装依赖
 npm install
+
+# 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，添加你的私钥
 ```
 
-### 2. 编译合约
+### 编译合约
 
 ```bash
 npm run compile
 ```
 
-### 3. 配置环境变量
-
-创建 `.env` 文件：
-
-```
-PRIVATE_KEY=你的私钥
-```
-
-### 4. 部署合约
+### 部署合约（测试网）
 
 ```bash
 npm run deploy:testnet
 ```
 
-### 5. 运行前端
-
-直接用浏览器打开 `frontend/index.html`，或使用本地服务器：
+### 部署合约（主网）
 
 ```bash
-cd frontend
-python3 -m http.server 8080
+npm run deploy:mainnet
 ```
 
-访问 http://localhost:8080
+### 验证合约
 
-## Qitmeer Testnet 配置
-
-- **Network Name**: Qitmeer Testnet
-- **RPC URL**: https://testnet-qng.rpc.qitmeer.io
-- **Chain ID**: 8131
-- **Currency Symbol**: MEER
-- **Block Explorer**: https://testnet-qng.qitmeer.io
-
-获取测试币：https://faucet.qitmeer.io
-
-## Demo 功能
-
-- ✅ 连接钱包 (MetaMask)
-- ✅ 铸造 ECHO 资产
-- ✅ 配置四权（使用权、衍生权、扩展权、收益权）
-- ✅ 查看资产列表
-- ✅ 查看四权分配
-
-## 合约地址
-
-### V2 合约（最新）
-```
-ECHOAssetV2: 0x319148d9b9265D75858c508E445d65B649036f75
-区块浏览器: https://qng.qitmeer.io/address/0x319148d9b9265D75858c508E445d65B649036f75
+```bash
+npm run verify:mainnet
 ```
 
-### V1 合约（旧版）
-```
-ECHOAsset: 0xCFAa24a24f6E6C408b38E95EB3adCbd259a395e0
-ECHOFusion: 0x9C99CB51495Ce85FEa1C5E7d5dFb68F6F1e6F45f
-```
-
-## 项目结构
+## 📁 项目结构
 
 ```
 echo-demo/
-├── contracts/
-│   ├── ECHOAsset.sol        # V1 智能合约
-│   ├── ECHOFusion.sol       # V1 融合合约
-│   └── ECHOAssetV2.sol      # V2 智能合约 ⭐
-├── scripts/
-│   ├── deploy.js            # V1 部署脚本
-│   └── deploy-v2.js         # V2 部署脚本 ⭐
-├── frontend/
-│   ├── index.html           # 主页面
-│   ├── app.js               # V1 前端逻辑
-│   ├── mint-v2.html         # V2 铸造界面 ⭐
-│   ├── version-control.html # 版本控制 ⭐
-│   ├── content-verification.html # 内容验证 ⭐
-│   ├── derivative-works.html# 衍生作品 ⭐
-│   └── js/
-│       └── echo-asset-v2.js # V2 合约交互 ⭐
-├── hardhat.config.js
-├── README.md
-├── USER_GUIDE_V2.md         # V2 用户指南 ⭐
-└── TEST_REPORT_V2.md        # V2 测试报告 ⭐
+├── contracts/              # 智能合约
+│   ├── ECHOAssetV2V3.sol   # 资产合约 V3
+│   ├── LicenseNFTV3.sol    # 授权 NFT 合约 V3
+│   └── ECHOFusion.sol      # 资产融合合约
+├── frontend/               # 前端代码
+│   ├── js/
+│   ├── css/
+│   └── html/
+├── scripts/                # 部署脚本
+│   ├── deploy-v3-mainnet.js
+│   └── verify.js
+├── test/                   # 测试文件
+├── docs/                   # 文档
+└── hardhat.config.js       # Hardhat 配置
 ```
 
-## 快速访问
+## 🔗 已部署合约（Qitmeer 主网）
 
-直接访问 Demo: https://zhouyatingkol.github.io/echo-demo1/frontend/
+| 合约 | 地址 | 状态 |
+|------|------|------|
+| **ECHOAssetV2V3** | `0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce` | ✅ 已验证 |
+| **ECHOFusion** | `0x31Cd483Ee827A272816808AD49b90c71B1c82E11` | ✅ 已验证 |
+| **LicenseNFTV3** | `0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23` | ✅ 已验证 |
 
-## 下一步
+[查看区块浏览器](https://qng.qitmeer.io/)
 
-1. 部署合约到 Qitmeer Testnet
-2. 获取测试币
-3. 运行前端Demo
-4. 铸造第一个 ECHO 资产
+## 🎨 核心功能
 
-## 许可证
+### 1. 三合一授权模式
 
-MIT
+```
+┌──────────┐ ┌──────────┐ ┌──────────┐
+│  买断制   │ │ 按次计费 │ │ 限时授权 │
+│  🔑      │ │  📊     │ │  ⏱️    │
+│ 永久使用 │ │ 用多少  │ │ 30天起 │
+│ 100 MEER │ │ 0.5/次  │ │ 10/天  │
+└──────────┘ └──────────┘ └──────────┘
+```
+
+### 2. 场景差异化定价
+
+| 使用场景 | 倍率 | 说明 |
+|---------|------|------|
+| 个人创作 | ×1.0 | 个人视频、播客 |
+| 游戏配乐 | ×1.5 | 游戏背景音乐 |
+| AI 训练 | ×2.0 | 机器学习数据集 |
+| 商业广告 | ×3.0 | 电视/网络广告 |
+
+### 3. License NFT
+
+每个授权都会铸造一个 **License NFT**：
+- ✅ 证明使用权
+- ✅ 可转让交易
+- ✅ 链上可验证
+
+## 🔐 安全特性
+
+- ✅ **ReentrancyGuard** - 防重入攻击
+- ✅ **Pausable** - 紧急暂停功能
+- ✅ **Access Control** - 精细化权限管理
+- ✅ **Input Validation** - 输入验证
+- ✅ **CEI Pattern** - Checks-Effects-Interactions 模式
+
+## 🛠️ 技术栈
+
+- **区块链**: Qitmeer Network (Chain ID: 813)
+- **智能合约**: Solidity 0.8.19
+- **开发框架**: Hardhat
+- **合约库**: OpenZeppelin Contracts
+- **前端**: HTML5, CSS3, JavaScript (ES6+)
+- **钱包集成**: ethers.js
+
+## 📝 使用指南
+
+### 音乐创作者
+
+1. 连接钱包
+2. 铸造音乐资产（上传作品、设置权属蓝图）
+3. 设置授权价格
+4. 等待购买者购买
+5. 自动获得 MEER 收益
+
+### 购买者
+
+1. 浏览市场，选择音乐
+2. 选择授权类型（买断/按次/限时）
+3. 选择使用场景
+4. 支付 MEER
+5. 获得 License NFT
+
+### AI 开发者
+
+1. 筛选支持 AI 训练的授权
+2. 批量购买训练数据授权
+3. 合法合规训练模型
+4. 链上证明数据来源
+
+## 🤝 贡献指南
+
+我们欢迎所有贡献！请参阅 [CONTRIBUTING.md](./CONTRIBUTING.md) 了解如何参与。
+
+## 📜 许可证
+
+本项目采用 [MIT License](./LICENSE) 开源。
+
+## 🌟 愿景
+
+> ECHO 不只是一个协议，它是创作者对"公平对待"的信仰。
+> 在这里，无论是碳基人类还是硅基 AI，都是平等的价值创造者。
+
+## 📞 联系我们
+
+- GitHub Issues: [提交问题](https://github.com/zhouyatingkol/echo-demo1/issues)
+- Email: echo@qitmeer.io
+
+---
+
+**🌱 准备好种你的第一棵树了吗？**
