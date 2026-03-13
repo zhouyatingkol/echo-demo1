@@ -1,3 +1,4 @@
+require('dotenv').config();
 require('@nomicfoundation/hardhat-toolbox');
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -7,8 +8,9 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 1,
       },
+      viaIR: true,  // 恢复 viaIR 以支持复杂合约
     },
   },
   networks: {
@@ -28,6 +30,7 @@ module.exports = {
       url: 'http://127.0.0.1:8545',
     },
   },
+  // Qitmeer 区块浏览器验证配置
   etherscan: {
     apiKey: {
       qitmeer: 'no-api-key-needed',
@@ -37,10 +40,15 @@ module.exports = {
         network: 'qitmeer',
         chainId: 813,
         urls: {
-          apiURL: 'https://qng.rpc.qitmeer.io',
-          browserURL: 'https://qng.qitmeer.io',
+          // 关键修正：使用区块浏览器的 API 地址
+          apiURL: 'https://qng.qitmeer.io/api',  // ✅ 验证 API 地址
+          browserURL: 'https://qng.qitmeer.io',   // ✅ 区块浏览器地址
         },
       },
     ],
   },
+  // 禁用 Sourcify 警告
+  sourcify: {
+    enabled: false
+  }
 };
