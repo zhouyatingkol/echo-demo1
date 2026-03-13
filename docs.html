@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档 — ECHO</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
+    <style>
+        /* ========== 文档页面专属样式 ========== */
+        
+        /* 基础布局 */
+        .docs-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+        
+        /* 文档标题区 */
+        .docs-header {
+            padding: 6vh 10vw 4vh;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .docs-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            color: var(--color-gold);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+        
+        .docs-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            letter-spacing: 0.12em;
+            color: var(--color-ink);
+            margin-bottom: 0.8rem;
+        }
+        
+        .docs-title .gold-char {
+            color: var(--color-gold);
+        }
+        
+        .docs-subtitle {
+            font-size: 1rem;
+            color: var(--color-clay);
+            letter-spacing: 0.15em;
+            font-weight: 300;
+            margin-bottom: 2.5rem;
+        }
+        
+        /* 搜索框 */
+        .search-box {
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            color: var(--color-ink);
+            background: rgba(240, 236, 227, 0.5);
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            outline: none;
+            transition: all 0.4s ease;
+        }
+        
+        .search-input::placeholder {
+            color: var(--color-clay);
+        }
+        
+        .search-input:focus {
+            border-color: var(--color-gold);
+            background: rgba(240, 236, 227, 0.8);
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-clay);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        
+        /* 三栏布局容器 */
+        .docs-layout {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5vw 10vh;
+            position: relative;
+            z-index: 1;
+            gap: 3rem;
+        }
+        
+        /* ========== 左侧导航目录 ========== */
+        .sidebar-left {
+            width: 220px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .sidebar-title {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: var(--color-clay);
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+        }
+        
+        .toc-list {
+            list-style: none;
+        }
+        
+        .toc-item {
+            margin-bottom: 0.3rem;
+        }
+        
+        .toc-link {
+            display: block;
+            padding: 0.7rem 1rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            color: var(--color-stone);
+            text-decoration: none;
+            border-left: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .toc-link:hover {
+            color: var(--color-ink);
+            background: linear-gradient(90deg, rgba(201, 168, 108, 0.05), transparent);
+        }
+        
+        .toc-link.active {
+            color: var(--color-gold);
+            border-left-color: var(--color-gold);
+            background: linear-gradient(90deg, rgba(201, 168, 108, 0.08), transparent);
+        }
+        
+        /* ========== 主内容区 ========== */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            max-width: 700px;
+        }
+        
+        .doc-section {
+            margin-bottom: 6rem;
+            scroll-margin-top: 100px;
+        }
+        
+        .doc-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-header {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section-number {
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            color: var(--color-gold);
+            letter-spacing: 0.3em;
+            margin-bottom: 0.8rem;
+        }
+        
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            color: var(--color-ink);
+        }
+        
+        /* 引用式左边框 */
+        .quote-block {
+            padding: 2rem 2.5rem;
+            border-left: 1px solid var(--color-gold);
+            background: linear-gradient(90deg, rgba(201, 168, 108, 0.05), transparent);
+            margin: 2rem 0;
+        }
+        
+        .quote-text {
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            line-height: 2.2;
+            color: var(--color-stone);
+            font-weight: 300;
+        }
+        
+        .quote-text strong {
+            color: var(--color-ink);
+            font-weight: 400;
+        }
+        
+        .quote-text .highlight {
+            color: var(--color-gold);
+            font-style: italic;
+        }
+        
+        /* 普通段落 */
+        .doc-paragraph {
+            font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+            line-height: 2.2;
+            color: var(--color-stone);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* 三步流程图 */
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin: 3rem 0;
+            padding: 2rem 0;
+        }
+        
+        .step-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 35px;
+            right: -1rem;
+            width: calc(50% - 35px);
+            height: 0.5px;
+            background: linear-gradient(90deg, var(--color-gold), transparent);
+            opacity: 0.4;
+        }
+        
+        .step-number {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 0.5px solid var(--color-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--color-gold);
+            font-weight: 300;
+            transition: all 0.4s ease;
+        }
+        
+        .step-item:hover .step-number {
+            background: rgba(201, 168, 108, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .step-title {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: var(--color-ink);
+            margin-bottom: 0.8rem;
+        }
+        
+        .step-desc {
+            font-size: 0.85rem;
+            color: var(--color-clay);
+            line-height: 1.8;
+            letter-spacing: 0.02em;
+        }
+        
+        /* 权益卡片 */
+        .rights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+        
+        .right-card {
+            padding: 2rem;
+            background: rgba(240, 236, 227, 0.5);
+            border: 0.5px solid rgba(26, 26, 26, 0.06);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .right-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--color-gold);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.4s ease;
+        }
+        
+        .right-card:hover {
+            background: rgba(240, 236, 227, 0.8);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(201, 168, 108, 0.08);
+        }
+        
+        .right-card:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .right-icon {
+            font-size: 1.8rem;
+            color: var(--color-gold);
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+        
+        .right-title {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: var(--color-ink);
+            margin-bottom: 0.8rem;
+        }
+        
+        .right-desc {
+            font-size: 0.85rem;
+            color: var(--color-clay);
+            line-height: 1.8;
+        }
+        
+        /* FAQ 可折叠问答 */
+        .faq-list {
+            margin-top: 2rem;
+        }
+        
+        .faq-item {
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            width: 100%;
+            padding: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: none;
+            border: none;
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.03em;
+            color: var(--color-ink);
+            cursor: pointer;
+            text-align: left;
+            transition: color 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            color: var(--color-gold);
+        }
+        
+        .faq-icon {
+            width: 24px;
+            height: 24px;
+            position: relative;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+        
+        .faq-icon::before,
+        .faq-icon::after {
+            content: '';
+            position: absolute;
+            background: var(--color-gold);
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-icon::before {
+            width: 10px;
+            height: 0.5px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .faq-icon::after {
+            width: 0.5px;
+            height: 10px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .faq-item.active .faq-icon::after {
+            transform: translate(-50%, -50%) rotate(90deg);
+            opacity: 0;
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding-bottom: 1.5rem;
+        }
+        
+        .faq-answer p {
+            font-size: 0.9rem;
+            line-height: 2;
+            color: var(--color-stone);
+            padding-right: 2rem;
+        }
+        
+        /* ========== 右侧快速导航 ========== */
+        .sidebar-right {
+            width: 180px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        
+        .quick-nav-title {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: var(--color-clay);
+            margin-bottom: 1.5rem;
+        }
+        
+        .quick-nav-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-nav-item {
+            margin-bottom: 0.6rem;
+        }
+        
+        .quick-nav-link {
+            font-size: 0.8rem;
+            color: var(--color-clay);
+            text-decoration: none;
+            display: block;
+            padding: 0.3rem 0;
+            border-left: 1px solid transparent;
+            padding-left: 1rem;
+            margin-left: -1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-nav-link:hover,
+        .quick-nav-link.active {
+            color: var(--color-gold);
+            border-left-color: var(--color-gold);
+        }
+        
+        /* 回到顶部按钮 */
+        .back-to-top {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1rem;
+            font-family: var(--font-serif);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: var(--color-clay);
+            background: transparent;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            width: 100%;
+        }
+        
+        .back-to-top:hover {
+            color: var(--color-gold);
+            border-color: var(--color-gold);
+            background: rgba(201, 168, 108, 0.05);
+        }
+        
+        .back-to-top svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+        }
+        
+        /* ========== 移动端菜单 ========== */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1001;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--color-ink);
+            border: none;
+            color: var(--color-paper);
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-toggle:hover {
+            transform: scale(1.05);
+            background: var(--color-gold);
+        }
+        
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            bottom: 5rem;
+            right: 2rem;
+            background: rgba(247, 244, 237, 0.98);
+            backdrop-filter: blur(10px);
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            padding: 1.5rem;
+            border-radius: 4px;
+            z-index: 1000;
+            min-width: 200px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .mobile-menu .toc-link {
+            padding: 0.8rem 1rem;
+        }
+        
+        /* ========== 响应式 ========== */
+        @media (max-width: 1100px) {
+            .sidebar-right {
+                display: none;
+            }
+            
+            .docs-layout {
+                gap: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .docs-header {
+                padding: 4vh 6vw 3vh;
+            }
+            
+            .docs-layout {
+                flex-direction: column;
+                padding: 0 6vw 8vh;
+            }
+            
+            .sidebar-left {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .main-content {
+                max-width: 100%;
+            }
+            
+            .doc-section {
+                margin-bottom: 4rem;
+            }
+            
+            /* 步骤流程图改为垂直 */
+            .steps-container {
+                flex-direction: column;
+                gap: 3rem;
+            }
+            
+            .step-item:not(:last-child)::after {
+                display: none;
+            }
+            
+            /* 权益卡片改为单列 */
+            .rights-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* 引用块调整 */
+            .quote-block {
+                padding: 1.5rem;
+                margin: 1.5rem 0;
+            }
+            
+            .quote-text {
+                font-size: 1rem;
+                line-height: 2;
+            }
+        }
+        
+        /* 动画 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 辨识度元素 -->
+    <div class="paper-texture"></div>
+    <div class="glow-soft"></div>
+    <div class="side-mark">ECHO</div>
+
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">ECHO</a>
+        <div class="nav-links">
+            <a href="market.html" class="nav-link">市场</a>
+            <a href="#" class="nav-link">创作</a>
+            <a href="docs.html" class="nav-link active">文档</a>
+        </div>
+    </nav>
+
+    <!-- 文档标题区 -->
+    <header class="docs-header">
+        <div class="docs-label">Documentation</div>
+        <h1 class="docs-title"><span class="gold-char">E</span>CHO 文档</h1>
+        <p class="docs-subtitle">动态数字生命协议</p>
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="搜索文档...">
+            <span class="search-icon">⌕</span>
+        </div>
+    </header>
+
+    <!-- 三栏布局 -->
+    <div class="docs-layout">
+        <!-- 左侧导航目录 -->
+        <aside class="sidebar-left">
+            <div class="sidebar-title">目录</div>
+            <ul class="toc-list">
+                <li class="toc-item">
+                    <a href="#what-is-echo" class="toc-link active">什么是 ECHO</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#quick-start" class="toc-link">快速开始</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#minting" class="toc-link">铸造指南</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#rights" class="toc-link">权益说明</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#architecture" class="toc-link">技术架构</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#faq" class="toc-link">常见问题</a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 第一章：什么是 ECHO -->
+            <section id="what-is-echo" class="doc-section">
+                <div class="section-header">
+                    <div class="section-number">01</div>
+                    <h2 class="section-title">什么是 ECHO</h2>
+                </div>
+                
+                <div class="quote-block">
+                    <p class="quote-text">
+                        <strong>不是 NFT，是活着的权益。</strong><br><br>
+                        NFT 是静态的收藏，是被封存的标本。<br>
+                        ECHO 是<span class="highlight">活着</span>的权益，是随使用生长的数字生命。<br><br>
+                        不是拥有，而是相伴。不是结束，而是开始。
+                    </p>
+                </div>
+                
+                <p class="doc-paragraph">
+                    ECHO 是一种全新的数字资产协议，它将「动态生长」引入数字权益领域。每一份 ECHO 都承载着创作者的心血，同时也记录着每一次使用、每一次流转的痕迹。随着时间推移，ECHO 会不断进化，价值也会随之流动。
+                </p>
+                <p class="doc-paragraph">
+                    我们相信，真正的数字资产不应该是一张静态的图片或一段固定的代码，而应该是一个有生命力、能与使用者互动、能随时间增值的数字实体。ECHO，就是数字世界的生命形态。
+                </p>
+            </section>
+
+            <!-- 第二章：快速开始 -->
+            <section id="quick-start" class="doc-section">
+                <div class="section-header">
+                    <div class="section-number">02</div>
+                    <h2 class="section-title">快速开始</h2>
+                </div>
+                
+                <p class="doc-paragraph">
+                    只需三步，即可开启你的 ECHO 之旅。
+                </p>
+                
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">连接钱包</h3>
+                        <p class="step-desc">使用 MetaMask 或其他兼容钱包连接 ECHO 平台</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">获取 ECHO</h3>
+                        <p class="step-desc">在市场上购买心仪的 ECHO 作品，或铸造你自己的</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">开始使用</h3>
+                        <p class="step-desc">根据权益配置使用作品，见证 ECHO 的生长</p>
+                    </div>
+                </div>
+                
+                <p class="doc-paragraph">
+                    首次使用者建议从市场浏览开始，了解不同类型的 ECHO 作品及其权益配置。每个 ECHO 都有独特的生长轨迹，选择与你共鸣的作品，开启一段数字相伴之旅。
+                </p>
+            </section>
+
+            <!-- 第三章：铸造指南 -->
+            <section id="minting" class="doc-section">
+                <div class="section-header">
+                    <div class="section-number">03</div>
+                    <h2 class="section-title">铸造指南</h2>
+                </div>
+                
+                <p class="doc-paragraph">
+                    创作者可以通过 ECHO 协议铸造自己的数字作品。铸造过程简单直观，同时提供丰富的权益配置选项，让你的创作能够以最适合的方式触达用户。
+                </p>
+                
+                <div class="quote-block">
+                    <p class="quote-text">
+                        <strong>铸造步骤</strong><br><br>
+                        1. 准备作品素材（音频、图像、文字等）<br>
+                        2. 配置作品元数据（名称、描述、类型）<br>
+                        3. 设置权益模式（使用权、衍生权、扩展权、收益权）<br>
+                        4. 确认铸造参数并提交<br>
+                        5. 等待区块链确认，作品即刻上线
+                    </p>
+                </div>
+                
+                <p class="doc-paragraph">
+                    铸造 ECHO 需要支付少量 Gas 费用。建议使用 Layer 2 网络以降低成本。作品铸造后，创作者可以实时监控作品的使用情况和收益分配。
+                </p>
+            </section>
+
+            <!-- 第四章：权益说明 -->
+            <section id="rights" class="doc-section">
+                <div class="section-header">
+                    <div class="section-number">04</div>
+                    <h2 class="section-title">权益说明</h2>
+                </div>
+                
+                <p class="doc-paragraph">
+                    ECHO 独创的四权模型，为数字资产的流通与使用提供了完整的解决方案。每一份 ECHO 都可以灵活配置这四种权益，实现真正的按需授权。
+                </p>
+                
+                <div class="rights-grid">
+                    <div class="right-card">
+                        <div class="right-icon">◈</div>
+                        <h3 class="right-title">使用权</h3>
+                        <p class="right-desc">基础使用权限，包括播放、展示、体验等。可配置买断、按时长、按次数等多种模式。</p>
+                    </div>
+                    <div class="right-card">
+                        <div class="right-icon">◇</div>
+                        <h3 class="right-title">衍生权</h3>
+                        <p class="right-desc">基于原作进行二次创作的权利。 remix、采样、改编，让创意在传承中绽放。</p>
+                    </div>
+                    <div class="right-card">
+                        <div class="right-icon">◎</div>
+                        <h3 class="right-title">扩展权</h3>
+                        <p class="right-desc">跨平台、跨场景使用的权利。游戏道具、社交头像、虚拟空间装饰等。</p>
+                    </div>
+                    <div class="right-card">
+                        <div class="right-icon">◉</div>
+                        <h3 class="right-title">收益权</h3>
+                        <p class="right-desc">分享作品后续收益的权利。流转分成、使用分成，创作者持续获益。</p>
+                    </div>
+                </div>
+                
+                <p class="doc-paragraph">
+                    四权可以独立配置，也可以组合使用。创作者可以根据自己的商业模式灵活设置，用户也可以根据实际需求选择适合的权益组合。
+                </p>
+            </section>
+
+            <!-- 第五章：技术架构 -->
+            <section id="architecture" class="doc-section">
+                <div class="section-header">
+                    <div class="section-number">05</div>
+                    <h2 class="section-title">技术架构</h2>
+                </div>
+                
+                <p class="doc-paragraph">
+                    ECHO 协议构建于以太坊及兼容 EVM 的区块链网络之上，采用模块化设计，确保系统的可扩展性与安全性。
+                </p>
+                
+                <div class="quote-block">
+                    <p class="quote-text">
+                        <strong>核心组件</strong><br><br>
+                        • <strong>智能合约层：</strong> ERC-721 扩展标准，支持动态元数据更新<br>
+                        • <strong>预言机网络：</strong> 链下数据验证与上链<br>
+                        • <strong>索引服务：</strong> 高效查询 ECHO 状态与历史<br>
+                        • <strong>前端 SDK：</strong> 开发者友好的集成方案
+                    </p>
+                </div>
+                
+                <p class="doc-paragraph">
+                    所有核心合约代码均已开源并通过第三方审计。ECHO 协议遵循去中心化原则，不依赖任何单一节点或服务，确保系统的长期稳定运行。
+                </p>
+            </section>
+
+            <!-- 第六章：常见问题 -->
+            <section id="faq" class="doc-section">
+                <div class="section-header">
+                    <div class="section-number">06</div>
+                    <h2 class="section-title">常见问题</h2>
+                </div>
+                
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            ECHO 和 NFT 有什么区别？
+                            <span class="faq-icon"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>NFT 是静态的、不可变的数字资产，一旦铸造便固定不变。ECHO 是动态生长的数字权益，其元数据、价值、权益配置都可以随使用而演变。ECHO 更强调「使用」而非「拥有」，是一种更贴近现实经济模式的数字资产形态。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            如何确保 ECHO 的动态更新是可信的？
+                            <span class="faq-icon"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>ECHO 的状态更新由智能合约自动执行，所有规则在铸造时即已确定并公开。关键状态变更通过预言机网络验证后上链，确保数据的可信度。同时，所有历史记录永久保存在区块链上，可供随时审计。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            创作者如何获得收益？
+                            <span class="faq-icon"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>ECHO 支持多种收益模式：首次销售、二次流转分成、按次使用费、订阅收入等。收益通过智能合约实时分配，无需人工干预。创作者可以在个人中心查看详细的收益报表和提现记录。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            ECHO 支持哪些类型的数字作品？
+                            <span class="faq-icon"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>目前 ECHO 主要支持音乐、视觉艺术、文字三类数字作品。未来将逐步扩展至视频、游戏资产、虚拟地产等更多类型。ECHO 的协议设计具有高度扩展性，可以适配各种数字内容形态。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            如何参与 ECHO 生态建设？
+                            <span class="faq-icon"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>您可以通过以下方式参与：成为创作者铸造 ECHO 作品、作为用户购买和使用 ECHO、为协议贡献代码、参与社区治理投票、成为节点运营者提供索引服务。ECHO 是一个开放生态，欢迎各种形式的贡献。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 右侧快速导航 -->
+        <aside class="sidebar-right">
+            <div class="quick-nav-title">本页导航</div>
+            <ul class="quick-nav-list" id="quickNav">
+                <li class="quick-nav-item">
+                    <a href="#what-is-echo" class="quick-nav-link active">什么是 ECHO</a>
+                </li>
+                <li class="quick-nav-item">
+                    <a href="#quick-start" class="quick-nav-link">快速开始</a>
+                </li>
+                <li class="quick-nav-item">
+                    <a href="#minting" class="quick-nav-link">铸造指南</a>
+                </li>
+                <li class="quick-nav-item">
+                    <a href="#rights" class="quick-nav-link">权益说明</a>
+                </li>
+                <li class="quick-nav-item">
+                    <a href="#architecture" class="quick-nav-link">技术架构</a>
+                </li>
+                <li class="quick-nav-item">
+                    <a href="#faq" class="quick-nav-link">常见问题</a>
+                </li>
+            </ul>
+            
+            <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+                    <path d="M18 15l-6-6-6 6"/>
+                </svg>
+                回到顶部
+            </button>
+        </aside>
+    </div>
+
+    <!-- 移动端菜单按钮 -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+    
+    <!-- 移动端菜单 -->
+    <nav class="mobile-menu" id="mobileMenu">
+        <ul class="toc-list">
+            <li class="toc-item">
+                <a href="#what-is-echo" class="toc-link active">什么是 ECHO</a>
+            </li>
+            <li class="toc-item">
+                <a href="#quick-start" class="toc-link">快速开始</a>
+            </li>
+            <li class="toc-item">
+                <a href="#minting" class="toc-link">铸造指南</a>
+            </li>
+            <li class="toc-item">
+                <a href="#rights" class="toc-link">权益说明</a>
+            </li>
+            <li class="toc-item">
+                <a href="#architecture" class="toc-link">技术架构</a>
+            </li>
+            <li class="toc-item">
+                <a href="#faq" class="toc-link">常见问题</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-logo">ECHO</div>
+        <div class="footer-links">
+            <a href="docs.html">文档</a>
+            <a href="#">GitHub</a>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ 折叠功能
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // 关闭所有其他项
+                document.querySelectorAll('.faq-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                
+                // 切换当前项
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+        
+        // 滚动监听 - 高亮当前章节
+        const sections = document.querySelectorAll('.doc-section');
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const quickNavLinks = document.querySelectorAll('.quick-nav-link');
+        
+        const observerOptions = {
+            rootMargin: '-20% 0px -60% 0px',
+            threshold: 0
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    
+                    // 更新左侧目录
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                    
+                    // 更新右侧快速导航
+                    quickNavLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+        
+        sections.forEach(section => observer.observe(section));
+        
+        // 移动端菜单
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
+        });
+        
+        // 点击菜单项后关闭菜单
+        mobileMenu.querySelectorAll('.toc-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+        });
+        
+        // 点击外部关闭菜单
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                mobileMenu.classList.remove('open');
+            }
+        });
+        
+        // 淡入动画
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.doc-section, .step-item, .right-card, .faq-item').forEach(el => {
+            el.classList.add('fade-up');
+            fadeObserver.observe(el);
+        });
+        
+        // 导航栏滚动效果
+        let lastScroll = 0;
+        const navbar = document.querySelector('.navbar');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.style.background = 'rgba(247, 244, 237, 0.98)';
+            } else {
+                navbar.style.background = 'linear-gradient(to bottom, rgba(247, 244, 237, 0.95), transparent)';
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>
