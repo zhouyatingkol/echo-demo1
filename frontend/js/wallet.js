@@ -202,8 +202,8 @@ class WalletManager {
         }
         
         try {
-            // Qitmeer 主网 LicenseNFT 合约地址
-            const LICENSE_CONTRACT_ADDRESS = '0x13c0637d86d179b66f22e0806c98b34bdbf48adf';
+            // Qitmeer 主网 LicenseNFT V3 合约地址
+            const LICENSE_CONTRACT_ADDRESS = '0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23';
             
             // 完整的 LicenseNFT ABI
             const LICENSE_ABI = [
