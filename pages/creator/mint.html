@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
-    <link href="../../../asse../../assets/fonts/local-fonts.css" rel="stylesheet">
+    <link href="../../assets/fonts/local-fonts.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -1535,6 +1535,19 @@
         </div>
     </main>
 
+    <!-- 交易状态模态框 -->
+    <div id="txModal" class="tx-modal" style="display: none;">
+        <div class="tx-modal-content">
+            <div class="tx-status-icon" id="txStatusIcon">⏳</div>
+            <h3 class="tx-status-title" id="txStatusTitle">正在处理</h3>
+            <p class="tx-status-desc" id="txStatusDesc">准备上传文件...</p>
+            <div class="tx-progress-bar">
+                <div class="tx-progress-fill" id="txProgressFill" style="width: 0%"></div>
+            </div>
+            <a href="#" class="tx-link" id="txLink" target="_blank" style="display: none;">查看交易</a>
+        </div>
+    </div>
+
     <!-- 页脚 -->
     <footer class="footer">
         <div class="footer-logo">ECHO</div>
@@ -1543,6 +1556,142 @@
             <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
         </div>
     </footer>
+
+    <!-- Ethers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+    <!-- 钱包模块 -->
+    <script src="../../scripts/core/wallet.js"></script>
+    <!-- 合约服务 -->
+    <script src="../../scripts/core/contract-service.js"></script>
+    <!-- 铸造服务 -->
+    <script src="../../scripts/core/mint-service.js"></script>
+    
+    <style>
+        /* 交易状态模态框样式 */
+        .tx-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tx-modal-content {
+            background: #f7f4ed;
+            padding: 3rem;
+            text-align: center;
+            max-width: 400px;
+            border: 0.5px solid rgba(201, 168, 108, 0.3);
+        }
+        
+        .tx-status-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tx-status-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.3rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.8rem;
+            color: #1a1a1a;
+        }
+        
+        .tx-status-desc {
+            font-size: 0.9rem;
+            color: #9e8b76;
+            margin-bottom: 2rem;
+        }
+        
+        .tx-progress-bar {
+            width: 100%;
+            height: 2px;
+            background: rgba(26, 26, 26, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tx-progress-fill {
+            height: 100%;
+            background: #c9a86c;
+            transition: width 0.3s ease;
+        }
+        
+        .tx-link {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: #c9a86c;
+            color: #f7f4ed;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            transition: all 0.3s ease;
+        }
+        
+        .tx-link:hover {
+            background: #b8965a;
+        }
+        
+        .tx-close-btn {
+            margin-top: 1rem;
+            padding: 0.6rem 1.5rem;
+            background: transparent;
+            border: 0.5px solid rgba(26, 26, 26, 0.2);
+            color: #5a5248;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+        }
+        
+        .tx-close-btn:hover {
+            border-color: #c9a86c;
+            color: #c9a86c;
+        }
+        
+        /* 网络警告 */
+        .network-warning {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(201, 168, 108, 0.95);
+            color: #f7f4ed;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .network-warning.show {
+            display: flex;
+        }
+        
+        .network-warning button {
+            background: #f7f4ed;
+            color: #c9a86c;
+            border: none;
+            padding: 0.4rem 1rem;
+            font-family: inherit;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+    </style>
+    
+    <!-- 网络警告 -->
+    <div class="network-warning" id="networkWarning">
+        <span>⚠️ 当前不在 Qitmeer 主网</span>
+        <button onclick="walletManager.switchToQitmeer()">切换网络</button>
+    </div>
 
     <script>
         // 全局错误捕获
@@ -1843,54 +1992,231 @@
         }
 
         // 生成
-        function mint() {
-            console.log('[ECHO] mint() called');
+        async function mint() {
+            console.log('[ECHO] mint() called - Smart Contract Mode');
+            
             const btn = document.getElementById('mintBtn');
             if (!btn) {
                 console.error('[ECHO] mintBtn not found');
                 return;
             }
             
+            // 检查钱包连接
+            if (!walletManager.isConnected) {
+                showToast('请先连接钱包', 'error');
+                const result = await walletManager.connect();
+                if (!result.success) return;
+            }
+            
+            // 检查网络
+            if (!walletManager.isCorrectNetwork) {
+                showToast('请切换到 Qitmeer 主网', 'error');
+                const switched = await walletManager.switchToQitmeer();
+                if (!switched) return;
+            }
+            
+            // 显示交易模态框
+            showTxModal();
+            updateTxStatus('pending', '准备上传文件...', 10);
+            
             btn.disabled = true;
-            btn.textContent = '生成中...';
-            console.log('[ECHO] Starting generation...');
-
-            // 模拟生成过程
-            setTimeout(() => {
-                console.log('[ECHO] Generation complete');
+            
+            try {
+                // 收集表单数据
+                const formData = collectFormData();
                 
-                // 生成随机交易哈希
-                const txHash = '0x' + Array.from({length: 64}, () => 
-                    '0123456789abcdef'[Math.floor(Math.random() * 16)]
-                ).join('');
-
-                document.getElementById('txHash').textContent = 
-                    txHash.substring(0, 20) + '...' + txHash.substring(60);
-
-                // 隐藏所有步骤
-                document.querySelectorAll('.step-content').forEach(el => {
-                    el.classList.remove('active');
+                // 设置铸造服务回调
+                mintService.setCallbacks({
+                    onStatusChange: (status, progress) => {
+                        updateTxProgress(progress);
+                        
+                        switch(status) {
+                            case 'uploading':
+                                updateTxStatus('pending', '正在上传文件到 IPFS...', progress);
+                                break;
+                            case 'building_metadata':
+                                updateTxStatus('pending', '正在构建作品元数据...', progress);
+                                break;
+                            case 'approving':
+                                updateTxStatus('pending', '请在钱包中确认交易...', progress);
+                                break;
+                            case 'confirming':
+                                updateTxStatus('pending', '等待区块确认...', progress);
+                                break;
+                            case 'success':
+                                updateTxStatus('success', '作品铸造成功！', 100);
+                                break;
+                            case 'error':
+                                updateTxStatus('error', '铸造失败', progress);
+                                break;
+                        }
+                    },
+                    onError: (error) => {
+                        console.error('[ECHO] Mint error:', error);
+                        updateTxStatus('error', error.message || '铸造失败');
+                        btn.disabled = false;
+                        btn.textContent = '重试';
+                    },
+                    onSuccess: (result) => {
+                        console.log('[ECHO] Mint success:', result);
+                        
+                        // 显示成功状态
+                        setTimeout(() => {
+                            hideTxModal();
+                            showMintSuccess(result);
+                        }, 2000);
+                    }
                 });
-
-                // 显示成功状态
-                const successStep = document.getElementById('step-success');
-                if (successStep) {
-                    successStep.classList.add('active');
-                    console.log('[ECHO] Success state shown');
-                } else {
-                    console.error('[ECHO] step-success element not found');
-                }
-
-                // 更新步骤指示器为全部完成
-                document.querySelectorAll('.step-item').forEach(el => {
-                    el.classList.remove('active');
-                    el.classList.add('completed');
-                });
-
-                document.querySelectorAll('.step-line').forEach(el => {
-                    el.classList.add('completed');
-                });
-            }, 2000);
+                
+                // 执行铸造
+                const result = await mintService.mint(formData);
+                
+            } catch (error) {
+                console.error('[ECHO] Mint exception:', error);
+                updateTxStatus('error', error.message || '铸造失败');
+                btn.disabled = false;
+                btn.textContent = '重试';
+            }
+        }
+        
+        // 收集表单数据
+        function collectFormData() {
+            const name = document.getElementById('workName').value.trim();
+            const description = document.getElementById('workDesc').value.trim();
+            const type = document.querySelector('input[name="workType"]:checked')?.value || 'music';
+            
+            // 授权价格
+            const buyoutPrice = document.getElementById('buyoutPrice')?.value || '100';
+            const perUsePrice = document.getElementById('perUsePrice')?.value || '0.5';
+            const timePrice = document.getElementById('timePrice')?.value || '10';
+            
+            // 权益配置
+            const deriveOpen = document.getElementById('deriveOpen')?.value || 'allow';
+            const parentShare = document.getElementById('parentShare')?.value || '30';
+            const creatorShare = document.getElementById('creatorShare')?.value || '70';
+            const commercialUse = document.getElementById('commercialUse')?.value || 'allow';
+            
+            return {
+                name,
+                description,
+                assetType: type,
+                file: uploadedFile,
+                // 授权价格
+                buyoutPrice: parseFloat(buyoutPrice),
+                perUsePrice: parseFloat(perUsePrice),
+                dailyPrice: parseFloat(timePrice),
+                // 权益配置
+                deriveOpen,
+                parentShare: parseInt(parentShare),
+                creatorShare: parseInt(creatorShare),
+                commercialUse: commercialUse === 'allow',
+                // 选中的授权模式
+                selectedLicenseModes: Array.from(selectedLicenseModes)
+            };
+        }
+        
+        // 显示交易模态框
+        function showTxModal() {
+            const modal = document.getElementById('txModal');
+            modal.style.display = 'flex';
+        }
+        
+        // 隐藏交易模态框
+        function hideTxModal() {
+            const modal = document.getElementById('txModal');
+            modal.style.display = 'none';
+        }
+        
+        // 更新交易状态
+        function updateTxStatus(status, message, progress = null) {
+            const iconEl = document.getElementById('txStatusIcon');
+            const titleEl = document.getElementById('txStatusTitle');
+            const descEl = document.getElementById('txStatusDesc');
+            const linkEl = document.getElementById('txLink');
+            
+            const icons = {
+                pending: '⏳',
+                success: '✅',
+                error: '❌'
+            };
+            
+            const titles = {
+                pending: '正在处理',
+                success: '铸造成功',
+                error: '铸造失败'
+            };
+            
+            iconEl.textContent = icons[status] || icons.pending;
+            titleEl.textContent = titles[status] || titles.pending;
+            descEl.textContent = message;
+            
+            if (progress !== null) {
+                updateTxProgress(progress);
+            }
+            
+            // 成功时显示交易链接
+            if (status === 'success') {
+                linkEl.style.display = 'inline-block';
+            }
+        }
+        
+        // 更新进度条
+        function updateTxProgress(progress) {
+            const fillEl = document.getElementById('txProgressFill');
+            fillEl.style.width = progress + '%';
+        }
+        
+        // 显示铸造成功
+        function showMintSuccess(result) {
+            const btn = document.getElementById('mintBtn');
+            btn.disabled = false;
+            btn.textContent = '确认生成';
+            
+            // 更新交易哈希
+            const txHashEl = document.getElementById('txHash');
+            const shortHash = result.txHash.substring(0, 20) + '...' + result.txHash.substring(60);
+            txHashEl.textContent = shortHash;
+            txHashEl.style.cursor = 'pointer';
+            txHashEl.title = '点击查看交易详情';
+            txHashEl.onclick = () => {
+                window.open(result.explorerUrl, '_blank');
+            };
+            
+            // 保存 tokenId 用于跳转
+            window.mintedTokenId = result.tokenId;
+            
+            // 隐藏所有步骤
+            document.querySelectorAll('.step-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // 显示成功状态
+            const successStep = document.getElementById('step-success');
+            if (successStep) {
+                successStep.classList.add('active');
+                console.log('[ECHO] Success state shown');
+            }
+            
+            // 更新步骤指示器为全部完成
+            document.querySelectorAll('.step-item').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('completed');
+            });
+            
+            document.querySelectorAll('.step-line').forEach(el => {
+                el.classList.add('completed');
+            });
+            
+            // 显示成功提示
+            showToast('作品铸造成功！Token ID: ' + result.tokenId, 'success');
+        }
+        
+        // 更新跳转链接
+        function updateSuccessLinks() {
+            const viewWorkBtn = document.querySelector('#step-success .btn-primary');
+            if (viewWorkBtn && window.mintedTokenId) {
+                viewWorkBtn.href = `../market/work-detail.html?id=${window.mintedTokenId}`;
+            }
         }
 
         // 步骤指示器点击
@@ -1936,6 +2262,28 @@
             }
             
             lastScroll = currentScroll;
+        });
+        
+        // 设置钱包回调
+        walletManager.setCallbacks({
+            onConnect: (data) => {
+                console.log('[ECHO] Wallet connected:', data);
+                if (!data.isCorrectNetwork) {
+                    document.getElementById('networkWarning').classList.add('show');
+                }
+            },
+            onDisconnect: () => {
+                console.log('[ECHO] Wallet disconnected');
+                document.getElementById('networkWarning').classList.remove('show');
+            },
+            onChainChange: (chainId, isCorrect) => {
+                console.log('[ECHO] Chain changed:', chainId);
+                if (isCorrect) {
+                    document.getElementById('networkWarning').classList.remove('show');
+                } else {
+                    document.getElementById('networkWarning').classList.add('show');
+                }
+            }
         });
     </script>
 </body>

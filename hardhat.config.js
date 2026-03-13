@@ -8,7 +8,7 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 1,
+        runs: 200,  // 与验证配置保持一致
       },
       viaIR: true,  // 恢复 viaIR 以支持复杂合约
     },

@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ECHO 创作者中心 - 收益管理</title>
+    
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../../../assets/styles/creator-enhanced.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <style>
+        /* 收益面板专用样式 */
+        .revenue-page {
+            padding-top: 80px;
+            min-height: 100vh;
+            background: var(--paper);
+        }
+        
+        /* 统计卡片网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 0.5px solid var(--border-color);
+            transition: all var(--transition-fast);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-gold);
+        }
+        
+        .stat-card.highlight {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%);
+            color: white;
+        }
+        
+        .stat-card.highlight .stat-label,
+        .stat-card.highlight .stat-change {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: var(--warm);
+        }
+        
+        .stat-card.highlight .stat-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-card.highlight .stat-value {
+            color: white;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-change {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+            display: inline-block;
+        }
+        
+        .stat-change.negative {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--error);
+        }
+        
+        .stat-card.highlight .stat-change {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        /* 图表区域 */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 0.5px solid var(--border-color);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .chart-filters {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chart-filter-btn {
+            padding: 0.375rem 0.75rem;
+            border: 0.5px solid var(--border-color);
+            background: transparent;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: inherit;
+        }
+        
+        .chart-filter-btn:hover,
+        .chart-filter-btn.active {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+        
+        .chart-container.pie-chart {
+            height: 240px;
+        }
+        
+        /* 提现区域 */
+        .withdraw-section {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        
+        .withdraw-info h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .withdraw-info p {
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+        
+        .withdraw-btn {
+            background: white;
+            color: var(--gold);
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: inherit;
+        }
+        
+        .withdraw-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .withdraw-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 排行和交易区域 */
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 1.5rem;
+        }
+        
+        .content-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 0.5px solid var(--border-color);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        
+        .view-all-btn {
+            font-size: 0.875rem;
+            color: var(--gold);
+            text-decoration: none;
+            transition: opacity var(--transition-fast);
+        }
+        
+        .view-all-btn:hover {
+            opacity: 0.8;
+        }
+        
+        /* 作品排行 */
+        .works-ranking {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--warm);
+            border-radius: var(--border-radius);
+            transition: all var(--transition-fast);
+        }
+        
+        .ranking-item:hover {
+            background: var(--silk);
+            transform: translateX(4px);
+        }
+        
+        .ranking-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            background: var(--silk);
+            color: var(--stone);
+        }
+        
+        .ranking-number.top {
+            background: var(--gold);
+            color: white;
+        }
+        
+        .ranking-cover {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-sm);
+            background: var(--silk);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .ranking-info {
+            flex: 1;
+        }
+        
+        .ranking-name {
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+        
+        .ranking-sales {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .ranking-revenue {
+            text-align: right;
+        }
+        
+        .ranking-amount {
+            font-weight: 600;
+            color: var(--success);
+            font-size: 1rem;
+        }
+        
+        .ranking-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* 交易表格 */
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .transactions-table th {
+            text-align: left;
+            padding: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 0.5px solid var(--border-color);
+        }
+        
+        .transactions-table td {
+            padding: 1rem 0.75rem;
+            font-size: 0.875rem;
+            border-bottom: 0.5px solid var(--border-color);
+        }
+        
+        .transactions-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .transactions-table tr:hover td {
+            background: var(--warm);
+        }
+        
+        .tx-type {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .tx-type.onetime {
+            background: rgba(66, 153, 225, 0.1);
+            color: var(--info);
+        }
+        
+        .tx-type.peruse {
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning);
+        }
+        
+        .tx-type.timed {
+            background: rgba(156, 66, 33, 0.1);
+            color: var(--clay);
+        }
+        
+        .tx-amount {
+            font-weight: 600;
+            color: var(--success);
+        }
+        
+        .tx-amount.withdrawal {
+            color: var(--error);
+        }
+        
+        .tx-link {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        
+        .tx-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* 加载状态 */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--silk);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+        
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: var(--ink);
+        }
+        
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-fast);
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: transform var(--transition-fast);
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.25rem;
+            color: var(--ink);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--bg-primary);
+            color: var(--ink);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .modal-actions button {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: inherit;
+        }
+        
+        .btn-cancel {
+            background: var(--warm);
+            border: none;
+            color: var(--ink);
+        }
+        
+        .btn-confirm {
+            background: var(--gold);
+            border: none;
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background: var(--silk);
+        }
+        
+        .btn-confirm:hover {
+            opacity: 0.9;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .bottom-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .revenue-page {
+                padding: 70px 1rem 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .withdraw-section {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+            
+            .transactions-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .transactions-table th,
+            .transactions-table td {
+                white-space: nowrap;
+            }
+        }
+        
+        /* 移动端表格转卡片 */
+        @media (max-width: 640px) {
+            .transactions-table thead {
+                display: none;
+            }
+            
+            .transactions-table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                background: var(--warm);
+                border-radius: var(--border-radius);
+                padding: 1rem;
+            }
+            
+            .transactions-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 0;
+                border-bottom: 0.5px solid var(--border-color);
+            }
+            
+            .transactions-table td:last-child {
+                border-bottom: none;
+            }
+            
+            .transactions-table td::before {
+                content: attr(data-label);
+                font-weight: 500;
+                color: var(--text-muted);
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="../../index.html" class="nav-logo">ECHO</a>
+        <div class="nav-links" id="navLinks">
+            <a href="../market/market.html" class="nav-link">市场</a>
+            <a href="creator.html" class="nav-link active">创作</a>
+            <a href="../docs.html" class="nav-link">文档</a>
+        </div>
+        <button class="nav-menu-btn" id="menuBtn" aria-label="菜单">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="revenue-page">
+        <div class="creator-container">
+            <!-- 页面头部 -->
+            <header class="creator-header" style="margin-bottom: 1.5rem;">
+                <div>
+                    <h1>📊 收益管理</h1>
+                    <p class="subtitle">查看收益统计，管理您的创作收入</p>
+                </div>
+                <div class="creator-header-actions">
+                    <button class="btn btn-primary" id="exportBtn" style="background: rgba(255,255,255,0.2); color: white;">
+                        📥 导出报表
+                    </button>
+                    <a href="creator-dashboard.html" class="btn btn-primary">← 返回仪表盘</a>
+                </div>
+            </header>
+
+            <!-- 收益统计卡片 -->
+            <section class="stats-grid">
+                <div class="stat-card highlight">
+                    <div class="stat-header">
+                        <span class="stat-icon">💰</span>
+                    </div>
+                    <div class="stat-value" id="availableBalance">0 MEER</div>
+                    <div class="stat-label">可提现余额</div>
+                    <span class="stat-change">随时可提现</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">📈</span>
+                    </div>
+                    <div class="stat-value" id="monthRevenue">0 MEER</div>
+                    <div class="stat-label">本月收益</div>
+                    <span class="stat-change" id="monthChange">+0%</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">💎</span>
+                    </div>
+                    <div class="stat-value" id="totalRevenue">0 MEER</div>
+                    <div class="stat-label">总收益</div>
+                    <span class="stat-change">累计收入</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">📜</span>
+                    </div>
+                    <div class="stat-value" id="totalSales">0</div>
+                    <div class="stat-label">授权销售</div>
+                    <span class="stat-change">总销售数</span>
+                </div>
+            </section>
+
+            <!-- 提现区域 -->
+            <section class="withdraw-section">
+                <div class="withdraw-info">
+                    <h3>💰 提现到钱包</h3>
+                    <p>将您的收益提现到连接的钱包地址</p>
+                </div>
+                <button class="withdraw-btn" id="withdrawBtn">立即提现</button>
+            </section>
+
+            <!-- 图表区域 -->
+            <section class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2 class="chart-title">📈 收益趋势</h2>
+                        <div class="chart-filters">
+                            <button class="chart-filter-btn" data-range="7">7天</button>
+                            <button class="chart-filter-btn active" data-range="30">30天</button>
+                            <button class="chart-filter-btn" data-range="90">90天</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2 class="chart-title">🥧 收益来源</h2>
+                    </div>
+                    <div class="chart-container pie-chart">
+                        <canvas id="sourceChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 排行和交易 -->
+            <section class="bottom-section">
+                <!-- 作品收益排行 -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2 class="card-title">🏆 作品收益排行</h2>
+                        <a href="creator-dashboard.html#works" class="view-all-btn">查看全部 →</a>
+                    </div>
+                    <div class="works-ranking" id="worksRanking">
+                        <div class="loading-state">
+                            <div class="loading-spinner"></div>
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近交易 -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2 class="card-title">📝 最近交易</h2>
+                        <a href="#" class="view-all-btn" id="viewAllTx">查看全部 →</a>
+                    </div>
+                    <div class="table-wrapper" id="transactionsWrapper">
+                        <table class="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>类型</th>
+                                    <th>作品</th>
+                                    <th>买家</th>
+                                    <th>金额</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsBody">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="loading-state">
+                                            <div class="loading-spinner"></div>
+                                            <p>加载中...</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-logo">ECHO</div>
+        <div class="footer-links">
+            <a href="../docs.html">文档</a>
+            <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+    <!-- 提现弹窗 -->
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💰 提现确认</h3>
+            </div>
+            <div class="form-group">
+                <label>可提现金额</label>
+                <input type="text" id="withdrawAvailable" readonly value="0 MEER">
+            </div>
+            <div class="form-group">
+                <label>提现金额 (MEER)</label>
+                <input type="number" id="withdrawAmount" min="0" step="0.01" placeholder="输入提现金额">
+            </div>
+            <div class="form-group">
+                <label>提现地址</label>
+                <input type="text" id="withdrawAddress" readonly value="-">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelWithdraw">取消</button>
+                <button class="btn-confirm" id="confirmWithdraw">确认提现</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="toast" class="hidden" style="position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: var(--gold); color: white; padding: 1rem 2rem; border-radius: var(--border-radius); box-shadow: var(--shadow-lg); z-index: 3000; transition: all var(--transition-fast);"></div>
+
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loadingText">处理中...</p>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="../../../scripts/contract-config.js"></script>
+    <script src="../../../scripts/core/wallet.js"></script>
+    <script src="../../../scripts/core/revenue-service.js"></script>
+    <script>
+        // ==================== 全局状态 ====================
+        const revenueState = {
+            isConnected: false,
+            walletAddress: null,
+            revenueService: null,
+            stats: null,
+            trendData: [],
+            transactions: [],
+            worksRanking: [],
+            charts: {
+                revenue: null,
+                source: null
+            }
+        };
+        
+        // ==================== 初始化 ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initRevenuePage();
+        });
+        
+        async function initRevenuePage() {
+            console.log('初始化收益页面...');
+            
+            // 初始化钱包
+            await initWallet();
+            
+            // 初始化收益服务
+            await initRevenueService();
+            
+            // 加载数据
+            await loadAllData();
+            
+            // 初始化事件监听
+            initEventListeners();
+        }
+        
+        // ==================== 钱包集成 ====================
+        async function initWallet() {
+            if (typeof walletManager === 'undefined') {
+                showToast('钱包管理器未加载', 'error');
+                return false;
+            }
+            
+            // 尝试自动连接
+            await walletManager.autoConnect();
+            updateWalletUI();
+            
+            return walletManager.isConnected;
+        }
+        
+        function updateWalletUI() {
+            revenueState.isConnected = walletManager.isConnected;
+            revenueState.walletAddress = walletManager.address;
+        }
+        
+        // ==================== 收益服务 ====================
+        async function initRevenueService() {
+            if (!walletManager.isConnected || !walletManager.provider) {
+                console.warn('钱包未连接，使用只读模式');
+            }
+            
+            try {
+                revenueState.revenueService = new RevenueService(
+                    walletManager.provider,
+                    walletManager.signer
+                );
+                await revenueState.revenueService.init();
+            } catch (error) {
+                console.error('初始化收益服务失败:', error);
+            }
+        }
+        
+        // ==================== 数据加载 ====================
+        async function loadAllData() {
+            if (!revenueState.isConnected) {
+                showEmptyState();
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // 并行加载所有数据
+                await Promise.all([
+                    loadStats(),
+                    loadTrendData(30),
+                    loadWorksRanking(),
+                    loadTransactions()
+                ]);
+                
+                // 初始化图表
+                initCharts();
+                
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                showToast('加载数据失败，请刷新重试', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        async function loadStats() {
+            if (!revenueState.revenueService) return;
+            
+            const stats = await revenueState.revenueService.calculateRevenueStats(
+                revenueState.walletAddress
+            );
+            
+            revenueState.stats = stats;
+            
+            // 更新UI
+            document.getElementById('availableBalance').textContent = 
+                parseFloat(stats.availableBalance).toFixed(4) + ' MEER';
+            document.getElementById('monthRevenue').textContent = 
+                parseFloat(stats.monthRevenue).toFixed(4) + ' MEER';
+            document.getElementById('totalRevenue').textContent = 
+                parseFloat(stats.totalRevenue).toFixed(4) + ' MEER';
+            document.getElementById('totalSales').textContent = stats.totalSales;
+            
+            // 更新月环比
+            const monthChangeEl = document.getElementById('monthChange');
+            const change = stats.monthChange;
+            monthChangeEl.textContent = (change >= 0 ? '+' : '') + change + '% 较上月';
+            monthChangeEl.className = 'stat-change ' + (change >= 0 ? '' : 'negative');
+        }
+        
+        async function loadTrendData(days = 30) {
+            if (!revenueState.revenueService) return;
+            
+            const trend = await revenueState.revenueService.getRevenueTrend(
+                revenueState.walletAddress,
+                days
+            );
+            
+            revenueState.trendData = trend;
+        }
+        
+        async function loadWorksRanking() {
+            if (!revenueState.revenueService) return;
+            
+            const ranking = await revenueState.revenueService.getWorksRanking(
+                revenueState.walletAddress,
+                5
+            );
+            
+            revenueState.worksRanking = ranking;
+            
+            // 渲染排行
+            const container = document.getElementById('worksRanking');
+            
+            if (ranking.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🏆</div>
+                        <h3>暂无数据</h3>
+                        <p>上传作品开始赚取收益吧</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = ranking.map((work, index) => `
+                <div class="ranking-item">
+                    <div class="ranking-number ${index < 3 ? 'top' : ''}">${index + 1}</div>
+                    <div class="ranking-cover">${work.cover}</div>
+                    <div class="ranking-info">
+                        <div class="ranking-name">${work.name}</div>
+                        <div class="ranking-sales">${work.sales} 次销售</div>
+                    </div>
+                    <div class="ranking-revenue">
+                        <div class="ranking-amount">${work.revenue.toFixed(2)} MEER</div>
+                        <div class="ranking-label">总收益</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function loadTransactions() {
+            if (!revenueState.revenueService) return;
+            
+            const transactions = await revenueState.revenueService.getRecentTransactions(
+                revenueState.walletAddress,
+                10
+            );
+            
+            revenueState.transactions = transactions;
+            
+            // 渲染交易表格
+            const tbody = document.getElementById('transactionsBody');
+            
+            if (transactions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="icon">📝</div>
+                                <h3>暂无交易记录</h3>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = transactions.map(tx => {
+                const dateStr = formatDate(tx.date);
+                const typeClass = tx.typeCode.toLowerCase();
+                
+                return `
+                    <tr>
+                        <td data-label="时间">${dateStr}</td>
+                        <td data-label="类型">
+                            <span class="tx-type ${typeClass}">${tx.type}</span>
+                        </td>
+                        <td data-label="作品">${tx.work}</td>
+                        <td data-label="买家">${tx.buyer}</td>
+                        <td data-label="金额">
+                            <span class="tx-amount">+${tx.amount.toFixed(4)} MEER</span>
+                        </td>
+                        <td data-label="操作">
+                            <a href="https://qng.qitmeer.io/tx/${tx.transactionHash}" 
+                               target="_blank" 
+                               class="tx-link">查看 →</a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ==================== 图表初始化 ====================
+        function initCharts() {
+            initRevenueChart();
+            initSourceChart();
+        }
+        
+        function initRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            const data = revenueState.trendData;
+            const labels = data.map(d => {
+                const date = new Date(d.date);
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            });
+            const values = data.map(d => d.revenue);
+            
+            // 销毁旧图表
+            if (revenueState.charts.revenue) {
+                revenueState.charts.revenue.destroy();
+            }
+            
+            revenueState.charts.revenue = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '收益 (MEER)',
+                        data: values,
+                        borderColor: '#c9a86c',
+                        backgroundColor: 'rgba(201, 168, 108, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#c9a86c',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                            titleColor: '#c9a86c',
+                            bodyColor: '#fff',
+                            borderColor: '#c9a86c',
+                            borderWidth: 0.5,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toFixed(4) + ' MEER';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#9e8b76',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            border: {
+                                display: false
+                            },
+                            grid: {
+                                color: 'rgba(26, 26, 26, 0.05)'
+                            },
+                            ticks: {
+                                color: '#9e8b76',
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return value.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+        
+        function initSourceChart() {
+            const ctx = document.getElementById('sourceChart').getContext('2d');
+            
+            const stats = revenueState.stats;
+            const typeStats = stats ? stats.typeStats : {
+                ONE_TIME: { revenue: 0 },
+                PER_USE: { revenue: 0 },
+                TIMED: { revenue: 0 }
+            };
+            
+            const data = [
+                typeStats.ONE_TIME.revenue,
+                typeStats.PER_USE.revenue,
+                typeStats.TIMED.revenue
+            ];
+            
+            // 如果全部为零，显示占位数据
+            const hasData = data.some(v => v > 0);
+            const chartData = hasData ? data : [1, 0, 0];
+            
+            // 销毁旧图表
+            if (revenueState.charts.source) {
+                revenueState.charts.source.destroy();
+            }
+            
+            revenueState.charts.source = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['买断授权', '按次授权', '限时授权'],
+                    datasets: [{
+                        data: chartData,
+                        backgroundColor: [
+                            '#c9a86c',
+                            '#d4b896',
+                            '#e8e2d6'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#5a5248',
+                                padding: 20,
+                                font: {
+                                    size: 12,
+                                    family: "'Noto Serif SC', serif"
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 26, 26, 0.9)',
+                            titleColor: '#c9a86c',
+                            bodyColor: '#fff',
+                            borderColor: '#c9a86c',
+                            borderWidth: 0.5,
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${value.toFixed(4)} MEER (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // ==================== 事件监听 ====================
+        function initEventListeners() {
+            // 移动端菜单
+            const menuBtn = document.getElementById('menuBtn');
+            const navLinks = document.getElementById('navLinks');
+            
+            if (menuBtn && navLinks) {
+                menuBtn.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                });
+            }
+            
+            // 图表时间范围筛选
+            document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    document.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const range = parseInt(this.dataset.range);
+                    await loadTrendData(range);
+                    initRevenueChart();
+                });
+            });
+            
+            // 提现按钮
+            const withdrawBtn = document.getElementById('withdrawBtn');
+            const withdrawModal = document.getElementById('withdrawModal');
+            const cancelWithdraw = document.getElementById('cancelWithdraw');
+            const confirmWithdraw = document.getElementById('confirmWithdraw');
+            
+            if (withdrawBtn) {
+                withdrawBtn.addEventListener('click', () => {
+                    if (!revenueState.isConnected) {
+                        showToast('请先连接钱包', 'error');
+                        return;
+                    }
+                    
+                    // 更新弹窗信息
+                    const available = revenueState.stats?.availableBalance || '0';
+                    document.getElementById('withdrawAvailable').value = parseFloat(available).toFixed(4) + ' MEER';
+                    document.getElementById('withdrawAddress').value = 
+                        revenueState.walletAddress.slice(0, 10) + '...' + revenueState.walletAddress.slice(-8);
+                    
+                    withdrawModal.classList.add('active');
+                });
+            }
+            
+            if (cancelWithdraw) {
+                cancelWithdraw.addEventListener('click', () => {
+                    withdrawModal.classList.remove('active');
+                });
+            }
+            
+            if (confirmWithdraw) {
+                confirmWithdraw.addEventListener('click', handleWithdraw);
+            }
+            
+            // 点击遮罩关闭弹窗
+            withdrawModal.addEventListener('click', (e) => {
+                if (e.target === withdrawModal) {
+                    withdrawModal.classList.remove('active');
+                }
+            });
+            
+            // 导出报表
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', handleExport);
+            }
+        }
+        
+        // ==================== 功能处理 ====================
+        async function handleWithdraw() {
+            const amountInput = document.getElementById('withdrawAmount');
+            const amount = parseFloat(amountInput.value);
+            
+            if (!amount || amount <= 0) {
+                showToast('请输入有效的提现金额', 'error');
+                return;
+            }
+            
+            const available = parseFloat(revenueState.stats?.availableBalance || 0);
+            if (amount > available) {
+                showToast('提现金额不能超过可提现余额', 'error');
+                return;
+            }
+            
+            document.getElementById('withdrawModal').classList.remove('active');
+            showLoading(true, '处理提现请求...');
+            
+            try {
+                // 模拟提现（实际应调用合约）
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                showToast(`成功提现 ${amount.toFixed(4)} MEER`);
+                amountInput.value = '';
+                
+                // 刷新数据
+                await loadAllData();
+                
+            } catch (error) {
+                console.error('提现失败:', error);
+                showToast('提现失败: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function handleExport() {
+            if (!revenueState.revenueService || !revenueState.isConnected) {
+                showToast('请先连接钱包', 'error');
+                return;
+            }
+            
+            if (revenueState.transactions.length === 0) {
+                showToast('暂无交易记录可导出', 'error');
+                return;
+            }
+            
+            revenueState.revenueService.exportRevenueReport(
+                revenueState.walletAddress,
+                revenueState.transactions
+            );
+            
+            showToast('报表导出成功');
+        }
+        
+        // ==================== 工具函数 ====================
+        function formatDate(date) {
+            const d = new Date(date);
+            const now = new Date();
+            const diff = now - d;
+            
+            // 小于24小时显示相对时间
+            if (diff < 24 * 60 * 60 * 1000) {
+                const hours = Math.floor(diff / (60 * 60 * 1000));
+                if (hours < 1) {
+                    const minutes = Math.floor(diff / (60 * 1000));
+                    return minutes < 1 ? '刚刚' : `${minutes}分钟前`;
+                }
+                return `${hours}小时前`;
+            }
+            
+            // 小于7天显示星期
+            if (diff < 7 * 24 * 60 * 60 * 1000) {
+                const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+                return days[d.getDay()];
+            }
+            
+            return `${d.getMonth() + 1}/${d.getDate()}`;
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = type === 'error' ? '#f56565' : '#c9a86c';
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+        
+        function showLoading(show, text = '加载中...') {
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            
+            if (show) {
+                if (loadingText) loadingText.textContent = text;
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+        
+        function showEmptyState() {
+            // 显示连接钱包提示
+            document.getElementById('worksRanking').innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">👛</div>
+                    <h3>请先连接钱包</h3>
+                    <p>连接钱包后查看您的收益数据</p>
+                </div>
+            `;
+            
+            document.getElementById('transactionsBody').innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="icon">👛</div>
+                            <h3>请先连接钱包</h3>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    </script>
+</body>
+</html>

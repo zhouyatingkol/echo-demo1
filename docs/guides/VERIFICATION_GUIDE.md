@@ -7,13 +7,21 @@
 - **Chain ID**: 813
 - **区块浏览器**: https://qng.qitmeer.io
 
-### 合约列表
+### 合约列表 (V3 最新版本 - 2026-03-13 部署)
 
 | 合约 | 地址 | 区块 | 交易哈希 |
 |------|------|------|----------|
-| ECHOAssetV2 | 0x6195f16cb8d32397032c6031e89c567a5fdbec9d | 2588530 | 0xf57c907d8207a8a1032b90c7352d939d83614cf51cfe9d6b95ec21ef7115b312 |
-| ECHOFusion | 0xa91499036db8a9501d4116c12114d24a906d7b97 | 2588532 | 0x76b47467526ca2227b877422edb82cd5ca33e403c8f7bdaf8cd4acafe049a61d |
-| LicenseNFT | 0x13c0637d86d179b66f22e0806c98b34bdbf48adf | 2588533 | 0xf727fb1d454d373e188beacbf65ff4f838a12bc83a345d3e0a88c202f482b57a |
+| ECHOAssetV2V3 | `0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce` | - | `0xffe9b254465323b96e00bec13786bef4719de964623b86394ebb968d60a5be75` |
+| ECHOFusionV2 | `0x8Eb7a29C41478a3f32015C1330DFf7cc683d0952` | - | `0x7d46d70d38c8b68cf3822b5e6faa3c3822ee909b3790348229c07121372dc041` |
+| LicenseNFTV3 | `0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23` | - | `0xab93099d83ea59e88c26b65e26b45da66b60423a66cbd66148ceb6b9c4de1999` |
+
+### 旧版本合约 (存档)
+
+| 合约 | 地址 | 版本 | 状态 |
+|------|------|------|------|
+| ECHOAssetV2 | `0x6195f16cb8d32397032c6031e89c567a5fdbec9d` | V2 | 已废弃 |
+| ECHOFusion | `0xa91499036db8a9501d4116c12114d24a906d7b97` | V1 | 已废弃 |
+| LicenseNFT | `0x13c0637d86d179b66f22e0806c98b34bdbf48adf` | V1 | 已废弃 |
 
 ## 验证参数
 
@@ -53,22 +61,22 @@ Runs: 200
 Source Code: [粘贴 ECHOAssetV2_flat.sol 内容]
 ```
 
-#### ECHOFusion
+#### ECHOFusionV2
 ```
 Compiler: Solidity 0.8.19
 Optimization: Yes
 Runs: 200
-Source Code: [粘贴 ECHOFusion_flat.sol 内容]
-Constructor Arguments: 0x0000000000000000000000006195f16cb8d32397032c6031e89c567a5fdbec9d
+Source Code: [粘贴 ECHOFusionV2_flat.sol 内容]
+Constructor Arguments: 0x000000000000000000000000F98f63b7e8064Dcf9c2f25A906B2af89Af4840ce
 ```
 
-#### LicenseNFT
+#### LicenseNFTV3
 ```
 Compiler: Solidity 0.8.19
 Optimization: Yes
 Runs: 200
-Source Code: [粘贴 LicenseNFT_flat.sol 内容]
-Constructor Arguments: 0x0000000000000000000000006195f16cb8d32397032c6031e89c567a5fdbec9d
+Source Code: [粘贴 LicenseNFTV3_flat.sol 内容]
+Constructor Arguments: 0x000000000000000000000000F98f63b7e8064Dcf9c2f25A906B2af89Af4840ce
 ```
 
 ### 5. 验证成功
@@ -76,16 +84,16 @@ Constructor Arguments: 0x0000000000000000000000006195f16cb8d32397032c6031e89c567
 
 ## 构造参数编码
 
-### ECHOFusion
+### ECHOFusionV2
 ```
-地址参数: 0x6195f16cb8d32397032c6031e89c567a5fdbec9d
-ABI 编码: 0x0000000000000000000000006195f16cb8d32397032c6031e89c567a5fdbec9d
+地址参数: 0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce
+ABI 编码: 0x000000000000000000000000F98f63b7e8064Dcf9c2f25A906B2af89Af4840ce
 ```
 
-### LicenseNFT
+### LicenseNFTV3
 ```
-地址参数: 0x6195f16cb8d32397032c6031e89c567a5fdbec9d
-ABI 编码: 0x0000000000000000000000006195f16cb8d32397032c6031e89c567a5fdbec9d
+地址参数: 0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce
+ABI 编码: 0x000000000000000000000000F98f63b7e8064Dcf9c2f25A906B2af89Af4840ce
 ```
 
 ## 自动化验证（API）
@@ -93,14 +101,14 @@ ABI 编码: 0x0000000000000000000000006195f16cb8d32397032c6031e89c567a5fdbec9d
 如果 Qitmeer 支持 Blockscout API:
 
 ```bash
-# ECHOAssetV2
+# ECHOAssetV2V3
 curl -X POST "https://qng.qitmeer.io/api?module=contract&action=verify" \
   -H "Content-Type: application/json" \
   -d '{
-    "addressHash": "0x6195f16cb8d32397032c6031e89c567a5fdbec9d",
+    "addressHash": "0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce",
     "compilerVersion": "v0.8.19+commit.7dd6d404",
     "contractSourceCode": "[粘贴源码]",
-    "name": "ECHOAssetV2",
+    "name": "ECHOAssetV2V3",
     "optimization": true,
     "optimizationRuns": 200
   }'
