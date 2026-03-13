@@ -178,7 +178,6 @@ echo-demo/
 ## 📞 联系我们
 
 - GitHub Issues: [提交问题](https://github.com/zhouyatingkol/echo-demo1/issues)
-- Email: echo@qitmeer.io
 
 ---
 
