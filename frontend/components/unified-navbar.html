@@ -1,5 +1,6 @@
 <!-- 
-  ECHO Music 统一导航栏
+  ECHO Music 统一导航栏 v2.0
+  所有页面使用此统一导航，确保链接一致性
   将此代码粘贴到每个页面的 <body> 标签后的第一行
 -->
 <nav style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;">
@@ -9,13 +10,14 @@
       🎵 ECHO Music
     </a>
     
-    <!-- 导航链接 -->
+    <!-- 主导航链接 -->
     <div style="display: flex; gap: 8px; flex: 1;">
       <a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
       <a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
       <a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
       <a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">铸造</a>
-      <a href="dashboard-analytics.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">数据</a>
+      <a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">收益</a>
+      <a href="my-assets.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">我的资产</a>
     </div>
     
     <!-- 右侧控制区 -->
@@ -35,6 +37,9 @@
         <option value="en" style="background: #1a1a2e; color: #fff;">EN</option>
       </select>
       
+      <!-- 收藏按钮 -->
+      <a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">❤️</a>
+      
       <!-- 钱包按钮 -->
       <button id="connectBtn" onclick="if(window.walletManager && walletManager.isWalletConnected()){walletManager.disconnect();}else{walletManager.connect();}"
         style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; transition: all 0.3s; font-weight: 500; white-space: nowrap; height: 36px;"
@@ -46,5 +51,20 @@
   </div>
 </nav>
 
-<!-- 页面内容顶部留白 -->
+<!-- 页面内容顶部留白 (在导航栏下方) -->
 <div style="height: 80px;"></div>
+
+<!-- 
+  导航链接说明：
+  - index.html: 首页
+  - discover.html: 发现音乐
+  - music-market.html: 音乐市场
+  - charts.html: 榜单
+  - mint-music.html: 铸造音乐
+  - dashboard.html: 创作者收益面板
+  - my-assets.html: 我的资产 (License ECHO)
+  - my-favorites.html: 我的收藏
+  - profile.html: 个人资料
+  - license-shop.html: 授权商店
+  - 404.html: 错误页面
+-->

@@ -34,8 +34,8 @@ const CONTRACT_ABI = [
   "function getCurrentTokenId() view returns (uint256)"
 ];
 
-// 合约地址 - V2 合约
-let CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+// 合约地址 - V3 安全修复版 (2026-03-13)
+let CONTRACT_ADDRESS = '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce';
 
 // 全局变量
 let provider = null;

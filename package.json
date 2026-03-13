@@ -13,5 +13,8 @@
     "@openzeppelin/contracts": "^4.9.0",
     "dotenv": "^17.3.1",
     "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "web3": "^4.16.0"
   }
 }

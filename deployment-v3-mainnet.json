@@ -1,0 +1,23 @@
+{
+  "network": "qitmeer",
+  "chainId": 813,
+  "deployer": "0x3a163461692222F7b986a9D3DcCe5d88390EC63C",
+  "timestamp": "2026-03-13T08:26:26.950Z",
+  "contracts": {
+    "ECHOAssetV2V3": {
+      "name": "ECHOAssetV2V3",
+      "address": "0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce",
+      "txHash": "0xffe9b254465323b96e00bec13786bef4719de964623b86394ebb968d60a5be75"
+    },
+    "ECHOFusion": {
+      "name": "ECHOFusion",
+      "address": "0x31Cd483Ee827A272816808AD49b90c71B1c82E11",
+      "txHash": "0x7ace547390591b970ae7683abc35f2f1b17c0dd700b48406b7c0e7be221195bd"
+    },
+    "LicenseNFTV3": {
+      "name": "LicenseNFTV3",
+      "address": "0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23",
+      "txHash": "0xab93099d83ea59e88c26b65e26b45da66b60423a66cbd66148ceb6b9c4de1999"
+    }
+  }
+}
