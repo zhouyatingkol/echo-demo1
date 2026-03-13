@@ -88,22 +88,22 @@ npm install eslint-plugin-security
 # .eslintrc.json
 {
   "plugins": ["security"],
-  "extends": ["plugin:security/recommended"],
+  "extends": ["plugin:docs/security/recommended"],
   "rules": {
-    "security/detect-eval-with-expression": "error",
-    "security/detect-non-literal-fs-filename": "error",
-    "security/detect-unsafe-regex": "error",
-    "security/detect-buffer-noassert": "error",
-    "security/detect-child-process": "error",
-    "security/detect-disable-mustache-escape": "error",
-    "security/detect-eval-with-expression": "error",
-    "security/detect-new-buffer": "error",
-    "security/detect-no-csrf-before-method-override": "error",
-    "security/detect-non-literal-regexp": "error",
-    "security/detect-non-literal-require": "error",
-    "security/detect-object-injection": "error",
-    "security/detect-possible-timing-attacks": "error",
-    "security/detect-pseudoRandomBytes": "error"
+    "docs/security/detect-eval-with-expression": "error",
+    "docs/security/detect-non-literal-fs-filename": "error",
+    "docs/security/detect-unsafe-regex": "error",
+    "docs/security/detect-buffer-noassert": "error",
+    "docs/security/detect-child-process": "error",
+    "docs/security/detect-disable-mustache-escape": "error",
+    "docs/security/detect-eval-with-expression": "error",
+    "docs/security/detect-new-buffer": "error",
+    "docs/security/detect-no-csrf-before-method-override": "error",
+    "docs/security/detect-non-literal-regexp": "error",
+    "docs/security/detect-non-literal-require": "error",
+    "docs/security/detect-object-injection": "error",
+    "docs/security/detect-possible-timing-attacks": "error",
+    "docs/security/detect-pseudoRandomBytes": "error"
   }
 }
 ```

@@ -45,7 +45,7 @@ function payForUsage(uint256 tokenId, uint256 durationDays) public payable {
 
 **修复建议**:
 ```solidity
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/docs/security/ReentrancyGuard.sol";
 
 contract ECHOAssetV2 is ERC721, ReentrancyGuard {
     function payForUsage(uint256 tokenId, uint256 durationDays) 
@@ -224,7 +224,7 @@ function _isSeedOwner(uint256 seedId, address user) internal view returns (bool)
 
 **修复**: 添加 Pausable
 ```solidity
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/docs/security/Pausable.sol";
 
 contract LicenseNFT is ..., Pausable {
     function pause() public onlyOwner {

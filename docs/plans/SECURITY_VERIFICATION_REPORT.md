@@ -10,7 +10,7 @@
 
 ```solidity
 // ✅ 已添加
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/docs/security/ReentrancyGuard.sol";
 
 contract LicenseNFTV3 is ..., ReentrancyGuard {
     function purchaseOneTime(...) public payable nonReentrant { ... }
@@ -63,7 +63,7 @@ function revokeLicense(uint256 _licenseId) public nonReentrant {
 
 ```solidity
 // ✅ 已添加
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/docs/security/Pausable.sol";
 
 contract LicenseNFTV3 is ..., Pausable {
     function pause() public onlyOwner { _pause(); }
