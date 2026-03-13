@@ -98,7 +98,7 @@ pragma solidity ^0.8.19;
 ```solidity
 /**
  * @title LicenseNFT V3
- * @dev 授权 NFT 合约
+ * @dev 授权 ECHO 合约
  * @author ECHO Team
  */
 contract LicenseNFTV3 {

@@ -1454,7 +1454,7 @@
                             </div>
                         </div>
                         
-                        <!-- License NFT 配置 -->
+                        <!-- License ECHO 配置 -->
                         <div class="right-config-card simple">
                             <div class="right-config-header">
                                 <div class="right-config-icon">
@@ -1465,7 +1465,7 @@
                                         <path d="M14 10V6C14 5.44772 14.4477 5 15 5H33C33.5523 5 34 5.44772 34 6V10" stroke="currentColor" stroke-width="1.5"/>
                                     </svg>
                                 </div>
-                                <div class="right-config-title">License NFT</div>
+                                <div class="right-config-title">License ECHO</div>
                             </div>
                             <div class="right-form">
                                 <label class="right-label">是否可转让</label>
@@ -1800,7 +1800,7 @@
             const resaleShare = document.getElementById('resaleShare')?.value || '10';
             const platformShare = document.getElementById('platformShare')?.value || '5';
             
-            // 读取 License NFT 配置
+            // 读取 License ECHO 配置
             const transferable = document.getElementById('transferable')?.selectedOptions[0]?.text || '可转让';
             const transferRoyalty = document.getElementById('transferRoyalty')?.value || '10';
             const attribution = document.getElementById('attribution')?.selectedOptions[0]?.text || '必须署名';
@@ -1835,7 +1835,7 @@
                 <div style="margin: 1rem 0;"><strong>收益权</strong></div>
                 <div>• 作者：${creatorShare}% | 二次流转：${resaleShare}% | 平台：${platformShare}%</div>
                 
-                <div style="margin: 1rem 0;"><strong>License NFT</strong></div>
+                <div style="margin: 1rem 0;"><strong>License ECHO</strong></div>
                 <div>• ${transferable} | 转让版税：${transferRoyalty}% | ${attribution}</div>
             `;
 

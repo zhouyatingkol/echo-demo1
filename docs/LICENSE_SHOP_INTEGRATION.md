@@ -120,7 +120,7 @@ const LicenseType = {
 
 - [ ] 从 URL 参数获取资产ID
 - [ ] 添加交易历史记录
-- [ ] 添加 License NFT 展示
+- [ ] 添加 License ECHO 展示
 - [ ] 集成 IPFS 音频播放
 - [ ] 添加加载动画
 

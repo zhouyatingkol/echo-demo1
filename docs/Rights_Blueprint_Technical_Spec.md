@@ -142,11 +142,11 @@ struct RevenueRights {
 
 ---
 
-## 三、License NFT 机制
+## 三、License ECHO 机制
 
-### 3.1 License NFT 定义
+### 3.1 License ECHO 定义
 
-License NFT 是使用权购买的链上凭证，代表持有者对特定 ECHO 资产的**有限使用权**。
+License ECHO 是使用权购买的链上凭证，代表持有者对特定 ECHO 资产的**有限使用权**。
 
 ```solidity
 struct LicenseNFT {
@@ -441,7 +441,7 @@ function arbitrateFreeze(uint256 licenseId, bool upholdFreeze) public {
 | 阶段 | 功能 | 预计工时 | 优先级 |
 |------|------|---------|--------|
 | Phase 1 | RightsBlueprint 数据结构 | 1天 | ⭐⭐⭐⭐⭐ |
-| Phase 1 | License NFT 合约 | 1天 | ⭐⭐⭐⭐⭐ |
+| Phase 1 | License ECHO 合约 | 1天 | ⭐⭐⭐⭐⭐ |
 | Phase 2 | 授权商店前端 | 1天 | ⭐⭐⭐⭐⭐ |
 | Phase 2 | 价格计算器 | 0.5天 | ⭐⭐⭐⭐⭐ |
 | Phase 3 | 混音创建流程 | 2天 | ⭐⭐⭐⭐ |

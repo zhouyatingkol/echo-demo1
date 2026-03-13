@@ -259,7 +259,7 @@ describe("LicenseNFT 合约测试", function () {
       await licenseNFT.connect(buyer).purchaseOneTime(1, 0, { value: price });
     });
 
-    it("应该可以转让 License NFT", async function () {
+    it("应该可以转让 License ECHO", async function () {
       await licenseNFT.connect(buyer).transferFrom(buyer.address, addrs[0].address, 1);
       expect(await licenseNFT.ownerOf(1)).to.equal(addrs[0].address);
     });
