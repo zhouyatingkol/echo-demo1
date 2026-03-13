@@ -25,9 +25,9 @@ const CONTRACT_CONFIG = {
             address: '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce',
             abi: null // 从 artifacts 加载
         },
-        // 融合合约 V3
+        // 融合合约 V2（安全修复版）
         ECHOFusion: {
-            address: '0x31Cd483Ee827A272816808AD49b90c71B1c82E11',
+            address: '0x8Eb7a29C41478a3f32015C1330DFf7cc683d0952',
             abi: null
         },
         // 授权 NFT 合约 V3
