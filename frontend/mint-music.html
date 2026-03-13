@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>铸造音乐资产 - ECHO Music</title>
+    <title>生成音乐资产 - ECHO Music</title>
     <script src="ethers.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
     <style>
@@ -375,7 +375,7 @@
     document.documentElement.setAttribute("data-theme", "dark");
   </script>
 </head>
-<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">铸造</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
+<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">生成</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
 <nav class="navbar">
   <div class="nav-container">
     <a href="index.html" class="nav-logo">🎵 ECHO Music</a>
@@ -384,7 +384,7 @@
       <a href="discover.html" class="nav-link">发现</a>
       <a href="music-market.html" class="nav-link">市场</a>
       <a href="charts.html" class="nav-link">榜单</a>
-      <a href="mint-music.html" class="nav-link">铸造</a>
+      <a href="mint-music.html" class="nav-link">生成</a>
       <a href="dashboard-analytics.html" class="nav-link">数据</a>
     </div>
     
@@ -399,7 +399,7 @@
   </div>
 </nav></nav>
 <div style="height: 80px;"></div><div style="height: 80px;"></div>    <div class="container">
-        <h1>🎵 铸造音乐资产</h1>
+        <h1>🎵 生成音乐资产</h1>
         <p class="subtitle">将您的音乐授权给 AI 训练，获得持续收益</p>
 
         <div class="wallet-section">
@@ -421,7 +421,7 @@
             </div>
             <div class="step" id="step4Indicator">
                 <div class="step-number">4</div>
-                <div class="step-label">确认铸造</div>
+                <div class="step-label">确认生成</div>
             </div>
         </div>
 
@@ -596,16 +596,16 @@
             
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="goToStep(2)">← 上一步</button>
-                <button class="btn" onclick="goToStep(4)">下一步：确认铸造 →</button>
+                <button class="btn" onclick="goToStep(4)">下一步：确认生成 →</button>
             </div>
         </div>
 
-        <!-- 步骤4: 确认铸造 -->
+        <!-- 步骤4: 确认生成 -->
         <div class="card hidden" id="step4">
-            <div class="card-title">🔨 步骤 4: 确认铸造</div>
+            <div class="card-title">🔨 步骤 4: 确认生成</div>
             
             <div class="preview-panel">
-                <div class="preview-title">铸造预览</div>
+                <div class="preview-title">生成预览</div>
                 
                 <div class="preview-item">
                     <span class="preview-label">音乐名称</span>
@@ -631,7 +631,7 @@
             
             <div class="nav-buttons">
                 <button class="btn btn-secondary" onclick="goToStep(3)">← 上一步</button>
-                <button class="btn" id="mintBtn" onclick="mintMusic()">🚀 确认铸造</button>
+                <button class="btn" id="mintBtn" onclick="mintMusic()">🚀 确认生成</button>
             </div>
             
             <div id="status"></div>
@@ -899,7 +899,7 @@
                 document.getElementById('usagePrice').value + ' MEER/次';
         }
         
-        // 铸造音乐资产
+        // 生成音乐资产
         async function mintMusic() {
             if (!isConnected) {
                 showStatus('请先连接钱包', 'error');
@@ -907,7 +907,7 @@
             }
             
             try {
-                showStatus('铸造中...请确认交易', 'pending');
+                showStatus('生成中...请确认交易', 'pending');
                 
                 const name = document.getElementById('musicName').value;
                 const description = document.getElementById('musicDesc').value;
@@ -977,7 +977,7 @@
                 
                 const receipt = await tx.wait();
                 
-                showStatus('✅ 音乐资产铸造成功！', 'success');
+                showStatus('✅ 音乐资产生成成功！', 'success');
                 
                 // 3秒后重置
                 setTimeout(() => {
@@ -985,7 +985,7 @@
                 }, 3000);
                 
             } catch (error) {
-                showStatus('铸造失败: ' + error.message, 'error');
+                showStatus('生成失败: ' + error.message, 'error');
             }
         }
         
