@@ -543,15 +543,19 @@
         }
         
         .right-config-icon {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 0.5px solid rgba(201, 168, 108, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
             color: #c9a86c;
+        }
+        
+        .right-config-icon svg {
+            width: 24px;
+            height: 24px;
         }
         
         .right-config-title {
@@ -715,38 +719,72 @@
             margin-top: 1rem;
         }
         
-        /* 场景差异化定价 */
-        .scene-pricing {
-            border: 0.5px solid rgba(26, 26, 26, 0.08);
+        /* 场景差异化定价 - 卡片式 */
+        .scene-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
             margin-bottom: 1rem;
         }
         
-        .scene-row {
-            display: grid;
-            grid-template-columns: 120px 80px 1fr;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
-            transition: all 0.3s ease;
+        .scene-card {
+            padding: 1.5rem 1rem;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: default;
         }
         
-        .scene-row:last-child {
-            border-bottom: none;
-        }
-        
-        .scene-row:hover {
+        .scene-card:hover {
+            border-color: rgba(201, 168, 108, 0.4);
             background: rgba(201, 168, 108, 0.03);
+            transform: translateY(-2px);
         }
         
-        .scene-name {
+        .scene-card .scene-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 1rem;
+            color: #c9a86c;
+        }
+        
+        .scene-card .scene-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .scene-card .scene-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .scene-card .scene-name {
             font-family: 'Noto Serif SC', serif;
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #1a1a1a;
         }
         
-        .scene-multiplier {
+        .scene-card .scene-multiplier {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            color: #c9a86c;
+            font-weight: 500;
+        }
+        
+        .scene-card .scene-desc {
+            font-size: 0.75rem;
+            color: #9e8b76;
+        }
+        
+        .scene-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #9e8b76;
+            margin-top: 1rem;
+        }
             color: #c9a86c;
             font-weight: 300;
         }
@@ -777,21 +815,19 @@
         
         @media (max-width: 768px) {
             .license-modes,
-            .rights-grid-simple {
+            .rights-grid-simple,
+            .scene-cards {
                 grid-template-columns: 1fr;
             }
             
-            .scene-row {
-                grid-template-columns: 80px 60px 1fr;
-                padding: 0.8rem 1rem;
+            .scene-cards {
+                grid-template-columns: repeat(2, 1fr);
             }
-            
-            .scene-name {
-                font-size: 0.9rem;
-            }
-            
-            .scene-desc {
-                font-size: 0.75rem;
+        }
+        
+        @media (max-width: 480px) {
+            .scene-cards {
+                grid-template-columns: 1fr;
             }
         }
         
@@ -1264,25 +1300,61 @@
 
                 <div class="form-group">
                     <div class="rights-section-title">场景差异化定价</div>
-                    <div class="scene-pricing">
-                        <div class="scene-row">
-                            <div class="scene-name">个人创作</div>
-                            <div class="scene-multiplier">×1.0</div>
+                    <div class="scene-cards">
+                        <div class="scene-card" data-multiplier="1.0">
+                            <div class="scene-icon">
+                                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="24" cy="18" r="8" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M12 40C12 33.3726 17.3726 28 24 28C30.6274 28 36 33.3726 36 40" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                            <div class="scene-info">
+                                <div class="scene-name">个人创作</div>
+                                <div class="scene-multiplier">×1.0</div>
+                            </div>
                             <div class="scene-desc">个人视频、播客</div>
                         </div>
-                        <div class="scene-row">
-                            <div class="scene-name">游戏配乐</div>
-                            <div class="scene-multiplier">×1.5</div>
+                        <div class="scene-card" data-multiplier="1.5">
+                            <div class="scene-icon">
+                                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="12" width="32" height="24" rx="3" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M16 20L22 26L16 32" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M26 32H34" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="scene-info">
+                                <div class="scene-name">游戏配乐</div>
+                                <div class="scene-multiplier">×1.5</div>
+                            </div>
                             <div class="scene-desc">游戏背景音乐</div>
                         </div>
-                        <div class="scene-row">
-                            <div class="scene-name">AI 训练</div>
-                            <div class="scene-multiplier">×2.0</div>
+                        <div class="scene-card" data-multiplier="2.0">
+                            <div class="scene-icon">
+                                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="8" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                    <rect x="26" y="8" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                    <rect x="8" y="26" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                    <rect x="26" y="26" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                            <div class="scene-info">
+                                <div class="scene-name">AI 训练</div>
+                                <div class="scene-multiplier">×2.0</div>
+                            </div>
                             <div class="scene-desc">机器学习数据集</div>
                         </div>
-                        <div class="scene-row">
-                            <div class="scene-name">商业广告</div>
-                            <div class="scene-multiplier">×3.0</div>
+                        <div class="scene-card" data-multiplier="3.0">
+                            <div class="scene-icon">
+                                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="6" y="14" width="36" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/>
+                                    <circle cx="24" cy="24" r="5" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M6 18H42" stroke="currentColor" stroke-width="1"/>
+                                </svg>
+                            </div>
+                            <div class="scene-info">
+                                <div class="scene-name">商业广告</div>
+                                <div class="scene-multiplier">×3.0</div>
+                            </div>
                             <div class="scene-desc">电视/网络广告</div>
                         </div>
                     </div>
@@ -1295,7 +1367,15 @@
                         <!-- 衍生权配置 -->
                         <div class="right-config-card simple">
                             <div class="right-config-header">
-                                <div class="right-config-icon">衍</div>
+                                <div class="right-config-icon">
+                                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="24" cy="14" r="6" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M24 20V28" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M18 34V28H30V34" stroke="currentColor" stroke-width="1.5"/>
+                                        <circle cx="14" cy="38" r="4" stroke="currentColor" stroke-width="1.5"/>
+                                        <circle cx="34" cy="38" r="4" stroke="currentColor" stroke-width="1.5"/>
+                                    </svg>
+                                </div>
                                 <div class="right-config-title">衍生权</div>
                             </div>
                             <div class="right-form">
@@ -1320,7 +1400,13 @@
                         <!-- 扩展权配置 -->
                         <div class="right-config-card simple">
                             <div class="right-config-header">
-                                <div class="right-config-icon">扩</div>
+                                <div class="right-config-icon">
+                                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="16" y="16" width="20" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M12 32V14C12 11.7909 13.7909 10 16 10H34" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M28 10L34 10L34 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
                                 <div class="right-config-title">扩展权</div>
                             </div>
                             <div class="right-form">
@@ -1348,7 +1434,14 @@
                         <!-- 收益权配置 -->
                         <div class="right-config-card simple">
                             <div class="right-config-header">
-                                <div class="right-config-icon">收</div>
+                                <div class="right-config-icon">
+                                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M18 20H22V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M30 28H26V32" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M20 28C20 30.2091 21.7909 32 24 32C26.2091 32 28 30.2091 28 28C28 25.7909 26.2091 24 24 24C21.7909 24 20 22.2091 20 20C20 17.7909 21.7909 16 24 16C26.2091 16 28 17.7909 28 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
                                 <div class="right-config-title">收益权</div>
                             </div>
                             <div class="right-form">
@@ -1364,7 +1457,14 @@
                         <!-- License NFT 配置 -->
                         <div class="right-config-card simple">
                             <div class="right-config-header">
-                                <div class="right-config-icon">证</div>
+                                <div class="right-config-icon">
+                                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="8" y="10" width="32" height="28" rx="3" stroke="currentColor" stroke-width="1.5"/>
+                                        <circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M21 24L23 26L27 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M14 10V6C14 5.44772 14.4477 5 15 5H33C33.5523 5 34 5.44772 34 6V10" stroke="currentColor" stroke-width="1.5"/>
+                                    </svg>
+                                </div>
                                 <div class="right-config-title">License NFT</div>
                             </div>
                             <div class="right-form">
