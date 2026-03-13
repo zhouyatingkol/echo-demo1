@@ -1,5 +1,6 @@
-// ECHO Asset V2 合约交互脚本
-const V2_CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+// ECHO Asset V2/V3 合约交互脚本
+// Updated: 2026-03-13 (Config Verify Fix)
+const V2_CONTRACT_ADDRESS = '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce'; // V3 地址
 
 const V2_ABI = [
     // 铸造

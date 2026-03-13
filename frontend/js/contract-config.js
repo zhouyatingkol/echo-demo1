@@ -1,6 +1,7 @@
 /**
  * ECHO Protocol 合约配置
- * Qitmeer 主网部署地址
+ * Qitmeer 主网部署地址 - V3 安全修复版
+ * Last Updated: 2026-03-13 (Config Verify Fix)
  */
 
 const CONTRACT_CONFIG = {

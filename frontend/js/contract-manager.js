@@ -8,10 +8,10 @@ class ECHOContractManager {
         this.provider = provider;
         this.signer = signer;
         
-        // 合约地址
+        // 合约地址 - V3 安全修复版 (2026-03-13)
         this.addresses = {
             ECHOAssetV2: '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce',
-            ECHOFusion: '0x31Cd483Ee827A272816808AD49b90c71B1c82E11',
+            ECHOFusion: '0x8Eb7a29C41478a3f32015C1330DFf7cc683d0952',
             LicenseNFT: '0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23'
         };
         

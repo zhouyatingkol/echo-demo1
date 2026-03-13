@@ -1,0 +1,19 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/ECHOAssetV2.sol": {
+      "content": "$(cat contracts/ECHOAssetV2.sol | sed 's/"/\\"/g' | tr '\n' ' ')"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": ["abi", "evm.bytecode"]
+      }
+    }
+  }
+}

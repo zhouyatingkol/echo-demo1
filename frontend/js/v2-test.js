@@ -1,7 +1,8 @@
-// V2 快速测试脚本
+// V2/V3 快速测试脚本
 // 在浏览器控制台运行这些命令测试功能
+// Updated: 2026-03-13 (Config Verify Fix)
 
-const V2_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+const V2_ADDRESS = '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce'; // V3 地址
 
 const V2_ABI = [
     "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
