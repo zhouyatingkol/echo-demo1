@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO — 动效版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+            background: #f8f6f3;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .paper-texture {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.4;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        .glow-subtle {
+            position: fixed;
+            top: -50%; right: -20%;
+            width: 80vw; height: 80vw;
+            background: radial-gradient(circle, rgba(196, 184, 160, 0.08) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+        
+        .hero {
+            height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            position: relative; z-index: 1;
+        }
+        
+        /* ✨ 逐字淡入动画 */
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            text-align: center;
+            line-height: 1.8;
+            color: #1a1a1a;
+        }
+        
+        .hero-title span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: charFadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes charFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ✨ 呼吸动画 */
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            font-weight: 300;
+            color: #999;
+            margin-top: 2rem;
+            font-style: italic;
+            letter-spacing: 0.3em;
+            opacity: 0;
+            animation: fadeIn 1s ease 1.5s forwards, breathe 4s ease-in-out 2.5s infinite;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        @keyframes breathe {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .divider-elegant {
+            width: 60px; height: 1px;
+            background: linear-gradient(90deg, transparent, #c4b8a0, transparent);
+            margin: 3rem auto;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+        
+        .enter-btn {
+            margin-top: 4rem;
+            padding: 1.2rem 4rem;
+            border: 0.5px solid rgba(26, 26, 26, 0.2);
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.85rem;
+            letter-spacing: 0.25em;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative; overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 1s ease 2.5s forwards;
+        }
+        
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a1a1a;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: -1;
+        }
+        
+        .enter-btn:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        .enter-btn:hover {
+            color: #f8f6f3;
+            border-color: #1a1a1a;
+        }
+        
+        .scroll-hint {
+            position: absolute;
+            bottom: 8vh; left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 1s ease 3s forwards;
+        }
+        
+        .scroll-hint span {
+            display: block;
+            font-size: 0.7rem;
+            color: #999;
+            letter-spacing: 0.3em;
+            margin-bottom: 1rem;
+        }
+        
+        .scroll-line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, #c4b8a0, transparent);
+            margin: 0 auto;
+            animation: pulseLine 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseLine {
+            0%, 100% { opacity: 0.3; transform: scaleY(1); }
+            50% { opacity: 0.8; transform: scaleY(1.1); }
+        }
+        
+        .section-poetic {
+            min-height: 80vh;
+            padding: 15vh 10vw;
+            display: flex; flex-direction: column;
+            justify-content: center;
+            position: relative; z-index: 1;
+        }
+        
+        .section-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            color: #c4b8a0;
+            margin-bottom: 4rem;
+            text-transform: uppercase;
+        }
+        
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            line-height: 1.4;
+            margin-bottom: 3rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .poetic-text {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            font-weight: 300;
+            line-height: 2.4;
+            color: #666;
+            max-width: 700px;
+        }
+        
+        .poetic-text p {
+            margin-bottom: 2.5rem;
+        }
+        
+        .emphasis {
+            color: #1a1a1a;
+            font-weight: 400;
+        }
+        
+        .gold-accent {
+            color: #c4b8a0;
+            font-style: italic;
+        }
+        
+        .feature-item {
+            padding: 4rem 0;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.1);
+            transition: all 0.5s ease;
+            /* ✨ 悬浮效果 */
+        }
+        
+        .feature-item:hover {
+            padding-left: 2rem;
+            border-color: rgba(26, 26, 26, 0.3);
+            /* ✨ 轻微上浮 */
+            transform: translateX(10px);
+        }
+        
+        .feature-number {
+            font-size: 0.75rem;
+            color: #c4b8a0;
+            letter-spacing: 0.3em;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 300;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+            transition: color 0.3s ease;
+        }
+        
+        .feature-item:hover .feature-title {
+            color: #c4b8a0;
+        }
+        
+        .feature-desc {
+            font-size: 1rem;
+            color: #888;
+            line-height: 2;
+            max-width: 500px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 3rem;
+            /* ✨ 悬浮卡片效果 */
+            transition: all 0.4s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 300;
+            color: #1a1a1a;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            /* ✨ 数字滚动动画 */
+        }
+        
+        .stat-number.gold {
+            color: #c4b8a0;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 1.5rem;
+            letter-spacing: 0.2em;
+        }
+        
+        .work-row {
+            padding: 3rem 0;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        
+        .work-row:hover {
+            border-color: rgba(26, 26, 26, 0.4);
+            padding-left: 1rem;
+            /* ✨ 背景渐变 */
+            background: linear-gradient(90deg, rgba(196, 184, 160, 0.05), transparent);
+        }
+        
+        .work-info h3 {
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .work-row:hover .work-info h3 {
+            color: #c4b8a0;
+            /* ✨ 字间距展开 */
+            letter-spacing: 0.08em;
+        }
+        
+        .work-artist {
+            font-size: 0.9rem;
+            color: #999;
+        }
+        
+        .work-price {
+            font-size: 1.1rem;
+            color: #c4b8a0;
+            font-style: italic;
+            transition: transform 0.3s ease;
+        }
+        
+        .work-row:hover .work-price {
+            /* ✨ 价格上浮 */
+            transform: translateY(-2px);
+        }
+        
+        .cta-section {
+            min-height: 70vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        
+        .cta-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+        
+        .footer {
+            padding: 8vh 10vw;
+            border-top: 0.5px solid rgba(26, 26, 26, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-logo {
+            font-size: 1.2rem;
+            letter-spacing: 0.3em;
+            font-weight: 300;
+        }
+        
+        .footer-links a {
+            margin-left: 3rem;
+            text-decoration: none;
+            color: #999;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 0.5px;
+            background: #1a1a1a;
+            transition: width 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #1a1a1a;
+            /* ✨ 字间距展开 */
+            letter-spacing: 0.2em;
+        }
+        
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* ✨ 更快的淡入 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .section-poetic { padding: 10vh 6vw; }
+            .footer { flex-direction: column; gap: 2rem; text-align: center; }
+            .footer-links a { margin: 0 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-texture"></div>
+    <div class="glow-subtle"></div>
+
+    <section class="hero">
+        <!-- ✨ 逐字淡入 -->
+        <h1 class="hero-title" id="heroTitle">动态数字生命</h1>
+        
+        <p class="hero-subtitle">— ECHO</p>
+        
+        <div class="divider-elegant"></div>
+        
+        <button class="enter-btn" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
+            进入
+        </button>
+
+        <div class="scroll-hint">
+            <span>SCROLL</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <section id="about" class="section-poetic">
+        <div class="section-label">Awakening</div>
+        
+        <h2 class="section-title">不是 NFT</h2>
+        
+        <div class="poetic-text">
+            <p><span class="emphasis">NFT</span> 是静态的收藏，是被封存的标本。</p>
+            <p><span class="emphasis">ECHO</span> 是<span class="gold-accent">活着</span>的权益，是随使用生长的数字生命。</p>
+            <p>每一次使用，都是一次呼吸。每一次交易，都是一次连接。</p>
+        </div>
+    </section>
+
+    <section class="section-poetic" style="background: #f5f3f0;">
+        <div class="section-label">Growth</div>
+        
+        <div style="max-width: 800px;">
+            <div class="feature-item">
+                <div class="feature-number">01 — 动态</div>
+                <h3 class="feature-title">生长</h3>
+                <p class="feature-desc">随使用次数、时间、场景不断进化。价值不是固定的，而是流动的。</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-number">02 — 多权利</div>
+                <h3 class="feature-title">配置</h3>
+                <p class="feature-desc">买断、按次、限时。一件作品，多种可能。</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-number">03 — 实时</div>
+                <h3 class="feature-title">分配</h3>
+                <p class="feature-desc">每次使用自动分配收益。创作者实时获得 MEER。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-poetic">
+        <div class="section-label">Propagation</div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 4rem; max-width: 1000px;">
+            <div class="stat-item">
+                <div class="stat-number">1,234</div>
+                <div class="stat-label">音乐作品</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number">5,678</div>
+                <div class="stat-label">ECHO</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number">987</div>
+                <div class="stat-label">创作者</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number gold">45.6K</div>
+                <div class="stat-label">MEER</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-poetic" style="background: #f5f3f0;">
+        <div class="section-label">Collection</div>
+        
+        <h2 class="section-title">精选作品</h2>
+        
+        <div style="max-width: 900px;">
+            <div class="work-row">
+                <div class="work-info">
+                    <h3>夏日微风</h3>
+                    <div class="work-artist">音乐创作者</div>
+                </div>
+                <div class="work-price">100 MEER</div>
+            </div>
+            
+            <div class="work-row">
+                <div class="work-info">
+                    <h3>城市节拍</h3>
+                    <div class="work-artist">BeatMaker</div>
+                </div>
+                <div class="work-price">150 MEER</div>
+            </div>
+            
+            <div class="work-row">
+                <div class="work-info">
+                    <h3>钢琴协奏曲</h3>
+                    <div class="work-artist">古典大师</div>
+                </div>
+                <div class="work-price">500 MEER</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="section-label">Evolution</div>
+        
+        <h2 class="cta-title">
+            生成你的 <span class="gold-accent">ECHO</span>
+        </h2>
+        
+        <p style="color: #888; margin-bottom: 3rem; font-size: 1.1rem;">让创作真正属于你，持续进化</p>
+        
+        <button class="enter-btn">开始创作</button>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-logo">ECHO</div>
+        
+        <div class="footer-links">
+            <a href="#">文档</a>
+            <a href="#">GitHub</a>
+            <a href="#">Qitmeer</a>
+        </div>
+    </footer>
+
+    <script>
+        // ✨ 逐字淡入
+        const heroTitle = document.getElementById('heroTitle');
+        const text = heroTitle.textContent;
+        heroTitle.innerHTML = '';
+        
+        [...text].forEach((char, i) => {
+            const span = document.createElement('span');
+            span.textContent = char === ' ' ? '\u00A0' : char;
+            span.style.animationDelay = `${i * 0.1}s`;
+            heroTitle.appendChild(span);
+        });
+        
+        // 淡入动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        
+        document.querySelectorAll('.section-label, .section-title, .poetic-text, .feature-item, .stat-item').forEach(el => {
+            el.classList.add('fade-up');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
