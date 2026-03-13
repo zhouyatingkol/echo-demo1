@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>市场 — ECHO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'Noto Serif SC', 'serif'],
+                        display: ['Cormorant Garamond', 'serif'],
+                    },
+                    colors: {
+                        'ink': '#1a1a1a',
+                        'paper': '#f7f4ed',
+                        'warm': '#f0ece3',
+                        'silk': '#e8e2d6',
+                        'gold': '#c9a86c',
+                        'gold-soft': '#d4b896',
+                        'clay': '#9e8b76',
+                        'stone': '#5a5248',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+            background: #f7f4ed;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .paper-texture {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.35;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        .glow-soft {
+            position: fixed;
+            top: -35%; right: -10%;
+            width: 70vw; height: 70vw;
+            background: radial-gradient(circle, rgba(201, 168, 108, 0.12) 0%, transparent 60%);
+            pointer-events: none; z-index: 0;
+        }
+        
+        /* ✨ 辨识度：左侧垂直水印 */
+        .side-mark {
+            position: fixed;
+            left: 5vw;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            font-size: 0.65rem;
+            letter-spacing: 0.8em;
+            color: rgba(26, 26, 26, 0.12);
+            z-index: 0;
+            pointer-events: none;
+            font-weight: 300;
+        }
+        
+        /* 顶部导航 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.5rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(247, 244, 237, 0.95), transparent);
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.4em;
+            font-weight: 300;
+            color: #1a1a1a;
+            text-decoration: none;
+            transition: all 0.4s ease;
+        }
+        
+        .nav-logo:hover {
+            letter-spacing: 0.5em;
+            color: #c9a86c;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+        }
+        
+        .nav-link {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            color: #5a5248;
+            text-decoration: none;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: #c9a86c;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: #1a1a1a;
+            letter-spacing: 0.2em;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active {
+            color: #c9a86c;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            padding-top: 100px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 页面标题区 */
+        .page-header {
+            padding: 8vh 10vw 4vh;
+            text-align: center;
+        }
+        
+        .page-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            color: #c9a86c;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+        
+        .page-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: #1a1a1a;
+        }
+        
+        .page-title .gold-char {
+            color: #c9a86c;
+        }
+        
+        /* 筛选标签 */
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 2rem 10vw;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.6rem 1.8rem;
+            font-family: inherit;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            color: #5a5248;
+            background: transparent;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .filter-btn:hover {
+            border-color: #c9a86c;
+            color: #1a1a1a;
+        }
+        
+        .filter-btn.active {
+            background: #1a1a1a;
+            border-color: #1a1a1a;
+            color: #f7f4ed;
+        }
+        
+        /* 作品网格 */
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2.5rem;
+            padding: 2rem 10vw 10vh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* ✨ 作品卡片 */
+        .work-card {
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .work-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        /* 封面图区域 */
+        .work-cover {
+            aspect-ratio: 4 / 3;
+            background: #f0ece3;
+            border: 0.5px solid rgba(26, 26, 26, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .work-card:hover .work-cover {
+            border-color: #c9a86c;
+            box-shadow: 0 12px 40px rgba(201, 168, 108, 0.12);
+        }
+        
+        /* 封面占位图 */
+        .cover-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f0ece3 0%, #e8e2d6 100%);
+            position: relative;
+        }
+        
+        .cover-placeholder::before {
+            content: '';
+            width: 40%;
+            height: 40%;
+            border: 0.5px solid rgba(201, 168, 108, 0.3);
+            border-radius: 50%;
+        }
+        
+        .cover-placeholder.music::before {
+            content: '♪';
+            font-size: 2.5rem;
+            color: #c9a86c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+        
+        .cover-placeholder.art::before {
+            content: '◆';
+            font-size: 2rem;
+            color: #c9a86c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+        
+        .cover-placeholder.text::before {
+            content: '✦';
+            font-size: 2rem;
+            color: #c9a86c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+        
+        /* 类型标签 */
+        .work-type-tag {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.55rem;
+            letter-spacing: 0.2em;
+            color: #5a5248;
+            background: rgba(247, 244, 237, 0.9);
+            border: 0.5px solid rgba(26, 26, 26, 0.08);
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: all 0.4s ease;
+        }
+        
+        .work-card:hover .work-type-tag {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 作品信息 */
+        .work-info {
+            padding: 1.2rem 0;
+        }
+        
+        .work-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.05rem;
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            color: #1a1a1a;
+            margin-bottom: 0.4rem;
+            transition: color 0.4s ease;
+        }
+        
+        .work-card:hover .work-name {
+            color: #c9a86c;
+        }
+        
+        .work-creator {
+            font-size: 0.75rem;
+            color: #9e8b76;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.6rem;
+        }
+        
+        .work-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .work-price {
+            font-size: 1rem;
+            color: #c9a86c;
+            font-style: italic;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            transition: transform 0.3s ease;
+        }
+        
+        .work-card:hover .work-price {
+            transform: translateY(-2px);
+        }
+        
+        .work-price-suffix {
+            font-size: 0.65rem;
+            color: #9e8b76;
+            margin-left: 0.2rem;
+        }
+        
+        /* 隐藏标签动/权/实 */
+        .hidden-tags {
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.4s ease;
+        }
+        
+        .work-card:hover .hidden-tags {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .mini-tag {
+            font-size: 0.5rem;
+            letter-spacing: 0.1em;
+            color: #c9a86c;
+            padding: 0.15rem 0.4rem;
+            border: 0.5px solid rgba(201, 168, 108, 0.3);
+        }
+        
+        /* 页脚 */
+        .footer {
+            padding: 8vh 10vw;
+            border-top: 0.5px solid rgba(26, 26, 26, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-logo {
+            font-size: 1rem;
+            letter-spacing: 0.4em;
+            font-weight: 300;
+        }
+        
+        .footer-links a {
+            margin-left: 3rem;
+            text-decoration: none;
+            color: #9e8b76;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: #c9a86c;
+            transition: width 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #1a1a1a;
+            letter-spacing: 0.2em;
+        }
+        
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* 淡入动画 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .side-mark { display: none; }
+            .navbar { padding: 1rem 5vw; }
+            .nav-links { gap: 1.5rem; }
+            .nav-link { font-size: 0.7rem; letter-spacing: 0.1em; }
+            .page-header { padding: 6vh 6vw 3vh; }
+            .filter-bar { padding: 1.5rem 6vw; gap: 0.8rem; }
+            .filter-btn { padding: 0.5rem 1.2rem; font-size: 0.65rem; }
+            .works-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+                gap: 1.2rem; 
+                padding: 1rem 6vw 6vh; 
+            }
+            .work-info { padding: 0.8rem 0; }
+            .work-name { font-size: 0.9rem; }
+            .footer { flex-direction: column; gap: 2rem; text-align: center; }
+            .footer-links a { margin: 0 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-texture"></div>
+    <div class="glow-soft"></div>
+    <div class="side-mark">ECHO</div>
+
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">ECHO</a>
+        <div class="nav-links">
+            <a href="market.html" class="nav-link active">市场</a>
+            <a href="#" class="nav-link">创作</a>
+            <a href="#" class="nav-link">文档</a>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 页面标题 -->
+        <header class="page-header">
+            <div class="page-label">Marketplace</div>
+            <h1 class="page-title"><span class="gold-char">市</span>场</h1>
+        </header>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="music">音乐</button>
+            <button class="filter-btn" data-filter="art">艺术</button>
+            <button class="filter-btn" data-filter="text">文字</button>
+        </div>
+
+        <!-- 作品网格 -->
+        <section class="works-grid" id="worksGrid">
+            <!-- 音乐作品 -->
+            <article class="work-card" data-category="music">
+                <div class="work-cover">
+                    <div class="cover-placeholder music"></div>
+                    <span class="work-type-tag">MUSIC</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">夏日微风</h3>
+                    <p class="work-creator">音乐创作者</p>
+                    <div class="work-price-row">
+                        <span class="work-price">100<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">动</span>
+                            <span class="mini-tag">权</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card" data-category="music">
+                <div class="work-cover">
+                    <div class="cover-placeholder music"></div>
+                    <span class="work-type-tag">MUSIC</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">城市节拍</h3>
+                    <p class="work-creator">BeatMaker</p>
+                    <div class="work-price-row">
+                        <span class="work-price">150<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">动</span>
+                            <span class="mini-tag">实</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card" data-category="music">
+                <div class="work-cover">
+                    <div class="cover-placeholder music"></div>
+                    <span class="work-type-tag">MUSIC</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">钢琴协奏曲</h3>
+                    <p class="work-creator">古典大师</p>
+                    <div class="work-price-row">
+                        <span class="work-price">500<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">权</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 艺术作品 -->
+            <article class="work-card" data-category="art">
+                <div class="work-cover">
+                    <div class="cover-placeholder art"></div>
+                    <span class="work-type-tag">ART</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">数字山水</h3>
+                    <p class="work-creator">视觉艺术家</p>
+                    <div class="work-price-row">
+                        <span class="work-price">280<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">动</span>
+                            <span class="mini-tag">权</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card" data-category="art">
+                <div class="work-cover">
+                    <div class="cover-placeholder art"></div>
+                    <span class="work-type-tag">ART</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">几何幻想</h3>
+                    <p class="work-creator">AI 创作者</p>
+                    <div class="work-price-row">
+                        <span class="work-price">180<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">实</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card" data-category="art">
+                <div class="work-cover">
+                    <div class="cover-placeholder art"></div>
+                    <span class="work-type-tag">ART</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">光之流动</h3>
+                    <p class="work-creator">新媒体艺术家</p>
+                    <div class="work-price-row">
+                        <span class="work-price">350<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">动</span>
+                            <span class="mini-tag">权</span>
+                            <span class="mini-tag">实</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 文字作品 -->
+            <article class="work-card" data-category="text">
+                <div class="work-cover">
+                    <div class="cover-placeholder text"></div>
+                    <span class="work-type-tag">TEXT</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">诗与代码</h3>
+                    <p class="work-creator">数字诗人</p>
+                    <div class="work-price-row">
+                        <span class="work-price">80<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">权</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card" data-category="text">
+                <div class="work-cover">
+                    <div class="cover-placeholder text"></div>
+                    <span class="work-type-tag">TEXT</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">算法叙事</h3>
+                    <p class="work-creator">AI 写手</p>
+                    <div class="work-price-row">
+                        <span class="work-price">120<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">动</span>
+                            <span class="mini-tag">实</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card" data-category="text">
+                <div class="work-cover">
+                    <div class="cover-placeholder text"></div>
+                    <span class="work-type-tag">TEXT</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">时间碎片</h3>
+                    <p class="work-creator">散文家</p>
+                    <div class="work-price-row">
+                        <span class="work-price">60<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">动</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 更多作品 -->
+            <article class="work-card" data-category="music">
+                <div class="work-cover">
+                    <div class="cover-placeholder music"></div>
+                    <span class="work-type-tag">MUSIC</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">深夜爵士</h3>
+                    <p class="work-creator">爵士乐手</p>
+                    <div class="work-price-row">
+                        <span class="work-price">220<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">权</span>
+                            <span class="mini-tag">实</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card" data-category="art">
+                <div class="work-cover">
+                    <div class="cover-placeholder art"></div>
+                    <span class="work-type-tag">ART</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">赛博禅意</h3>
+                    <p class="work-creator">数字艺术家</p>
+                    <div class="work-price-row">
+                        <span class="work-price">420<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">动</span>
+                            <span class="mini-tag">权</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="work-card" data-category="text">
+                <div class="work-cover">
+                    <div class="cover-placeholder text"></div>
+                    <span class="work-type-tag">TEXT</span>
+                </div>
+                <div class="work-info">
+                    <h3 class="work-name">元宇宙日记</h3>
+                    <p class="work-creator">虚拟探险家</p>
+                    <div class="work-price-row">
+                        <span class="work-price">90<span class="work-price-suffix">ECHO</span></span>
+                        <div class="hidden-tags">
+                            <span class="mini-tag">动</span>
+                            <span class="mini-tag">实</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-logo">ECHO</div>
+        <div class="footer-links">
+            <a href="#">文档</a>
+            <a href="#">GitHub</a>
+        </div>
+    </footer>
+
+    <script>
+        // 筛选功能
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const workCards = document.querySelectorAll('.work-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 更新按钮状态
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.dataset.filter;
+
+                // 筛选作品
+                workCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'block';
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            card.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 50);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // 滚动淡入动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.work-card, .page-header, .filter-bar').forEach(el => {
+            el.classList.add('fade-up');
+            observer.observe(el);
+        });
+
+        // 导航栏滚动效果
+        let lastScroll = 0;
+        const navbar = document.querySelector('.navbar');
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.style.background = 'rgba(247, 244, 237, 0.98)';
+            } else {
+                navbar.style.background = 'linear-gradient(to bottom, rgba(247, 244, 237, 0.95), transparent)';
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>
