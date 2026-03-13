@@ -30,12 +30,26 @@
 font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
 ```
 
+### 全局字号（已调整，更温润可读）
 | 元素 | 字号 | 字重 | 字间距 |
 |------|------|------|--------|
 | 首页标题 | clamp(2.2rem, 8vw, 5rem) | 300 | 0.18em |
 | 章节标题 | clamp(1.6rem, 4vw, 2.6rem) | 300 | 0.1em |
 | 正文 | clamp(0.95rem, 1.6vw, 1.15rem) | 300 | - |
-| 标签 | 0.6rem | 400 | 0.5em |
+| 副标题/描述 | 0.85rem | 300 | 0.05em |
+
+### 组件字号
+| 元素 | 字号 | 说明 |
+|------|------|------|
+| 导航链接 | 0.75rem | 顶部导航 |
+| 筛选按钮 | 0.85rem | 市场筛选 |
+| 卡片标题 | 1.2rem | 作品名称 |
+| 卡片元信息 | 0.85rem | 创作者、类型 |
+| 卡片价格 | 1rem | ECHO 价格 |
+| 表格表头 | 0.8rem | 流转记录 |
+| 表格内容 | 1rem | 地址、时间 |
+| 标签 | 0.8rem | 类型标签（铸造/流转/使用）|
+| 页脚 | 0.7rem | 底部链接 |
 
 ---
 
@@ -44,6 +58,7 @@ font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
 - 章节内边距：`20vh 10vw`（移动端 `12vh 6vw`）
 - 边框粗细：**0.5px**（极细，东方感）
 - 最大宽度：600-800px
+- 导航栏 z-index：**1000**（确保点击有效）
 
 ---
 
@@ -69,11 +84,33 @@ font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
 
 ## 📄 页面清单
 
-- [x] index.html — 首页（已完成）
-- [ ] market.html — 市场/作品列表
-- [ ] creator.html — 创作者中心
-- [ ] work-detail.html — 作品详情
-- [ ] mint.html — 铸造 ECHO
-- [ ] profile.html — 个人中心
-- [ ] docs.html — 文档/白皮书
+- [x] **index.html** — 首页（温润 × 辨识度）
+- [x] **market.html** — 市场/作品列表（已连接）
+- [x] **work-detail.html** — 作品详情（已连接）
+- [ ] **mint.html** — 铸造 ECHO（创建新资产）
+- [ ] **creator.html** — 创作者中心（管理作品）
+- [ ] **profile.html** — 个人中心（我的收藏/收益）
+- [ ] **docs.html** — 文档/白皮书
+
+---
+
+## 🔗 页面链接结构
+
+```
+index.html (首页)
+    ├─ 市场 → market.html
+    ├─ 创作 → creator.html (待)
+    └─ 文档 → docs.html (待)
+
+market.html (市场)
+    ├─ ECHO → index.html
+    ├─ 创作 → creator.html (待)
+    ├─ 文档 → docs.html (待)
+    └─ 作品卡片 → work-detail.html
+
+work-detail.html (作品详情)
+    ├─ ECHO → index.html
+    ├─ 返回名录 → market.html
+    └─ 购买 → (待连接钱包)
+```
 
