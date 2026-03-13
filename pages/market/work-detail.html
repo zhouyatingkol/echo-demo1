@@ -717,7 +717,7 @@
                         <div class="price-label">当前价格</div>
                         <div class="price-value">100<span>ECHO</span></div>
                     </div>
-                    <button class="buy-btn">立即购买</button>
+                    <button class="buy-btn" onclick="openLicenseModal()">立即购买</button>
                 </div>
             </div>
         </section>
@@ -828,6 +828,374 @@
         </div>
     </footer>
 
+    <!-- 购买授权模态框 -->
+    <div id="licenseModal" class="license-modal" style="display: none;">
+        <div class="license-modal-content">
+            <button class="license-modal-close" onclick="closeLicenseModal()">&times;</button>
+            <h3 class="license-modal-title">购买授权</h3>
+            
+            <div class="license-work-info">
+                <div class="license-work-name" id="licenseWorkName">夏日微风</div>
+                <div class="license-work-creator" id="licenseWorkCreator">林清风</div>
+            </div>
+            
+            <!-- 授权类型选择 -->
+            <div class="license-type-section">
+                <div class="license-section-label">选择授权类型</div>
+                <div class="license-type-options">
+                    <div class="license-type-card selected" data-type="onetime" onclick="selectLicenseType('onetime')">
+                        <div class="license-type-name">买断制</div>
+                        <div class="license-type-desc">永久使用，一次性付费</div>
+                        <div class="license-type-price" id="onetimePrice">100 MEER</div>
+                    </div>
+                    <div class="license-type-card" data-type="peruse" onclick="selectLicenseType('peruse')">
+                        <div class="license-type-name">按次计费</div>
+                        <div class="license-type-desc">按需使用，灵活付费</div>
+                        <div class="license-type-price" id="perusePrice">0.5 MEER/次</div>
+                    </div>
+                    <div class="license-type-card" data-type="timed" onclick="selectLicenseType('timed')">
+                        <div class="license-type-name">限时授权</div>
+                        <div class="license-type-desc">按天租赁，30天起</div>
+                        <div class="license-type-price" id="timedPrice">10 MEER/天</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 使用场景选择 -->
+            <div class="license-usage-section">
+                <div class="license-section-label">使用场景</div>
+                <select class="license-usage-select" id="usageTypeSelect" onchange="updatePrice()">
+                    <option value="0">个人创作 (×1.0)</option>
+                    <option value="1">游戏配乐 (×1.5)</option>
+                    <option value="2">AI 训练 (×2.0)</option>
+                    <option value="3">商业广告 (×3.0)</option>
+                    <option value="4">广播 (×2.5)</option>
+                    <option value="5">流媒体 (×1.2)</option>
+                </select>
+            </div>
+            
+            <!-- 数量/时长选择 -->
+            <div class="license-quantity-section" id="quantitySection" style="display: none;">
+                <div class="license-section-label">
+                    <span id="quantityLabel">使用次数</span>
+                </div>
+                <div class="license-quantity-control">
+                    <button onclick="adjustQuantity(-1)">-</button>
+                    <input type="number" id="quantityInput" value="100" min="1" onchange="updatePrice()">
+                    <button onclick="adjustQuantity(1)">+</button>
+                </div>
+            </div>
+            
+            <!-- 价格明细 -->
+            <div class="license-price-breakdown">
+                <div class="price-row">
+                    <span>基础价格</span>
+                    <span id="basePriceDisplay">100 MEER</span>
+                </div>
+                <div class="price-row">
+                    <span>场景倍率</span>
+                    <span id="multiplierDisplay">×1.0</span>
+                </div>
+                <div class="price-row">
+                    <span>平台费 (5%)</span>
+                    <span id="platformFeeDisplay">5 MEER</span>
+                </div>
+                <div class="price-row total">
+                    <span>总计</span>
+                    <span id="totalPriceDisplay">105 MEER</span>
+                </div>
+            </div>
+            
+            <!-- 交易状态 -->
+            <div class="license-tx-status" id="licenseTxStatus" style="display: none;">
+                <div class="license-tx-icon">⏳</div>
+                <div class="license-tx-message">等待交易确认...</div>
+            </div>
+            
+            <!-- 购买按钮 -->
+            <button class="license-buy-btn" id="licenseBuyBtn" onclick="purchaseLicense()">确认购买</button>
+            
+            <a href="#" class="license-tx-link" id="licenseTxLink" target="_blank" style="display: none;">查看交易</a>
+        </div>
+    </div>
+
+    <!-- Ethers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+    <!-- 钱包模块 -->
+    <script src="../../scripts/core/wallet.js"></script>
+    <!-- 合约服务 -->
+    <script src="../../scripts/core/contract-service.js"></script>
+    
+    <style>
+        /* 购买授权模态框样式 */
+        .license-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .license-modal-content {
+            background: #f7f4ed;
+            padding: 2.5rem;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 0.5px solid rgba(201, 168, 108, 0.3);
+            position: relative;
+        }
+        .license-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #9e8b76;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .license-modal-close:hover {
+            color: #c9a86c;
+        }
+        .license-modal-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+        }
+        .license-work-info {
+            padding: 1rem 0;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .license-work-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.2rem;
+            color: #1a1a1a;
+            margin-bottom: 0.3rem;
+        }
+        .license-work-creator {
+            font-size: 0.85rem;
+            color: #9e8b76;
+        }
+        .license-section-label {
+            font-size: 0.75rem;
+            color: #5a5248;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+        .license-type-section {
+            margin-bottom: 1.5rem;
+        }
+        .license-type-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .license-type-card {
+            padding: 1rem 1.2rem;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .license-type-card:hover {
+            border-color: rgba(201, 168, 108, 0.4);
+            background: rgba(201, 168, 108, 0.02);
+        }
+        .license-type-card.selected {
+            border-color: #c9a86c;
+            background: rgba(201, 168, 108, 0.05);
+        }
+        .license-type-card.selected::before {
+            content: '✓';
+            width: 20px;
+            height: 20px;
+            background: #c9a86c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .license-type-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1rem;
+            color: #1a1a1a;
+            min-width: 80px;
+        }
+        .license-type-desc {
+            font-size: 0.8rem;
+            color: #9e8b76;
+            flex: 1;
+        }
+        .license-type-price {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: #c9a86c;
+            font-weight: 500;
+        }
+        .license-usage-section, .license-quantity-section {
+            margin-bottom: 1.5rem;
+        }
+        .license-usage-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            color: #5a5248;
+            background: rgba(247, 244, 237, 0.8);
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239e8b76' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            cursor: pointer;
+        }
+        .license-usage-select:focus {
+            outline: none;
+            border-color: #c9a86c;
+        }
+        .license-quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .license-quantity-control button {
+            width: 36px;
+            height: 36px;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            background: transparent;
+            color: #5a5248;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .license-quantity-control button:hover {
+            border-color: #c9a86c;
+            color: #c9a86c;
+        }
+        .license-quantity-control input {
+            width: 80px;
+            height: 36px;
+            text-align: center;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            color: #1a1a1a;
+        }
+        .license-quantity-control input:focus {
+            outline: none;
+            border-color: #c9a86c;
+        }
+        .license-price-breakdown {
+            background: rgba(247, 244, 237, 0.5);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 0.5px solid rgba(26, 26, 26, 0.05);
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            font-size: 0.9rem;
+            color: #5a5248;
+        }
+        .price-row.total {
+            border-top: 0.5px solid rgba(26, 26, 26, 0.1);
+            margin-top: 0.5rem;
+            padding-top: 0.8rem;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.1rem;
+            color: #1a1a1a;
+        }
+        .price-row.total span:last-child {
+            color: #c9a86c;
+            font-weight: 500;
+        }
+        .license-tx-status {
+            text-align: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(201, 168, 108, 0.05);
+            border: 0.5px solid rgba(201, 168, 108, 0.2);
+        }
+        .license-tx-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .license-tx-message {
+            font-size: 0.9rem;
+            color: #5a5248;
+        }
+        .license-buy-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #c9a86c;
+            border: none;
+            color: #f7f4ed;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .license-buy-btn:hover:not(:disabled) {
+            background: #b8965a;
+        }
+        .license-buy-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .license-tx-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: transparent;
+            border: 0.5px solid #c9a86c;
+            color: #c9a86c;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+        }
+        .license-tx-link:hover {
+            background: #c9a86c;
+            color: #f7f4ed;
+        }
+        @media (max-width: 600px) {
+            .license-modal {
+                padding: 1rem;
+            }
+            .license-modal-content {
+                padding: 1.5rem;
+            }
+            .license-type-card {
+                flex-wrap: wrap;
+            }
+            .license-type-desc {
+                width: 100%;
+                margin-top: 0.3rem;
+            }
+        }
+    </style>
     <script>
         // 滚动淡入动画
         const observer = new IntersectionObserver((entries) => {
