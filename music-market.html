@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐市场 - ECHO Music</title>
+    <script src="ethers.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background: #0a0a0a; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #00d4ff; }
+        .wallet-btn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+        }
+        .wallet-btn.connected {
+            background: rgba(0,255,0,0.2);
+            border: 1px solid #0f0;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .filter-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .filter-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .filter-tag {
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-tag:hover {
+            border-color: rgba(0,212,255,0.5);
+        }
+        .filter-tag.active {
+            background: rgba(0,212,255,0.2);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        /* 高级筛选 */
+        .advanced-filters {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .filter-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        .bpm-range {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .bpm-range input[type="range"] {
+            flex: 1;
+        }
+        .bpm-value {
+            min-width: 60px;
+            text-align: center;
+            font-size: 14px;
+            color: #00d4ff;
+        }
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        select option {
+            background: #1a1a2e;
+        }
+        
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* Music Grid */
+        .music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .music-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        .music-card:hover {
+            border-color: rgba(0,212,255,0.3);
+            transform: translateY(-4px);
+        }
+        
+        .music-visual {
+            height: 160px;
+            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .waveform {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 60px;
+        }
+        .wave-bar {
+            width: 4px;
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+        @keyframes wave {
+            0%, 100% { height: 20%; }
+            50% { height: 100%; }
+        }
+        .play-overlay {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .music-card:hover .play-overlay {
+            opacity: 1;
+        }
+        
+        .music-info {
+            padding: 16px;
+        }
+        .music-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .music-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .meta-tag {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: rgba(0,212,255,0.1);
+            border-radius: 4px;
+            color: #00d4ff;
+        }
+        .music-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0f0;
+        }
+        .price-unit {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .buy-btn {
+            padding: 8px 16px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .share-btn {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .share-btn:hover {
+            background: rgba(0,212,255,0.2);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+        
+        /* Audio Player Fixed */
+        .player-fixed {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10,10,26,0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 16px 20px;
+            display: none;
+            align-items: center;
+            gap: 16px;
+        }
+        .player-fixed.active {
+            display: flex;
+        }
+        .player-info {
+            flex: 0 0 200px;
+        }
+        .player-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .player-artist {
+            font-size: 12px;
+            color: #888;
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .control-btn.play {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        }
+        .player-progress {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-radius: 2px;
+            width: 0%;
+        }
+        .time {
+            font-size: 12px;
+            color: #888;
+            min-width: 40px;
+        }
+        
+        .player-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .modal-header {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #0f0;
+        }
+        .modal-body { padding-top: 64px;
+            margin-bottom: 24px;
+        }
+        .license-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: left;
+        }
+        .license-title {
+            font-size: 14px;
+            color: #00d4ff;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .license-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+        }
+        .license-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* 收藏按钮 */
+        .favorite-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        .favorite-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+        .favorite-btn.active {
+            color: #ff4757;
+        }
+        .favorite-btn.active:hover {
+            color: #ff6b81;
+        }
+        
+        /* 添加到播放列表下拉菜单 */
+        .playlist-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(26,26,46,0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px 0;
+            min-width: 180px;
+            display: none;
+            z-index: 100;
+        }
+        .playlist-dropdown.active {
+            display: block;
+        }
+        .playlist-dropdown-item {
+            padding: 10px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .playlist-dropdown-item:hover {
+            background: rgba(0,212,255,0.2);
+        }
+        .playlist-dropdown-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 8px 0;
+        }
+        
+        /* 播放列表按钮 */
+        .add-to-playlist-btn {
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            position: relative;
+        }
+        .add-to-playlist-btn:hover {
+            border-color: rgba(0,212,255,0.5);
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+  <script src="frontend/js/theme-switcher.js" defer></script>
+  <script src="frontend/js/i18n.js" defer></script>
+  <link rel="stylesheet" href="frontend/css/global.css">
+  <link rel="stylesheet" href="frontend/css/theme.css"
+  <link rel="stylesheet" href="frontend/css/navbar.css">
+  <link rel="stylesheet" href="frontend/css/mobile.css">
+  <script src="frontend/js/wallet-state.js" defer></script>
+  <script>
+    // PRELOAD_THEME: Force dark theme before page render
+    document.documentElement.setAttribute("data-theme", "dark");
+  </script>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">🎵 ECHO Music</a>
+    
+    <div class="nav-links">
+      <a href="discover.html" class="nav-link">发现</a>
+      <a href="music-market.html" class="nav-link">市场</a>
+      <a href="charts.html" class="nav-link">榜单</a>
+      <a href="mint-music.html" class="nav-link">铸造</a>
+      <a href="dashboard-analytics.html" class="nav-link">数据</a>
+    </div>
+    
+    <div class="nav-right">
+      <button id="themeToggle" class="nav-control" onclick="toggleTheme()">🌓</button>
+      <select id="langSelect" class="nav-control" onchange="changeLanguage(this.value)">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+      </select>
+      <button id="connectBtn" class="wallet-btn">连接钱包</button>
+    </div>
+  </div>
+</nav><nav style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;">
+  <div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;">
+    <a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a>
+    <div style="display: flex; gap: 8px; flex: 1;">
+      <a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
+      <a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
+      <a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
+      <a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">铸造</a>
+      <a href="dashboard-analytics.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">数据</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button id="themeToggle" onclick="toggleTheme()" style="padding: 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 16px; cursor: pointer;">🌓</button>
+      <select id="langSelect" onchange="changeLanguage(this.value)" style="padding: 8px 28px 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 13px; cursor: pointer; appearance: none; -webkit-appearance: none;">
+        <option value="zh" style="background: #1a1a2e;">中文</option>
+        <option value="en" style="background: #1a1a2e;">EN</option>
+      </select>
+      <button id="connectBtn" style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; font-weight: 500;">连接钱包</button>
+    </div>
+  </div>
+</nav>
+<div style="height: 80px;"></div>                <div class="filter-tag" data-filter="folk">民谣</div>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索音乐..." onkeyup="if(event.key==='Enter')applyFilters()">
+                <button class="wallet-btn" onclick="applyFilters()">🔍 搜索</button>
+            </div>
+            
+            <!-- 高级筛选 -->
+            <div class="advanced-filters">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>BPM 范围: <span id="bpmRangeValue">60 - 180</span></label>
+                        <div class="bpm-range">
+                            <input type="range" id="bpmMin" min="60" max="180" value="60" oninput="updateBPMRange()">
+                            <span class="bpm-value" id="bpmMinVal">60</span>
+                            <span style="color:#888">-</span>
+                            <span class="bpm-value" id="bpmMaxVal">180</span>
+                            <input type="range" id="bpmMax" min="60" max="180" value="180" oninput="updateBPMRange()">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>时长</label>
+                        <select id="durationFilter" onchange="applyFilters()">
+                            <option value="all">全部时长</option>
+                            <option value="short">短 (&lt; 1分钟)</option>
+                            <option value="medium">中 (1-3分钟)</option>
+                            <option value="long">长 (&gt; 3分钟)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>排序</label>
+                        <select id="sortBy" onchange="applyFilters()">
+                            <option value="newest">最新发布</option>
+                            <option value="price-low">价格: 低到高</option>
+                            <option value="price-high">价格: 高到低</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="totalMusic">--</span>
+                <span class="stat-label">首音乐</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalCreators">--</span>
+                <span class="stat-label">位创作者</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalTransactions">--</span>
+                <span class="stat-label">次授权</span>
+            </div>
+        </div>
+
+        <div class="music-grid" id="musicGrid">
+            <!-- 动态生成 -->
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #888;">
+                连接钱包后加载音乐列表...
+            </div>
+        </div>
+    </div>
+
+    <!-- 固定播放器 -->
+    <div class="player-fixed" id="fixedPlayer">
+        <div class="player-info">
+            <div class="player-title" id="playerTitle">--</div>
+            <div class="player-artist" id="playerArtist">--</div>
+            <div class="player-preview" id="playerPreviewTag" style="display: none; font-size: 11px; color: #ffd700; margin-top: 4px;">🔒 30秒预览模式</div>
+        </div>
+        
+        <div class="player-controls">
+            <button class="control-btn" onclick="skipBackward()">⏮</button>
+            <button class="control-btn play" id="playerPlayBtn" onclick="togglePlayer()">▶</button>
+            <button class="control-btn" onclick="skipForward()">⏭</button>
+        </div>
+        
+        <div class="player-progress">
+            <span class="time" id="currentTime">0:00</span>
+            <div class="progress-bar" onclick="seekPlayer(event)">
+                <div class="progress-fill" id="playerProgress"></div>
+            </div>
+            <span class="time" id="totalTime">0:00</span>
+        </div>
+        
+        <div class="player-actions">
+            <button class="buy-btn" id="playerBuyBtn" onclick="buyCurrentMusic()" style="display: none;">购买授权</button>
+        </div>
+        
+        <audio id="audioElement" preload="metadata"></audio>
+    </div>
+
+    <!-- 购买成功弹窗 -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">🎉 购买成功！</div>
+            <div class="modal-body">
+                <p>您已成功获得该音乐的 AI 训练授权</p>
+                <div class="license-card">
+                    <div class="license-title">授权凭证</div>
+                    <div class="license-item">
+                        <span>Token ID</span>
+                        <span id="licenseTokenId">--</span>
+                    </div>
+                    <div class="license-item">
+                        <span>授权类型</span>
+                        <span>AI 训练使用权</span>
+                    </div>
+                    <div class="license-item">
+                        <span>有效期</span>
+                        <span>30 天</span>
+                    </div>
+                    <div class="license-item">
+                        <span>交易哈希</span>
+                        <span id="licenseTxHash" style="font-size: 11px;">--</span>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: #888; margin-top: 16px;">
+                    授权信息已记录在区块链上，可在<a href="#" target="_blank" style="color: #00d4ff;">区块浏览器</a>查看
+                </p>
+            </div>
+            <button class="btn" onclick="closeModal()">确定</button>
+        </div>
+    </div>
+
+
+    <script>
+        const V2_CONTRACT_ADDRESS = '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce';
+        const V2_ABI = [
+            "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)",
+            "function getCurrentTokenId() view returns (uint256)",
+            "function payForUsage(uint256 tokenId, uint256 durationDays) payable"
+        ];
+        
+        let provider, signer, contract, userAddress;
+        let isConnected = false;
+        let currentFilter = 'all';
+        let musicList = [];
+        let currentMusic = null;
+        let isPlaying = false;
+        let previewMode = true;
+        
+        // 音频元素
+        const audio = document.getElementById('audioElement');
+        
+        // 音频时间更新
+        audio.addEventListener('timeupdate', function() {
+            const current = this.currentTime;
+            const duration = this.duration || 0;
+            
+            // 30秒预览限制
+            if (previewMode && current >= 30) {
+                this.pause();
+                this.currentTime = 0;
+                isPlaying = false;
+                document.getElementById('playerPlayBtn').textContent = '▶';
+                showPreviewLimit();
+                return;
+            }
+            
+            const percent = (current / duration) * 100;
+            document.getElementById('playerProgress').style.width = percent + '%';
+            document.getElementById('currentTime').textContent = formatTime(current);
+            document.getElementById('totalTime').textContent = formatTime(duration);
+        });
+        
+        audio.addEventListener('ended', function() {
+            isPlaying = false;
+            document.getElementById('playerPlayBtn').textContent = '▶';
+        });
+        
+        audio.addEventListener('loadedmetadata', function() {
+            document.getElementById('totalTime').textContent = formatTime(this.duration);
+        });
+        
+        // 显示预览限制提示
+        function showPreviewLimit() {
+            const tag = document.getElementById('playerPreviewTag');
+            tag.innerHTML = '🔒 预览已结束，请购买授权';
+            tag.style.color = '#ff6b6b';
+            document.getElementById('playerBuyBtn').style.display = 'block';
+        }
+        
+        // 筛选标签点击
+        document.querySelectorAll('#genreFilters .filter-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                document.querySelectorAll('#genreFilters .filter-tag').forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+                currentFilter = tag.dataset.filter;
+                renderMusicList();
+            });
+        });
+        
+        // 连接钱包
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('请先安装 MetaMask 钱包！');
+                return;
+            }
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                isConnected = true;
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, signer);
+                
+                document.getElementById('connectBtn').textContent = 
+                    userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                document.getElementById('connectBtn').classList.add('connected');
+                
+                loadMusicList();
+            } catch (error) {
+                console.error('连接失败:', error);
+            }
+        }
+        
+        // 加载音乐列表
+        async function loadMusicList() {
+            if (!contract) return;
+            
+            try {
+                const currentId = await contract.getCurrentTokenId();
+                musicList = [];
+                const creators = new Set();
+                
+                for (let i = 0; i < currentId.toNumber(); i++) {
+                    try {
+                        const [metadata, blueprint, creator] = await contract.getAssetInfo(i);
+                        
+                        // 只显示音乐类型
+                        if (metadata.assetType && metadata.assetType.startsWith('music_')) {
+                            // 尝试从 metadata.uri 解析 BPM 和时长
+                            let bpm = 120; // 默认值
+                            let duration = '0:00';
+                            
+                            if (metadata.uri) {
+                                try {
+                                    // 如果是 data URI，解析 JSON
+                                    if (metadata.uri.startsWith('data:')) {
+                                        const base64Data = metadata.uri.split(',')[1];
+                                        const jsonStr = atob(base64Data);
+                                        const meta = JSON.parse(jsonStr);
+                                        bpm = meta.bpm || 120;
+                                        duration = meta.duration || '0:00';
+                                    }
+                                } catch (e) {
+                                    // 解析失败使用默认值
+                                }
+                            }
+                            
+                            musicList.push({
+                                tokenId: i,
+                                name: metadata.name,
+                                genre: metadata.assetType.replace('music_', ''),
+                                creator: creator,
+                                price: ethers.utils.formatEther(blueprint.usage.fee),
+                                uri: metadata.uri,
+                                bpm: bpm,
+                                duration: duration
+                            });
+                            creators.add(creator);
+                        }
+                    } catch (e) {
+                        // 跳过错误
+                    }
+                }
+                
+                // 更新统计
+                document.getElementById('totalMusic').textContent = musicList.length;
+                document.getElementById('totalCreators').textContent = creators.size;
+                document.getElementById('totalTransactions').textContent = '--';
+                
+                renderMusicList();
+            } catch (error) {
+                console.error('加载失败:', error);
+            }
+        }
+        
+        // 渲染音乐列表
+        function renderMusicList() {
+            const grid = document.getElementById('musicGrid');
+            
+            let filtered = musicList;
+            if (currentFilter !== 'all') {
+                filtered = musicList.filter(m => m.genre === currentFilter);
+            }
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #888;">暂无音乐</div>';
+                return;
+            }
+            
+            const favorites = getFavorites();
+            
+            grid.innerHTML = filtered.map(music => {
+                const isFav = favorites.includes(music.tokenId);
+                return `
+                <div class="music-card">
+                    <div class="music-visual">
+                        <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(${music.tokenId})" title="${isFav ? '取消收藏' : '收藏'}">
+                            ${isFav ? '❤️' : '🤍'}
+                        </button>
+                        <div class="waveform">
+                            ${Array(20).fill(0).map(() => `
+                                <div class="wave-bar" style="height: ${Math.random() * 80 + 20}%; animation-delay: ${Math.random()}s"></div>
+                            `).join('')}
+                        </div>
+                        <div class="play-overlay" onclick="playMusic(${music.tokenId})">▶</div>
+                    </div>
+                    <div class="music-info">
+                        <div class="music-title">${music.name}</div>
+                        <div class="music-meta">
+                            <span class="meta-tag">${getGenreLabel(music.genre)}</span>
+                            <span class="meta-tag">Token #${music.tokenId}</span>
+                        </div>
+                        <div class="music-stats">
+                            <div class="price">
+                                ${music.price}
+                                <span class="price-unit">MEER/次</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="share-btn" onclick="musicShare.openModal({tokenId: ${music.tokenId}, name: '${music.name}', creator: '${music.creator}'})" title="分享">🔗</button>
+                                <button class="buy-btn" onclick="buyLicense(${music.tokenId}, '${music.price}')">购买授权</button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 12px;">
+                            <button class="add-to-playlist-btn" onclick="showPlaylistDropdown(event, ${music.tokenId})">
+                                📋 添加到播放列表
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+        
+        // ========== 筛选功能 ==========
+        
+        // 更新BPM范围显示
+        function updateBPMRange() {
+            let min = parseInt(document.getElementById('bpmMin').value);
+            let max = parseInt(document.getElementById('bpmMax').value);
+            
+            // 确保 min <= max
+            if (min > max) {
+                const temp = min;
+                min = max;
+                max = temp;
+                document.getElementById('bpmMin').value = min;
+                document.getElementById('bpmMax').value = max;
+            }
+            
+            document.getElementById('bpmMinVal').textContent = min;
+            document.getElementById('bpmMaxVal').textContent = max;
+            document.getElementById('bpmRangeValue').textContent = min + ' - ' + max;
+        }
+        
+        // 应用所有筛选条件
+        function applyFilters() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            const bpmMin = parseInt(document.getElementById('bpmMin').value);
+            const bpmMax = parseInt(document.getElementById('bpmMax').value);
+            const durationFilter = document.getElementById('durationFilter').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            let filtered = musicList;
+            
+            // 风格筛选
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(m => m.genre === currentFilter);
+            }
+            
+            // 关键词搜索
+            if (keyword) {
+                filtered = filtered.filter(m => 
+                    m.name.toLowerCase().includes(keyword) ||
+                    m.creator.toLowerCase().includes(keyword)
+                );
+            }
+            
+            // BPM筛选
+            filtered = filtered.filter(m => {
+                const bpm = m.bpm || 120; // 默认120
+                return bpm >= bpmMin && bpm <= bpmMax;
+            });
+            
+            // 时长筛选
+            if (durationFilter !== 'all') {
+                filtered = filtered.filter(m => {
+                    // 从duration字符串解析秒数，例如 "3:45" -> 225秒
+                    const durationStr = m.duration || '0:00';
+                    const parts = durationStr.split(':');
+                    const seconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+                    
+                    switch(durationFilter) {
+                        case 'short': return seconds < 60;
+                        case 'medium': return seconds >= 60 && seconds <= 180;
+                        case 'long': return seconds > 180;
+                        default: return true;
+                    }
+                });
+            }
+            
+            // 排序
+            switch(sortBy) {
+                case 'price-low':
+                    filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+                    break;
+                case 'price-high':
+                    filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+                    break;
+                case 'newest':
+                    filtered.sort((a, b) => b.tokenId - a.tokenId);
+                    break;
+            }
+            
+            // 渲染筛选后的结果
+            renderFilteredList(filtered);
+        }
+        
+        // 渲染筛选后的列表
+        function renderFilteredList(filtered) {
+            const grid = document.getElementById('musicGrid');
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #888;">没有找到匹配的音乐</div>';
+                return;
+            }
+            
+            const favorites = getFavorites();
+            
+            grid.innerHTML = filtered.map(music => {
+                const isFav = favorites.includes(music.tokenId);
+                return `
+                <div class="music-card">
+                    <div class="music-visual">
+                        <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(${music.tokenId})" title="${isFav ? '取消收藏' : '收藏'}">
+                            ${isFav ? '❤️' : '🤍'}
+                        </button>
+                        <div class="waveform">
+                            ${Array(20).fill(0).map(() => `
+                                <div class="wave-bar" style="height: ${Math.random() * 80 + 20}%; animation-delay: ${Math.random()}s"></div>
+                            `).join('')}
+                        </div>
+                        <div class="play-overlay" onclick="playMusic(${music.tokenId})">▶</div>
+                    </div>
+                    <div class="music-info">
+                        <div class="music-title">${music.name}</div>
+                        <div class="music-meta">
+                            <span class="meta-tag">${getGenreLabel(music.genre)}</span>
+                            ${music.bpm ? `<span class="meta-tag">${music.bpm} BPM</span>` : ''}
+                            <span class="meta-tag">Token #${music.tokenId}</span>
+                        </div>
+                        <div class="music-stats">
+                            <div class="price">
+                                ${music.price}
+                                <span class="price-unit">MEER/次</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="share-btn" onclick="musicShare.openModal({tokenId: ${music.tokenId}, name: '${music.name}', creator: '${music.creator}'})" title="分享">🔗</button>
+                                <button class="buy-btn" onclick="buyLicense(${music.tokenId}, '${music.price}')">购买授权</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+        
+        // ========== 收藏功能 ==========
+        
+        // 获取收藏列表
+        function getFavorites() {
+            const data = localStorage.getItem('echoMusicData');
+            if (!data) return [];
+            try {
+                const parsed = JSON.parse(data);
+                return parsed.favorites || [];
+            } catch (e) {
+                return [];
+            }
+        }
+        
+        // 切换收藏状态
+        function toggleFavorite(tokenId) {
+            const favorites = getFavorites();
+            const index = favorites.indexOf(tokenId);
+            
+            if (index > -1) {
+                favorites.splice(index, 1);
+                showToast('已取消收藏');
+            } else {
+                favorites.push(tokenId);
+                showToast('已添加到收藏');
+            }
+            
+            saveFavorites(favorites);
+            renderMusicList();
+        }
+        
+        // 保存收藏
+        function saveFavorites(favorites) {
+            const data = localStorage.getItem('echoMusicData');
+            let parsed = {};
+            if (data) {
+                try {
+                    parsed = JSON.parse(data);
+                } catch (e) {}
+            }
+            parsed.favorites = favorites;
+            localStorage.setItem('echoMusicData', JSON.stringify(parsed));
+        }
+        
+        // ========== 播放列表功能 ==========
+        
+        // 获取播放列表
+        function getPlaylists() {
+            const data = localStorage.getItem('echoMusicData');
+            if (!data) return [];
+            try {
+                const parsed = JSON.parse(data);
+                return parsed.playlists || [];
+            } catch (e) {
+                return [];
+            }
+        }
+        
+        // 创建播放列表
+        function createPlaylist(name) {
+            const playlists = getPlaylists();
+            const newId = playlists.length > 0 ? Math.max(...playlists.map(p => p.id)) + 1 : 1;
+            
+            playlists.push({
+                id: newId,
+                name: name,
+                items: []
+            });
+            
+            savePlaylists(playlists);
+            return newId;
+        }
+        
+        // 保存播放列表
+        function savePlaylists(playlists) {
+            const data = localStorage.getItem('echoMusicData');
+            let parsed = {};
+            if (data) {
+                try {
+                    parsed = JSON.parse(data);
+                } catch (e) {}
+            }
+            parsed.playlists = playlists;
+            localStorage.setItem('echoMusicData', JSON.stringify(parsed));
+        }
+        
+        // 添加音乐到播放列表
+        function addToPlaylist(playlistId, tokenId) {
+            const playlists = getPlaylists();
+            const playlist = playlists.find(p => p.id === playlistId);
+            
+            if (!playlist) {
+                showToast('播放列表不存在');
+                return;
+            }
+            
+            if (playlist.items.includes(tokenId)) {
+                showToast('该音乐已在播放列表中');
+                return;
+            }
+            
+            playlist.items.push(tokenId);
+            savePlaylists(playlists);
+            showToast(`已添加到「${playlist.name}」`);
+        }
+        
+        // 显示播放列表下拉菜单
+        function showPlaylistDropdown(event, tokenId) {
+            event.stopPropagation();
+            
+            // 移除已有的下拉菜单
+            document.querySelectorAll('.playlist-dropdown').forEach(el => el.remove());
+            
+            const playlists = getPlaylists();
+            
+            const dropdown = document.createElement('div');
+            dropdown.className = 'playlist-dropdown active';
+            dropdown.style.top = (event.target.offsetHeight + 4) + 'px';
+            dropdown.style.right = '0';
+            
+            if (playlists.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="playlist-dropdown-item" style="color: #888;">暂无播放列表</div>
+                    <div class="playlist-dropdown-divider"></div>
+                    <div class="playlist-dropdown-item" onclick="createNewPlaylist(${tokenId})">
+                        ➕ 创建新播放列表
+                    </div>
+                `;
+            } else {
+                dropdown.innerHTML = playlists.map(p => `
+                    <div class="playlist-dropdown-item" onclick="addToPlaylist(${p.id}, ${tokenId}); hidePlaylistDropdown();">
+                        ${p.name} (${p.items.length})
+                    </div>
+                `).join('') + `
+                    <div class="playlist-dropdown-divider"></div>
+                    <div class="playlist-dropdown-item" onclick="createNewPlaylist(${tokenId})">
+                        ➕ 创建新播放列表
+                    </div>
+                `;
+            }
+            
+            event.target.style.position = 'relative';
+            event.target.appendChild(dropdown);
+            
+            // 点击其他地方关闭
+            setTimeout(() => {
+                document.addEventListener('click', hidePlaylistDropdown, { once: true });
+            }, 10);
+        }
+        
+        // 隐藏播放列表下拉菜单
+        function hidePlaylistDropdown() {
+            document.querySelectorAll('.playlist-dropdown').forEach(el => el.remove());
+        }
+        
+        // 创建新播放列表
+        function createNewPlaylist(tokenId) {
+            const name = prompt('请输入播放列表名称：', '我的歌单');
+            if (name && name.trim()) {
+                const newId = createPlaylist(name.trim());
+                if (tokenId !== undefined) {
+                    addToPlaylist(newId, tokenId);
+                }
+                hidePlaylistDropdown();
+            }
+        }
+        
+        // Toast 提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+                color: #fff;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                animation: slideDown 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+        
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+                to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // 获取风格中文
+        function getGenreLabel(genre) {
+            const labels = {
+                electronic: '电子',
+                rock: '摇滚',
+                classical: '古典',
+                jazz: '爵士',
+                pop: '流行',
+                ambient: '氛围',
+                hiphop: '嘻哈',
+                folk: '民谣'
+            };
+            return labels[genre] || genre;
+        }
+        
+        // 播放音乐
+        async function playMusic(tokenId) {
+            const music = musicList.find(m => m.tokenId === tokenId);
+            if (!music) return;
+            
+            currentMusic = music;
+            previewMode = true;
+            
+            document.getElementById('playerTitle').textContent = music.name;
+            document.getElementById('playerArtist').textContent = '创作者: ' + music.creator.slice(0, 6) + '...' + music.creator.slice(-4);
+            document.getElementById('playerPreviewTag').style.display = 'block';
+            document.getElementById('playerPreviewTag').innerHTML = '🔒 30秒预览模式';
+            document.getElementById('playerPreviewTag').style.color = '#ffd700';
+            document.getElementById('playerBuyBtn').style.display = 'none';
+            document.getElementById('fixedPlayer').classList.add('active');
+            
+            // 加载音频（优先从 IPFS，否则用示例音频）
+            let audioUrl = music.uri;
+            if (audioUrl && audioUrl.startsWith('ipfs://')) {
+                audioUrl = audioUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
+            }
+            
+            // 如果没有有效音频URL，使用示例音频
+            if (!audioUrl || audioUrl === '') {
+                // 使用一个示例音频URL（可以替换为实际的示例音频）
+                audioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+            }
+            
+            audio.src = audioUrl;
+            audio.currentTime = 0;
+            
+            try {
+                await audio.play();
+                isPlaying = true;
+                document.getElementById('playerPlayBtn').textContent = '⏸';
+            } catch (error) {
+                console.error('播放失败:', error);
+                alert('音频加载失败，请稍后重试');
+            }
+        }
+        
+        // 播放器控制
+        async function togglePlayer() {
+            if (!currentMusic) return;
+            
+            const btn = document.getElementById('playerPlayBtn');
+            
+            if (isPlaying) {
+                audio.pause();
+                btn.textContent = '▶';
+                isPlaying = false;
+            } else {
+                try {
+                    await audio.play();
+                    btn.textContent = '⏸';
+                    isPlaying = true;
+                } catch (error) {
+                    console.error('播放失败:', error);
+                }
+            }
+        }
+        
+        function skipBackward() {
+            if (!audio) return;
+            audio.currentTime = Math.max(0, audio.currentTime - 10);
+        }
+        
+        function skipForward() {
+            if (!audio) return;
+            if (previewMode) {
+                audio.currentTime = Math.min(30, audio.currentTime + 10);
+            } else {
+                audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+            }
+        }
+        
+        function seekPlayer(event) {
+            const bar = event.currentTarget;
+            const clickX = event.offsetX;
+            const width = bar.offsetWidth;
+            const percent = clickX / width;
+            
+            if (previewMode) {
+                audio.currentTime = Math.min(30, percent * audio.duration);
+            } else {
+                audio.currentTime = percent * audio.duration;
+            }
+        }
+        
+        // 购买授权
+        async function buyLicense(tokenId, price) {
+            if (!isConnected) {
+                alert('请先连接钱包');
+                return;
+            }
+            
+            try {
+                const priceWei = ethers.utils.parseEther(price);
+                const tx = await contract.payForUsage(tokenId, 30, { value: priceWei });
+                await tx.wait();
+                
+                // 显示成功弹窗
+                document.getElementById('licenseTokenId').textContent = '#' + tokenId;
+                document.getElementById('licenseTxHash').textContent = tx.hash.slice(0, 20) + '...';
+                document.getElementById('successModal').classList.add('active');
+                
+                // 解锁完整播放
+                previewMode = false;
+                document.getElementById('playerPreviewTag').innerHTML = '✅ 已获得完整授权';
+                document.getElementById('playerPreviewTag').style.color = '#0f0';
+                document.getElementById('playerBuyBtn').style.display = 'none';
+                
+            } catch (error) {
+                alert('购买失败: ' + error.message);
+            }
+        }
+        
+        // 购买当前播放的音乐
+        function buyCurrentMusic() {
+            if (currentMusic) {
+                buyLicense(currentMusic.tokenId, currentMusic.price);
+            }
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+        
+        // 格式化时间
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ':' + secs.toString().padStart(2, '0');
+        }
+    </script>
+    <script src="frontend/js/share.js"></script>
+</body>
+</html>
+<script>
+// Theme and Language functions
+function toggleTheme() {
+  const html = document.documentElement;
+  const currentTheme = html.getAttribute('data-theme') || 'dark';
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('echo-theme', newTheme);
+}
+
+function changeLanguage(lang) {
+  localStorage.setItem('echo-locale', lang);
+  window.location.reload();
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  // Theme
+  const savedTheme = localStorage.getItem('echo-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  
+  // Language
+  const savedLang = localStorage.getItem('echo-locale') || 'zh';
+  const langSelect = document.getElementById('langSelect');
+  if (langSelect) langSelect.value = savedLang;
+});
+</script>
