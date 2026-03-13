@@ -1,0 +1,10 @@
+{
+  "contractName": "ECHOFusionV2",
+  "network": "qitmeer",
+  "chainId": 813,
+  "contractAddress": "0x8Eb7a29C41478a3f32015C1330DFf7cc683d0952",
+  "transactionHash": "0x7d46d70d38c8b68cf3822b5e6faa3c3822ee909b3790348229c07121372dc041",
+  "deployer": "0x3a163461692222F7b986a9D3DcCe5d88390EC63C",
+  "echoAssetAddress": "0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce",
+  "timestamp": "2026-03-13T10:44:55.780Z"
+}

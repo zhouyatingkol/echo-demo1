@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO 创作者中心 - 收益管理</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/creator.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🌳</span>
+            <span class="brand-text">创作者中心</span>
+        </div>
+        <div class="nav-links">
+            <a href="marketplace.html">市场</a>
+            <a href="license-shop.html">授权商店</a>
+            <a href="creator-dashboard.html" class="active">创作者中心</a>
+        </div>
+        <div class="wallet-section">
+            <span id="walletAddress" class="wallet-address hidden"></span>
+            <button id="walletConnect" class="btn btn-primary">连接钱包</button>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="revenue-container">
+        <!-- 页面头部 -->
+        <header class="creator-header" style="margin-bottom: 2rem;">
+            <div>
+                <h1>📊 收益管理</h1>
+                <p class="subtitle">查看收益统计，管理您的创作收入</p>
+            </div>
+            <div class="creator-header-actions">
+                <a href="creator-dashboard.html" class="btn btn-primary" style="background: rgba(255,255,255,0.2); color: white;">← 返回仪表盘</a>
+            </div>
+        </header>
+
+        <!-- 收益汇总 -->
+        <section class="revenue-summary">
+            <div class="revenue-summary-card">
+                <h4>可提现余额</h4>
+                <div class="amount highlight" id="availableBalance">0 MEER</div>
+                <div class="change positive">随时可提现</div>
+            </div>
+            <div class="revenue-summary-card">
+                <h4>本月收益</h4>
+                <div class="amount" id="monthRevenue">0 MEER</div>
+                <div class="change positive" id="monthChange">+0% 较上月</div>
+            </div>
+            <div class="revenue-summary-card">
+                <h4>总收益</h4>
+                <div class="amount" id="totalRevenue">0 MEER</div>
+                <div class="change">累计收入</div>
+            </div>
+            <div class="revenue-summary-card">
+                <h4>授权销售</h4>
+                <div class="amount" id="licenseSales">0</div>
+                <div class="change">总授权数</div>
+            </div>
+        </section>
+
+        <!-- 提现区域 -->
+        <section class="withdraw-section">
+            <div class="withdraw-info">
+                <h3>💰 提现到钱包</h3>
+                <p>将您的收益提现到连接的钱包地址</p>
+            </div>
+            <button class="btn withdraw-btn" id="withdrawBtn">立即提现</button>
+        </section>
+
+        <!-- 收益图表 -->
+        <section class="chart-section">
+            <div class="chart-header">
+                <h2>📈 收益趋势</h2>
+                <div class="chart-filters">
+                    <button class="chart-filter-btn active" data-range="7d">近7天</button>
+                    <button class="chart-filter-btn" data-range="30d">近30天</button>
+                    <button class="chart-filter-btn" data-range="90d">近3个月</button>
+                    <button class="chart-filter-btn" data-range="1y">近1年</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-bars" id="revenueChart">
+                    <!-- 图表将由 JS 动态生成 -->
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 40%;" data-value="40 MEER"></div>
+                        <span class="chart-bar-label">周一</span>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 65%;" data-value="65 MEER"></div>
+                        <span class="chart-bar-label">周二</span>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 30%;" data-value="30 MEER"></div>
+                        <span class="chart-bar-label">周三</span>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 85%;" data-value="85 MEER"></div>
+                        <span class="chart-bar-label">周四</span>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 50%;" data-value="50 MEER"></div>
+                        <span class="chart-bar-label">周五</span>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 70%;" data-value="70 MEER"></div>
+                        <span class="chart-bar-label">周六</span>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 90%;" data-value="90 MEER"></div>
+                        <span class="chart-bar-label">周日</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 收益明细 -->
+        <section class="content-card">
+            <div class="content-card-header">
+                <h2>📝 收益明细</h2>
+                <button class="export-btn" id="exportBtn">
+                    <span>📥</span>
+                    <span>导出报表</span>
+                </button>
+            </div>
+            
+            <div class="table-container" style="overflow-x: auto;">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>类型</th>
+                            <th>作品</th>
+                            <th>买家</th>
+                            <th>金额</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <!-- 交易记录将由 JS 动态生成 -->
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                                暂无交易记录
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 作品收益排行 -->
+        <section class="content-card">
+            <div class="content-card-header">
+                <h2>🏆 作品收益排行</h2>
+            </div>
+            
+            <div class="works-list" id="topWorksList">
+                <!-- 作品排行将由 JS 动态生成 -->
+                <div class="empty-state">
+                    <span class="icon">🏆</span>
+                    <h3>暂无数据</h3>
+                    <p>上传作品开始赚取收益吧</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>🌳 ECHO Protocol - 保护创作者的数字权益</p>
+        <p>Powered by Qitmeer Network</p>
+    </footer>
+
+    <!-- 提现弹窗 -->
+    <div id="withdrawModal" class="transaction-status hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); min-width: 400px; max-width: 90%;">
+        <h3 style="margin-bottom: 1rem;">💰 提现确认</h3>
+        
+        <div style="background: var(--bg-secondary); padding: 1rem; border-radius: var(--border-radius-sm); margin-bottom: 1rem;">
+            <p>可提现金额: <strong id="withdrawAmount">0 MEER</strong></p>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.5rem;">提现地址: <span id="withdrawAddress">-</span></p>
+        </div>
+        
+        <div class="form-group" style="text-align: left;">
+            <label>提现金额 (MEER)</label>
+            <input type="number" id="withdrawInput" min="0" step="0.01" placeholder="输入提现金额">
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <button class="btn btn-cancel" id="cancelWithdraw" style="flex: 1;">取消</button>
+            <button class="btn btn-submit" id="confirmWithdraw" style="flex: 1;">确认提现</button>
+        </div>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loadingText">处理中...</p>
+        </div>
+    </div>
+
+    <!-- 成功提示 -->
+    <div id="successMessage" class="success-message hidden" style="position: fixed; top: 100px; left: 50%; transform: translateX(-50%); z-index: 2000;">
+        操作成功！
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="contract-config.js"></script>
+    <script src="wallet.js"></script>
+    <script src="contract-manager-v3.js"></script>
+    <script src="creator.js"></script>
+    <script>
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化收益页面
+            if (typeof initRevenuePage === 'function') {
+                initRevenuePage();
+            }
+        });
+    </script>
+</body>
+</html>

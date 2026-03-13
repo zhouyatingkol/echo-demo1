@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO 创作者中心 - 仪表盘</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/creator.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🌳</span>
+            <span class="brand-text">创作者中心</span>
+        </div>
+        <div class="nav-links">
+            <a href="marketplace.html">市场</a>
+            <a href="license-shop.html">授权商店</a>
+            <a href="creator-dashboard.html" class="active">创作者中心</a>
+        </div>
+        <div class="wallet-section">
+            <span id="walletAddress" class="wallet-address hidden"></span>
+            <button id="walletConnect" class="btn btn-primary">连接钱包</button>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="creator-container">
+        <!-- 页面头部 -->
+        <header class="creator-header">
+            <div>
+                <h1>🎵 创作者中心</h1>
+                <p class="subtitle">管理您的数字资产，追踪收益与授权</p>
+            </div>
+            <div class="creator-header-actions">
+                <a href="creator-upload.html" class="btn btn-primary">+ 上传新作品</a>
+            </div>
+        </header>
+
+        <!-- 统计卡片 -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon works">🎵</div>
+                <div class="stat-content">
+                    <h3 id="totalWorks">0</h3>
+                    <p>我的作品</p>
+                    <span class="stat-change positive">+2 本月新增</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon revenue">💰</div>
+                <div class="stat-content">
+                    <h3 id="totalRevenue">0 MEER</h3>
+                    <p>总收益</p>
+                    <span class="stat-change positive">+15% 较上月</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon licenses">📜</div>
+                <div class="stat-content">
+                    <h3 id="totalLicenses">0</h3>
+                    <p>授权数量</p>
+                    <span class="stat-change positive">+5 本周新增</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快捷操作 -->
+        <section class="quick-actions">
+            <h2>快捷操作</h2>
+            <div class="actions-grid">
+                <a href="creator-upload.html" class="action-btn primary">
+                    <span class="icon">📤</span>
+                    <span>上传新作品</span>
+                </a>
+                <a href="creator-revenue.html" class="action-btn">
+                    <span class="icon">📊</span>
+                    <span>查看收益</span>
+                </a>
+                <a href="creator-dashboard.html#works" class="action-btn">
+                    <span class="icon">🎼</span>
+                    <span>管理作品</span>
+                </a>
+                <a href="creator-dashboard.html#licenses" class="action-btn">
+                    <span class="icon">📋</span>
+                    <span>授权管理</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- 我的作品 -->
+        <section class="content-card" id="works">
+            <div class="content-card-header">
+                <h2>🎵 我的作品</h2>
+                <a href="creator-dashboard.html" class="view-all">查看全部 →</a>
+            </div>
+            <div class="works-list" id="worksList">
+                <!-- 作品列表将由 JS 动态生成 -->
+                <div class="empty-state">
+                    <span class="icon">🎵</span>
+                    <h3>暂无作品</h3>
+                    <p>点击"上传新作品"开始创作之旅</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最新动态 -->
+        <section class="content-card">
+            <div class="content-card-header">
+                <h2>🔔 最新动态</h2>
+                <a href="#" class="view-all">查看全部 →</a>
+            </div>
+            <div class="notifications-list" id="notificationsList">
+                <!-- 通知列表将由 JS 动态生成 -->
+                <div class="notification-item info">
+                    <span class="notification-icon">💡</span>
+                    <div class="notification-content">
+                        <p>欢迎使用 ECHO 创作者中心！开始上传您的第一个作品吧。</p>
+                        <span class="notification-time">刚刚</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>🌳 ECHO Protocol - 保护创作者的数字权益</p>
+        <p>Powered by Qitmeer Network</p>
+    </footer>
+
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>加载中...</p>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="contract-config.js"></script>
+    <script src="wallet.js"></script>
+    <script src="contract-manager-v3.js"></script>
+    <script src="creator.js"></script>
+    <script>
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化创作者仪表盘
+            if (typeof initCreatorDashboard === 'function') {
+                initCreatorDashboard();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO 创作者中心 - 上传作品</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/creator.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🌳</span>
+            <span class="brand-text">创作者中心</span>
+        </div>
+        <div class="nav-links">
+            <a href="marketplace.html">市场</a>
+            <a href="license-shop.html">授权商店</a>
+            <a href="creator-dashboard.html" class="active">创作者中心</a>
+        </div>
+        <div class="wallet-section">
+            <span id="walletAddress" class="wallet-address hidden"></span>
+            <button id="walletConnect" class="btn btn-primary">连接钱包</button>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="upload-container">
+        <!-- 页面头部 -->
+        <header class="creator-header" style="margin-bottom: 2rem;">
+            <div>
+                <h1>📤 上传新作品</h1>
+                <p class="subtitle">填写作品信息，配置权属蓝图，开始赚取收益</p>
+            </div>
+            <div class="creator-header-actions">
+                <a href="creator-dashboard.html" class="btn btn-primary" style="background: rgba(255,255,255,0.2); color: white;">← 返回仪表盘</a>
+            </div>
+        </header>
+
+        <!-- 上传表单 -->
+        <form class="upload-form" id="uploadForm">
+            <!-- 基本信息 -->
+            <section class="form-section">
+                <h2 class="form-section-title">
+                    <span class="step-number">1</span>
+                    作品基本信息
+                </h2>
+                
+                <div class="form-group">
+                    <label for="workTitle">作品标题 <span class="required">*</span></label>
+                    <input type="text" id="workTitle" name="title" placeholder="给你的作品起个名字" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="workDescription">作品描述</label>
+                    <textarea id="workDescription" name="description" placeholder="描述你的作品风格、创作背景等..."></textarea>
+                    <p class="hint">良好的描述有助于买家了解你的作品</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="musicType">音乐类型</label>
+                    <select id="musicType" name="musicType">
+                        <option value="pop">流行</option>
+                        <option value="electronic">电子</option>
+                        <option value="classical">古典</option>
+                        <option value="jazz">爵士</option>
+                        <option value="rock">摇滚</option>
+                        <option value="folk">民谣</option>
+                        <option value="ambient">氛围</option>
+                        <option value="hiphop">嘻哈</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- 文件上传 -->
+            <section class="form-section">
+                <h2 class="form-section-title">
+                    <span class="step-number">2</span>
+                    上传文件
+                </h2>
+                
+                <!-- 音频文件 -->
+                <div class="form-group">
+                    <label>音频文件 <span class="required">*</span></label>
+                    <div class="file-upload-area" id="audioUploadArea">
+                        <div class="upload-icon">🎵</div>
+                        <h3>点击或拖拽上传音频文件</h3>
+                        <p>支持 MP3, WAV, FLAC 格式，最大 50MB</p>
+                        <input type="file" id="audioFile" name="audio" accept="audio/*" required>
+                    </div>
+                    <div class="file-preview hidden" id="audioPreview">
+                        <span class="file-icon">🎵</span>
+                        <div class="file-info">
+                            <div class="file-name" id="audioFileName">-</div>
+                            <div class="file-size" id="audioFileSize">-</div>
+                        </div>
+                        <button type="button" class="file-remove" id="removeAudio">✕</button>
+                    </div>
+                </div>
+                
+                <!-- 封面图片 -->
+                <div class="form-group">
+                    <label>封面图片</label>
+                    <div class="cover-upload">
+                        <div class="cover-preview" id="coverPreview">
+                            <div class="placeholder">
+                                <div class="icon">🖼️</div>
+                                <p>封面预览</p>
+                            </div>
+                        </div>
+                        <div class="cover-upload-options">
+                            <p class="hint">建议尺寸: 1000×1000px，支持 JPG, PNG 格式</p>
+                            <button type="button" class="btn btn-secondary" id="selectCoverBtn" style="margin-top: 0.5rem;">
+                                选择封面
+                            </button>
+                            <input type="file" id="coverFile" name="cover" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 权属蓝图配置 -->
+            <section class="form-section">
+                <h2 class="form-section-title">
+                    <span class="step-number">3</span>
+                    权属蓝图配置
+                </h2>
+                <p class="hint" style="margin-bottom: 1.5rem;">配置您作品的各项权利，决定买家可以获得哪些授权</p>
+                
+                <div class="rights-blueprint">
+                    <!-- 使用权 -->
+                    <div class="right-card">
+                        <div class="right-card-header">
+                            <input type="checkbox" id="enableUsage" name="enableUsage" checked>
+                            <h4>使用权</h4>
+                            <span class="right-badge">基础权利</span>
+                        </div>
+                        <div class="right-card-content">
+                            <div class="form-group">
+                                <label>授权费用 (MEER)</label>
+                                <input type="number" id="usageFee" name="usageFee" value="100" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="commercialUse" name="commercialUse" checked>
+                                    允许商业使用
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="modificationAllowed" name="modificationAllowed">
+                                    允许修改
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 衍生权 -->
+                    <div class="right-card">
+                        <div class="right-card-header">
+                            <input type="checkbox" id="enableDerivative" name="enableDerivative">
+                            <h4>衍生权</h4>
+                            <span class="right-badge">高级权利</span>
+                        </div>
+                        <div class="right-card-content">
+                            <div class="form-group">
+                                <label>衍生授权费用 (MEER)</label>
+                                <input type="number" id="derivativeFee" name="derivativeFee" value="500" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>收益分成比例 (%)</label>
+                                <input type="number" id="revenueShare" name="revenueShare" value="10" min="0" max="100">
+                                <p class="hint">当衍生作品产生收益时，您将获得的分成比例</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 扩展权 -->
+                    <div class="right-card">
+                        <div class="right-card-header">
+                            <input type="checkbox" id="enableExtension" name="enableExtension">
+                            <h4>扩展权</h4>
+                            <span class="right-badge">高级权利</span>
+                        </div>
+                        <div class="right-card-content">
+                            <div class="form-group">
+                                <label>扩展授权费用 (MEER)</label>
+                                <input type="number" id="extensionFee" name="extensionFee" value="200" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>允许的扩展类型</label>
+                                <input type="text" id="allowedExtensions" name="allowedExtensions" placeholder="如: remix, cover, mashup">
+                                <p class="hint">用逗号分隔多个类型</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 收益权 -->
+                    <div class="right-card">
+                        <div class="right-card-header">
+                            <input type="checkbox" id="enableRevenue" name="enableRevenue" checked>
+                            <h4>收益权</h4>
+                            <span class="right-badge">自动分成</span>
+                        </div>
+                        <div class="right-card-content">
+                            <div class="form-group">
+                                <label>您的收益分成比例 (%)</label>
+                                <input type="number" id="creatorShare" name="creatorShare" value="95" min="0" max="100">
+                                <p class="hint">作品销售时您获得的分成（平台收取5%服务费）</p>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="autoDistribute" name="autoDistribute" checked>
+                                    自动分发收益
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 价格设置 -->
+            <section class="form-section">
+                <h2 class="form-section-title">
+                    <span class="step-number">4</span>
+                    授权价格设置
+                </h2>
+                <p class="hint" style="margin-bottom: 1.5rem;">设置不同授权模式的价格</p>
+                
+                <div class="pricing-options">
+                    <!-- 买断制 -->
+                    <div class="pricing-card">
+                        <div class="pricing-card-header">
+                            <input type="checkbox" id="enableOnetime" name="enableOnetime" checked>
+                            <h4>买断制</h4>
+                        </div>
+                        <div class="pricing-card-content">
+                            <div class="form-group">
+                                <label>价格 (MEER)</label>
+                                <div class="price-input-group">
+                                    <input type="number" id="onetimePrice" name="onetimePrice" value="100" min="0" step="0.01">
+                                    <span class="unit">MEER</span>
+                                </div>
+                            </div>
+                            <p class="hint">买家一次性支付，获得永久使用权</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 按次计费 -->
+                    <div class="pricing-card">
+                        <div class="pricing-card-header">
+                            <input type="checkbox" id="enablePeruse" name="enablePeruse">
+                            <h4>按次计费</h4>
+                        </div>
+                        <div class="pricing-card-content">
+                            <div class="form-group">
+                                <label>单价 (MEER/次)</label>
+                                <div class="price-input-group">
+                                    <input type="number" id="perusePrice" name="perusePrice" value="0.5" min="0" step="0.01">
+                                    <span class="unit">MEER</span>
+                                </div>
+                            </div>
+                            <p class="hint">买家按实际使用次数付费</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 限时授权 -->
+                    <div class="pricing-card">
+                        <div class="pricing-card-header">
+                            <input type="checkbox" id="enableTimed" name="enableTimed">
+                            <h4>限时授权</h4>
+                        </div>
+                        <div class="pricing-card-content">
+                            <div class="form-group">
+                                <label>日租金 (MEER/天)</label>
+                                <div class="price-input-group">
+                                    <input type="number" id="timedPrice" name="timedPrice" value="10" min="0" step="0.01">
+                                    <span class="unit">MEER</span>
+                                </div>
+                            </div>
+                            <p class="hint">买家按授权天数付费，最少30天</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 预览与提交 -->
+            <section class="form-section">
+                <h2 class="form-section-title">
+                    <span class="step-number">5</span>
+                    预览与确认
+                </h2>
+                
+                <div id="uploadPreview" style="background: var(--bg-secondary); border-radius: var(--border-radius-sm); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">作品预览</h3>
+                    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                        <div style="width: 120px; height: 120px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); border-radius: var(--border-radius-sm); display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                            🎵
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <h4 id="previewTitle" style="font-size: 1.25rem; margin-bottom: 0.5rem;">未命名作品</h4>
+                            <p id="previewType" style="color: var(--text-muted); margin-bottom: 0.5rem;">类型: 流行</p>
+                            <p id="previewRights" style="color: var(--text-muted); font-size: 0.875rem;">已配置权利: 使用权, 收益权</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">取消</button>
+                    <button type="submit" class="btn btn-submit" id="submitBtn">
+                        <span>确认并铸造 NFT</span>
+                    </button>
+                </div>
+            </section>
+        </form>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>🌳 ECHO Protocol - 保护创作者的数字权益</p>
+        <p>Powered by Qitmeer Network</p>
+    </footer>
+
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loadingText">正在上传...</p>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="contract-config.js"></script>
+    <script src="wallet.js"></script>
+    <script src="contract-manager-v3.js"></script>
+    <script src="creator.js"></script>
+    <script>
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化上传页面
+            if (typeof initUploadPage === 'function') {
+                initUploadPage();
+            }
+        });
+    </script>
+</body>
+</html>
