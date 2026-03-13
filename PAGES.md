@@ -7,7 +7,7 @@
 ├── index.html          ✅ 首页（已完成）
 ├── market.html         ✅ 市场 — 浏览所有作品
 ├── work-detail.html    ✅ 作品详情页
-├── mint.html           ✅ 铸造 — 创建新 ECHO
+├── mint.html           ✅ 生成 — 创建新 ECHO
 ├── creator.html        ✅ 创作者中心 — 管理作品
 ├── profile.html        ✅ 个人中心 — 我的收藏
 └── docs.html           ✅ 文档/白皮书
@@ -20,7 +20,7 @@
 | index.html | ✅ | 首页动画、温润气质 |
 | market.html | ✅ | 筛选、作品网格 |
 | work-detail.html | ✅ | 作品详情、流转记录 |
-| mint.html | ✅ | 四步骤铸造、四权配置 |
+| mint.html | ✅ | 四步骤生成、四权配置 |
 | creator.html | ✅ | 作品管理、收益概览 |
 | profile.html | ✅ | 我的收藏、活动时间线 |
 | docs.html | ✅ | 文档站点、FAQ折叠 |

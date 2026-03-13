@@ -135,7 +135,7 @@ async function runTests() {
         
         console.log('✅ 所有基础测试通过！');
         console.log('\n下一步建议:');
-        console.log('1. 连接钱包进行写操作测试（铸造资产）');
+        console.log('1. 连接钱包进行写操作测试（生成资产）');
         console.log('2. 测试授权购买流程');
         console.log('3. 测试融合功能');
         

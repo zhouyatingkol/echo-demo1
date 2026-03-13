@@ -60,7 +60,7 @@ class ContractManagerV3 {
                 "function perUsePrices(uint256 tokenId) public view returns (uint256)",
                 "function dailyPrices(uint256 tokenId) public view returns (uint256)",
                 
-                // 铸造
+                // 生成
                 "function mintECHO(string memory name, string memory description, string memory assetType, string memory uri, bytes32 contentHash, tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue) memory blueprint) public returns (uint256)"
             ],
             

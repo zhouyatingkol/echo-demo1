@@ -11,7 +11,7 @@
     items: [
       { id: 'discover', icon: '🎯', label: '发现', href: 'discover.html' },
       { id: 'market', icon: '🛒', label: '市场', href: 'music-market.html' },
-      { id: 'mint', icon: '🎵', label: '铸造', href: 'mint-music.html' },
+      { id: 'mint', icon: '🎵', label: '生成', href: 'mint-music.html' },
       { id: 'favorites', icon: '❤️', label: '我的', href: 'my-favorites.html' }
     ],
     breakpoint: 768

@@ -125,7 +125,7 @@ function shareRevenue(...) public payable nonReentrant
 
 | 函数 | 访问控制 | 状态 |
 |------|----------|------|
-| mintECHO | public | ✅ 任何人可铸造 |
+| mintECHO | public | ✅ 任何人可生成 |
 | updateContent | onlyAssetCreator | ✅ 受保护 |
 | transferUsageRight | onlyUsageOwner | ✅ 受保护 |
 | transferDerivativeRight | onlyDerivativeOwner | ✅ 受保护 |

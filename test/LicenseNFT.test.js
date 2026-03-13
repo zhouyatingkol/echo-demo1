@@ -47,7 +47,7 @@ describe("LicenseNFT 合约测试", function () {
       ).to.emit(licenseNFT, "LicensePurchased")
        .withArgs(1, 1, buyer.address, 0, 0, price);
 
-      // 验证 License 被铸造
+      // 验证 License 被生成
       expect(await licenseNFT.ownerOf(1)).to.equal(buyer.address);
       
       // 验证 License 数据

@@ -269,8 +269,8 @@ const ErrorMessages = {
         severity: 'warning'
     },
     [ErrorCodes.ASSET_MINT_FAILED]: {
-        title: '铸造失败',
-        message: '资产铸造未能完成',
+        title: '生成失败',
+        message: '资产生成未能完成',
         action: '重试',
         severity: 'error'
     },

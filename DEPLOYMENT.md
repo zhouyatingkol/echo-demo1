@@ -5,7 +5,7 @@
 ECHO Protocol 是一个四权分离的数字资产平台，基于 Qitmeer 区块链构建。
 
 ### 核心功能
-- **铸造数字种子** - 创建带有四权配置的 ECHO 资产
+- **生成数字种子** - 创建带有四权配置的 ECHO 资产
 - **资产融合** - 多颗种子融合成树
 - **四权管理** - 使用权、衍生权、扩展权、收益权独立流转
 - **收益分配** - 树产生的收益按权重分配
@@ -18,7 +18,7 @@ ECHO Protocol 是一个四权分离的数字资产平台，基于 Qitmeer 区块
 
 | 合约 | 地址 | 用途 |
 |------|------|------|
-| **ECHOAsset** | `0x5f5AAe09BB85f561b21845729B79E840AB026148` | 铸造种子、四权管理 |
+| **ECHOAsset** | `0x5f5AAe09BB85f561b21845729B79E840AB026148` | 生成种子、四权管理 |
 | **ECHOFusion** | `0x3AD441ECfC193fbe7f086b962d0bCfd2Bc2Bac0d` | 资产融合、收益分配 |
 
 ### 区块浏览器
@@ -37,7 +37,7 @@ https://zhouyatingkol.github.io/echo-demo1/frontend/
 
 | 页面 | 地址 | 功能 |
 |------|------|------|
-| 铸造种子 | `/frontend/mint.html` | 铸造新的 ECHO 资产 |
+| 生成种子 | `/frontend/mint.html` | 生成新的 ECHO 资产 |
 | 融合测试 | `/frontend/fusion-test.html` | 简单融合界面 |
 | 四权管理 | `/frontend/rights-management.html` | 查看和管理四权 |
 | 我的树 | `/frontend/my-tree.html` | 树的收益管理 |
@@ -65,16 +65,16 @@ RPC URL: https://qng.rpc.qitmeer.io
 - 从交易所购买 MEER
 - 提现到您的钱包地址
 
-### 2. 铸造数字种子
+### 2. 生成数字种子
 
-1. 打开铸造页面
+1. 打开生成页面
 2. 连接 MetaMask 钱包
 3. 填写资产信息
    - 名称：如"智能合约算法V1"
    - 描述：资产详细说明
    - 类型：代码/算法/数据/专利
 4. 配置四权所有者（默认全部为自己）
-5. 点击铸造，确认交易
+5. 点击生成，确认交易
 
 **Gas费用**：约 0.02 MEER
 

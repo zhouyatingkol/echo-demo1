@@ -211,7 +211,7 @@ describe("🔒 ECHO Protocol V3 渗透测试套件", function () {
             const contentHash = ethers.id("duplicate-test-" + Date.now());
             const blueprint = createBlueprint(creator.address);
             
-            // 第一次铸造
+            // 第一次生成
             await echoAsset.mintECHO("Song1", "Desc1", "type", "uri1", contentHash, blueprint);
             
             // 第二次使用相同哈希
@@ -456,7 +456,7 @@ describe("🔒 ECHO Protocol V3 渗透测试套件", function () {
     describe("🎭 7. 综合场景测试", function () {
 
         it("7.1 完整工作流程测试", async function () {
-            // 1. 创作者铸造资产
+            // 1. 创作者生成资产
             const blueprint = createBlueprint(creator.address);
             await echoAsset.connect(creator).mintECHO(
                 "Complete Workflow Song",

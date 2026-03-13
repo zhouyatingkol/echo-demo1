@@ -94,7 +94,7 @@ const checkHighValueTransaction = (value: bigint) => {
 
 **需要二次确认的操作**
 - 购买 License (金额 > 100 MEER)
-- 铸造资产
+- 生成资产
 - 收益提现
 - 授权转让
 
