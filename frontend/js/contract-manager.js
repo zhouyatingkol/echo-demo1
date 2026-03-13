@@ -10,9 +10,9 @@ class ECHOContractManager {
         
         // 合约地址
         this.addresses = {
-            ECHOAssetV2: '0x6195f16cb8d32397032c6031e89c567a5fdbec9d',
-            ECHOFusion: '0xa91499036db8a9501d4116c12114d24a906d7b97',
-            LicenseNFT: '0x13c0637d86d179b66f22e0806c98b34bdbf48adf'
+            ECHOAssetV2: '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce',
+            ECHOFusion: '0x31Cd483Ee827A272816808AD49b90c71B1c82E11',
+            LicenseNFT: '0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23'
         };
         
         // 初始化合约
