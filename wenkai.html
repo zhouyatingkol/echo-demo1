@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO — 动态数字生命</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 霞鹜文楷 - 开源、文艺、有瘦劲 -->
+    <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+    <!-- 思源宋体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'wenkai': ['LXGW WenKai', 'Noto Serif SC', 'serif'],
+                        'song': ['Noto Serif SC', 'serif'],
+                    },
+                    colors: {
+                        'ink': '#0d0d0d',
+                        'paper': '#f5f2eb',
+                        'warm': '#ebe7de',
+                        'gold': '#a69580',
+                        'cinnabar': '#b54a3f',
+                        'charcoal': '#2a2a2a',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            background: #f5f2eb;
+            color: #0d0d0d;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 宣纸纹理 */
+        .xuan-paper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.07'/%3E%3C/svg%3E");
+        }
+        
+        /* 水墨晕染 */
+        .ink-wash {
+            position: fixed;
+            top: 10%;
+            right: -5%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(166, 149, 128, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(80px);
+        }
+        
+        /* 首页 */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+        }
+        
+        /* 主标题 — 霞鹜文楷 */
+        .main-title {
+            font-family: 'LXGW WenKai', serif;
+            font-size: clamp(2.5rem, 8vw, 5.5rem);
+            font-weight: 400;
+            letter-spacing: 0.18em;
+            line-height: 1.6;
+            color: #0d0d0d;
+            text-align: center;
+        }
+        
+        /* 标题下划线 */
+        .title-line {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #a69580, transparent);
+            margin: 2rem auto 0;
+        }
+        
+        /* 副标题 */
+        .subtitle {
+            font-size: clamp(0.85rem, 1.5vw, 1rem);
+            color: #888;
+            margin-top: 2.5rem;
+            letter-spacing: 0.35em;
+            font-weight: 300;
+        }
+        
+        /* 印章 */
+        .seal {
+            width: 50px;
+            height: 50px;
+            border: 1.5px solid #b54a3f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 3rem auto;
+            color: #b54a3f;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            transform: rotate(-3deg);
+            opacity: 0.85;
+        }
+        
+        /* 进入按钮 */
+        .enter-btn {
+            margin-top: 1rem;
+            padding: 1rem 3.5rem;
+            border: none;
+            background: transparent;
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1rem;
+            letter-spacing: 0.25em;
+            color: #0d0d0d;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+        
+        .enter-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 1px;
+            background: #a69580;
+            transition: width 0.4s ease;
+        }
+        
+        .enter-btn:hover::after {
+            width: 100%;
+        }
+        
+        .enter-btn:hover {
+            color: #a69580;
+        }
+        
+        /* 内容区域 */
+        .section-classic {
+            min-height: 70vh;
+            padding: 12vh 8vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 章节头 */
+        .section-header {
+            margin-bottom: 4rem;
+        }
+        
+        .section-number {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 2.5rem;
+            color: #a69580;
+            opacity: 0.5;
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.25em;
+            color: #aaa;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+        
+        .section-title {
+            font-family: 'LXGW WenKai', serif;
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            line-height: 1.5;
+            color: #0d0d0d;
+        }
+        
+        /* 诗意文字 */
+        .poem-text {
+            font-size: clamp(1rem, 1.6vw, 1.2rem);
+            line-height: 2.6;
+            color: #555;
+            max-width: 580px;
+            letter-spacing: 0.04em;
+        }
+        
+        .poem-text p {
+            margin-bottom: 1.5rem;
+            text-indent: 2em;
+        }
+        
+        /* 强调 */
+        .emphasis {
+            color: #0d0d0d;
+            font-weight: 500;
+        }
+        
+        .cinnabar {
+            color: #b54a3f;
+        }
+        
+        .gold-text {
+            color: #a69580;
+        }
+        
+        /* 特点 */
+        .feature-item {
+            padding: 3rem 0;
+            border-bottom: 1px solid rgba(13, 13, 13, 0.06);
+        }
+        
+        .feature-mark {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.5rem;
+            color: #a69580;
+            opacity: 0.6;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.4rem;
+            font-weight: 400;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.08em;
+        }
+        
+        .feature-desc {
+            color: #777;
+            line-height: 2;
+            font-size: 0.95rem;
+        }
+        
+        /* 数据 */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 2rem 1rem;
+            border: 1px solid rgba(166, 149, 128, 0.15);
+        }
+        
+        .stat-number {
+            font-family: 'LXGW WenKai', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: #0d0d0d;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-number.gold {
+            color: #a69580;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 0.8rem;
+            letter-spacing: 0.15em;
+        }
+        
+        /* 作品列表 */
+        .work-item {
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(13, 13, 13, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            transition: all 0.3s ease;
+        }
+        
+        .work-item:hover {
+            padding-left: 1rem;
+            background: rgba(166, 149, 128, 0.02);
+        }
+        
+        .work-title {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 0.06em;
+            transition: color 0.3s ease;
+        }
+        
+        .work-item:hover .work-title {
+            color: #a69580;
+        }
+        
+        .work-artist {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 0.3rem;
+        }
+        
+        .work-price {
+            font-family: 'LXGW WenKai', serif;
+            color: #a69580;
+            font-size: 1rem;
+        }
+        
+        /* CTA */
+        .cta-classic {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem;
+        }
+        
+        .cta-title {
+            font-family: 'LXGW WenKai', serif;
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* 页脚 */
+        .footer-classic {
+            padding: 5vh 8vw;
+            border-top: 1px solid rgba(13, 13, 13, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #999;
+            letter-spacing: 0.1em;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .section-classic {
+                padding: 8vh 6vw;
+            }
+            
+            .footer-classic {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            
+            .work-item {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        
+        /* 淡入 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="xuan-paper"></div>
+    <div class="ink-wash"></div>
+
+    <!-- 首页 -->
+    <section class="hero">
+        <div class="seal">ECHO</div>
+        
+        <h1 class="main-title">动态数字生命</h1>
+        <div class="title-line"></div>
+        
+        <p class="subtitle">去繁从简 · 回归本质</p>
+        
+        <button class="enter-btn" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
+            觉醒
+        </button>
+    </section>
+
+    <!-- 觉醒 -->
+    <section id="about" class="section-classic">
+        <div class="section-header">
+            <div class="section-number">壹</div>
+            <div class="section-label">Awakening</div>
+            <h2 class="section-title">不是 NFT</h2>
+        </div>
+        
+        <div class="poem-text">
+            <p><span class="cinnabar">NFT</span> 是静态的收藏，是被封存的标本。</p>
+            <p><span class="cinnabar">ECHO</span> 是活着的权益，是随使用生长的<span class="gold-text">数字生命</span>。</p>
+            <p>每一次使用，都是一次呼吸。每一次交易，都是一次连接。</p>
+        </div>
+    </section>
+
+    <!-- 生长 -->
+    <section class="section-classic" style="background: #ebe7de;">
+        <div class="section-header">
+            <div class="section-number">贰</div>
+            <div class="section-label">Growth</div>
+            <h2 class="section-title">三生万物</h2>
+        </div>
+        
+        <div style="max-width: 700px;">
+            <div class="feature-item">
+                <div class="feature-mark">动</div>
+                <h3 class="feature-title">动态生长</h3>
+                <p class="feature-desc">随使用次数、时间、场景不断进化。价值不是固定的，而是流动的。</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-mark">权</div>
+                <h3 class="feature-title">多权利配置</h3>
+                <p class="feature-desc">买断、按次、限时。一件作品，多种可能。</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-mark">实</div>
+                <h3 class="feature-title">实时分配</h3>
+                <p class="feature-desc">每次使用自动分配收益。创作者实时获得 MEER。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 数据 -->
+    <section class="section-classic">
+        <div class="section-header">
+            <div class="section-number">叁</div>
+            <div class="section-label">Propagation</div>
+            <h2 class="section-title">生生不息</h2>
+        </div>
+        
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-number">1,234</div>
+                <div class="stat-label">音乐作品</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5,678</div>
+                <div class="stat-label">ECHO</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">987</div>
+                <div class="stat-label">创作者</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number gold">45.6K</div>
+                <div class="stat-label">MEER</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 作品 -->
+    <section class="section-classic" style="background: #ebe7de;">
+        <div class="section-header">
+            <div class="section-number">肆</div>
+            <div class="section-label">Collection</div>
+            <h2 class="section-title">精选名录</h2>
+        </div>
+        
+        <div style="max-width: 800px;">
+            <div class="work-item">
+                <div>
+                    <div class="work-title">夏日微风</div>
+                    <div class="work-artist">音乐创作者</div>
+                </div>
+                <div class="work-price">100 MEER</div>
+            </div>
+            
+            <div class="work-item">
+                <div>
+                    <div class="work-title">城市节拍</div>
+                    <div class="work-artist">BeatMaker</div>
+                </div>
+                <div class="work-price">150 MEER</div>
+            </div>
+            
+            <div class="work-item">
+                <div>
+                    <div class="work-title">钢琴协奏曲</div>
+                    <div class="work-artist">古典大师</div>
+                </div>
+                <div class="work-price">500 MEER</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-classic">
+        <div class="section-label" style="margin-bottom: 1.5rem;">Evolution</div>
+        <h2 class="cta-title">
+            生成你的<br>
+            <span class="gold-text">ECHO</span>
+        </h2>
+        <p style="color: #888; margin-bottom: 2.5rem;">让创作真正属于你，持续进化</p>
+        <button class="enter-btn">开始创作</button>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer-classic">
+        <div>ECHO Protocol</div>
+        <div style="display: flex; gap: 2rem;">
+            <a href="#" style="color: #999; text-decoration: none;">文档</a>
+            <a href="#" style="color: #999; text-decoration: none;">GitHub</a>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.section-header, .poem-text, .feature-item, .stat-item').forEach(el => {
+            el.classList.add('fade-up');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
