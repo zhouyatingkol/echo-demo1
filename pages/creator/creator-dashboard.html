@@ -2,27 +2,25 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ECHO 创作者中心 - 仪表盘</title>
-    <link rel="stylesheet" href="../../../assets/styles/main.css">
-    <link rel="stylesheet" href="../../../assets/styles/creator.css">
+    <!-- 引入增强版样式 -->
+    <link rel="stylesheet" href="../../../assets/styles/creator-enhanced.css">
 </head>
 <body>
     <!-- 导航栏 -->
     <nav class="navbar">
-        <div class="nav-brand">
-            <span class="logo">🌳</span>
-            <span class="brand-text">创作者中心</span>
+        <a href="../../index.html" class="nav-logo">ECHO</a>
+        <div class="nav-links" id="navLinks">
+            <a href="../market/market.html" class="nav-link">市场</a>
+            <a href="creator.html" class="nav-link active">创作</a>
+            <a href="../docs.html" class="nav-link">文档</a>
         </div>
-        <div class="nav-links">
-            <a href="marketplace.html">市场</a>
-            <a href="../market/license-shop.html">授权商店</a>
-            <a href="creator-dashboard.html" class="active">创作者中心</a>
-        </div>
-        <div class="wallet-section">
-            <span id="walletAddress" class="wallet-address hidden"></span>
-            <button id="walletConnect" class="btn btn-primary">连接钱包</button>
-        </div>
+        <button class="nav-menu-btn" id="menuBtn" aria-label="菜单">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
 
     <!-- 主内容区 -->
@@ -51,7 +49,7 @@
             <div class="stat-card">
                 <div class="stat-icon revenue">💰</div>
                 <div class="stat-content">
-                    <h3 id="totalRevenue">0 MEER</h3>
+                    <h3 id="totalRevenue">0 ECHO</h3>
                     <p>总收益</p>
                     <span class="stat-change positive">+15% 较上月</span>
                 </div>
@@ -62,6 +60,50 @@
                     <h3 id="totalLicenses">0</h3>
                     <p>授权数量</p>
                     <span class="stat-change positive">+5 本周新增</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 收益概览图表 -->
+        <section class="chart-section">
+            <div class="chart-header">
+                <h2>📊 收益趋势</h2>
+                <div class="chart-filters">
+                    <button class="chart-filter-btn active">7天</button>
+                    <button class="chart-filter-btn">30天</button>
+                    <button class="chart-filter-btn">90天</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-bars">
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 40%;" data-value="120 ECHO"></div>
+                        <div class="chart-bar-label">周一</div>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 65%;" data-value="280 ECHO"></div>
+                        <div class="chart-bar-label">周二</div>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 45%;" data-value="150 ECHO"></div>
+                        <div class="chart-bar-label">周三</div>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 80%;" data-value="420 ECHO"></div>
+                        <div class="chart-bar-label">周四</div>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 55%;" data-value="200 ECHO"></div>
+                        <div class="chart-bar-label">周五</div>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 90%;" data-value="580 ECHO"></div>
+                        <div class="chart-bar-label">周六</div>
+                    </div>
+                    <div class="chart-bar-group">
+                        <div class="chart-bar" style="height: 70%;" data-value="350 ECHO"></div>
+                        <div class="chart-bar-label">周日</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -96,11 +138,81 @@
                 <a href="creator-dashboard.html" class="view-all">查看全部 →</a>
             </div>
             <div class="works-list" id="worksList">
-                <!-- 作品列表将由 JS 动态生成 -->
-                <div class="empty-state">
-                    <span class="icon">🎵</span>
-                    <h3>暂无作品</h3>
-                    <p>点击"上传新作品"开始创作之旅</p>
+                <!-- 示例作品列表 -->
+                <div class="work-item">
+                    <div class="work-cover">🎵</div>
+                    <div class="work-info">
+                        <h3>夏日微风</h3>
+                        <div class="work-meta">
+                            <span>流行</span>
+                            <span>·</span>
+                            <span class="status-tag active">已上架</span>
+                        </div>
+                    </div>
+                    <div class="work-stats">
+                        <div class="work-stat">
+                            <div class="value">12</div>
+                            <div class="label">授权</div>
+                        </div>
+                        <div class="work-stat">
+                            <div class="value">1.2k</div>
+                            <div class="label">播放</div>
+                        </div>
+                    </div>
+                    <div class="work-actions">
+                        <button class="work-action-btn">编辑</button>
+                        <button class="work-action-btn">查看</button>
+                    </div>
+                </div>
+                <div class="work-item">
+                    <div class="work-cover">🎸</div>
+                    <div class="work-info">
+                        <h3>城市节拍</h3>
+                        <div class="work-meta">
+                            <span>摇滚</span>
+                            <span>·</span>
+                            <span class="status-tag active">已上架</span>
+                        </div>
+                    </div>
+                    <div class="work-stats">
+                        <div class="work-stat">
+                            <div class="value">8</div>
+                            <div class="label">授权</div>
+                        </div>
+                        <div class="work-stat">
+                            <div class="value">890</div>
+                            <div class="label">播放</div>
+                        </div>
+                    </div>
+                    <div class="work-actions">
+                        <button class="work-action-btn">编辑</button>
+                        <button class="work-action-btn">查看</button>
+                    </div>
+                </div>
+                <div class="work-item">
+                    <div class="work-cover">🎹</div>
+                    <div class="work-info">
+                        <h3>山间晨雾</h3>
+                        <div class="work-meta">
+                            <span>古典</span>
+                            <span>·</span>
+                            <span class="status-tag pending">审核中</span>
+                        </div>
+                    </div>
+                    <div class="work-stats">
+                        <div class="work-stat">
+                            <div class="value">0</div>
+                            <div class="label">授权</div>
+                        </div>
+                        <div class="work-stat">
+                            <div class="value">—</div>
+                            <div class="label">播放</div>
+                        </div>
+                    </div>
+                    <div class="work-actions">
+                        <button class="work-action-btn">编辑</button>
+                        <button class="work-action-btn">查看</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -112,12 +224,25 @@
                 <a href="#" class="view-all">查看全部 →</a>
             </div>
             <div class="notifications-list" id="notificationsList">
-                <!-- 通知列表将由 JS 动态生成 -->
                 <div class="notification-item info">
                     <span class="notification-icon">💡</span>
                     <div class="notification-content">
                         <p>欢迎使用 ECHO 创作者中心！开始上传您的第一个作品吧。</p>
                         <span class="notification-time">刚刚</span>
+                    </div>
+                </div>
+                <div class="notification-item success">
+                    <span class="notification-icon">✅</span>
+                    <div class="notification-content">
+                        <p>您的作品《夏日微风》获得新的授权订单。</p>
+                        <span class="notification-time">2小时前</span>
+                    </div>
+                </div>
+                <div class="notification-item warning">
+                    <span class="notification-icon">⚠️</span>
+                    <div class="notification-content">
+                        <p>作品《山间晨雾》审核中，预计24小时内完成。</p>
+                        <span class="notification-time">1天前</span>
                     </div>
                 </div>
             </div>
@@ -126,8 +251,11 @@
 
     <!-- 页脚 -->
     <footer class="footer">
-        <p>🌳 ECHO Protocol - 保护创作者的数字权益</p>
-        <p>Powered by Qitmeer Network</p>
+        <div class="footer-logo">ECHO</div>
+        <div class="footer-links">
+            <a href="../docs.html">文档</a>
+            <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+        </div>
     </footer>
 
     <!-- 加载遮罩 -->
@@ -151,6 +279,30 @@
             if (typeof initCreatorDashboard === 'function') {
                 initCreatorDashboard();
             }
+            
+            // 移动端菜单切换
+            const menuBtn = document.getElementById('menuBtn');
+            const navLinks = document.getElementById('navLinks');
+            
+            menuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+            
+            // 点击导航链接后关闭菜单
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                });
+            });
+            
+            // 图表筛选按钮
+            document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    // 这里可以添加切换图表数据的逻辑
+                });
+            });
         });
     </script>
 </body>

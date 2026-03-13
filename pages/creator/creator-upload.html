@@ -2,27 +2,25 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ECHO 创作者中心 - 上传作品</title>
-    <link rel="stylesheet" href="../../../assets/styles/main.css">
-    <link rel="stylesheet" href="../../../assets/styles/creator.css">
+    <!-- 引入增强版样式 -->
+    <link rel="stylesheet" href="../../../assets/styles/creator-enhanced.css">
 </head>
 <body>
     <!-- 导航栏 -->
     <nav class="navbar">
-        <div class="nav-brand">
-            <span class="logo">🌳</span>
-            <span class="brand-text">创作者中心</span>
+        <a href="../../index.html" class="nav-logo">ECHO</a>
+        <div class="nav-links" id="navLinks">
+            <a href="../market/market.html" class="nav-link">市场</a>
+            <a href="creator.html" class="nav-link active">创作</a>
+            <a href="../docs.html" class="nav-link">文档</a>
         </div>
-        <div class="nav-links">
-            <a href="marketplace.html">市场</a>
-            <a href="../market/license-shop.html">授权商店</a>
-            <a href="creator-dashboard.html" class="active">创作者中心</a>
-        </div>
-        <div class="wallet-section">
-            <span id="walletAddress" class="wallet-address hidden"></span>
-            <button id="walletConnect" class="btn btn-primary">连接钱包</button>
-        </div>
+        <button class="nav-menu-btn" id="menuBtn" aria-label="菜单">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
 
     <!-- 主内容区 -->
@@ -37,6 +35,30 @@
                 <a href="creator-dashboard.html" class="btn btn-primary" style="background: rgba(255,255,255,0.2); color: white;">← 返回仪表盘</a>
             </div>
         </header>
+
+        <!-- 步骤指示器 -->
+        <div class="steps-indicator">
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div class="step-label">基本信息</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-label">上传文件</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-label">权属配置</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-label">价格设置</div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-label">确认提交</div>
+            </div>
+        </div>
 
         <!-- 上传表单 -->
         <form class="upload-form" id="uploadForm">
@@ -139,7 +161,7 @@
                         </div>
                         <div class="right-card-content">
                             <div class="form-group">
-                                <label>授权费用 (MEER)</label>
+                                <label>授权费用 (ECHO)</label>
                                 <input type="number" id="usageFee" name="usageFee" value="100" min="0" step="0.01">
                             </div>
                             <div class="form-group">
@@ -166,7 +188,7 @@
                         </div>
                         <div class="right-card-content">
                             <div class="form-group">
-                                <label>衍生授权费用 (MEER)</label>
+                                <label>衍生授权费用 (ECHO)</label>
                                 <input type="number" id="derivativeFee" name="derivativeFee" value="500" min="0" step="0.01">
                             </div>
                             <div class="form-group">
@@ -186,7 +208,7 @@
                         </div>
                         <div class="right-card-content">
                             <div class="form-group">
-                                <label>扩展授权费用 (MEER)</label>
+                                <label>扩展授权费用 (ECHO)</label>
                                 <input type="number" id="extensionFee" name="extensionFee" value="200" min="0" step="0.01">
                             </div>
                             <div class="form-group">
@@ -238,10 +260,10 @@
                         </div>
                         <div class="pricing-card-content">
                             <div class="form-group">
-                                <label>价格 (MEER)</label>
+                                <label>价格 (ECHO)</label>
                                 <div class="price-input-group">
                                     <input type="number" id="onetimePrice" name="onetimePrice" value="100" min="0" step="0.01">
-                                    <span class="unit">MEER</span>
+                                    <span class="unit">ECHO</span>
                                 </div>
                             </div>
                             <p class="hint">买家一次性支付，获得永久使用权</p>
@@ -256,10 +278,10 @@
                         </div>
                         <div class="pricing-card-content">
                             <div class="form-group">
-                                <label>单价 (MEER/次)</label>
+                                <label>单价 (ECHO/次)</label>
                                 <div class="price-input-group">
                                     <input type="number" id="perusePrice" name="perusePrice" value="0.5" min="0" step="0.01">
-                                    <span class="unit">MEER</span>
+                                    <span class="unit">ECHO</span>
                                 </div>
                             </div>
                             <p class="hint">买家按实际使用次数付费</p>
@@ -274,10 +296,10 @@
                         </div>
                         <div class="pricing-card-content">
                             <div class="form-group">
-                                <label>日租金 (MEER/天)</label>
+                                <label>日租金 (ECHO/天)</label>
                                 <div class="price-input-group">
                                     <input type="number" id="timedPrice" name="timedPrice" value="10" min="0" step="0.01">
-                                    <span class="unit">MEER</span>
+                                    <span class="unit">ECHO</span>
                                 </div>
                             </div>
                             <p class="hint">买家按授权天数付费，最少30天</p>
@@ -293,16 +315,16 @@
                     预览与确认
                 </h2>
                 
-                <div id="uploadPreview" style="background: var(--bg-secondary); border-radius: var(--border-radius-sm); padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">作品预览</h3>
+                <div id="uploadPreview" style="background: var(--bg-secondary); border-radius: var(--border-radius-sm); padding: 1.5rem; margin-bottom: 1.5rem; border: 0.5px solid var(--border-color);">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 0.9rem; letter-spacing: 0.1em;">作品预览</h3>
                     <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-                        <div style="width: 120px; height: 120px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); border-radius: var(--border-radius-sm); display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%); border-radius: var(--border-radius-sm); display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
                             🎵
                         </div>
                         <div style="flex: 1; min-width: 200px;">
-                            <h4 id="previewTitle" style="font-size: 1.25rem; margin-bottom: 0.5rem;">未命名作品</h4>
-                            <p id="previewType" style="color: var(--text-muted); margin-bottom: 0.5rem;">类型: 流行</p>
-                            <p id="previewRights" style="color: var(--text-muted); font-size: 0.875rem;">已配置权利: 使用权, 收益权</p>
+                            <h4 id="previewTitle" style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 400;">未命名作品</h4>
+                            <p id="previewType" style="color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.85rem;">类型: 流行</p>
+                            <p id="previewRights" style="color: var(--text-muted); font-size: 0.8rem;">已配置权利: 使用权, 收益权</p>
                         </div>
                     </div>
                 </div>
@@ -318,9 +340,12 @@
     </main>
 
     <!-- 页脚 -->
-    <footer class="footer">
-        <p>🌳 ECHO Protocol - 保护创作者的数字权益</p>
-        <p>Powered by Qitmeer Network</p>
+    <footer class="footer" style="margin-top: 2rem;">
+        <div class="footer-logo">ECHO</div>
+        <div class="footer-links">
+            <a href="../docs.html">文档</a>
+            <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+        </div>
     </footer>
 
     <!-- 加载遮罩 -->
@@ -344,6 +369,21 @@
             if (typeof initUploadPage === 'function') {
                 initUploadPage();
             }
+            
+            // 移动端菜单切换
+            const menuBtn = document.getElementById('menuBtn');
+            const navLinks = document.getElementById('navLinks');
+            
+            menuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+            
+            // 点击导航链接后关闭菜单
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                });
+            });
         });
     </script>
 </body>

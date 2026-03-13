@@ -2,13 +2,14 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>创作中心 — ECHO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../../assets/styles/global.css">
+    <!-- 引入增强版样式 -->
+    <link rel="stylesheet" href="../../../assets/styles/creator-enhanced.css">
     <script>
         tailwind.config = {
             theme: {
@@ -32,18 +33,7 @@
         }
     </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        
-        body {
-            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
-            background: #f7f4ed;
-            color: #1a1a1a;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        /* 辨识度元素：左侧垂直水印 */
+        /* 页面专属样式 - 仅保留Tailwind无法覆盖的样式 */
         .side-mark {
             position: fixed;
             left: 5vw;
@@ -58,7 +48,6 @@
             font-weight: 300;
         }
         
-        /* 金色光晕 */
         .glow-soft {
             position: fixed;
             top: -35%;
@@ -70,7 +59,6 @@
             z-index: 0;
         }
         
-        /* 纸张纹理 */
         .paper-texture {
             position: fixed;
             top: 0;
@@ -124,6 +112,7 @@
             padding: 1.5rem 2.5rem;
             background: rgba(240, 236, 227, 0.6);
             border: 0.5px solid rgba(26, 26, 26, 0.06);
+            border-radius: 8px;
         }
         
         .creator-avatar {
@@ -158,84 +147,6 @@
             letter-spacing: 0.1em;
         }
         
-        /* 关注按钮样式 */
-        .follow-section {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 0.5px solid rgba(26, 26, 26, 0.08);
-        }
-        
-        .follow-btn-elegant {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.6rem 1.5rem;
-            border: 0.5px solid #c9a86c;
-            background: transparent;
-            color: #c9a86c;
-            font-family: inherit;
-            font-size: 0.75rem;
-            letter-spacing: 0.2em;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .follow-btn-elegant:hover {
-            background: #c9a86c;
-            color: #f7f4ed;
-        }
-        
-        .follow-btn-elegant.is-following {
-            background: #c9a86c;
-            color: #f7f4ed;
-        }
-        
-        .follow-btn-elegant.is-following:hover {
-            background: #9e8b76;
-            border-color: #9e8b76;
-        }
-        
-        .follow-btn-elegant .icon-plus,
-        .follow-btn-elegant .icon-check {
-            width: 14px;
-            height: 14px;
-            transition: all 0.3s ease;
-        }
-        
-        .follow-btn-elegant.is-following .icon-plus,
-        .follow-btn-elegant:not(.is-following) .icon-check {
-            display: none;
-        }
-        
-        .follow-btn-elegant.loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-        
-        .follow-btn-elegant .btn-text-follow,
-        .follow-btn-elegant .btn-text-following {
-            display: none;
-        }
-        
-        .follow-btn-elegant:not(.is-following) .btn-text-follow,
-        .follow-btn-elegant.is-following .btn-text-following {
-            display: inline;
-        }
-        
-        .followers-count {
-            margin-top: 0.8rem;
-            font-size: 0.75rem;
-            color: #9e8b76;
-            letter-spacing: 0.05em;
-        }
-        
-        .followers-count strong {
-            color: #c9a86c;
-            font-weight: 400;
-        }
-        
         /* 快捷操作卡片 */
         .actions-section {
             padding: 0 10vw 6vh;
@@ -249,7 +160,7 @@
             padding: 1rem 2.5rem;
             border: 0.5px solid #c9a86c;
             background: transparent;
-            font-family: inherit;
+            font-family: 'Noto Serif SC', serif;
             font-size: 0.8rem;
             letter-spacing: 0.3em;
             color: #c9a86c;
@@ -261,6 +172,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.8rem;
+            border-radius: 4px;
         }
         
         .action-btn::before {
@@ -648,7 +560,26 @@
             transform: translateY(0);
         }
         
-        /* 响应式设计 */
+        /* 移动端菜单按钮 */
+        .nav-menu-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            padding: 8px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .nav-menu-btn span {
+            display: block;
+            width: 24px;
+            height: 1.5px;
+            background: var(--ink);
+            transition: all 0.3s ease;
+        }
+        
+        /* 响应式设计 - 平板端 (768px - 1024px) */
         @media (max-width: 1024px) {
             .earnings-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -665,13 +596,58 @@
             }
         }
         
+        /* 响应式设计 - 移动端 (768px以下) */
         @media (max-width: 768px) {
             .side-mark { display: none; }
+            
+            .navbar {
+                padding: 1rem 4vw;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: rgba(247, 244, 237, 0.98);
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0;
+                border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
+                transform: translateY(-150%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.4s ease;
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .nav-link {
+                padding: 1rem;
+                border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
+                font-size: 0.9rem;
+            }
+            
+            .nav-link:last-child {
+                border-bottom: none;
+            }
+            
+            .nav-menu-btn {
+                display: flex;
+            }
             
             .hero-section,
             .actions-section {
                 padding-left: 6vw;
                 padding-right: 6vw;
+            }
+            
+            .hero-title {
+                font-size: clamp(1.75rem, 8vw, 2.5rem);
             }
             
             .works-section,
@@ -685,17 +661,35 @@
                 flex-direction: column;
                 text-align: center;
                 padding: 1.5rem;
+                width: 100%;
+                max-width: 280px;
             }
             
             .creator-info {
                 text-align: center;
             }
             
-            .earnings-grid {
-                grid-template-columns: 1fr;
-                gap: 3rem;
+            .creator-name {
+                font-size: 1.1rem;
             }
             
+            .action-btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+            
+            .earnings-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .earnings-circle {
+                width: 130px;
+                height: 130px;
+            }
+            
+            /* 表格移动端卡片化 */
             .works-table,
             .history-table {
                 font-size: 0.85rem;
@@ -711,6 +705,7 @@
                 display: block;
                 margin-bottom: 1.5rem;
                 border: 0.5px solid rgba(26, 26, 26, 0.06);
+                border-radius: 8px;
                 padding: 1rem;
                 background: rgba(247, 244, 237, 0.5);
             }
@@ -720,7 +715,7 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 0.8rem 0;
+                padding: 0.75rem 0;
                 border-bottom: 0.5px solid rgba(26, 26, 26, 0.04);
             }
             
@@ -736,20 +731,108 @@
                 color: #9e8b76;
                 letter-spacing: 0.1em;
                 text-transform: uppercase;
+                font-weight: 400;
             }
             
             .action-group {
                 justify-content: flex-end;
+                gap: 1rem;
+            }
+            
+            .action-link {
+                padding: 0.5rem;
             }
             
             .footer {
                 flex-direction: column;
                 gap: 2rem;
                 text-align: center;
+                padding: 6vh 6vw;
             }
             
             .footer-links a {
                 margin: 0 1rem;
+            }
+        }
+        
+        /* 小手机端优化 (375px - 390px) */
+        @media (max-width: 480px) {
+            .main-content {
+                padding-top: 12vh;
+            }
+            
+            .hero-section {
+                padding: 3vh 5vw 6vh;
+            }
+            
+            .hero-title {
+                font-size: 1.75rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 0.8rem;
+                margin-bottom: 2rem;
+            }
+            
+            .creator-avatar {
+                width: 56px;
+                height: 56px;
+                font-size: 1.25rem;
+            }
+            
+            .creator-name {
+                font-size: 1rem;
+            }
+            
+            .creator-stats {
+                font-size: 0.75rem;
+            }
+            
+            .section-title {
+                font-size: 1.25rem;
+            }
+            
+            .works-section,
+            .earnings-section,
+            .history-section {
+                padding: 4vh 5vw 6vh;
+            }
+            
+            .earnings-circle {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .earnings-value {
+                font-size: 1.5rem;
+            }
+            
+            .works-table tbody tr,
+            .history-table tbody tr {
+                padding: 0.875rem;
+                margin-bottom: 1rem;
+            }
+            
+            .works-table tbody td,
+            .history-table tbody td {
+                padding: 0.625rem 0;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* 触摸设备优化 */
+        @media (hover: none) {
+            .action-btn:hover::before {
+                transform: scaleX(0);
+            }
+            
+            .action-btn:hover {
+                color: #c9a86c;
+            }
+            
+            .earnings-card:hover .earnings-circle {
+                border-color: rgba(201, 168, 108, 0.3);
+                box-shadow: none;
             }
         }
     </style>
@@ -762,11 +845,16 @@
     <!-- 导航栏 -->
     <nav class="navbar">
         <a href="../index.html" class="nav-logo">ECHO</a>
-        <div class="nav-links">
+        <div class="nav-links" id="navLinks">
             <a href="../market/market.html" class="nav-link">市场</a>
             <a href="creator.html" class="nav-link active">创作</a>
             <a href="../docs.html" class="nav-link">文档</a>
         </div>
+        <button class="nav-menu-btn" id="menuBtn" aria-label="菜单">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
 
     <!-- 主内容 -->
@@ -784,38 +872,23 @@
                 <div class="creator-info">
                     <div class="creator-name">林清风</div>
                     <div class="creator-stats">已发布作品 · 5件</div>
-                    <div class="follow-section">
-                        <button class="follow-btn-elegant" id="followBtn" data-creator="0x742d35cc6f0e9f0e8a8d5c6e7f8a9b0c1d2e3f4a">
-                            <svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 5v14M5 12h14"/>
-                            </svg>
-                            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"/>
-                            </svg>
-                            <span class="btn-text-follow">关注</span>
-                            <span class="btn-text-following">已关注</span>
-                        </button>
-                        <div class="followers-count">
-                            <strong id="followersCount">0</strong> 位粉丝
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
 
         <!-- 快捷操作 -->
         <section class="actions-section">
-            <a href="mint.html" class="action-btn fade-up">
+            <a href="creator-upload.html" class="action-btn fade-up">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M12 5v14M5 12h14"/>
                 </svg>
                 生成新作品
             </a>
-            <a href="../market/market.html" class="action-btn fade-up">
+            <a href="creator-dashboard.html" class="action-btn fade-up">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 3h18v18H3zM9 3v18M15 3v18M3 9h18M3 15h18"/>
                 </svg>
-                查看市场
+                仪表盘
             </a>
         </section>
 
@@ -1010,7 +1083,6 @@
         </div>
     </footer>
 
-    <script src="../../frontend/js/follow-system.js"></script>
     <script>
         // 滚动淡入动画
         const observer = new IntersectionObserver((entries) => {
@@ -1024,114 +1096,20 @@
         document.querySelectorAll('.fade-up').forEach(el => {
             observer.observe(el);
         });
-
-        // 关注系统初始化
-        let followSystem = null;
-        let currentUserAddress = null;
-
-        // 获取当前登录用户地址（从 localStorage 或钱包）
-        function getCurrentUserAddress() {
-            return localStorage.getItem('echo_wallet_address') || null;
-        }
-
-        // 获取创作者地址
-        function getCreatorAddress() {
-            // 从 URL 参数或页面数据获取
-            const urlParams = new URLSearchParams(window.location.search);
-            const creatorFromUrl = urlParams.get('creator');
-            if (creatorFromUrl) return creatorFromUrl;
-            
-            // 默认使用页面上的 data 属性
-            const btn = document.getElementById('followBtn');
-            return btn?.dataset.creator;
-        }
-
-        // 初始化关注按钮
-        async function initFollowButton() {
-            currentUserAddress = getCurrentUserAddress();
-            const creatorAddress = getCreatorAddress();
-            const followBtn = document.getElementById('followBtn');
-            const followersCountEl = document.getElementById('followersCount');
-            
-            if (!creatorAddress) return;
-
-            // 更新粉丝数显示
-            const count = FollowSystem.getCreatorFollowersCount(creatorAddress);
-            followersCountEl.textContent = count;
-
-            // 如果用户未登录，按钮点击提示登录
-            if (!currentUserAddress) {
-                followBtn.addEventListener('click', () => {
-                    alert('请先连接钱包以关注创作者');
-                    // 可以在这里触发钱包连接
-                });
-                return;
-            }
-
-            // 初始化关注系统
-            followSystem = followSystemManager.getInstance(currentUserAddress);
-
-            // 检查是否已关注
-            const isFollowing = followSystem.isFollowing(creatorAddress);
-            updateFollowButtonUI(isFollowing);
-
-            // 绑定点击事件
-            followBtn.addEventListener('click', async () => {
-                followBtn.classList.add('loading');
-                
-                try {
-                    const isCurrentlyFollowing = followBtn.classList.contains('is-following');
-                    let result;
-
-                    if (isCurrentlyFollowing) {
-                        result = await followSystem.unfollow(creatorAddress);
-                        if (result.success) {
-                            updateFollowButtonUI(false);
-                            followersCountEl.textContent = parseInt(followersCountEl.textContent) - 1;
-                        }
-                    } else {
-                        const creatorInfo = {
-                            name: '林清风',
-                            avatar: null,
-                            bio: '数字艺术创作'
-                        };
-                        result = await followSystem.follow(creatorAddress, creatorInfo);
-                        if (result.success) {
-                            updateFollowButtonUI(true);
-                            followersCountEl.textContent = parseInt(followersCountEl.textContent) + 1;
-                        }
-                    }
-
-                    if (!result.success) {
-                        console.error('关注操作失败:', result.error);
-                    }
-                } catch (error) {
-                    console.error('关注操作失败:', error);
-                } finally {
-                    followBtn.classList.remove('loading');
-                }
+        
+        // 移动端菜单切换
+        const menuBtn = document.getElementById('menuBtn');
+        const navLinks = document.getElementById('navLinks');
+        
+        menuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // 点击导航链接后关闭菜单
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
             });
-        }
-
-        // 更新关注按钮UI
-        function updateFollowButtonUI(isFollowing) {
-            const followBtn = document.getElementById('followBtn');
-            if (isFollowing) {
-                followBtn.classList.add('is-following');
-            } else {
-                followBtn.classList.remove('is-following');
-            }
-        }
-
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', initFollowButton);
-
-        // 监听钱包连接事件
-        window.addEventListener('walletConnected', (e) => {
-            currentUserAddress = e.detail?.address;
-            if (currentUserAddress) {
-                initFollowButton();
-            }
         });
     </script>
 </body>
