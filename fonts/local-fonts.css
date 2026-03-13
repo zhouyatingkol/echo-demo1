@@ -1,0 +1,16 @@
+/** ECHO Local Fonts CSS
+ * 基于 Google Fonts: Noto Serif SC + Cormorant Garamond
+ * 本地回退方案
+ */
+
+/* 系统字体回退栈 */
+:root {
+  --font-serif: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', '宋体', serif;
+  --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+}
+
+/* 确保字体加载 */
+body {
+  font-family: var(--font-serif);
+  font-display: swap;
+}
