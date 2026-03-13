@@ -462,6 +462,241 @@
       }
     }
   </style>
+  <!-- 关注列表样式 -->
+  <style>
+    /* 标签页导航 */
+    .tabs-nav {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      color: var(--color-clay);
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      position: relative;
+      transition: all var(--transition-fast);
+    }
+
+    .tab-btn:hover {
+      color: var(--color-gold);
+    }
+
+    .tab-btn.active {
+      color: var(--color-gold);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 2px;
+      background: var(--color-gold);
+    }
+
+    .tab-btn .count {
+      font-size: 0.75rem;
+      color: var(--color-gold);
+      margin-left: 0.3rem;
+    }
+
+    /* 标签页内容 */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* 关注列表 */
+    .follow-list-elegant {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .follow-item {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.2rem 0;
+      border-bottom: 0.5px solid rgba(26, 26, 26, 0.04);
+      transition: all var(--transition-fast);
+    }
+
+    .follow-item:hover {
+      background: rgba(201, 168, 108, 0.02);
+      margin: 0 -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .follow-item-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-warm) 0%, var(--color-silk) 100%);
+      border: 1px solid rgba(201, 168, 108, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--color-clay);
+      flex-shrink: 0;
+    }
+
+    .follow-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .follow-item-name {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--color-ink);
+      letter-spacing: 0.03em;
+      margin-bottom: 0.3rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .follow-item-address {
+      font-size: 0.75rem;
+      color: var(--color-clay);
+      font-family: 'SF Mono', monospace;
+    }
+
+    .follow-item-bio {
+      font-size: 0.8rem;
+      color: var(--color-clay);
+      margin-top: 0.3rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .follow-item-actions {
+      flex-shrink: 0;
+    }
+
+    .follow-item-btn {
+      padding: 0.5rem 1.2rem;
+      border: 0.5px solid var(--color-gold);
+      background: transparent;
+      color: var(--color-gold);
+      font-family: inherit;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .follow-item-btn:hover {
+      background: var(--color-gold);
+      color: var(--color-paper);
+    }
+
+    .follow-item-btn.is-following {
+      background: var(--color-gold);
+      color: var(--color-paper);
+    }
+
+    .follow-item-btn.is-following:hover {
+      background: var(--color-clay);
+      border-color: var(--color-clay);
+    }
+
+    /* 空状态 */
+    .follow-empty {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .follow-empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+
+    .follow-empty-text {
+      font-size: 0.9rem;
+      color: var(--color-clay);
+      letter-spacing: 0.05em;
+    }
+
+    .follow-empty-hint {
+      font-size: 0.8rem;
+      color: var(--color-stone);
+      margin-top: 0.5rem;
+    }
+
+    /* 加载更多 */
+    .load-more {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .load-more-btn {
+      padding: 0.8rem 2rem;
+      border: 0.5px solid rgba(26, 26, 26, 0.1);
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.8rem;
+      color: var(--color-clay);
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .load-more-btn:hover {
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .tabs-nav {
+        gap: 1rem;
+      }
+
+      .tab-btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+      }
+
+      .follow-item {
+        gap: 1rem;
+        padding: 1rem 0;
+      }
+
+      .follow-item-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 1rem;
+      }
+
+      .follow-item-name {
+        font-size: 0.9rem;
+      }
+
+      .follow-item-bio {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- 辨识度元素 -->
@@ -512,79 +747,116 @@
       </div>
     </section>
 
-    <!-- 我的收藏 -->
+    <!-- 我的收藏/关注标签页 -->
     <section class="collection-section">
-      <div class="section-header">
-        <h2 class="section-title">我的收藏</h2>
-        <span class="section-count">共 12 件作品</span>
+      <!-- 标签页导航 -->
+      <div class="tabs-nav fade-up">
+        <button class="tab-btn active" data-tab="collection">
+          我的收藏
+          <span class="count" id="collectionCount">12</span>
+        </button>
+        <button class="tab-btn" data-tab="following">
+          我的关注
+          <span class="count" id="followingCount">0</span>
+        </button>
+        <button class="tab-btn" data-tab="followers">
+          我的粉丝
+          <span class="count" id="followersCount">0</span>
+        </button>
       </div>
-      <div class="collection-grid">
-        <a href="../market/work-detail.html" class="work-card">
-          <div class="work-cover"></div>
-          <div class="work-info">
-            <h3 class="work-name">夏日微风</h3>
-            <p class="work-creator">创作者 / 林清风</p>
-            <div class="work-price">
-              <span class="price-label">购入价格</span>
-              <span class="price-value">100 ECHO</span>
+
+      <!-- 我的收藏 -->
+      <div class="tab-content active" id="tab-collection">
+        <div class="collection-grid">
+          <a href="../market/work-detail.html" class="work-card">
+            <div class="work-cover"></div>
+            <div class="work-info">
+              <h3 class="work-name">夏日微风</h3>
+              <p class="work-creator">创作者 / 林清风</p>
+              <div class="work-price">
+                <span class="price-label">购入价格</span>
+                <span class="price-value">100 ECHO</span>
+              </div>
             </div>
-          </div>
-        </a>
-        <a href="../market/work-detail.html" class="work-card">
-          <div class="work-cover"></div>
-          <div class="work-info">
-            <h3 class="work-name">城市节拍</h3>
-            <p class="work-creator">创作者 / 都市行者</p>
-            <div class="work-price">
-              <span class="price-label">购入价格</span>
-              <span class="price-value">180 ECHO</span>
+          </a>
+          <a href="../market/work-detail.html" class="work-card">
+            <div class="work-cover"></div>
+            <div class="work-info">
+              <h3 class="work-name">城市节拍</h3>
+              <p class="work-creator">创作者 / 都市行者</p>
+              <div class="work-price">
+                <span class="price-label">购入价格</span>
+                <span class="price-value">180 ECHO</span>
+              </div>
             </div>
-          </div>
-        </a>
-        <a href="../market/work-detail.html" class="work-card">
-          <div class="work-cover"></div>
-          <div class="work-info">
-            <h3 class="work-name">钢琴协奏曲</h3>
-            <p class="work-creator">创作者 / 琴韵悠扬</p>
-            <div class="work-price">
-              <span class="price-label">购入价格</span>
-              <span class="price-value">320 ECHO</span>
+          </a>
+          <a href="../market/work-detail.html" class="work-card">
+            <div class="work-cover"></div>
+            <div class="work-info">
+              <h3 class="work-name">钢琴协奏曲</h3>
+              <p class="work-creator">创作者 / 琴韵悠扬</p>
+              <div class="work-price">
+                <span class="price-label">购入价格</span>
+                <span class="price-value">320 ECHO</span>
+              </div>
             </div>
-          </div>
-        </a>
-        <a href="../market/work-detail.html" class="work-card">
-          <div class="work-cover"></div>
-          <div class="work-info">
-            <h3 class="work-name">深夜爵士</h3>
-            <p class="work-creator">创作者 / 蓝调诗人</p>
-            <div class="work-price">
-              <span class="price-label">购入价格</span>
-              <span class="price-value">150 ECHO</span>
+          </a>
+          <a href="../market/work-detail.html" class="work-card">
+            <div class="work-cover"></div>
+            <div class="work-info">
+              <h3 class="work-name">深夜爵士</h3>
+              <p class="work-creator">创作者 / 蓝调诗人</p>
+              <div class="work-price">
+                <span class="price-label">购入价格</span>
+                <span class="price-value">150 ECHO</span>
+              </div>
             </div>
-          </div>
-        </a>
-        <a href="../market/work-detail.html" class="work-card">
-          <div class="work-cover"></div>
-          <div class="work-info">
-            <h3 class="work-name">晨露轻响</h3>
-            <p class="work-creator">创作者 / 自然之声</p>
-            <div class="work-price">
-              <span class="price-label">购入价格</span>
-              <span class="price-value">95 ECHO</span>
+          </a>
+          <a href="../market/work-detail.html" class="work-card">
+            <div class="work-cover"></div>
+            <div class="work-info">
+              <h3 class="work-name">晨露轻响</h3>
+              <p class="work-creator">创作者 / 自然之声</p>
+              <div class="work-price">
+                <span class="price-label">购入价格</span>
+                <span class="price-value">95 ECHO</span>
+              </div>
             </div>
-          </div>
-        </a>
-        <a href="../market/work-detail.html" class="work-card">
-          <div class="work-cover"></div>
-          <div class="work-info">
-            <h3 class="work-name">星河入梦</h3>
-            <p class="work-creator">创作者 / 星辰画师</p>
-            <div class="work-price">
-              <span class="price-label">购入价格</span>
-              <span class="price-value">250 ECHO</span>
+          </a>
+          <a href="../market/work-detail.html" class="work-card">
+            <div class="work-cover"></div>
+            <div class="work-info">
+              <h3 class="work-name">星河入梦</h3>
+              <p class="work-creator">创作者 / 星辰画师</p>
+              <div class="work-price">
+                <span class="price-label">购入价格</span>
+                <span class="price-value">250 ECHO</span>
+              </div>
             </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- 我的关注 -->
+      <div class="tab-content" id="tab-following">
+        <div class="follow-list-elegant" id="followingList">
+          <div class="follow-empty">
+            <div class="follow-empty-icon">👤</div>
+            <p class="follow-empty-text">还没有关注任何创作者</p>
+            <p class="follow-empty-hint">去发现页探索感兴趣的创作者吧</p>
           </div>
-        </a>
+        </div>
+      </div>
+
+      <!-- 我的粉丝 -->
+      <div class="tab-content" id="tab-followers">
+        <div class="follow-list-elegant" id="followersList">
+          <div class="follow-empty">
+            <div class="follow-empty-icon">👥</div>
+            <p class="follow-empty-text">还没有粉丝</p>
+            <p class="follow-empty-hint">发布优质作品吸引更多关注</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -666,5 +938,173 @@
       <a href="#">隐私</a>
     </div>
   </footer>
+  <script src="../../frontend/js/follow-system.js"></script>
+  <script>
+    // 关注系统初始化
+    let followSystem = null;
+    let currentUserAddress = null;
+
+    // 获取当前用户地址
+    function getCurrentUserAddress() {
+      return localStorage.getItem('echo_wallet_address');
+    }
+
+    // 初始化关注系统
+    function initFollowSystem() {
+      currentUserAddress = getCurrentUserAddress();
+      
+      if (currentUserAddress) {
+        followSystem = followSystemManager.getInstance(currentUserAddress);
+        updateFollowStats();
+        renderFollowingList();
+        renderFollowersList();
+      }
+    }
+
+    // 更新关注统计数据
+    function updateFollowStats() {
+      if (!followSystem) return;
+      
+      document.getElementById('followingCount').textContent = followSystem.getFollowingCount();
+      document.getElementById('followersCount').textContent = followSystem.getFollowersCount();
+    }
+
+    // 渲染关注列表
+    function renderFollowingList() {
+      if (!followSystem) return;
+      
+      const list = followSystem.getFollowingList({ limit: 50 });
+      const container = document.getElementById('followingList');
+      
+      if (list.list.length === 0) {
+        container.innerHTML = `
+          <div class="follow-empty">
+            <div class="follow-empty-icon">👤</div>
+            <p class="follow-empty-text">还没有关注任何创作者</p>
+            <p class="follow-empty-hint">去发现页探索感兴趣的创作者吧</p>
+          </div>
+        `;
+        return;
+      }
+
+      const creatorsInfo = followSystem.getCreatorsInfo(list.list);
+      
+      container.innerHTML = creatorsInfo.map(creator => `
+        <div class="follow-item" data-address="${creator.address}">
+          <div class="follow-item-avatar">${creator.name?.[0] || '?'}</div>
+          <div class="follow-item-info">
+            <div class="follow-item-name">${creator.name || '未知创作者'}</div>
+            <div class="follow-item-address">${formatAddress(creator.address)}</div>
+            <div class="follow-item-bio">${creator.bio || '暂无简介'}</div>
+          </div>
+          <div class="follow-item-actions">
+            <button class="follow-item-btn is-following" onclick="toggleFollow('${creator.address}', this)">已关注</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 渲染粉丝列表
+    function renderFollowersList() {
+      if (!followSystem) return;
+      
+      const list = followSystem.getFollowersList({ limit: 50 });
+      const container = document.getElementById('followersList');
+      
+      if (list.list.length === 0) {
+        container.innerHTML = `
+          <div class="follow-empty">
+            <div class="follow-empty-icon">👥</div>
+            <p class="follow-empty-text">还没有粉丝</p>
+            <p class="follow-empty-hint">发布优质作品吸引更多关注</p>
+          </div>
+        `;
+        return;
+      }
+
+      const creatorsInfo = followSystem.getCreatorsInfo(list.list);
+      
+      container.innerHTML = creatorsInfo.map(creator => {
+        const isFollowing = followSystem.isFollowing(creator.address);
+        return `
+        <div class="follow-item" data-address="${creator.address}">
+          <div class="follow-item-avatar">${creator.name?.[0] || '?'}</div>
+          <div class="follow-item-info">
+            <div class="follow-item-name">${creator.name || '未知用户'}</div>
+            <div class="follow-item-address">${formatAddress(creator.address)}</div>
+          </div>
+          <div class="follow-item-actions">
+            <button class="follow-item-btn ${isFollowing ? 'is-following' : ''}" onclick="toggleFollow('${creator.address}', this)">${isFollowing ? '已关注' : '关注'}</button>
+          </div>
+        </div>
+      `}).join('');
+    }
+
+    // 切换关注状态
+    async function toggleFollow(address, btn) {
+      if (!followSystem) {
+        alert('请先连接钱包');
+        return;
+      }
+
+      btn.disabled = true;
+      const isFollowing = btn.classList.contains('is-following');
+
+      try {
+        if (isFollowing) {
+          const result = await followSystem.unfollow(address);
+          if (result.success) {
+            btn.classList.remove('is-following');
+            btn.textContent = '关注';
+            updateFollowStats();
+          }
+        } else {
+          const result = await followSystem.follow(address);
+          if (result.success) {
+            btn.classList.add('is-following');
+            btn.textContent = '已关注';
+            updateFollowStats();
+          }
+        }
+      } catch (error) {
+        console.error('关注操作失败:', error);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // 格式化地址
+    function formatAddress(address) {
+      if (!address) return '';
+      return address.slice(0, 6) + '...' + address.slice(-4);
+    }
+
+    // 标签页切换
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // 更新按钮状态
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // 更新内容显示
+        const tabName = btn.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+      });
+    });
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', initFollowSystem);
+
+    // 监听钱包连接事件
+    window.addEventListener('walletConnected', (e) => {
+      currentUserAddress = e.detail?.address;
+      if (currentUserAddress) {
+        initFollowSystem();
+      }
+    });
+  </script>
 </body>
 </html>

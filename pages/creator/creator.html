@@ -158,6 +158,84 @@
             letter-spacing: 0.1em;
         }
         
+        /* 关注按钮样式 */
+        .follow-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 0.5px solid rgba(26, 26, 26, 0.08);
+        }
+        
+        .follow-btn-elegant {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            border: 0.5px solid #c9a86c;
+            background: transparent;
+            color: #c9a86c;
+            font-family: inherit;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .follow-btn-elegant:hover {
+            background: #c9a86c;
+            color: #f7f4ed;
+        }
+        
+        .follow-btn-elegant.is-following {
+            background: #c9a86c;
+            color: #f7f4ed;
+        }
+        
+        .follow-btn-elegant.is-following:hover {
+            background: #9e8b76;
+            border-color: #9e8b76;
+        }
+        
+        .follow-btn-elegant .icon-plus,
+        .follow-btn-elegant .icon-check {
+            width: 14px;
+            height: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .follow-btn-elegant.is-following .icon-plus,
+        .follow-btn-elegant:not(.is-following) .icon-check {
+            display: none;
+        }
+        
+        .follow-btn-elegant.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .follow-btn-elegant .btn-text-follow,
+        .follow-btn-elegant .btn-text-following {
+            display: none;
+        }
+        
+        .follow-btn-elegant:not(.is-following) .btn-text-follow,
+        .follow-btn-elegant.is-following .btn-text-following {
+            display: inline;
+        }
+        
+        .followers-count {
+            margin-top: 0.8rem;
+            font-size: 0.75rem;
+            color: #9e8b76;
+            letter-spacing: 0.05em;
+        }
+        
+        .followers-count strong {
+            color: #c9a86c;
+            font-weight: 400;
+        }
+        
         /* 快捷操作卡片 */
         .actions-section {
             padding: 0 10vw 6vh;
@@ -706,6 +784,21 @@
                 <div class="creator-info">
                     <div class="creator-name">林清风</div>
                     <div class="creator-stats">已发布作品 · 5件</div>
+                    <div class="follow-section">
+                        <button class="follow-btn-elegant" id="followBtn" data-creator="0x742d35cc6f0e9f0e8a8d5c6e7f8a9b0c1d2e3f4a">
+                            <svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span class="btn-text-follow">关注</span>
+                            <span class="btn-text-following">已关注</span>
+                        </button>
+                        <div class="followers-count">
+                            <strong id="followersCount">0</strong> 位粉丝
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -917,6 +1010,7 @@
         </div>
     </footer>
 
+    <script src="../../frontend/js/follow-system.js"></script>
     <script>
         // 滚动淡入动画
         const observer = new IntersectionObserver((entries) => {
@@ -929,6 +1023,115 @@
         
         document.querySelectorAll('.fade-up').forEach(el => {
             observer.observe(el);
+        });
+
+        // 关注系统初始化
+        let followSystem = null;
+        let currentUserAddress = null;
+
+        // 获取当前登录用户地址（从 localStorage 或钱包）
+        function getCurrentUserAddress() {
+            return localStorage.getItem('echo_wallet_address') || null;
+        }
+
+        // 获取创作者地址
+        function getCreatorAddress() {
+            // 从 URL 参数或页面数据获取
+            const urlParams = new URLSearchParams(window.location.search);
+            const creatorFromUrl = urlParams.get('creator');
+            if (creatorFromUrl) return creatorFromUrl;
+            
+            // 默认使用页面上的 data 属性
+            const btn = document.getElementById('followBtn');
+            return btn?.dataset.creator;
+        }
+
+        // 初始化关注按钮
+        async function initFollowButton() {
+            currentUserAddress = getCurrentUserAddress();
+            const creatorAddress = getCreatorAddress();
+            const followBtn = document.getElementById('followBtn');
+            const followersCountEl = document.getElementById('followersCount');
+            
+            if (!creatorAddress) return;
+
+            // 更新粉丝数显示
+            const count = FollowSystem.getCreatorFollowersCount(creatorAddress);
+            followersCountEl.textContent = count;
+
+            // 如果用户未登录，按钮点击提示登录
+            if (!currentUserAddress) {
+                followBtn.addEventListener('click', () => {
+                    alert('请先连接钱包以关注创作者');
+                    // 可以在这里触发钱包连接
+                });
+                return;
+            }
+
+            // 初始化关注系统
+            followSystem = followSystemManager.getInstance(currentUserAddress);
+
+            // 检查是否已关注
+            const isFollowing = followSystem.isFollowing(creatorAddress);
+            updateFollowButtonUI(isFollowing);
+
+            // 绑定点击事件
+            followBtn.addEventListener('click', async () => {
+                followBtn.classList.add('loading');
+                
+                try {
+                    const isCurrentlyFollowing = followBtn.classList.contains('is-following');
+                    let result;
+
+                    if (isCurrentlyFollowing) {
+                        result = await followSystem.unfollow(creatorAddress);
+                        if (result.success) {
+                            updateFollowButtonUI(false);
+                            followersCountEl.textContent = parseInt(followersCountEl.textContent) - 1;
+                        }
+                    } else {
+                        const creatorInfo = {
+                            name: '林清风',
+                            avatar: null,
+                            bio: '数字艺术创作'
+                        };
+                        result = await followSystem.follow(creatorAddress, creatorInfo);
+                        if (result.success) {
+                            updateFollowButtonUI(true);
+                            followersCountEl.textContent = parseInt(followersCountEl.textContent) + 1;
+                        }
+                    }
+
+                    if (!result.success) {
+                        console.error('关注操作失败:', result.error);
+                    }
+                } catch (error) {
+                    console.error('关注操作失败:', error);
+                } finally {
+                    followBtn.classList.remove('loading');
+                }
+            });
+        }
+
+        // 更新关注按钮UI
+        function updateFollowButtonUI(isFollowing) {
+            const followBtn = document.getElementById('followBtn');
+            if (isFollowing) {
+                followBtn.classList.add('is-following');
+            } else {
+                followBtn.classList.remove('is-following');
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initFollowButton);
+
+        // 监听钱包连接事件
+        window.addEventListener('walletConnected', (e) => {
+            currentUserAddress = e.detail?.address;
+            if (currentUserAddress) {
+                initFollowButton();
+            }
         });
     </script>
 </body>
