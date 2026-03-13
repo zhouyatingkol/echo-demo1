@@ -25,7 +25,7 @@ class ECHOContractManager {
     initContracts() {
         // ECHOAssetV2 ABI（关键函数）
         const ECHO_ASSET_ABI = [
-            // 铸造函数
+            // 生成函数
             'function mintECHO(string name, string description, string assetType, string uri, bytes32 contentHash, tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue) blueprint) returns (uint256)',
             // 查询函数
             'function assetMetadata(uint256 tokenId) view returns (string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated)',
@@ -118,7 +118,7 @@ class ECHOContractManager {
     // ========== ECHOAssetV2 方法 ==========
     
     /**
-     * 铸造新的 ECHO 资产
+     * 生成新的 ECHO 资产
      */
     async mintAsset(name, description, assetType, uri, contentHash, blueprint) {
         const tx = await this.echoAsset.mintECHO(name, description, assetType, uri, contentHash, blueprint);
@@ -175,7 +175,7 @@ class ECHOContractManager {
     }
     
     /**
-     * 检查内容是否已铸造
+     * 检查内容是否已生成
      */
     async isContentMinted(contentHash) {
         const tokenId = await this.echoAsset.contentHashToToken(contentHash);

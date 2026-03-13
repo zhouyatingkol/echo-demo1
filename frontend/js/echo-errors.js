@@ -3,7 +3,7 @@
 const ECHOErrors = {
     // 合约错误映射
     CONTRACT_ERRORS: {
-        'Content already minted': '该内容已被铸造，不能重复创建',
+        'Content already minted': '该内容已被生成，不能重复创建',
         'Invalid content hash': '无效的内容哈希',
         'Asset does not exist': '资产不存在，请检查 Token ID',
         'Only creator can update': '只有创作者可以更新内容',

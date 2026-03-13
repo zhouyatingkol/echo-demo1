@@ -117,7 +117,7 @@ describe("Access Control", function () {
         const ECHOAsset = await ethers.getContractFactory("ECHOAssetV2V3");
         echoAsset = await ECHOAsset.deploy();
         
-        // 铸造资产
+        // 生成资产
         const blueprint = {
             usage: {
                 owner: creator.address,
@@ -291,7 +291,7 @@ describe("Input Validation", function () {
             const contentHash = ethers.utils.id("unique");
             const blueprint = { /* ... */ };
             
-            // 第一次铸造
+            // 第一次生成
             await echoAsset.mintECHO("Song1", "Desc1", "type", "uri1", contentHash, blueprint);
             
             // 第二次使用相同 hash 应该失败
@@ -464,7 +464,7 @@ describe("Price Manipulation Protection", function () {
         const LicenseNFT = await ethers.getContractFactory("LicenseNFTV3");
         licenseNFT = await LicenseNFT.deploy(echoAsset.address);
         
-        // 铸造资产
+        // 生成资产
         const blueprint = { /* ... */ };
         const tx = await echoAsset.connect(creator).mintECHO(
             "Test", "Desc", "type", "uri", ethers.utils.id("hash"), blueprint
@@ -542,7 +542,7 @@ describe("Integration Tests", function () {
     });
 
     it("Should complete full workflow", async function () {
-        // 1. 创作者铸造资产
+        // 1. 创作者生成资产
         const blueprint = { /* ... */ };
         const tx = await echoAsset.connect(creator).mintECHO(
             "My Song", "Description", "music", "ipfs://...",
@@ -578,7 +578,7 @@ describe("Integration Tests", function () {
     });
 
     it("Should handle emergency pause correctly", async function () {
-        // 铸造并购买
+        // 生成并购买
         const blueprint = { /* ... */ };
         await echoAsset.connect(creator).mintECHO("Test", "Desc", "type", "uri", ethers.utils.id("hash"), blueprint);
         await echoAsset.connect(creator).setBasePrice(1, ethers.utils.parseEther("1"));

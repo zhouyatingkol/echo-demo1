@@ -172,7 +172,7 @@ function renderSeedSelector(seeds) {
   const container = document.getElementById('seedSelector');
   
   if (seeds.length === 0) {
-    container.innerHTML = '<p>您还没有种子资产，请先铸造</p>';
+    container.innerHTML = '<p>您还没有种子资产，请先生成</p>';
     return;
   }
   

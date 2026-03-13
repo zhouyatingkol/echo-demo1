@@ -570,7 +570,7 @@ class AssetAPI {
                 throw new Error('资产合约未初始化');
             }
 
-            // 获取最新铸造的资产
+            // 获取最新生成的资产
             const totalSupply = await this.assetContract.totalSupply();
             const total = totalSupply.toNumber();
             

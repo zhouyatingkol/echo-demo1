@@ -126,7 +126,7 @@ async function switchNetwork() {
   }
 }
 
-// 铸造资产
+// 生成资产
 document.getElementById('mintForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   
@@ -148,13 +148,13 @@ document.getElementById('mintForm')?.addEventListener('submit', async (e) => {
     
     const uri = JSON.stringify({ name, description, assetType, createdAt: new Date().toISOString() });
     
-    showStatus('铸造中...', 'pending');
+    showStatus('生成中...', 'pending');
     const tx = await echoAssetContract.mintECHO(name, description, assetType, uri, rights);
     
     showStatus('等待确认...', 'pending');
     const receipt = await tx.wait();
     
-    showStatus('✅ 铸造成功！', 'success');
+    showStatus('✅ 生成成功！', 'success');
     document.getElementById('mintForm').reset();
     
   } catch (error) {

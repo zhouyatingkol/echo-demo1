@@ -12,7 +12,7 @@
 | index.html | 首页 - 温润动画 | ✅ |
 | market.html | 市场 - 作品发现 | ✅ |
 | work-detail.html | 详情 - 流转记录 | ✅ |
-| mint.html | 铸造 - 四步骤流程 | ✅ |
+| mint.html | 生成 - 四步骤流程 | ✅ |
 | creator.html | 创作者 - 作品管理 | ✅ |
 | profile.html | 个人中心 - 我的收藏 | ✅ |
 | docs.html | 文档 - 白皮书+FAQ | ✅ |
@@ -49,7 +49,7 @@ https://zhouyatingkol.github.io/echo-demo1/
     ├─ 作品卡片 → work-detail.html
     └─ 创作 → mint.html
 
-铸造 (mint)
+生成 (mint)
     └─ 确认 → work-detail.html
 
 所有页面

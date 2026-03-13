@@ -568,8 +568,8 @@ async function handleUploadSubmit() {
         // 2. 构建权属蓝图
         const blueprint = buildBlueprint();
 
-        // 3. 调用合约铸造 NFT
-        showLoading('正在铸造 NFT...');
+        // 3. 调用合约生成 NFT
+        showLoading('正在生成 NFT...');
 
         // 模拟合约调用
         await new Promise(resolve => setTimeout(resolve, 2000));

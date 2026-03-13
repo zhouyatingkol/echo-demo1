@@ -165,7 +165,7 @@ function updateWalletUI() {
   networkName.textContent = 'Qitmeer Mainnet';
 }
 
-// 显示铸造区域
+// 显示生成区域
 function showMintSection() {
   mintSection.classList.remove('hidden');
   assetsSection.classList.remove('hidden');
@@ -183,7 +183,7 @@ function showMintSection() {
   loadAssets();
 }
 
-// 铸造资产 (V2)
+// 生成资产 (V2)
 async function mintAsset(e) {
   e.preventDefault();
   
@@ -193,7 +193,7 @@ async function mintAsset(e) {
   }
   
   try {
-    showStatus('铸造中...请确认交易', '');
+    showStatus('生成中...请确认交易', '');
     
     const name = document.getElementById('assetName').value;
     const description = document.getElementById('assetDesc').value;
@@ -244,14 +244,14 @@ async function mintAsset(e) {
       }
     };
     
-    console.log('铸造参数:', { name, assetType, contentHash: contentHash.slice(0, 20) + '...' });
+    console.log('生成参数:', { name, assetType, contentHash: contentHash.slice(0, 20) + '...' });
     
     const tx = await contract.mintECHO(name, description, assetType, uri, contentHash, blueprint);
     showStatus('交易已提交，等待确认...', '');
     
     const receipt = await tx.wait();
     
-    showStatus('铸造成功!', 'success');
+    showStatus('生成成功!', 'success');
     console.log('交易收据:', receipt);
     
     // 刷新资产列表
@@ -261,8 +261,8 @@ async function mintAsset(e) {
     mintForm.reset();
     
   } catch (error) {
-    console.error('铸造失败:', error);
-    showStatus('铸造失败: ' + error.message, 'error');
+    console.error('生成失败:', error);
+    showStatus('生成失败: ' + error.message, 'error');
   }
 }
 

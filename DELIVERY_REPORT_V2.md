@@ -14,7 +14,7 @@
 
 ### 前端界面
 - ✅ **index.html** - 主界面，含 V2 导航
-- ✅ **mint-v2.html** - V2 铸造（权属蓝图配置）
+- ✅ **mint-v2.html** - V2 生成（权属蓝图配置）
 - ✅ **version-control.html** - 版本控制
 - ✅ **content-verification.html** - 内容验证
 - ✅ **derivative-works.html** - 衍生作品管理
@@ -85,7 +85,7 @@ fe9c676a feat: V2 frontend complete - rights blueprint, version control...
 
 ### 3. 使用 V2 功能
 在主界面点击 V2 功能卡片：
-- 🎨 铸造 V2 - 创建带权属蓝图的资产
+- 🎨 生成 V2 - 创建带权属蓝图的资产
 - 📜 版本控制 - 查看/更新资产版本
 - 🔐 内容验证 - 验证文件完整性
 - 🌱 衍生作品 - 创建和管理衍生作品
@@ -108,7 +108,7 @@ await V2Test.runAllTests(1)
 
 ## 📝 下一步建议
 
-1. **用户验收测试** - 实际铸造、更新、验证流程
+1. **用户验收测试** - 实际生成、更新、验证流程
 2. **Bug 修复** - 根据测试反馈修复问题
 3. **性能优化** - Gas 优化、加载速度优化
 4. **功能扩展** - 批量操作、数据分析等

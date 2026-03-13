@@ -51,7 +51,7 @@ struct SeedInTree {
 
 ### 2.2 核心功能
 
-#### 融合铸造
+#### 融合生成
 ```solidity
 function fuseTrees(
     uint256[] memory seedTokenIds,
@@ -81,7 +81,7 @@ function getSeedTrees(uint256 seedId) external view returns (uint256[] memory);
 2. **设置权重** - 拖动滑块调整每颗种子的贡献比例
 3. **配置权利** - 设置树的四权所有者
 4. **预览确认** - 显示融合后的权益分配预览
-5. **确认融合** - 签名交易，铸造树资产
+5. **确认融合** - 签名交易，生成树资产
 
 ### 3.2 树的展示
 - 树形结构图展示父子关系
@@ -113,7 +113,7 @@ function getSeedTrees(uint256 seedId) external view returns (uint256[] memory);
 
 ### 5.2 文案规范
 - "选择你的种子" → 选择要融合的资产
-- "培育新树" → 融合铸造
+- "培育新树" → 融合生成
 - "收获果实" → 领取收益
 
 ---

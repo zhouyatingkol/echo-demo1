@@ -48,7 +48,7 @@ font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
 | 卡片价格 | 1rem | ECHO 价格 |
 | 表格表头 | 0.8rem | 流转记录 |
 | 表格内容 | 1rem | 地址、时间 |
-| 标签 | 0.8rem | 类型标签（铸造/流转/使用）|
+| 标签 | 0.8rem | 类型标签（生成/流转/使用）|
 | 页脚 | 0.7rem | 底部链接 |
 
 ---
@@ -87,7 +87,7 @@ font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
 - [x] **index.html** — 首页（温润 × 辨识度）
 - [x] **market.html** — 市场/作品列表（已连接）
 - [x] **work-detail.html** — 作品详情（已连接）
-- [ ] **mint.html** — 铸造 ECHO（创建新资产）
+- [ ] **mint.html** — 生成 ECHO（创建新资产）
 - [ ] **creator.html** — 创作者中心（管理作品）
 - [ ] **profile.html** — 个人中心（我的收藏/收益）
 - [ ] **docs.html** — 文档/白皮书

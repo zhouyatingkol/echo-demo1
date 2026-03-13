@@ -9,20 +9,20 @@
     "discover": "发现",
     "market": "市场",
     "charts": "榜单",
-    "mint": "铸造",
+    "mint": "生成",
     "revenue": "收益",
     "profile": "我的"
   },
   "hero": {
     "title": "ECHO Music",
     "subtitle": "去中心化音乐授权平台",
-    "description": "创作、铸造、交易你的音乐版权",
+    "description": "创作、生成、交易你的音乐版权",
     "cta_primary": "开始创作",
     "cta_secondary": "浏览市场"
   },
   "features": {
     "mint": {
-      "title": "铸造 ECHO",
+      "title": "生成 ECHO",
       "desc": "将你的音乐作品上链，创建不可篡改的版权证明"
     },
     "market": {

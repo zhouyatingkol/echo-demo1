@@ -36,7 +36,7 @@ Developer → Reviewer → Tester → 推送
 
 ## 当前任务队列
 
-### Task 1: 修复铸造页面的 Bug
+### Task 1: 修复生成页面的 Bug
 - [ ] Developer: 修复已知问题
 - [ ] Reviewer: 代码审查
 - [ ] Tester: 功能验证

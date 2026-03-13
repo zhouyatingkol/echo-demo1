@@ -364,7 +364,7 @@ class LicenseShop {
             if (result.licenseId) {
                 alert(`购买成功！\n交易哈希: ${result.txHash}\nLicense ID: ${result.licenseId}`);
             } else {
-                alert(`购买成功！\n交易哈希: ${result.txHash}\nLicense NFT 已铸造`);
+                alert(`购买成功！\n交易哈希: ${result.txHash}\nLicense NFT 已生成`);
             }
             
             // 可以跳转到用户资产页面
