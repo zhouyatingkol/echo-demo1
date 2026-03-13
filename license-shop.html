@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO License Shop - 购买授权</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/license-shop.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🌳</span>
+            <span class="brand-text">ECHO License Shop</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">首页</a>
+            <a href="marketplace.html">市场</a>
+            <a href="license-shop.html" class="active">授权商店</a>
+            <a href="dashboard.html">我的资产</a>
+        </div>
+        <div class="wallet-section">
+            <button id="connectWallet" class="btn btn-primary">连接钱包</button>
+            <span id="walletAddress" class="wallet-address hidden"></span>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="license-shop-container">
+        <!-- 资产信息卡片 -->
+        <section class="asset-info-card">
+            <div class="asset-preview">
+                <div class="asset-cover">
+                    <span class="cover-placeholder">🎵</span>
+                </div>
+            </div>
+            <div class="asset-details">
+                <h1 class="asset-title">夏日微风</h1>
+                <p class="asset-creator">创作者: <span class="creator-name">音乐制作人小王</span></p>
+                <div class="asset-stats">
+                    <span class="stat"><span class="stat-value">1,234</span> 次播放</span>
+                    <span class="stat"><span class="stat-value">56</span> 个授权</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 授权类型选择 -->
+        <section class="license-type-section">
+            <h2>请选择授权类型</h2>
+            
+            <div class="license-type-grid">
+                <!-- 买断制 -->
+                <div class="license-card selected" data-type="onetime">
+                    <div class="license-header">
+                        <div class="license-icon">🔑</div>
+                        <h3>买断制</h3>
+                        <span class="check-icon">✓</span>
+                    </div>
+                    <div class="license-body">
+                        <div class="license-price">
+                            <span class="price-value" data-base="100">100</span>
+                            <span class="price-unit">MEER</span>
+                        </div>
+                        <ul class="license-features">
+                            <li>✓ 永久使用权</li>
+                            <li>✓ 无次数限制</li>
+                            <li>✓ 可转让</li>
+                            <li class="feature-highlight">适合：长期使用</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 按次计费 -->
+                <div class="license-card" data-type="peruse">
+                    <div class="license-header">
+                        <div class="license-icon">📊</div>
+                        <h3>按次计费</h3>
+                        <span class="check-icon hidden">✓</span>
+                    </div>
+                    <div class="license-body">
+                        <div class="license-price">
+                            <span class="price-value" data-base="0.5">0.5</span>
+                            <span class="price-unit">MEER/次</span>
+                        </div>
+                        
+                        <div class="usage-input">
+                            <label>使用次数:</label>
+                            <input type="number" id="usageCount" value="100" min="1" max="10000">
+                        </div>
+                        
+                        <ul class="license-features">
+                            <li>✓ 用多少付多少</li>
+                            <li>✓ 灵活可控</li>
+                            <li class="feature-highlight">适合：按需使用</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 限时授权 -->
+                <div class="license-card" data-type="timed">
+                    <div class="license-header">
+                        <div class="license-icon">⏱️</div>
+                        <h3>限时授权</h3>
+                        <span class="check-icon hidden">✓</span>
+                    </div>
+                    <div class="license-body">
+                        <div class="license-price">
+                            <span class="price-value" data-base="10">10</span>
+                            <span class="price-unit">MEER/天</span>
+                        </div>
+                        
+                        <div class="duration-input">
+                            <label>授权天数:</label>
+                            <input type="number" id="durationDays" value="30" min="30" max="365">
+                            <span class="input-hint">最少 30 天</span>
+                        </div>
+                        
+                        <ul class="license-features">
+                            <li>✓ 有效期内无限次使用</li>
+                            <li>✓ 到期自动失效</li>
+                            <li class="feature-highlight">适合：短期项目</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使用场景选择 -->
+        <section class="usage-type-section">
+            <h2>请选择使用场景</h2>
+            <p class="section-hint">不同场景将影响最终价格</p>
+            
+            <div class="usage-type-grid">
+                <label class="usage-option">
+                    <input type="radio" name="usageType" value="personal" checked>
+                    <span class="usage-icon">🎧</span>
+                    <span class="usage-name">个人创作</span>
+                    <span class="usage-multiplier">×1.0</span>
+                </label>
+
+                <label class="usage-option">
+                    <input type="radio" name="usageType" value="game">
+                    <span class="usage-icon">🎮</span>
+                    <span class="usage-name">游戏配乐</span>
+                    <span class="usage-multiplier">×1.5</span>
+                </label>
+
+                <label class="usage-option">
+                    <input type="radio" name="usageType" value="ai_training">
+                    <span class="usage-icon">🤖</span>
+                    <span class="usage-name">AI训练</span>
+                    <span class="usage-multiplier">×2.0</span>
+                </label>
+
+                <label class="usage-option">
+                    <input type="radio" name="usageType" value="commercial">
+                    <span class="usage-icon">📺</span>
+                    <span class="usage-name">商业广告</span>
+                    <span class="usage-multiplier">×3.0</span>
+                </label>
+            </div>
+        </section>
+
+        <!-- 价格汇总 -->
+        <section class="price-summary-section">
+            <div class="price-breakdown">
+                <div class="price-row">
+                    <span>基础价格</span>
+                    <span id="basePrice">100 MEER</span>
+                </div>
+                
+                <div class="price-row">
+                    <span>场景倍率</span>
+                    <span id="multiplierDisplay">×1.0 (个人创作)</span>
+                </div>
+                
+                <div class="price-row platform-fee">
+                    <span>平台服务费 (5%)</span>
+                    <span id="platformFee">5 MEER</span>
+                </div>
+                
+                <div class="price-row total">
+                    <span>总计</span>
+                    <span id="totalPrice">105 MEER</span>
+                </div>
+            </div>
+
+            <button id="purchaseBtn" class="btn btn-purchase">
+                <span class="btn-text">立即购买并获得 License NFT</span>
+                <span class="btn-price">105 MEER</span>
+            </button>
+            
+            <p class="purchase-hint">
+                💡 购买后您将获得一个可转让的 License NFT，证明您的使用权
+            </p>
+        </section>
+        <!-- 交易状态提示 -->
+        <div id="transactionStatus" class="transaction-status hidden">
+            <div class="loading-spinner"></div>
+            <p id="statusText">正在处理交易...</p>
+        </div>
+
+        <div id="errorMessage" class="error-message hidden"></div>
+        <div id="successMessage" class="success-message hidden"></div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>🌳 ECHO Protocol - 保护创作者的数字权益</p>
+        <p>Powered by Qitmeer Network</p>
+    </footer>
+
+    <!-- 脚本 -->
+    <script src="contract-config.js"></script>
+    <script src="wallet.js"></script>
+    <script src="contract-manager-v3.js"></script>
+    <script src="license-shop.js"></script>
+</body>
+</html>
