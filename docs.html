@@ -346,6 +346,195 @@
             line-height: 1.8;
         }
         
+        /* 子标题 */
+        .subsection-title {
+            font-family: var(--font-serif);
+            font-size: 1.3rem;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            color: var(--color-ink);
+            margin: 2.5rem 0 1.5rem;
+            padding-left: 1rem;
+            border-left: 2px solid var(--color-gold);
+        }
+        
+        /* 三合一授权模式文档 */
+        .license-modes-doc {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .license-mode-card {
+            padding: 2rem 1.5rem;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+        
+        .license-mode-card:hover {
+            border-color: var(--color-gold);
+            background: rgba(201, 168, 108, 0.03);
+        }
+        
+        .mode-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .mode-name {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            color: var(--color-ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .mode-price {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            color: var(--color-gold);
+            margin-bottom: 1rem;
+        }
+        
+        .mode-desc {
+            font-size: 0.85rem;
+            color: var(--color-clay);
+            line-height: 1.6;
+        }
+        
+        /* 场景定价表格 */
+        .scene-table {
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            margin: 2rem 0;
+        }
+        
+        .scene-table-row {
+            display: grid;
+            grid-template-columns: 150px 100px 1fr;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
+        }
+        
+        .scene-table-row:last-child {
+            border-bottom: none;
+        }
+        
+        .scene-table-row.header {
+            background: rgba(201, 168, 108, 0.05);
+            font-weight: 500;
+        }
+        
+        .scene-name {
+            font-family: var(--font-serif);
+            color: var(--color-ink);
+        }
+        
+        .scene-multiplier {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            color: var(--color-gold);
+        }
+        
+        .scene-example {
+            font-size: 0.9rem;
+            color: var(--color-clay);
+            text-align: right;
+        }
+        
+        /* 混音示意图 */
+        .remix-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(240, 236, 227, 0.5);
+            border: 0.5px solid rgba(26, 26, 26, 0.08);
+        }
+        
+        .remix-parents {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .parent-item {
+            padding: 1rem 1.5rem;
+            background: var(--color-paper);
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            text-align: center;
+        }
+        
+        .parent-label {
+            font-size: 0.85rem;
+            color: var(--color-clay);
+            margin-bottom: 0.3rem;
+        }
+        
+        .parent-share {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--color-gold);
+        }
+        
+        .remix-arrow {
+            font-size: 1.5rem;
+            color: var(--color-gold);
+        }
+        
+        .remix-result {
+            padding: 1.5rem 2rem;
+            background: var(--color-paper);
+            border: 1px solid var(--color-gold);
+            text-align: center;
+        }
+        
+        .result-label {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+            color: var(--color-ink);
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-desc {
+            font-size: 0.85rem;
+            color: var(--color-clay);
+        }
+        
+        /* 熔断时间线 */
+        .freeze-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 2rem 0;
+            padding-left: 2rem;
+            border-left: 1px solid var(--color-gold);
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .timeline-time {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            color: var(--color-gold);
+            min-width: 80px;
+        }
+        
+        .timeline-content {
+            font-size: 0.95rem;
+            color: var(--color-stone);
+        }
+        
         /* FAQ 可折叠问答 */
         .faq-list {
             margin-top: 2rem;
@@ -791,35 +980,168 @@
                 </div>
                 
                 <p class="doc-paragraph">
-                    ECHO 独创的四权模型，为数字资产的流通与使用提供了完整的解决方案。每一份 ECHO 都可以灵活配置这四种权益，实现真正的按需授权。
+                    ECHO 独创的<strong>四权分离模型</strong>，将传统版权的"模糊权利"转化为链上可编程、可验证、可流转的智能合约结构。每个 ECHO 资产包含四个独立的权利维度，可灵活配置实现按需授权。
                 </p>
+                
+                <h3 class="subsection-title">四权架构</h3>
                 
                 <div class="rights-grid">
                     <div class="right-card">
                         <div class="right-icon">◈</div>
                         <h3 class="right-title">使用权</h3>
-                        <p class="right-desc">基础使用权限，包括播放、展示、体验等。可配置买断、按时长、按次数等多种模式。</p>
+                        <p class="right-desc">允许在特定场景、时间、次数内使用资产。支持买断、按次、限时三种授权模式。</p>
                     </div>
                     <div class="right-card">
                         <div class="right-icon">◇</div>
                         <h3 class="right-title">衍生权</h3>
-                        <p class="right-desc">基于原作进行二次创作的权利。 remix、采样、改编，让创意在传承中绽放。</p>
+                        <p class="right-desc">基于原作创作 remix、翻唱、改编的权利。支持多父资产混音，自动收益分配。</p>
                     </div>
                     <div class="right-card">
                         <div class="right-icon">◎</div>
                         <h3 class="right-title">扩展权</h3>
-                        <p class="right-desc">跨平台、跨场景使用的权利。游戏道具、社交头像、虚拟空间装饰等。</p>
+                        <p class="right-desc">跨平台、跨媒体、跨地域使用的权利。自动扩展条款，7天通知期保护。</p>
                     </div>
                     <div class="right-card">
                         <div class="right-icon">◉</div>
                         <h3 class="right-title">收益权</h3>
-                        <p class="right-desc">分享作品后续收益的权利。流转分成、使用分成，创作者持续获益。</p>
+                        <p class="right-desc">资产收益的分配规则。创作者分成、协作者分配、平台费用，链上实时结算。</p>
+                    </div>
+                </div>
+                
+                <h3 class="subsection-title">三合一授权模式</h3>
+                
+                <p class="doc-paragraph">
+                    ECHO 的使用权支持三种灵活授权模式，创作者可同时开启多种模式，让用户自主选择：
+                </p>
+                
+                <div class="license-modes-doc">
+                    <div class="license-mode-card">
+                        <div class="mode-icon">🔑</div>
+                        <div class="mode-name">买断制</div>
+                        <div class="mode-price">100 ECHO 起</div>
+                        <div class="mode-desc">一次性付费，永久使用。适合长期使用需求，如品牌主题曲。</div>
+                    </div>
+                    <div class="license-mode-card">
+                        <div class="mode-icon">📊</div>
+                        <div class="mode-name">按次计费</div>
+                        <div class="mode-price">0.5 ECHO/次 起</div>
+                        <div class="mode-desc">用多少付多少，无使用不付费。适合偶尔使用的场景。</div>
+                    </div>
+                    <div class="license-mode-card">
+                        <div class="mode-icon">⏱️</div>
+                        <div class="mode-name">限时授权</div>
+                        <div class="mode-price">10 ECHO/天 起</div>
+                        <div class="mode-desc">灵活租赁，30天起租。适合短期项目、活动配乐。</div>
+                    </div>
+                </div>
+                
+                <h3 class="subsection-title">场景差异化定价</h3>
+                
+                <p class="doc-paragraph">
+                    购买时选择使用场景，系统自动计算最终价格：
+                </p>
+                
+                <div class="scene-table">
+                    <div class="scene-table-row header">
+                        <div class="scene-name">使用场景</div>
+                        <div class="scene-multiplier">倍率</div>
+                        <div class="scene-example">示例</div>
+                    </div>
+                    <div class="scene-table-row">
+                        <div class="scene-name">个人创作</div>
+                        <div class="scene-multiplier">×1.0</div>
+                        <div class="scene-example">个人视频、播客</div>
+                    </div>
+                    <div class="scene-table-row">
+                        <div class="scene-name">游戏配乐</div>
+                        <div class="scene-multiplier">×1.5</div>
+                        <div class="scene-example">游戏背景音乐</div>
+                    </div>
+                    <div class="scene-table-row">
+                        <div class="scene-name">AI 训练</div>
+                        <div class="scene-multiplier">×2.0</div>
+                        <div class="scene-example">机器学习数据集</div>
+                    </div>
+                    <div class="scene-table-row">
+                        <div class="scene-name">商业广告</div>
+                        <div class="scene-multiplier">×3.0</div>
+                        <div class="scene-example">电视/网络广告</div>
+                    </div>
+                </div>
+                
+                <h3 class="subsection-title">混音作品权属继承</h3>
+                
+                <p class="doc-paragraph">
+                    ECHO 支持多父资产混音创作，新作品自动继承父资产的权益配置，并通过智能合约自动分配收益：
+                </p>
+                
+                <div class="remix-diagram">
+                    <div class="remix-parents">
+                        <div class="parent-item">
+                            <div class="parent-label">父资产 A</div>
+                            <div class="parent-share">30%</div>
+                        </div>
+                        <div class="parent-item">
+                            <div class="parent-label">父资产 B</div>
+                            <div class="parent-share">50%</div>
+                        </div>
+                        <div class="parent-item">
+                            <div class="parent-label">父资产 C</div>
+                            <div class="parent-share">20%</div>
+                        </div>
+                    </div>
+                    <div class="remix-arrow">↓</div>
+                    <div class="remix-result">
+                        <div class="result-label">混音作品 X</div>
+                        <div class="result-desc">新 ECHO 资产，收益自动分配</div>
                     </div>
                 </div>
                 
                 <p class="doc-paragraph">
-                    四权可以独立配置，也可以组合使用。创作者可以根据自己的商业模式灵活设置，用户也可以根据实际需求选择适合的权益组合。
+                    <strong>混音规则：</strong>最多 5 个父资产 | 48 小时协商期 | 贡献度算法自动调分成
                 </p>
+                
+                <h3 class="subsection-title">License NFT 机制</h3>
+                
+                <p class="doc-paragraph">
+                    每次购买授权都会铸造一个 License NFT，作为使用权的链上凭证：
+                </p>
+                
+                <div class="quote-block">
+                    <p class="quote-text">
+                        <strong>License NFT 包含信息：</strong><br><br>
+                        • 授权类型（买断/按次/限时）<br>
+                        • 使用场景限制<br>
+                        • 有效期与使用次数<br>
+                        • 是否可转让及转让版税<br>
+                        • 授权条款哈希
+                    </p>
+                </div>
+                
+                <p class="doc-paragraph">
+                    每次使用资产时，系统自动验证 License NFT 的有效性，确保合规使用。
+                </p>
+                
+                <h3 class="subsection-title">紧急撤销机制（熔断）</h3>
+                
+                <p class="doc-paragraph">
+                    创作者在发现非法使用等紧急情况时，可触发冻结机制：
+                </p>
+                
+                <div class="freeze-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-time">T+0</div>
+                        <div class="timeline-content">创作者触发冻结，立即生效</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">T+0~7天</div>
+                        <div class="timeline-content">被授权方可提交申诉与辩护</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">T+7天</div>
+                        <div class="timeline-content">社区陪审团仲裁，最终裁决</div>
+                    </div>
+                </div>
             </section>
 
             <!-- 第五章：技术架构 -->

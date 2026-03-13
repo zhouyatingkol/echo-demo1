@@ -1268,30 +1268,95 @@
                 <div class="form-group">
                     <div class="rights-section-title">其他权益配置</div>
                     <div class="rights-grid-simple">
+                        <!-- 衍生权配置 -->
                         <div class="right-config-card simple">
                             <div class="right-config-header">
                                 <div class="right-config-icon">衍</div>
                                 <div class="right-config-title">衍生权</div>
                             </div>
                             <div class="right-form">
+                                <label class="right-label">开放衍生</label>
                                 <select class="right-select" id="deriveOpen">
-                                    <option value="allow">允许衍生创作</option>
+                                    <option value="allow">允许混音/改编</option>
                                     <option value="forbid">禁止衍生</option>
                                     <option value="approval">需获得授权</option>
+                                </select>
+                                <label class="right-label">原作分成 (%)</label>
+                                <input type="number" class="right-input" id="parentShare" value="30" min="0" max="100">
+                                <label class="right-label">最大父资产数</label>
+                                <select class="right-select" id="maxParents">
+                                    <option value="2">2 个</option>
+                                    <option value="3">3 个</option>
+                                    <option value="4">4 个</option>
+                                    <option value="5" selected>5 个</option>
                                 </select>
                             </div>
                         </div>
                         
+                        <!-- 扩展权配置 -->
+                        <div class="right-config-card simple">
+                            <div class="right-config-header">
+                                <div class="right-config-icon">扩</div>
+                                <div class="right-config-title">扩展权</div>
+                            </div>
+                            <div class="right-form">
+                                <label class="right-label">商业使用</label>
+                                <select class="right-select" id="commercialUse">
+                                    <option value="forbid">禁止商业使用</option>
+                                    <option value="allow" selected>允许商业使用</option>
+                                    <option value="approval">需协商</option>
+                                </select>
+                                <label class="right-label">联名权</label>
+                                <select class="right-select" id="coBrand">
+                                    <option value="forbid">禁止联名</option>
+                                    <option value="allow" selected>允许联名</option>
+                                    <option value="approval">需审批</option>
+                                </select>
+                                <label class="right-label">平台扩展</label>
+                                <select class="right-select" id="platformExt">
+                                    <option value="auto">自动扩展</option>
+                                    <option value="notice">7天通知期</option>
+                                    <option value="approval">需审批</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- 收益权配置 -->
                         <div class="right-config-card simple">
                             <div class="right-config-header">
                                 <div class="right-config-icon">收</div>
-                                <div class="right-config-title">收益分成</div>
+                                <div class="right-config-title">收益权</div>
                             </div>
                             <div class="right-form">
                                 <label class="right-label">作者分成 (%)</label>
                                 <input type="number" class="right-input" id="creatorShare" value="70" min="0" max="100">
                                 <label class="right-label">二次流转分成 (%)</label>
                                 <input type="number" class="right-input" id="resaleShare" value="10" min="0" max="100">
+                                <label class="right-label">平台分成 (%)</label>
+                                <input type="number" class="right-input" id="platformShare" value="5" min="0" max="100">
+                            </div>
+                        </div>
+                        
+                        <!-- License NFT 配置 -->
+                        <div class="right-config-card simple">
+                            <div class="right-config-header">
+                                <div class="right-config-icon">证</div>
+                                <div class="right-config-title">License NFT</div>
+                            </div>
+                            <div class="right-form">
+                                <label class="right-label">是否可转让</label>
+                                <select class="right-select" id="transferable">
+                                    <option value="yes" selected>可转让</option>
+                                    <option value="no">不可转让</option>
+                                </select>
+                                <label class="right-label">转让版税 (%)</label>
+                                <input type="number" class="right-input" id="transferRoyalty" value="10" min="0" max="50">
+                                <label class="right-label">需署名</label>
+                                <select class="right-select" id="attribution">
+                                    <option value="must" selected>必须署名</option>
+                                    <option value="suggest">建议署名</option>
+                                    <option value="none">无要求</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -1587,10 +1652,25 @@
             const perUsePrice = document.getElementById('perUsePrice')?.value || '0.5';
             const timePrice = document.getElementById('timePrice')?.value || '10';
             
-            // 读取其他权益配置
-            const deriveOpen = document.getElementById('deriveOpen')?.selectedOptions[0]?.text || '允许衍生创作';
+            // 读取衍生权配置
+            const deriveOpen = document.getElementById('deriveOpen')?.selectedOptions[0]?.text || '允许混音/改编';
+            const parentShare = document.getElementById('parentShare')?.value || '30';
+            const maxParents = document.getElementById('maxParents')?.value || '5';
+            
+            // 读取扩展权配置
+            const commercialUse = document.getElementById('commercialUse')?.selectedOptions[0]?.text || '允许商业使用';
+            const coBrand = document.getElementById('coBrand')?.selectedOptions[0]?.text || '允许联名';
+            const platformExt = document.getElementById('platformExt')?.selectedOptions[0]?.text || '自动扩展';
+            
+            // 读取收益权配置
             const creatorShare = document.getElementById('creatorShare')?.value || '70';
             const resaleShare = document.getElementById('resaleShare')?.value || '10';
+            const platformShare = document.getElementById('platformShare')?.value || '5';
+            
+            // 读取 License NFT 配置
+            const transferable = document.getElementById('transferable')?.selectedOptions[0]?.text || '可转让';
+            const transferRoyalty = document.getElementById('transferRoyalty')?.value || '10';
+            const attribution = document.getElementById('attribution')?.selectedOptions[0]?.text || '必须署名';
             
             let rightsHtml = `
                 <div style="margin-bottom: 1rem;"><strong>三合一授权模式</strong></div>
@@ -1602,6 +1682,32 @@
             if (selectedLicenseModes.has('per-use')) {
                 rightsHtml += `<div>• 按次计费：${perUsePrice} ECHO/次</div>`;
             }
+            if (selectedLicenseModes.has('time')) {
+                rightsHtml += `<div>• 限时授权：${timePrice} ECHO/天（30天起）</div>`;
+            }
+            
+            rightsHtml += `
+                <div style="margin: 1rem 0;"><strong>场景差异化定价</strong></div>
+                <div>• 个人创作 ×1.0 | 游戏配乐 ×1.5</div>
+                <div>• AI 训练 ×2.0 | 商业广告 ×3.0</div>
+                
+                <div style="margin: 1rem 0;"><strong>衍生权</strong></div>
+                <div>• ${deriveOpen}</div>
+                <div>• 原作分成：${parentShare}% | 最大父资产：${maxParents}个</div>
+                
+                <div style="margin: 1rem 0;"><strong>扩展权</strong></div>
+                <div>• ${commercialUse}</div>
+                <div>• ${coBrand} | ${platformExt}</div>
+                
+                <div style="margin: 1rem 0;"><strong>收益权</strong></div>
+                <div>• 作者：${creatorShare}% | 二次流转：${resaleShare}% | 平台：${platformShare}%</div>
+                
+                <div style="margin: 1rem 0;"><strong>License NFT</strong></div>
+                <div>• ${transferable} | 转让版税：${transferRoyalty}% | ${attribution}</div>
+            `;
+
+            rightsPreview.innerHTML = rightsHtml;
+        }
             if (selectedLicenseModes.has('time')) {
                 rightsHtml += `<div>• 限时授权：${timePrice} ECHO/天（30天起）</div>`;
             }
