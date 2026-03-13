@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO Protocol V4 - 演示版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#667eea',
+                        'primary-dark': '#764ba2',
+                        'bg-primary': '#0a0a0a',
+                        'bg-secondary': '#1a1a2e',
+                        'bg-card': '#16162a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass {
+            background: rgba(22, 22, 42, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-bg-primary text-white min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🌳</span>
+                    <span class="text-xl font-bold gradient-text">ECHO Protocol</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-white/70 hover:text-white transition">发现</a>
+                    <a href="#marketplace" class="text-white/70 hover:text-white transition">市场</a>
+                    <a href="#" class="text-white/70 hover:text-white transition">榜单</a>
+                    <a href="#creator" class="text-white/70 hover:text-white transition">创作</a>
+                </div>
+                <button class="bg-gradient-to-r from-primary to-primary-dark px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                    连接钱包
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                发现音乐的
+                <span class="gradient-text">未来</span>
+            </h1>
+            <p class="text-xl text-white/60 mb-10 max-w-2xl mx-auto">
+                去中心化音乐授权平台，保护创作者权益，释放音乐价值
+            </p>
+            
+            <!-- 搜索框 -->
+            <div class="max-w-2xl mx-auto mb-12">
+                <div class="relative">
+                    <input type="text" 
+                           placeholder="搜索音乐、创作者..." 
+                           class="w-full bg-bg-secondary border border-white/10 rounded-xl px-6 py-4 pl-14 text-white placeholder-white/40 focus:outline-none focus:border-primary">
+                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 text-xl">🔍</span>
+                    <button class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary px-6 py-2 rounded-lg font-medium hover:bg-primary/80 transition">
+                        搜索
+                    </button>
+                </div>
+            </div>
+
+            <!-- 统计 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+                <div class="text-center">
+                    <div class="text-4xl font-bold gradient-text mb-2">1,234</div>
+                    <div class="text-white/50">音乐作品</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold gradient-text mb-2">5,678</div>
+                    <div class="text-white/50">License</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold gradient-text mb-2">987</div>
+                    <div class="text-white/50">创作者</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold gradient-text mb-2">45.6K</div>
+                    <div class="text-white/50">交易量</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 热门音乐 -->
+    <section id="marketplace" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-10">
+                <h2 class="text-3xl font-bold">🔥 热门音乐</h2>
+                <a href="#" class="text-primary hover:text-primary/80 flex items-center gap-2">
+                    查看全部 <span>→</span>
+                </a>
+            </div>
+
+            <!-- 筛选器 -->
+            <div class="flex flex-wrap gap-4 mb-8">
+                <select class="bg-bg-secondary border border-white/10 rounded-lg px-4 py-2 text-white">
+                    <option>全部类型</option>
+                    <option>电子音乐</option>
+                    <option>流行音乐</option>
+                    <option>古典音乐</option>
+                </select>
+                <select class="bg-bg-secondary border border-white/10 rounded-lg px-4 py-2 text-white">
+                    <option>价格范围</option>
+                    <option>0 - 50 MEER</option>
+                    <option>50 - 100 MEER</option>
+                    <option>100+ MEER</option>
+                </select>
+                <select class="bg-bg-secondary border border-white/10 rounded-lg px-4 py-2 text-white">
+                    <option>最新上架</option>
+                    <option>价格: 低到高</option>
+                    <option>价格: 高到低</option>
+                    <option>最受欢迎</option>
+                </select>
+            </div>
+
+            <!-- 音乐网格 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
+                    <div class="aspect-square bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center text-6xl">
+                        🎵
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">夏日微风</h3>
+                        <p class="text-white/50 text-sm mb-3">👤 音乐创作者</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded">电子</span>
+                            <span class="font-bold gradient-text">💎 100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
+                    <div class="aspect-square bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-6xl">
+                        🎸
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">摇滚之夜</h3>
+                        <p class="text-white/50 text-sm mb-3">👤 RockStar</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-pink-500/20 text-pink-400 px-2 py-1 rounded">摇滚</span>
+                            <span class="font-bold gradient-text">💎 250</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
+                    <div class="aspect-square bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-6xl">
+                        🎹
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">钢琴协奏曲</h3>
+                        <p class="text-white/50 text-sm mb-3">👤 古典大师</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">古典</span>
+                            <span class="font-bold gradient-text">💎 500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
+                    <div class="aspect-square bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center text-6xl">
+                        🎤
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">城市节拍</h3>
+                        <p class="text-white/50 text-sm mb-3">👤 嘻哈达人</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">嘻哈</span>
+                            <span class="font-bold gradient-text">💎 150</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 创作者中心 CTA -->
+    <section id="creator" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-gradient-to-r from-primary/10 to-primary-dark/10 rounded-3xl p-12 text-center border border-primary/20">
+                <h2 class="text-4xl font-bold mb-4">🎨 创作者中心</h2>
+                <p class="text-xl text-white/60 mb-8 max-w-2xl mx-auto">
+                    上传你的音乐作品，通过 License ECHO 获得收益，
+                    让你的创作被更多人发现和使用
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button class="bg-gradient-to-r from-primary to-primary-dark px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition">
+                        开始创作
+                    </button>
+                    <button class="border border-white/20 px-8 py-3 rounded-xl font-semibold hover:bg-white/5 transition">
+                        了解更多
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 最新上架 -->
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-10">
+                <h2 class="text-3xl font-bold">⚡ 最新上架</h2>
+                <a href="#" class="text-primary hover:text-primary/80 flex items-center gap-2">
+                    查看全部 <span>→</span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Cards (similar to above) -->
+                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
+                    <div class="aspect-square bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center text-6xl">
+                        🎺
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">爵士时光</h3>
+                        <p class="text-white/50 text-sm mb-3">👤 JazzMaster</p>
+                        <span class="font-bold gradient-text">💎 180</span>
+                    </div>
+                </div>
+
+                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
+                    <div class="aspect-square bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-6xl">
+                        🎻
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">弦乐四重奏</h3>
+                        <p class="text-white/50 text-sm mb-3">👤 交响乐团</p>
+                        <span class="font-bold gradient-text">💎 350</span>
+                    </div>
+                </div>
+
+                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
+                    <div class="aspect-square bg-gradient-to-br from-teal-500/20 to-cyan-500/20 flex items-center justify-center text-6xl">
+                        🥁
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">鼓点节奏</h3>
+                        <p class="text-white/50 text-sm mb-3">👤 BeatMaker</p>
+                        <span class="font-bold gradient-text">💎 80</span>
+                    </div>
+                </div>
+
+                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
+                    <div class="aspect-square bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center text-6xl">
+                        🎼
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg mb-1">梦幻旋律</h3>
+                        <p class="text-white/50 text-sm mb-3">👤 Dreamer</p>
+                        <span class="font-bold gradient-text">💎 200</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🌳</span>
+                    <span class="text-xl font-bold gradient-text">ECHO Protocol</span>
+                </div>
+                <p class="text-white/50">保护创作者的数字权益 - Powered by Qitmeer</p>
+                <div class="flex items-center space-x-6">
+                    <a href="#" class="text-white/50 hover:text-white transition">文档</a>
+                    <a href="#" class="text-white/50 hover:text-white transition">GitHub</a>
+                    <a href="#" class="text-white/50 hover:text-white transition">Twitter</a>
+                </div>
+            </div>
+            <div class="text-center mt-8 text-white/30 text-sm">
+                © 2026 ECHO Protocol. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 简单的交互效果
+        document.querySelectorAll('.card-hover').forEach(card => {
+            card.addEventListener('click', () => {
+                alert('点击了音乐卡片！在实际版本中，这将跳转到资产详情页');
+            });
+        });
+
+        // 连接钱包按钮
+        document.querySelector('button').addEventListener('click', (e) => {
+            if (e.target.textContent.includes('连接钱包')) {
+                alert('在实际版本中，这将唤起 MetaMask 连接');
+            }
+        });
+    </script>
+</body>
+</html>
