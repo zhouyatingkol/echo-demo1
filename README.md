@@ -86,7 +86,7 @@ echo-demo/
 | 合约 | 地址 | 状态 |
 |------|------|------|
 | **ECHOAssetV2V3** | `0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce` | ✅ 已验证 |
-| **ECHOFusion** | `0x31Cd483Ee827A272816808AD49b90c71B1c82E11` | ✅ 已验证 |
+| **ECHOFusionV2** | `0x8Eb7a29C41478a3f32015C1330DFf7cc683d0952` | ✅ 已验证 |
 | **LicenseNFTV3** | `0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23` | ✅ 已验证 |
 
 [查看区块浏览器](https://qng.qitmeer.io/)

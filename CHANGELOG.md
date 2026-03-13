@@ -28,7 +28,10 @@
   - ✅ 完整的购买和验证流程
   - ✅ 紧急暂停功能
 
-- **ECHOFusion** - 资产融合合约
+- **ECHOFusionV2** - 资产融合合约 V2（安全修复版）
+  - 修复 distributeRevenue() 权限控制漏洞
+  - 添加 Pausable 紧急暂停功能
+  - 添加 Ownable 管理功能
   - ✅ 种子合成树
   - ✅ 收益分配机制
 
@@ -45,6 +48,19 @@
   - ✅ 实时价格查询
   - ✅ 错误处理和事件解析
 
+- **创作者后台** - 创作者中心
+  - ✅ creator-dashboard.html (仪表盘)
+  - ✅ creator-upload.html (上传作品)
+  - ✅ creator-revenue.html (收益管理)
+  - ✅ 作品上传与权属配置
+  - ✅ 收益统计与提现
+
+- **测试套件** - 完整 E2E 测试
+  - ✅ 26个端到端测试用例
+  - ✅ MockWallet (MetaMask 模拟)
+  - ✅ MockContract (合约模拟)
+  - ✅ 浏览器测试控制台
+
 ### 🔐 安全改进
 
 - 修复所有已知安全漏洞
@@ -59,12 +75,12 @@
 | 合约 | 地址 | 验证状态 |
 |------|------|----------|
 | ECHOAssetV2V3 | `0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce` | ✅ 已验证 |
-| ECHOFusion | `0x31Cd483Ee827A272816808AD49b90c71B1c82E11` | ✅ 已验证 |
+| ECHOFusionV2 | `0x8Eb7a29C41478a3f32015C1330DFf7cc683d0952` | ✅ 已验证 |
 | LicenseNFTV3 | `0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23` | ✅ 已验证 |
 
 **交易哈希：**
 - ECHOAssetV2V3: `0xffe9b254465323b96e00bec13786bef4719de964623b86394ebb968d60a5be75`
-- ECHOFusion: `0x7ace547390591b970ae7683abc35f2f1b17c0dd700b48406b7c0e7be221195bd`
+- ECHOFusionV2: `0x7d46d70d38c8b68cf3822b5e6faa3c3822ee909b3790348229c07121372dc041`
 - LicenseNFTV3: `0xab93099d83ea59e88c26b65e26b45da66b60423a66cbd66148ceb6b9c4de1999`
 
 ### 🐛 修复
