@@ -563,29 +563,59 @@
         .right-config-desc {
             font-size: 0.9rem;
             color: #9e8b76;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
         }
         
-        .right-owner-input {
+        .right-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .right-label {
+            font-size: 0.8rem;
+            color: #5a5248;
+            letter-spacing: 0.05em;
+            margin-bottom: -0.3rem;
+        }
+        
+        .right-input, .right-select {
             width: 100%;
-            padding: 0.8rem 1rem;
-            font-family: 'Cormorant Garamond', monospace;
+            padding: 0.7rem 1rem;
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
             font-size: 0.9rem;
             color: #5a5248;
-            background: rgba(247, 244, 237, 0.5);
-            border: 0.5px solid rgba(26, 26, 26, 0.08);
+            background: rgba(247, 244, 237, 0.8);
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            border-radius: 2px;
             transition: all 0.4s ease;
         }
         
-        .right-owner-input:focus {
+        .right-input:focus, .right-select:focus {
             outline: none;
             border-color: #c9a86c;
+            background: rgba(247, 244, 237, 1);
         }
         
-        .right-owner-input::placeholder {
+        .right-input::placeholder {
             color: #9e8b76;
             opacity: 0.5;
+        }
+        
+        .right-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239e8b76' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+        
+        .right-select option {
+            font-family: 'Noto Serif SC', serif;
+            background: #f7f4ed;
+            color: #5a5248;
         }
         
         @media (max-width: 768px) {
@@ -1005,40 +1035,96 @@
                 <div class="form-group">
                     <div class="rights-section-title">四权配置</div>
                     <div class="rights-grid">
+                        <!-- 使用权 -->
                         <div class="right-config-card">
                             <div class="right-config-header">
                                 <div class="right-config-icon">用</div>
                                 <div class="right-config-title">使用权</div>
                             </div>
                             <div class="right-config-desc">允许他人使用该作品的权利，包括播放、展示、运行等</div>
-                            <input type="text" class="right-owner-input" id="usageOwner" placeholder="所有者地址 (0x...)">
+                            <div class="right-form">
+                                <label class="right-label">使用费用 (ECHO)</label>
+                                <input type="number" class="right-input" id="usageFee" placeholder="0.00" min="0" step="0.01">
+                                <label class="right-label">授权范围</label>
+                                <select class="right-select" id="usageScope">
+                                    <option value="public">公开 - 任何人可使用</option>
+                                    <option value="license">授权 - 需获得授权</option>
+                                    <option value="private">私有 - 仅所有者可用</option>
+                                </select>
+                                <label class="right-label">使用次数限制</label>
+                                <select class="right-select" id="usageLimit">
+                                    <option value="unlimited">无限次</option>
+                                    <option value="single">单次使用</option>
+                                    <option value="limited">有限次数</option>
+                                </select>
+                            </div>
                         </div>
 
+                        <!-- 衍生权 -->
                         <div class="right-config-card">
                             <div class="right-config-header">
                                 <div class="right-config-icon">衍</div>
                                 <div class="right-config-title">衍生权</div>
                             </div>
                             <div class="right-config-desc">基于原作创作衍生作品的权利，如混音、改编、二次创作</div>
-                            <input type="text" class="right-owner-input" id="deriveOwner" placeholder="所有者地址 (0x...)">
+                            <div class="right-form">
+                                <label class="right-label">开放衍生</label>
+                                <select class="right-select" id="deriveOpen">
+                                    <option value="allow">允许 - 他人可衍生</option>
+                                    <option value="forbid">禁止 - 不允许衍生</option>
+                                    <option value="approval">需审批 - 需获得授权</option>
+                                </select>
+                                <label class="right-label">衍生分成 (%)</label>
+                                <input type="number" class="right-input" id="deriveShare" placeholder="5" min="0" max="100" value="5">
+                                <label class="right-label">原作保留权</label>
+                                <select class="right-select" id="deriveRetain">
+                                    <option value="must">必须注明原作</option>
+                                    <option value="suggest">建议注明原作</option>
+                                    <option value="none">无要求</option>
+                                </select>
+                            </div>
                         </div>
 
+                        <!-- 扩展权 -->
                         <div class="right-config-card">
                             <div class="right-config-header">
                                 <div class="right-config-icon">扩</div>
                                 <div class="right-config-title">扩展权</div>
                             </div>
                             <div class="right-config-desc">将作品用于扩展场景的权利，如商业使用、品牌联名</div>
-                            <input type="text" class="right-owner-input" id="extendOwner" placeholder="所有者地址 (0x...)">
+                            <div class="right-form">
+                                <label class="right-label">商业使用</label>
+                                <select class="right-select" id="commercialUse">
+                                    <option value="forbid">禁止商业使用</option>
+                                    <option value="allow">允许商业使用</option>
+                                    <option value="negotiate">需协商</option>
+                                </select>
+                                <label class="right-label">商业授权费 (ECHO)</label>
+                                <input type="number" class="right-input" id="commercialFee" placeholder="0.00" min="0" step="0.01">
+                                <label class="right-label">联名权</label>
+                                <select class="right-select" id="coBrand">
+                                    <option value="forbid">禁止联名</option>
+                                    <option value="allow">允许联名</option>
+                                    <option value="approval">需审批</option>
+                                </select>
+                            </div>
                         </div>
 
+                        <!-- 收益权 -->
                         <div class="right-config-card">
                             <div class="right-config-header">
                                 <div class="right-config-icon">收</div>
                                 <div class="right-config-title">收益权</div>
                             </div>
                             <div class="right-config-desc">获得作品使用所产生收益分成的权利</div>
-                            <input type="text" class="right-owner-input" id="revenueOwner" placeholder="所有者地址 (0x...)">
+                            <div class="right-form">
+                                <label class="right-label">首次销售价格 (ECHO)</label>
+                                <input type="number" class="right-input" id="mintPrice" placeholder="100" min="0" step="0.01">
+                                <label class="right-label">作者分成 (%)</label>
+                                <input type="number" class="right-input" id="creatorShare" placeholder="70" min="0" max="100" value="70">
+                                <label class="right-label">二次流转分成 (%)</label>
+                                <input type="number" class="right-input" id="resaleShare" placeholder="10" min="0" max="100" value="10">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1301,7 +1387,7 @@
 
             // 权益预览
             const rightsPreview = document.getElementById('rightsPreview');
-            const rights = ['usage', 'derive', 'extend', 'revenue'];
+            // 权益配置已更新，使用新表单字段
             let rightsHtml = '';
 
             rights.forEach(right => {
