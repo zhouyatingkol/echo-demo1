@@ -618,8 +618,174 @@
             color: #5a5248;
         }
         
+        /* 三合一授权模式 */
+        .license-modes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .license-card {
+            padding: 2rem 1.5rem;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .license-card:hover {
+            border-color: rgba(201, 168, 108, 0.4);
+            background: rgba(201, 168, 108, 0.02);
+            transform: translateY(-3px);
+        }
+        
+        .license-card.selected {
+            border-color: #c9a86c;
+            background: rgba(201, 168, 108, 0.06);
+            box-shadow: 0 4px 20px rgba(201, 168, 108, 0.1);
+        }
+        
+        .license-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background: #c9a86c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .license-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        
+        .license-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+        
+        .license-desc {
+            font-size: 0.85rem;
+            color: #9e8b76;
+            margin-bottom: 1.5rem;
+        }
+        
+        .license-price {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .price-input {
+            width: 80px;
+            text-align: center;
+            padding: 0.5rem;
+        }
+        
+        .price-unit {
+            font-size: 0.8rem;
+            color: #9e8b76;
+        }
+        
+        .license-hint {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #9e8b76;
+            margin-top: 1rem;
+        }
+        
+        /* 场景差异化定价 */
+        .scene-pricing {
+            border: 0.5px solid rgba(26, 26, 26, 0.08);
+            margin-bottom: 1rem;
+        }
+        
+        .scene-row {
+            display: grid;
+            grid-template-columns: 120px 80px 1fr;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .scene-row:last-child {
+            border-bottom: none;
+        }
+        
+        .scene-row:hover {
+            background: rgba(201, 168, 108, 0.03);
+        }
+        
+        .scene-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1rem;
+            color: #1a1a1a;
+        }
+        
+        .scene-multiplier {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: #c9a86c;
+            font-weight: 300;
+        }
+        
+        .scene-desc {
+            font-size: 0.85rem;
+            color: #9e8b76;
+            text-align: right;
+        }
+        
+        .scene-note {
+            font-size: 0.8rem;
+            color: #9e8b76;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+        
+        /* 简化版权益配置 */
+        .rights-grid-simple {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .right-config-card.simple {
+            padding: 1.5rem;
+        }
+        
         @media (max-width: 768px) {
-            .rights-grid { grid-template-columns: 1fr; }
+            .license-modes,
+            .rights-grid-simple {
+                grid-template-columns: 1fr;
+            }
+            
+            .scene-row {
+                grid-template-columns: 80px 60px 1fr;
+                padding: 0.8rem 1rem;
+            }
+            
+            .scene-name {
+                font-size: 0.9rem;
+            }
+            
+            .scene-desc {
+                font-size: 0.75rem;
+            }
         }
         
         /* 预览区 */
@@ -1033,97 +1199,99 @@
             <!-- 步骤3：确权 -->
             <div class="step-content" id="step-3">
                 <div class="form-group">
-                    <div class="rights-section-title">四权配置</div>
-                    <div class="rights-grid">
-                        <!-- 使用权 -->
-                        <div class="right-config-card">
-                            <div class="right-config-header">
-                                <div class="right-config-icon">用</div>
-                                <div class="right-config-title">使用权</div>
-                            </div>
-                            <div class="right-config-desc">允许他人使用该作品的权利，包括播放、展示、运行等</div>
-                            <div class="right-form">
-                                <label class="right-label">使用费用 (ECHO)</label>
-                                <input type="number" class="right-input" id="usageFee" placeholder="0.00" min="0" step="0.01">
-                                <label class="right-label">授权范围</label>
-                                <select class="right-select" id="usageScope">
-                                    <option value="public">公开 - 任何人可使用</option>
-                                    <option value="license">授权 - 需获得授权</option>
-                                    <option value="private">私有 - 仅所有者可用</option>
-                                </select>
-                                <label class="right-label">使用次数限制</label>
-                                <select class="right-select" id="usageLimit">
-                                    <option value="unlimited">无限次</option>
-                                    <option value="single">单次使用</option>
-                                    <option value="limited">有限次数</option>
-                                </select>
+                    <div class="rights-section-title">三合一授权模式</div>
+                    
+                    <!-- 授权模式选择卡片 -->
+                    <div class="license-modes">
+                        <div class="license-card" data-mode="buyout" onclick="selectLicenseMode('buyout')">
+                            <div class="license-icon">🔑</div>
+                            <div class="license-title">买断制</div>
+                            <div class="license-desc">永久使用</div>
+                            <div class="license-price">
+                                <input type="number" class="right-input price-input" id="buyoutPrice" value="100" min="0">
+                                <span class="price-unit">ECHO</span>
                             </div>
                         </div>
+                        
+                        <div class="license-card" data-mode="per-use" onclick="selectLicenseMode('per-use')">
+                            <div class="license-icon">📊</div>
+                            <div class="license-title">按次计费</div>
+                            <div class="license-desc">用多少付多少</div>
+                            <div class="license-price">
+                                <input type="number" class="right-input price-input" id="perUsePrice" value="0.5" min="0" step="0.1">
+                                <span class="price-unit">ECHO/次</span>
+                            </div>
+                        </div>
+                        
+                        <div class="license-card" data-mode="time" onclick="selectLicenseMode('time')">
+                            <div class="license-icon">⏱️</div>
+                            <div class="license-title">限时授权</div>
+                            <div class="license-desc">30天起</div>
+                            <div class="license-price">
+                                <input type="number" class="right-input price-input" id="timePrice" value="10" min="0">
+                                <span class="price-unit">ECHO/天</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 可多选提示 -->
+                    <div class="license-hint">点击选择一种或多种授权模式</div>
+                </div>
 
-                        <!-- 衍生权 -->
-                        <div class="right-config-card">
+                <div class="form-group">
+                    <div class="rights-section-title">场景差异化定价</div>
+                    <div class="scene-pricing">
+                        <div class="scene-row">
+                            <div class="scene-name">个人创作</div>
+                            <div class="scene-multiplier">×1.0</div>
+                            <div class="scene-desc">个人视频、播客</div>
+                        </div>
+                        <div class="scene-row">
+                            <div class="scene-name">游戏配乐</div>
+                            <div class="scene-multiplier">×1.5</div>
+                            <div class="scene-desc">游戏背景音乐</div>
+                        </div>
+                        <div class="scene-row">
+                            <div class="scene-name">AI 训练</div>
+                            <div class="scene-multiplier">×2.0</div>
+                            <div class="scene-desc">机器学习数据集</div>
+                        </div>
+                        <div class="scene-row">
+                            <div class="scene-name">商业广告</div>
+                            <div class="scene-multiplier">×3.0</div>
+                            <div class="scene-desc">电视/网络广告</div>
+                        </div>
+                    </div>
+                    <div class="scene-note">* 购买时根据使用场景自动计算最终价格</div>
+                </div>
+
+                <div class="form-group">
+                    <div class="rights-section-title">其他权益配置</div>
+                    <div class="rights-grid-simple">
+                        <div class="right-config-card simple">
                             <div class="right-config-header">
                                 <div class="right-config-icon">衍</div>
                                 <div class="right-config-title">衍生权</div>
                             </div>
-                            <div class="right-config-desc">基于原作创作衍生作品的权利，如混音、改编、二次创作</div>
                             <div class="right-form">
-                                <label class="right-label">开放衍生</label>
                                 <select class="right-select" id="deriveOpen">
-                                    <option value="allow">允许 - 他人可衍生</option>
-                                    <option value="forbid">禁止 - 不允许衍生</option>
-                                    <option value="approval">需审批 - 需获得授权</option>
-                                </select>
-                                <label class="right-label">衍生分成 (%)</label>
-                                <input type="number" class="right-input" id="deriveShare" placeholder="5" min="0" max="100" value="5">
-                                <label class="right-label">原作保留权</label>
-                                <select class="right-select" id="deriveRetain">
-                                    <option value="must">必须注明原作</option>
-                                    <option value="suggest">建议注明原作</option>
-                                    <option value="none">无要求</option>
+                                    <option value="allow">允许衍生创作</option>
+                                    <option value="forbid">禁止衍生</option>
+                                    <option value="approval">需获得授权</option>
                                 </select>
                             </div>
                         </div>
-
-                        <!-- 扩展权 -->
-                        <div class="right-config-card">
-                            <div class="right-config-header">
-                                <div class="right-config-icon">扩</div>
-                                <div class="right-config-title">扩展权</div>
-                            </div>
-                            <div class="right-config-desc">将作品用于扩展场景的权利，如商业使用、品牌联名</div>
-                            <div class="right-form">
-                                <label class="right-label">商业使用</label>
-                                <select class="right-select" id="commercialUse">
-                                    <option value="forbid">禁止商业使用</option>
-                                    <option value="allow">允许商业使用</option>
-                                    <option value="negotiate">需协商</option>
-                                </select>
-                                <label class="right-label">商业授权费 (ECHO)</label>
-                                <input type="number" class="right-input" id="commercialFee" placeholder="0.00" min="0" step="0.01">
-                                <label class="right-label">联名权</label>
-                                <select class="right-select" id="coBrand">
-                                    <option value="forbid">禁止联名</option>
-                                    <option value="allow">允许联名</option>
-                                    <option value="approval">需审批</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- 收益权 -->
-                        <div class="right-config-card">
+                        
+                        <div class="right-config-card simple">
                             <div class="right-config-header">
                                 <div class="right-config-icon">收</div>
-                                <div class="right-config-title">收益权</div>
+                                <div class="right-config-title">收益分成</div>
                             </div>
-                            <div class="right-config-desc">获得作品使用所产生收益分成的权利</div>
                             <div class="right-form">
-                                <label class="right-label">首次销售价格 (ECHO)</label>
-                                <input type="number" class="right-input" id="mintPrice" placeholder="100" min="0" step="0.01">
                                 <label class="right-label">作者分成 (%)</label>
-                                <input type="number" class="right-input" id="creatorShare" placeholder="70" min="0" max="100" value="70">
+                                <input type="number" class="right-input" id="creatorShare" value="70" min="0" max="100">
                                 <label class="right-label">二次流转分成 (%)</label>
-                                <input type="number" class="right-input" id="resaleShare" placeholder="10" min="0" max="100" value="10">
+                                <input type="number" class="right-input" id="resaleShare" value="10" min="0" max="100">
                             </div>
                         </div>
                     </div>
@@ -1259,6 +1427,32 @@
             goToStep(current - 1);
         }
 
+        // 三合一授权模式选择
+        let selectedLicenseModes = new Set(['buyout']); // 默认选择买断制
+        
+        function selectLicenseMode(mode) {
+            const card = document.querySelector(`.license-card[data-mode="${mode}"]`);
+            
+            if (selectedLicenseModes.has(mode)) {
+                selectedLicenseModes.delete(mode);
+                card.classList.remove('selected');
+            } else {
+                selectedLicenseModes.add(mode);
+                card.classList.add('selected');
+            }
+            
+            // 确保至少选中一个模式
+            if (selectedLicenseModes.size === 0) {
+                selectedLicenseModes.add('buyout');
+                document.querySelector('.license-card[data-mode="buyout"]').classList.add('selected');
+            }
+        }
+        
+        // 初始化默认选中状态
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.license-card[data-mode="buyout"]').classList.add('selected');
+        });
+
         // 验证步骤
         function validateStep(step) {
             let valid = true;
@@ -1385,15 +1579,41 @@
             document.getElementById('previewType').textContent = typeMap[type]?.label || 'MUSIC';
             document.getElementById('previewIcon').textContent = typeMap[type]?.icon || '♪';
 
-            // 权益预览
+            // 权益配置预览
             const rightsPreview = document.getElementById('rightsPreview');
-            // 权益配置已更新，使用新表单字段
-            let rightsHtml = '';
-
-            rights.forEach(right => {
-                const owner = document.getElementById(`${right}Owner`).value || '默认（创建者）';
-                rightsHtml += `<div>• ${rightNames[right]}：${owner}</div>`;
-            });
+            
+            // 读取三合一授权配置
+            const buyoutPrice = document.getElementById('buyoutPrice')?.value || '100';
+            const perUsePrice = document.getElementById('perUsePrice')?.value || '0.5';
+            const timePrice = document.getElementById('timePrice')?.value || '10';
+            
+            // 读取其他权益配置
+            const deriveOpen = document.getElementById('deriveOpen')?.selectedOptions[0]?.text || '允许衍生创作';
+            const creatorShare = document.getElementById('creatorShare')?.value || '70';
+            const resaleShare = document.getElementById('resaleShare')?.value || '10';
+            
+            let rightsHtml = `
+                <div style="margin-bottom: 1rem;"><strong>三合一授权模式</strong></div>
+            `;
+            
+            if (selectedLicenseModes.has('buyout')) {
+                rightsHtml += `<div>• 买断制：${buyoutPrice} ECHO（永久使用）</div>`;
+            }
+            if (selectedLicenseModes.has('per-use')) {
+                rightsHtml += `<div>• 按次计费：${perUsePrice} ECHO/次</div>`;
+            }
+            if (selectedLicenseModes.has('time')) {
+                rightsHtml += `<div>• 限时授权：${timePrice} ECHO/天（30天起）</div>`;
+            }
+            
+            rightsHtml += `
+                <div style="margin: 1rem 0;"><strong>场景差异化定价</strong></div>
+                <div>• 个人创作 ×1.0 | 游戏配乐 ×1.5</div>
+                <div>• AI 训练 ×2.0 | 商业广告 ×3.0</div>
+                <div style="margin: 1rem 0;"><strong>其他权益</strong></div>
+                <div>• 衍生权：${deriveOpen}</div>
+                <div>• 作者分成：${creatorShare}% | 二次流转：${resaleShare}%</div>
+            `;
 
             rightsPreview.innerHTML = rightsHtml;
         }
