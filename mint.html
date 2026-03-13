@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>铸造 — ECHO</title>
+    <title>生成 — ECHO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -927,7 +927,7 @@
             color: #f7f4ed;
         }
         
-        /* 铸造按钮（特殊样式） */
+        /* 生成按钮（特殊样式） */
         .btn-mint {
             padding: 1.3rem 4rem;
             background: linear-gradient(135deg, #c9a86c 0%, #d4b896 100%);
@@ -1395,7 +1395,7 @@
             <!-- 步骤4：确认 -->
             <div class="step-content" id="step-4">
                 <div class="preview-section">
-                    <div class="preview-title">铸造预览</div>
+                    <div class="preview-title">生成预览</div>
                     <div class="preview-card">
                         <div class="preview-cover" id="previewIcon">♪</div>
                         <div class="preview-info">
@@ -1415,7 +1415,7 @@
 
                 <div class="btn-group">
                     <button class="btn btn-secondary" onclick="prevStep(4)">上一步</button>
-                    <button class="btn btn-mint" id="mintBtn" onclick="mint()">确认铸造</button>
+                    <button class="btn btn-mint" id="mintBtn" onclick="mint()">确认生成</button>
                 </div>
             </div>
 
@@ -1423,7 +1423,7 @@
             <div class="step-content" id="step-success">
                 <div class="success-section">
                     <div class="success-icon">✓</div>
-                    <div class="success-title">铸造成功</div>
+                    <div class="success-title">生成成功</div>
                     <div class="success-desc">你的 ECHO 已诞生，正在区块链上永久记录</div>
                     <div class="tx-hash" id="txHash">0x...</div>
                     <div class="btn-group">
@@ -1742,7 +1742,7 @@
             rightsPreview.innerHTML = rightsHtml;
         }
 
-        // 铸造
+        // 生成
         function mint() {
             console.log('[ECHO] mint() called');
             const btn = document.getElementById('mintBtn');
@@ -1752,12 +1752,12 @@
             }
             
             btn.disabled = true;
-            btn.textContent = '铸造中...';
-            console.log('[ECHO] Starting mint simulation...');
+            btn.textContent = '生成中...';
+            console.log('[ECHO] Starting generation...');
 
             // 模拟铸造过程
             setTimeout(() => {
-                console.log('[ECHO] Mint simulation complete');
+                console.log('[ECHO] Generation complete');
                 
                 // 生成随机交易哈希
                 const txHash = '0x' + Array.from({length: 64}, () => 
