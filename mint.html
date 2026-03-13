@@ -1708,21 +1708,6 @@
 
             rightsPreview.innerHTML = rightsHtml;
         }
-            if (selectedLicenseModes.has('time')) {
-                rightsHtml += `<div>• 限时授权：${timePrice} ECHO/天（30天起）</div>`;
-            }
-            
-            rightsHtml += `
-                <div style="margin: 1rem 0;"><strong>场景差异化定价</strong></div>
-                <div>• 个人创作 ×1.0 | 游戏配乐 ×1.5</div>
-                <div>• AI 训练 ×2.0 | 商业广告 ×3.0</div>
-                <div style="margin: 1rem 0;"><strong>其他权益</strong></div>
-                <div>• 衍生权：${deriveOpen}</div>
-                <div>• 作者分成：${creatorShare}% | 二次流转：${resaleShare}%</div>
-            `;
-
-            rightsPreview.innerHTML = rightsHtml;
-        }
 
         // 铸造
         function mint() {
