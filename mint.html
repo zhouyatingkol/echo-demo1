@@ -1711,12 +1711,21 @@
 
         // 铸造
         function mint() {
+            console.log('[ECHO] mint() called');
             const btn = document.getElementById('mintBtn');
+            if (!btn) {
+                console.error('[ECHO] mintBtn not found');
+                return;
+            }
+            
             btn.disabled = true;
             btn.textContent = '铸造中...';
+            console.log('[ECHO] Starting mint simulation...');
 
             // 模拟铸造过程
             setTimeout(() => {
+                console.log('[ECHO] Mint simulation complete');
+                
                 // 生成随机交易哈希
                 const txHash = '0x' + Array.from({length: 64}, () => 
                     '0123456789abcdef'[Math.floor(Math.random() * 16)]
@@ -1731,9 +1740,13 @@
                 });
 
                 // 显示成功状态
-                setTimeout(() => {
-                    document.getElementById('step-success').classList.add('active');
-                }, 50);
+                const successStep = document.getElementById('step-success');
+                if (successStep) {
+                    successStep.classList.add('active');
+                    console.log('[ECHO] Success state shown');
+                } else {
+                    console.error('[ECHO] step-success element not found');
+                }
 
                 // 更新步骤指示器为全部完成
                 document.querySelectorAll('.step-item').forEach(el => {
