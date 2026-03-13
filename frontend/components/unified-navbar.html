@@ -6,18 +6,18 @@
 <nav style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;">
   <div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;">
     <!-- Logo -->
-    <a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+    <a href="../pages/index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
       🎵 ECHO Music
     </a>
     
     <!-- 主导航链接 -->
     <div style="display: flex; gap: 8px; flex: 1;">
-      <a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
-      <a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
-      <a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
-      <a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">生成</a>
-      <a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">收益</a>
-      <a href="my-assets.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">我的资产</a>
+      <a href="../pages/market/discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
+      <a href="../pages/market/music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
+      <a href="../pages/market/charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
+      <a href="../pages/creator/mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">生成</a>
+      <a href="../pages/user/dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">收益</a>
+      <a href="../pages/user/my-assets.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">我的资产</a>
     </div>
     
     <!-- 右侧控制区 -->
@@ -38,7 +38,7 @@
       </select>
       
       <!-- 收藏按钮 -->
-      <a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">❤️</a>
+      <a href="../pages/user/my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">❤️</a>
       
       <!-- 钱包按钮 -->
       <button id="connectBtn" onclick="if(window.walletManager && walletManager.isWalletConnected()){walletManager.disconnect();}else{walletManager.connect();}"
