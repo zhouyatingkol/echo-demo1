@@ -500,12 +500,28 @@
             transform: translateY(0);
         }
         
+        .domain-item {
+            transition: all 0.5s ease;
+            cursor: default;
+        }
+        
+        .domain-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .domain-item:hover div:first-child {
+            opacity: 1 !important;
+            transform: scale(1.1);
+            transition: all 0.4s ease;
+        }
+        
         @media (max-width: 768px) {
             .side-mark { display: none; }
             .section-poetic { padding: 12vh 6vw; }
             .poem-block { padding-left: 1.5rem; }
             .stat-row { gap: 2rem; }
             .footer { flex-direction: column; gap: 2rem; text-align: center; }
+            .domain-item { padding: 1.5rem 1rem !important; }
         }
     </style>
 </head>
@@ -542,7 +558,7 @@
             <span class="first-char">动</span>态数字生命
         </h1>
         
-        <p class="hero-subtitle">每一次流转，都是一次生长</p>
+        <p class="hero-subtitle">声音、色彩、文字 —— 在流转中生长</p>
         
         <div class="divider-gold"></div>
         
@@ -578,21 +594,54 @@
         <h2 class="section-title">三生</h2>
         
         <div class="feature-list">
-            <div class="feature-item" data-mark="动">
+            <div class="feature-item" data-mark="音">
                 <h3 class="feature-title">动态生长</h3>
-                <p class="feature-desc">随使用次数、时间、场景不断进化。价值不是固定的，而是流动的。</p>
+                <p class="feature-desc">旋律随演奏进化，画作随观赏变化，文字随阅读流转。价值不是固定的，而是流动的。</p>
             </div>
             
-            <div class="feature-item" data-mark="权">
+            <div class="feature-item" data-mark="色">
                 <h3 class="feature-title">多权利配置</h3>
-                <p class="feature-desc">买断、按次、限时。一件作品，多种可能，各得其所。</p>
+                <p class="feature-desc">买断、按次、限时。一首曲子、一幅画、一首诗 —— 各得其所。</p>
             </div>
             
-            <div class="feature-item" data-mark="实">
+            <div class="feature-item" data-mark="文">
                 <h3 class="feature-title">实时分配</h3>
                 <p class="feature-desc">每次使用自动分配收益，创作者实时获得 ECHO。</p>
             </div>
         </div>
+    </section>
+
+    <!-- 三域 -->
+    <section class="section-poetic" style="background: #f0ece3;">
+        <div class="section-label">Domains</div>
+        
+        <div style="display: flex; justify-content: center; gap: 8vw; text-align: center; flex-wrap: wrap;">
+            <div class="domain-item" style="padding: 2rem;">
+                <div style="font-size: 2.2rem; margin-bottom: 1rem; opacity: 0.85;">🌳</div>
+                <div style="font-size: 1.2rem; letter-spacing: 0.3em; margin-bottom: 0.6rem; font-weight: 300;">音</div>
+                <div style="font-size: 0.75rem; color: #9e8b76; letter-spacing: 0.15em;">音乐</div>
+            </div>
+            
+            <div style="width: 1px; height: 100px; background: linear-gradient(to bottom, transparent, #c9a86c, transparent); opacity: 0.25;"></div>
+            
+            <div class="domain-item" style="padding: 2rem;">
+                <div style="font-size: 2.2rem; margin-bottom: 1rem; opacity: 0.85;">🌸</div>
+                <div style="font-size: 1.2rem; letter-spacing: 0.3em; margin-bottom: 0.6rem; font-weight: 300;">色</div>
+                <div style="font-size: 0.75rem; color: #9e8b76; letter-spacing: 0.15em;">艺术</div>
+            </div>
+            
+            <div style="width: 1px; height: 100px; background: linear-gradient(to bottom, transparent, #c9a86c, transparent); opacity: 0.25;"></div>
+            
+            <div class="domain-item" style="padding: 2rem;">
+                <div style="font-size: 2.2rem; margin-bottom: 1rem; opacity: 0.85;">🌊</div>
+                <div style="font-size: 1.2rem; letter-spacing: 0.3em; margin-bottom: 0.6rem; font-weight: 300;">文</div>
+                <div style="font-size: 0.75rem; color: #9e8b76; letter-spacing: 0.15em;">文学</div>
+            </div>
+        </div>
+        
+        <p style="text-align: center; margin-top: 3rem; font-size: 0.9rem; color: #7a6e5f; letter-spacing: 0.2em; font-style: italic;">
+            三者共鸣，生长不息
+        </p>
     </section>
 
     <!-- 繁衍 -->
@@ -700,7 +749,7 @@
             });
         }, { threshold: 0.1 });
         
-        document.querySelectorAll('.section-label, .section-title, .poem-block, .feature-item, .stat-circle, .work-row').forEach(el => {
+        document.querySelectorAll('.section-label, .section-title, .poem-block, .feature-item, .stat-circle, .work-row, .domain-item').forEach(el => {
             el.classList.add('fade-up');
             observer.observe(el);
         });
