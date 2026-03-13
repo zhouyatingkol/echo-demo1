@@ -1421,6 +1421,12 @@
     </footer>
 
     <script>
+        // 全局错误捕获
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('[ECHO Error]', msg, 'at line', line, ':', col);
+            return false;
+        };
+        
         // 当前步骤
         let currentStep = 1;
         let uploadedFile = null;
@@ -1515,7 +1521,10 @@
         
         // 初始化默认选中状态
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('.license-card[data-mode="buyout"]').classList.add('selected');
+            const buyoutCard = document.querySelector('.license-card[data-mode="buyout"]');
+            if (buyoutCard) {
+                buyoutCard.classList.add('selected');
+            }
         });
 
         // 验证步骤
