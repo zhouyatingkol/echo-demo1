@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO 市场 - 浏览音乐资产</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/marketplace.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🌳</span>
+            <span class="brand-text">ECHO 市场</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">首页</a>
+            <a href="marketplace.html" class="active">市场</a>
+            <a href="license-shop.html">授权商店</a>
+            <a href="dashboard.html">我的资产</a>
+        </div>
+        <div class="wallet-section">
+            <button id="connectWallet" class="btn btn-primary">连接钱包</button>
+            <span id="walletAddress" class="wallet-address hidden"></span>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="marketplace-container">
+        <!-- 页面标题和搜索 -->
+        <section class="marketplace-header">
+            <h1 class="page-title">🎵 探索音乐资产</h1>
+            <p class="page-subtitle">发现独特的音乐作品，获取正版授权</p>
+            
+            <!-- 搜索和筛选栏 -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="搜索音乐、创作者..." />
+                </div>
+                
+                <div class="filter-group">
+                    <select id="priceFilter" class="filter-select">
+                        <option value="">价格范围</option>
+                        <option value="0-50">0 - 50 MEER</option>
+                        <option value="50-100">50 - 100 MEER</option>
+                        <option value="100-500">100 - 500 MEER</option>
+                        <option value="500+">500+ MEER</option>
+                    </select>
+                    
+                    <select id="sceneFilter" class="filter-select">
+                        <option value="">使用场景</option>
+                        <option value="personal">个人创作</option>
+                        <option value="game">游戏配乐</option>
+                        <option value="ai_training">AI训练</option>
+                        <option value="commercial">商业广告</option>
+                    </select>
+                    
+                    <select id="sortFilter" class="filter-select">
+                        <option value="newest">最新上架</option>
+                        <option value="price_asc">价格: 低到高</option>
+                        <option value="price_desc">价格: 高到低</option>
+                        <option value="popular">最受欢迎</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- 加载状态 -->
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner large"></div>
+            <p>正在加载音乐资产...</p>
+        </div>
+
+        <!-- 错误状态 -->
+        <div id="errorState" class="error-state hidden">
+            <span class="error-icon">⚠️</span>
+            <p id="errorText">加载失败，请稍后重试</p>
+            <button class="btn btn-secondary" onclick="marketplace.loadAssets()">重新加载</button>
+        </div>
+
+        <!-- 空状态 -->
+        <div id="emptyState" class="empty-state hidden">
+            <span class="empty-icon">🎵</span>
+            <p>暂无符合条件的音乐资产</p>
+            <button class="btn btn-secondary" onclick="marketplace.clearFilters()">清除筛选</button>
+        </div>
+
+        <!-- 资产网格 -->
+        <section id="assetGrid" class="asset-grid hidden">
+            <!-- 资产卡片将通过 JS 动态生成 -->
+        </section>
+
+        <!-- 分页 -->
+        <section id="pagination" class="pagination hidden">
+            <button id="prevPage" class="btn btn-page" disabled>← 上一页</button>
+            <span id="pageInfo" class="page-info">第 1 页</span>
+            <button id="nextPage" class="btn btn-page">下一页 →</button>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>🌳 ECHO Protocol - 保护创作者的数字权益</p>
+        <p>Powered by Qitmeer Network</p>
+    </footer>
+
+    <!-- 脚本 -->
+    <script src="contract-config.js"></script>
+    <script src="wallet.js"></script>
+    <script src="contract-manager-v3.js"></script>
+    <script src="marketplace.js"></script>
+</body>
+</html>

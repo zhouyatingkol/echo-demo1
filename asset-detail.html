@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO 资产详情 - 购买授权</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/asset-detail.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🌳</span>
+            <span class="brand-text">ECHO 市场</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">首页</a>
+            <a href="marketplace.html">市场</a>
+            <a href="license-shop.html">授权商店</a>
+            <a href="dashboard.html">我的资产</a>
+        </div>
+        <div class="wallet-section">
+            <button id="connectWallet" class="btn btn-primary">连接钱包</button>
+            <span id="walletAddress" class="wallet-address hidden"></span>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="asset-detail-container">
+        <!-- 面包屑导航 -->
+        <nav class="breadcrumb">
+            <a href="marketplace.html">🌳 ECHO 市场</a>
+            <span class="separator">></span>
+            <span id="assetName">加载中...</span>
+        </nav>
+
+        <!-- 加载状态 -->
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner large"></div>
+            <p>正在加载资产详情...</p>
+        </div>
+
+        <!-- 错误状态 -->
+        <div id="errorState" class="error-state hidden">
+            <span class="error-icon">⚠️</span>
+            <p id="errorText">加载失败，请稍后重试</p>
+            <a href="marketplace.html" class="btn btn-secondary">返回市场</a>
+        </div>
+
+        <!-- 资产详情内容 -->
+        <div id="assetContent" class="asset-content hidden">
+            <!-- 资产头部信息 -->
+            <section class="asset-header">
+                <div class="asset-cover-section">
+                    <div class="asset-cover-large">
+                        <span class="cover-placeholder" id="coverIcon">🎵</span>
+                        <button class="play-btn" id="playBtn">▶️</button>
+                    </div>
+                </div>
+                
+                <div class="asset-info-section">
+                    <h1 class="asset-title" id="assetTitle">夏日微风</h1>
+                    
+                    <div class="asset-meta">
+                        <div class="creator-info">
+                            <span class="creator-avatar">👤</span>
+                            <div class="creator-details">
+                                <span class="creator-label">创作者</span>
+                                <span class="creator-name" id="creatorName">音乐制作人小王</span>
+                            </div>
+                        </div>
+                        
+                        <div class="asset-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="playCount">1,234</span>
+                                <span class="stat-label">次播放</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="licenseCount">56</span>
+                                <span class="stat-label">个授权</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="createdAt">2024-01</span>
+                                <span class="stat-label">发布</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-description" id="assetDescription">
+                        这是一首关于夏天的轻松音乐，适合用于视频背景音乐、游戏场景配乐等。旋律清新自然，给人带来愉悦的听觉体验。
+                    </div>
+                    
+                    <div class="asset-tags" id="assetTags">
+                        <span class="tag">流行</span>
+                        <span class="tag">轻松</span>
+                        <span class="tag">夏日</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 权属蓝图信息 -->
+            <section class="blueprint-section">
+                <h2 class="section-title">📋 权属蓝图</h2>
+                <div class="blueprint-grid">
+                    <div class="blueprint-card">
+                        <h3>🎧 使用权</h3>
+                        <ul class="blueprint-list" id="usageRights">
+                            <li><span class="check">✓</span> 允许商业使用</li>
+                            <li><span class="check">✓</span> 允许修改</li>
+                            <li><span class="cross">✗</span> 不可再许可</li>
+                        </ul>
+                    </div>
+                    <div class="blueprint-card">
+                        <h3>🔄 衍生权</h3>
+                        <ul class="blueprint-list" id="derivativeRights">
+                            <li><span class="check">✓</span> 允许创作衍生作品</li>
+                            <li><span class="check">✓</span> 收益分成: 10%</li>
+                        </ul>
+                    </div>
+                    <div class="blueprint-card">
+                        <h3>⚡ 扩展权</h3>
+                        <ul class="blueprint-list" id="extensionRights">
+                            <li><span class="check">✓</span> 允许平台扩展</li>
+                            <li><span class="check">✓</span> 支持 AI 训练</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 授权选项 -->
+            <section class="license-options-section">
+                <h2 class="section-title">💎 选择授权方案</h2>
+                
+                <div class="license-options-grid">
+                    <!-- 买断制 -->
+                    <div class="license-option-card" data-type="onetime">
+                        <div class="option-header">
+                            <span class="option-icon">🔑</span>
+                            <h3>买断制</h3>
+                            <span class="option-badge">推荐</span>
+                        </div>
+                        <div class="option-price">
+                            <span class="price-value" id="onetimePrice">100</span>
+                            <span class="price-unit">MEER</span>
+                        </div>
+                        <ul class="option-features">
+                            <li>✓ 永久使用权</li>
+                            <li>✓ 无次数限制</li>
+                            <li>✓ 可转让授权</li>
+                            <li>✓ 终身技术支持</li>
+                        </ul>
+                        <button class="btn btn-select" onclick="assetDetail.selectLicenseType('onetime')">选择此方案</button>
+                    </div>
+
+                    <!-- 按次计费 -->
+                    <div class="license-option-card" data-type="peruse">
+                        <div class="option-header">
+                            <span class="option-icon">📊</span>
+                            <h3>按次计费</h3>
+                        </div>
+                        <div class="option-price">
+                            <span class="price-value" id="perusePrice">0.5</span>
+                            <span class="price-unit">MEER/次</span>
+                        </div>
+                        <div class="usage-input">
+                            <label>使用次数:</label>
+                            <input type="number" id="usageCount" value="100" min="1" max="10000">
+                        </div>
+                        <ul class="option-features">
+                            <li>✓ 用多少付多少</li>
+                            <li>✓ 灵活可控</li>
+                            <li>✓ 实时统计</li>
+                        </ul>
+                        <button class="btn btn-select" onclick="assetDetail.selectLicenseType('peruse')">选择此方案</button>
+                    </div>
+
+                    <!-- 限时授权 -->
+                    <div class="license-option-card" data-type="timed">
+                        <div class="option-header">
+                            <span class="option-icon">⏱️</span>
+                            <h3>限时授权</h3>
+                        </div>
+                        <div class="option-price">
+                            <span class="price-value" id="timedPrice">10</span>
+                            <span class="price-unit">MEER/天</span>
+                        </div>
+                        <div class="duration-input">
+                            <label>授权天数:</label>
+                            <input type="number" id="durationDays" value="30" min="30" max="365">
+                            <span class="input-hint">最少 30 天</span>
+                        </div>
+                        <ul class="option-features">
+                            <li>✓ 有效期内无限使用</li>
+                            <li>✓ 到期自动续费选项</li>
+                            <li>✓ 适合短期项目</li>
+                        </ul>
+                        <button class="btn btn-select" onclick="assetDetail.selectLicenseType('timed')">选择此方案</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 使用场景选择 -->
+            <section class="usage-scene-section">
+                <h2 class="section-title">🎯 选择使用场景</h2>
+                <p class="section-hint">不同场景将影响最终价格</p>
+                
+                <div class="scene-grid">
+                    <label class="scene-option">
+                        <input type="radio" name="usageType" value="personal" checked>
+                        <span class="scene-icon">🎧</span>
+                        <span class="scene-name">个人创作</span>
+                        <span class="scene-multiplier">×1.0</span>
+                    </label>
+
+                    <label class="scene-option">
+                        <input type="radio" name="usageType" value="game">
+                        <span class="scene-icon">🎮</span>
+                        <span class="scene-name">游戏配乐</span>
+                        <span class="scene-multiplier">×1.5</span>
+                    </label>
+
+                    <label class="scene-option">
+                        <input type="radio" name="usageType" value="ai_training">
+                        <span class="scene-icon">🤖</span>
+                        <span class="scene-name">AI训练</span>
+                        <span class="scene-multiplier">×2.0</span>
+                    </label>
+
+                    <label class="scene-option">
+                        <input type="radio" name="usageType" value="commercial">
+                        <span class="scene-icon">📺</span>
+                        <span class="scene-name">商业广告</span>
+                        <span class="scene-multiplier">×3.0</span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- 价格汇总和购买 -->
+            <section class="purchase-section">
+                <div class="price-summary">
+                    <div class="price-row">
+                        <span>基础价格</span>
+                        <span id="basePriceDisplay">100 MEER</span>
+                    </div>
+                    <div class="price-row">
+                        <span>场景倍率</span>
+                        <span id="multiplierDisplay">×1.0 (个人创作)</span>
+                    </div>
+                    <div class="price-row">
+                        <span>平台服务费 (5%)</span>
+                        <span id="platformFeeDisplay">5 MEER</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>总计</span>
+                        <span id="totalPriceDisplay">105 MEER</span>
+                    </div>
+                </div>
+
+                <button id="purchaseBtn" class="btn btn-purchase">
+                    <span class="btn-text">购买 License ECHO</span>
+                    <span class="btn-price" id="btnPrice">105 MEER</span>
+                </button>
+                
+                <p class="purchase-hint">
+                    💡 购买后您将获得一个可转让的 License ECHO NFT，证明您的合法使用权
+                </p>
+            </section>
+
+            <!-- 类似作品推荐 -->
+            <section class="similar-assets-section">
+                <h2 class="section-title">🎵 类似作品推荐</h2>
+                <div class="similar-grid" id="similarGrid">
+                    <!-- 将通过 JS 动态填充 -->
+                </div>
+            </section>
+        </div>
+
+        <!-- 交易状态提示 -->
+        <div id="transactionStatus" class="transaction-status hidden">
+            <div class="loading-spinner"></div>
+            <p id="statusText">正在处理交易...</p>
+        </div>
+
+        <div id="errorMessage" class="error-message hidden"></div>
+        <div id="successMessage" class="success-message hidden"></div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>🌳 ECHO Protocol - 保护创作者的数字权益</p>
+        <p>Powered by Qitmeer Network</p>
+    </footer>
+
+    <!-- 脚本 -->
+    <script src="contract-config.js"></script>
+    <script src="wallet.js"></script>
+    <script src="contract-manager-v3.js"></script>
+    <script src="asset-detail.js"></script>
+</body>
+</html>
