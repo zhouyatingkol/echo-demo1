@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO Protocol - 生长的多权利资产</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        'ECHO': {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#00d4ff',
+                            600: '#00b4d8',
+                        },
+                        'dark': {
+                            900: '#000000',
+                            800: '#0a0a0a',
+                            700: '#141414',
+                            600: '#1a1a1a',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px #00d4ff, 0 0 10px #00d4ff' },
+                            '100%': { boxShadow: '0 0 20px #00d4ff, 0 0 30px #00d4ff' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Space Grotesk', system-ui, sans-serif; }
+        
+        body {
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* 网格背景 */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        /* 扫描线效果 */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            animation: scan 8s linear infinite;
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateY(-100vh); }
+            100% { transform: translateY(100vh); }
+        }
+        
+        /* 霓虹发光文字 */
+        .neon-text {
+            text-shadow: 
+                0 0 10px rgba(0, 212, 255, 0.5),
+                0 0 20px rgba(0, 212, 255, 0.3),
+                0 0 30px rgba(0, 212, 255, 0.2);
+        }
+        
+        /* 玻璃拟态 */
+        .glass {
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        /* 按钮发光效果 */
+        .btn-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-glow:hover::before {
+            left: 100%;
+        }
+        
+        /* 卡片悬停 */
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .card-hover:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        /* 音频波形动画 */
+        .wave-bar {
+            animation: wave 1s ease-in-out infinite;
+        }
+        
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+        
+        @keyframes wave {
+            0%, 100% { height: 20%; }
+            50% { height: 100%; }
+        }
+        
+        /* 数字滚动效果 */
+        .counter {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        /* 生长动画 */
+        .grow-animation {
+            animation: grow 3s ease-out forwards;
+        }
+        
+        @keyframes grow {
+            0% { transform: scaleY(0); }
+            100% { transform: scaleY(1); }
+        }
+        
+        /* 极简滚动条 */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #00d4ff;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="grid-bg">
+    <!-- 扫描线 -->
+    <div class="scan-line"></div>
+
+    <!-- 导航 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 border border-[#00d4ff]/30 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-[#00d4ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-light tracking-[0.3em]">ECHO</span>
+                </div>
+
+                <!-- 导航链接 -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-sm text-white/40 hover:text-white transition-colors tracking-wider">探索</a>
+                    <a href="#market" class="text-sm text-white/40 hover:text-white transition-colors tracking-wider">市场</a>
+                    <a href="#create" class="text-sm text-white/40 hover:text-white transition-colors tracking-wider">创作</a>
+                    <a href="#" class="text-sm text-white/40 hover:text-white transition-colors tracking-wider">文档</a>
+                </div>
+
+                <!-- 连接按钮 -->
+                <button class="btn-glow px-6 py-2.5 border border-[#00d4ff]/30 text-[#00d4ff] text-sm tracking-wider hover:bg-[#00d4ff]/10 transition-all rounded-sm">
+                    连接
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center relative px-6">
+        <!-- 装饰元素 -->
+        <div class="absolute top-1/4 left-10 w-32 h-32 border border-[#00d4ff]/10 rounded-full animate-pulse-slow"></div>
+        <div class="absolute bottom-1/4 right-10 w-48 h-48 border border-white/5 rounded-full animate-pulse-slow"></div>
+
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <!-- 标签 -->
+            <div class="inline-flex items-center space-x-2 px-4 py-2 border border-white/10 rounded-full mb-8">
+                <span class="w-2 h-2 bg-[#00d4ff] rounded-full animate-pulse"></span>
+                <span class="text-xs text-white/40 tracking-widest">QITMEER 主网已上线</span>
+            </div>
+
+            <!-- 主标题 -->
+            <h1 class="text-6xl md:text-8xl font-light mb-6 tracking-tight">
+                <span class="neon-text text-[#00d4ff]">生长的</span>
+                <br>
+                <span class="text-white/90">多权利资产</span>
+            </h1>
+
+            <!-- 副标题 -->
+            <p class="text-lg md:text-xl text-white/30 font-light mb-12 max-w-2xl mx-auto leading-relaxed">
+                ECHO Protocol 是下一代音乐权益协议
+                <br class="hidden md:block">
+                不是静态 NFT，而是随使用生长的动态权益凭证
+            </p>
+
+            <!-- CTA 按钮 -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button class="btn-glow group px-8 py-4 bg-[#00d4ff] text-black font-medium tracking-wider hover:bg-[#00d4ff]/90 transition-all rounded-sm flex items-center space-x-2">
+                    <span>开始探索</span>
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </button>
+                
+                <button class="px-8 py-4 border border-white/10 text-white/60 font-light tracking-wider hover:border-white/30 hover:text-white transition-all rounded-sm">
+                    了解更多
+                </button>
+            </div>
+
+            <!-- 滚动提示 -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-2">
+                <span class="text-xs text-white/20 tracking-widest">SCROLL</span>
+                <div class="w-px h-8 bg-gradient-to-b from-[#00d4ff] to-transparent"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ECHO 特点介绍 -->
+    <section class="py-24 border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <div class="text-[#00d4ff] text-sm tracking-widest mb-4">WHY ECHO</div>
+                <h2 class="text-4xl md:text-5xl font-light">不是 NFT，是<span class="text-[#00d4ff]">生长的资产</span></h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 特点 1 -->
+                <div class="p-8 border border-white/5 hover:border-[#00d4ff]/30 transition-all">
+                    <div class="w-12 h-12 border border-[#00d4ff]/30 rounded-lg flex items-center justify-center mb-6">
+                        <span class="text-2xl">🌱</span>
+                    </div>
+                    <h3 class="text-xl font-light mb-4">生长性</h3>
+                    <p class="text-white/40 text-sm leading-relaxed">
+                        ECHO 不是静态凭证，而是会随使用次数、时间、场景不断生长的动态权益。使用越多，价值越高。
+                    </p>
+                </div>
+
+                <!-- 特点 2 -->
+                <div class="p-8 border border-white/5 hover:border-[#00d4ff]/30 transition-all">
+                    <div class="w-12 h-12 border border-[#00d4ff]/30 rounded-lg flex items-center justify-center mb-6">
+                        <span class="text-2xl">🔀</span>
+                    </div>
+                    <h3 class="text-xl font-light mb-4">多权利</h3>
+                    <p class="text-white/40 text-sm leading-relaxed">
+                        一件作品可配置多种授权模式：买断、按次、限时。每种模式都是独立的 ECHO，可组合交易。
+                    </p>
+                </div>
+
+                <!-- 特点 3 -->
+                <div class="p-8 border border-white/5 hover:border-[#00d4ff]/30 transition-all">
+                    <div class="w-12 h-12 border border-[#00d4ff]/30 rounded-lg flex items-center justify-center mb-6">
+                        <span class="text-2xl">⚡</span>
+                    </div>
+                    <h3 class="text-xl font-light mb-4">实时收益</h3>
+                    <p class="text-white/40 text-sm leading-relaxed">
+                        每次使用自动分配收益，创作者可实时提现。智能合约确保透明公平的收益分配。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 数据展示 -->
+    <section class="py-24 border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5">
+                <div class="bg-dark-900 p-8 text-center">
+                    <div class="text-4xl md:text-5xl font-light text-[#00d4ff] counter mb-2">1,234</div>
+                    <div class="text-xs text-white/30 tracking-widest uppercase">音乐作品</div>
+                </div>
+                
+                <div class="bg-dark-900 p-8 text-center">
+                    <div class="text-4xl md:text-5xl font-light text-[#00d4ff] counter mb-2">5,678</div>
+                    <div class="text-xs text-white/30 tracking-widest uppercase">ECHO 凭证</div>
+                </div>
+                
+                <div class="bg-dark-900 p-8 text-center">
+                    <div class="text-4xl md:text-5xl font-light text-[#00d4ff] counter mb-2">987</div>
+                    <div class="text-xs text-white/30 tracking-widest uppercase">创作者</div>
+                </div>
+                
+                <div class="bg-dark-900 p-8 text-center">
+                    <div class="text-4xl md:text-5xl font-light text-[#00d4ff] counter mb-2">45.6K</div>
+                    <div class="text-xs text-white/30 tracking-widest uppercase">MEER 交易量</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 音乐市场 -->
+    <section id="market" class="py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- 标题 -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16">
+                <div>
+                    <div class="text-[#00d4ff] text-sm tracking-widest mb-4">MARKETPLACE</div>
+                    <h2 class="text-4xl md:text-5xl font-light">探索<span class="text-white/30">音乐资产</span></h2>
+                </div>
+                
+                <a href="#" class="text-sm text-white/30 hover:text-[#00d4ff] transition-colors flex items-center space-x-2 mt-4 md:mt-0">
+                    <span>查看全部</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- 筛选器 -->
+            <div class="flex flex-wrap gap-4 mb-12">
+                <button class="px-6 py-3 border border-[#00d4ff]/30 text-[#00d4ff] text-sm tracking-wider">全部</button>
+                <button class="px-6 py-3 border border-white/10 text-white/40 text-sm tracking-wider hover:border-white/30 transition">电子</button>
+                <button class="px-6 py-3 border border-white/10 text-white/40 text-sm tracking-wider hover:border-white/30 transition">流行</button>
+                <button class="px-6 py-3 border border-white/10 text-white/40 text-sm tracking-wider hover:border-white/30 transition">古典</button>
+                <button class="px-6 py-3 border border-white/10 text-white/40 text-sm tracking-wider hover:border-white/30 transition">嘻哈</button>
+            </div>
+
+            <!-- 音乐网格 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="card-hover bg-dark-800 group cursor-pointer">
+                    <div class="aspect-square bg-dark-700 relative overflow-hidden">
+                        <!-- 波形可视化 -->
+                        <div class="absolute inset-0 flex items-center justify-center space-x-1">
+                            <div class="wave-bar w-1 bg-[#00d4ff]/30 rounded-full h-8"></div>
+                            <div class="wave-bar w-1 bg-[#00d4ff]/50 rounded-full h-12"></div>
+                            <div class="wave-bar w-1 bg-[#00d4ff] rounded-full h-16"></div>
+                            <div class="wave-bar w-1 bg-[#00d4ff]/50 rounded-full h-12"></div>
+                            <div class="wave-bar w-1 bg-[#00d4ff]/30 rounded-full h-8"></div>
+                        </div>
+                        
+                        <!-- 播放按钮 -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
+                            <div class="w-16 h-16 border border-[#00d4ff] rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-[#00d4ff] ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-lg font-light mb-1">夏日微风</h3>
+                        <p class="text-sm text-white/30 mb-4">音乐创作者</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-[#00d4ff] border border-[#00d4ff]/20 px-2 py-1">电子</span>
+                            <span class="text-[#00d4ff] font-light">100 MEER</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2-4 (similar structure) -->
+                <div class="card-hover bg-dark-800 group cursor-pointer">
+                    <div class="aspect-square bg-dark-700 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center space-x-1">
+                            <div class="wave-bar w-1 bg-purple-500/30 rounded-full h-6"></div>
+                            <div class="wave-bar w-1 bg-purple-500/50 rounded-full h-10"></div>
+                            <div class="wave-bar w-1 bg-purple-500 rounded-full h-14"></div>
+                            <div class="wave-bar w-1 bg-purple-500/50 rounded-full h-10"></div>
+                            <div class="wave-bar w-1 bg-purple-500/30 rounded-full h-6"></div>
+                        </div>
+                        
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
+                            <div class="w-16 h-16 border border-purple-500 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-purple-500 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-lg font-light mb-1">城市节拍</h3>
+                        <p class="text-sm text-white/30 mb-4">BeatMaker</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-purple-500 border border-purple-500/20 px-2 py-1">嘻哈</span>
+                            <span class="text-purple-500 font-light">150 MEER</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-hover bg-dark-800 group cursor-pointer">
+                    <div class="aspect-square bg-dark-700 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center space-x-1">
+                            <div class="wave-bar w-1 bg-blue-500/30 rounded-full h-10"></div>
+                            <div class="wave-bar w-1 bg-blue-500/50 rounded-full h-6"></div>
+                            <div class="wave-bar w-1 bg-blue-500 rounded-full h-14"></div>
+                            <div class="wave-bar w-1 bg-blue-500/50 rounded-full h-8"></div>
+                            <div class="wave-bar w-1 bg-blue-500/30 rounded-full h-12"></div>
+                        </div>
+                        
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
+                            <div class="w-16 h-16 border border-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-500 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-lg font-light mb-1">钢琴协奏曲</h3>
+                        <p class="text-sm text-white/30 mb-4">古典大师</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-blue-500 border border-blue-500/20 px-2 py-1">古典</span>
+                            <span class="text-blue-500 font-light">500 MEER</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-hover bg-dark-800 group cursor-pointer">
+                    <div class="aspect-square bg-dark-700 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center space-x-1">
+                            <div class="wave-bar w-1 bg-pink-500/30 rounded-full h-8"></div>
+                            <div class="wave-bar w-1 bg-pink-500/50 rounded-full h-14"></div>
+                            <div class="wave-bar w-1 bg-pink-500 rounded-full h-10"></div>
+                            <div class="wave-bar w-1 bg-pink-500/50 rounded-full h-16"></div>
+                            <div class="wave-bar w-1 bg-pink-500/30 rounded-full h-6"></div>
+                        </div>
+                        
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
+                            <div class="w-16 h-16 border border-pink-500 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-pink-500 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="text-lg font-light mb-1">梦幻旋律</h3>
+                        <p class="text-sm text-white/30 mb-4">Dreamer</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-pink-500 border border-pink-500/20 px-2 py-1">流行</span>
+                            <span class="text-pink-500 font-light">200 MEER</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 创作者中心 -->
+    <section id="create" class="py-24 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <div class="text-[#00d4ff] text-sm tracking-widest mb-4">CREATOR</div>
+                    <h2 class="text-4xl md:text-5xl font-light mb-6">铸造你的
+                        <br>
+                        <span class="neon-text text-[#00d4ff]">ECHO 资产</span>
+                    </h2>
+                    
+                    <p class="text-white/30 text-lg mb-8 leading-relaxed">
+                        上传作品，定义多权利配置，让资产随使用生长。
+                        <br>
+                        ECHO 让创作真正属于你，持续产生价值。
+                    </p>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-8 h-8 border border-[#00d4ff]/30 rounded flex items-center justify-center">
+                                <span class="text-[#00d4ff] text-sm">01</span>
+                            </div>
+                            <span class="text-white/60">上传音乐作品</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <div class="w-8 h-8 border border-[#00d4ff]/30 rounded flex items-center justify-center">
+                                <span class="text-[#00d4ff] text-sm">02</span>
+                            </div>
+                            <span class="text-white/60">配置多权利参数</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <div class="w-8 h-8 border border-[#00d4ff]/30 rounded flex items-center justify-center">
+                                <span class="text-[#00d4ff] text-sm">03</span>
+                            </div>
+                            <span class="text-white/60">资产随使用生长</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-glow px-8 py-4 bg-[#00d4ff] text-black font-medium tracking-wider hover:bg-[#00d4ff]/90 transition-all rounded-sm">
+                        开始创作
+                    </button>
+                </div>
+
+                <div class="relative">
+                    <div class="aspect-square border border-white/10 bg-dark-800 p-8 relative">
+                        <!-- 装饰网格 -->
+                        <div class="absolute inset-0 opacity-10">
+                            <div class="w-full h-full" style="background-image: linear-gradient(rgba(0,212,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.1) 1px, transparent 1px); background-size: 20px 20px;"></div>
+                        </div>
+
+                        <div class="relative z-10 h-full flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <div class="text-white/40 text-sm">收益预览</div>
+                                <div class="w-2 h-2 bg-[#00d4ff] rounded-full animate-pulse"></div>
+                            </div>
+
+                            <div class="text-center">
+                                <div class="text-6xl md:text-7xl font-light text-[#00d4ff] counter mb-2">12,345</div>
+                                <div class="text-white/30 text-sm tracking-widest">MEER 总收益</div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-white/30">本月</span>
+                                    <span class="text-[#00d4ff]">+2,340 MEER</span>
+                                </div>
+                                <div class="h-px bg-white/10"></div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-white/30">作品数</span>
+                                    <span class="text-white/60">23</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-12 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 border border-[#00d4ff]/30 rounded flex items-center justify-center">
+                        <svg class="w-4 h-4 text-[#00d4ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-light tracking-[0.3em]">ECHO</span>
+                </div>
+
+                <div class="flex items-center space-x-8">
+                    <a href="#" class="text-sm text-white/30 hover:text-[#00d4ff] transition-colors tracking-wider">文档</a>
+                    <a href="#" class="text-sm text-white/30 hover:text-[#00d4ff] transition-colors tracking-wider">GitHub</a>
+                    <a href="#" class="text-sm text-white/30 hover:text-[#00d4ff] transition-colors tracking-wider">Twitter</a>
+                </div>
+
+                <div class="text-sm text-white/20">
+                    Powered by Qitmeer
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
