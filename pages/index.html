@@ -398,52 +398,51 @@
             line-height: 1.8;
         }
         
-        /* 朱红印章 - 手绘古朴效果 */
+        /* 朱红印章 - 古朴手绘效果 */
         .hero-seal {
-            width: 40px;
-            height: 72px;
+            width: 38px;
+            height: 70px;
             background-color: #A03020;
-            border-radius: 2px;
             position: relative;
-            /* 直接显示 */
             opacity: 1;
-            transform: none;
-            /* 简化的古朴效果 */
-            box-shadow: 
-                inset 0 0 15px rgba(0,0,0,0.15),
-                2px 2px 4px rgba(0,0,0,0.1);
-            /* 使用 clip-path 制造不规则边缘 */
+            /* 自然的不规则边缘 - 模拟手工篆刻 */
             clip-path: polygon(
-                5% 2%, 95% 0%, 98% 5%, 100% 95%, 
-                95% 100%, 5% 98%, 0% 95%, 2% 5%
+                8% 3%, 92% 1%, 96% 6%, 98% 30%, 100% 55%, 97% 85%, 93% 98%, 
+                50% 100%, 7% 97%, 2% 88%, 0% 60%, 3% 25%, 6% 8%
             );
+            /* 内部阴影营造印泥质感 */
+            box-shadow: 
+                inset 2px 2px 8px rgba(0,0,0,0.2),
+                inset -1px -1px 4px rgba(0,0,0,0.1);
         }
         
         /* 印章内部文字 - 竖排共生 */
         .hero-seal::before {
             content: '共';
             position: absolute;
-            top: 10px;
+            top: 8px;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'LXGW WenKai', serif;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 400;
             color: rgba(248, 246, 241, 0.95);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            letter-spacing: 0;
         }
         
         .hero-seal::after {
             content: '生';
             position: absolute;
-            bottom: 10px;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'LXGW WenKai', serif;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 400;
             color: rgba(248, 246, 241, 0.95);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            letter-spacing: 0;
         }
         
         .hero-seal-text-img {
