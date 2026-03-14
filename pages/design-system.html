@@ -157,7 +157,7 @@
             text-align: center;
         }
         
-        /* 「动」字 */
+        /* 「共生」词组 */
         .hero-title {
             display: flex;
             flex-direction: column;
@@ -165,13 +165,13 @@
             gap: 0.5rem;
         }
         
-        .hero-char {
+        .hero-word {
             font-family: var(--font-display);
-            font-size: clamp(5rem, 12vw, 8rem);
+            font-size: clamp(4rem, 10vw, 6rem);
             font-weight: 300;
             color: var(--ink-deep);
-            letter-spacing: 0.28em;
-            line-height: 1;
+            letter-spacing: 0.35em;
+            line-height: 1.2;
             position: relative;
             opacity: 0;
             transform: translateY(30px);
@@ -181,13 +181,13 @@
             animation-delay: 0.3s, 3s;
         }
         
-        .hero-char::after {
+        .hero-word::after {
             content: '';
             position: absolute;
-            bottom: -0.5rem;
+            bottom: -0.3rem;
             left: 50%;
             transform: translateX(-50%);
-            width: 2rem;
+            width: 3rem;
             height: 0.5px;
             background: var(--gold-primary);
             opacity: 0.6;
@@ -230,34 +230,18 @@
         
         .subtitle-main {
             font-family: var(--font-serif);
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: var(--ink-medium);
-            letter-spacing: 0.4em;
+            letter-spacing: 0.35em;
         }
         
         .subtitle-highlight {
             font-family: var(--font-serif);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--ink-light);
-            letter-spacing: 0.3em;
-            font-weight: 300;
-            position: relative;
-            padding: 0.5rem 2rem;
-        }
-        
-        .subtitle-highlight::before,
-        .subtitle-highlight::after {
-            content: '—';
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gold-primary);
-            opacity: 0.4;
+            letter-spacing: 0.25em;
             font-weight: 300;
         }
-        
-        .subtitle-highlight::before { left: 0; }
-        .subtitle-highlight::after { right: 0; }
         
         /* 宋瓷按钮 */
         .hero-cta {
@@ -444,9 +428,14 @@
         
         /* 响应式 */
         @media (max-width: 768px) {
-            .hero-char {
-                font-size: clamp(4rem, 15vw, 6rem);
-                letter-spacing: 0.15em;
+            .hero-word {
+                font-size: clamp(3rem, 12vw, 4.5rem);
+                letter-spacing: 0.2em;
+            }
+            
+            .subtitle-main {
+                font-size: 0.9rem;
+                letter-spacing: 0.2em;
             }
             
             .realm-section {
@@ -474,13 +463,13 @@
         
         <div class="hero-content">
             <div class="hero-title">
-                <span class="hero-char">动</span>
+                <span class="hero-word">共生</span>
                 <span class="hero-brand">ECHO</span>
             </div>
             
             <div class="hero-subtitle">
-                <span class="subtitle-main">声音、色彩、文字</span>
-                <span class="subtitle-highlight">在流转中生长</span>
+                <span class="subtitle-main">万物有灵，皆可生长</span>
+                <span class="subtitle-highlight">人类与 Agent 的共同进化之地</span>
             </div>
             
             <button class="hero-cta">
