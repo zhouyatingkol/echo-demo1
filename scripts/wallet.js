@@ -457,8 +457,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 已连接状态：点击进入个人中心
                 window.location.href = 'profile.html';
             } else {
-                // 未连接状态：连接钱包
-                walletManager.connect();
+                // 未连接状态：跳转到"入"页面
+                window.location.href = 'login.html';
             }
         });
     }
@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (walletManager.isConnected) {
                 window.location.href = 'profile.html';
             } else {
-                walletManager.connect();
+                window.location.href = 'login.html';
             }
         });
     }
@@ -482,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (walletManager.isConnected) {
                 window.location.href = 'profile.html';
             } else {
-                walletManager.connect();
+                window.location.href = 'login.html';
             }
         });
     }

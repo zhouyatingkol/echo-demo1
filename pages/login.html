@@ -502,24 +502,36 @@
 
     <script>
         // 等待钱包管理器初始化
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 延迟检查，确保 walletManager 已加载
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
             // 如果已经连接，直接跳转到个人中心
-            if (window.EchoWallet && window.EchoWallet.isConnected()) {
+            if (typeof walletManager !== 'undefined' && walletManager.isConnected) {
                 window.location.href = 'profile.html';
             }
         });
 
         // MetaMask 连接 - 使用 walletManager API
         async function connectMetaMask() {
+            console.log('MetaMask clicked, walletManager:', typeof walletManager);
+            
             if (typeof walletManager === 'undefined') {
                 alert('系统初始化中，请稍候...');
                 return;
             }
             
-            const result = await walletManager.connect();
-            if (result.success) {
-                // 连接成功，跳转到个人中心
-                window.location.href = 'profile.html';
+            try {
+                const result = await walletManager.connect();
+                console.log('Connect result:', result);
+                
+                if (result && result.success) {
+                    // 连接成功，跳转到个人中心
+                    window.location.href = 'profile.html';
+                }
+            } catch (error) {
+                console.error('Connection error:', error);
+                alert('连接失败: ' + error.message);
             }
         }
 
