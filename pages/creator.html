@@ -357,9 +357,9 @@
         }
 
         .step-dot--active {
-            background: var(--seal-red);
+            background: var(--accent-elegant);
             color: var(--bg-primary);
-            box-shadow: 0 4px 16px rgba(160, 48, 32, 0.25);
+            box-shadow: 0 4px 16px rgba(107, 91, 79, 0.2);
         }
 
         .step-dot--completed {
@@ -597,8 +597,8 @@
         }
 
         .preview-remove:hover {
-            color: var(--seal-red);
-            border-color: var(--seal-red);
+            color: var(--accent-elegant);
+            border-color: var(--accent-elegant);
         }
 
         /* ===== 三域选择 - 雅色系 ===== */
@@ -625,10 +625,10 @@
         }
 
         .realm-card.is-selected {
-            border-color: var(--seal-red);
+            border-color: var(--accent-elegant);
             box-shadow: 
-                0 8px 30px rgba(160, 48, 32, 0.12),
-                inset 0 0 0 1px rgba(160, 48, 32, 0.1);
+                0 8px 30px rgba(107, 91, 79, 0.12),
+                inset 0 0 0 1px rgba(107, 91, 79, 0.1);
             transform: translateY(-3px);
         }
 
@@ -696,17 +696,17 @@
             color: var(--ink-light);
         }
 
-        /* 三域选中态 - 统一朱红系 */
+        /* 三域选中态 - 统一雅色系 */
         .realm-card.is-selected .realm-icon svg {
-            stroke: var(--seal-red);
+            stroke: var(--accent-elegant);
         }
 
         .realm-card.is-selected .realm-name {
-            color: var(--seal-red);
+            color: var(--accent-elegant);
         }
 
         .realm-card.is-selected .realm-desc {
-            color: rgba(160, 48, 32, 0.7);
+            color: rgba(107, 91, 79, 0.8);
         }
 
         .realm-icon {
@@ -745,7 +745,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--seal-red);
+            background: var(--accent-elegant);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -816,14 +816,20 @@
             color: var(--ink-deep);
         }
 
-        .price-option.is-selected {
-            background: var(--seal-red);
-            color: var(--bg-primary);
-            border-color: var(--seal-red);
-            box-shadow: 0 4px 12px rgba(160, 48, 32, 0.2);
+        /* 雅色强调 - 老茶墨色 */
+        :root {
+            --accent-elegant: #6B5B4F;
+            --accent-elegant-light: rgba(107, 91, 79, 0.08);
         }
 
-        /* ===== 权益设置 - 四权印契 ===== */
+        .price-option.is-selected {
+            background: var(--accent-elegant);
+            color: var(--bg-primary);
+            border-color: var(--accent-elegant);
+            box-shadow: 0 4px 12px rgba(107, 91, 79, 0.2);
+        }
+
+        /* ===== 权益设置 - 四权印契（雅色版） ===== */
         .rights-intro {
             text-align: center;
             font-family: var(--font-serif);
@@ -895,23 +901,23 @@
         }
 
         .rights-card.is-enabled {
-            border-color: rgba(160, 48, 32, 0.4);
+            border-color: rgba(107, 91, 79, 0.4);
             background: linear-gradient(135deg, 
-                rgba(160, 48, 32, 0.02) 0%, 
+                rgba(107, 91, 79, 0.03) 0%, 
                 var(--bg-primary) 50%,
-                rgba(160, 48, 32, 0.02) 100%);
+                rgba(107, 91, 79, 0.03) 100%);
             box-shadow: 
-                0 8px 32px rgba(160, 48, 32, 0.08),
-                inset 0 0 0 1px rgba(160, 48, 32, 0.05);
+                0 8px 32px rgba(107, 91, 79, 0.08),
+                inset 0 0 0 1px rgba(107, 91, 79, 0.05);
         }
 
         .rights-card.is-enabled::before {
             opacity: 1;
             background: linear-gradient(90deg, 
                 transparent 0%, 
-                rgba(160, 48, 32, 0.4) 30%, 
-                rgba(160, 48, 32, 0.6) 50%,
-                rgba(160, 48, 32, 0.4) 70%, 
+                rgba(107, 91, 79, 0.35) 30%, 
+                rgba(107, 91, 79, 0.5) 50%,
+                rgba(107, 91, 79, 0.35) 70%, 
                 transparent 100%);
         }
 
@@ -950,14 +956,14 @@
         }
 
         .rights-card.is-enabled .rights-seal {
-            border-color: var(--seal-red);
-            color: var(--seal-red);
-            background: rgba(160, 48, 32, 0.03);
-            box-shadow: inset 0 0 8px rgba(160, 48, 32, 0.1);
+            border-color: var(--accent-elegant);
+            color: var(--accent-elegant);
+            background: rgba(107, 91, 79, 0.04);
+            box-shadow: inset 0 0 8px rgba(107, 91, 79, 0.08);
         }
 
         .rights-card.is-enabled .rights-seal::before {
-            border-color: rgba(160, 48, 32, 0.15);
+            border-color: rgba(107, 91, 79, 0.2);
         }
 
         /* 竖排装饰线 */
@@ -978,7 +984,7 @@
         .rights-card.is-enabled .rights-header::after {
             background: linear-gradient(180deg, 
                 transparent 0%, 
-                rgba(160, 48, 32, 0.3) 50%, 
+                rgba(107, 91, 79, 0.35) 50%, 
                 transparent 100%);
         }
 
@@ -1008,11 +1014,11 @@
         }
 
         .rights-card.is-enabled .rights-name {
-            color: var(--seal-red);
+            color: var(--accent-elegant);
         }
 
         .rights-card.is-enabled .rights-name-secondary {
-            color: rgba(160, 48, 32, 0.7);
+            color: rgba(107, 91, 79, 0.8);
         }
 
         .rights-summary {
@@ -1063,7 +1069,7 @@
         }
 
         .rights-toggle input:checked + .toggle-slider {
-            background: var(--seal-red);
+            background: var(--accent-elegant);
         }
 
         .rights-toggle input:checked + .toggle-slider::before {
@@ -1108,7 +1114,7 @@
             height: 4px;
             background: linear-gradient(90deg, 
                 transparent 0%, 
-                rgba(160, 48, 32, 0.2) 50%, 
+                rgba(107, 91, 79, 0.2) 50%, 
                 transparent 100%);
             border-radius: 2px;
         }
@@ -1156,8 +1162,8 @@
         }
 
         .setting-option.is-selected {
-            border-color: var(--seal-red);
-            background: rgba(160, 48, 32, 0.06);
+            border-color: var(--accent-elegant);
+            background: rgba(107, 91, 79, 0.06);
             position: relative;
         }
 
@@ -1168,7 +1174,7 @@
             right: 2px;
             width: 4px;
             height: 4px;
-            background: var(--seal-red);
+            background: var(--accent-elegant);
             border-radius: 50%;
         }
 
@@ -1180,7 +1186,7 @@
         }
 
         .setting-option.is-selected .option-name {
-            color: var(--seal-red);
+            color: var(--accent-elegant);
         }
 
         .option-desc {
@@ -1285,10 +1291,10 @@
         }
 
         .submit-btn:hover {
-            background: var(--seal-red);
+            background: var(--accent-elegant);
             letter-spacing: 0.6em;
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(160, 48, 32, 0.2);
+            box-shadow: 0 8px 30px rgba(107, 91, 79, 0.2);
         }
 
         .submit-btn:disabled {
@@ -1316,7 +1322,7 @@
         .seal-decoration span {
             font-family: var(--font-display);
             font-size: 1.5rem;
-            color: var(--seal-red);
+            color: var(--accent-elegant);
             letter-spacing: 0.1em;
         }
 
