@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>典 — ECHO</title>
+    <title>典 - ECHO</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- 字体系统：霞鹜文楷 + 思源宋体 -->
@@ -13,7 +13,7 @@
         html {
             font-size: 20px;
         }
-        
+
         /* ===== 导航栏样式（内嵌确保加载） ===== */
         .navbar {
             position: fixed;
@@ -31,21 +31,21 @@
                         box-shadow 0.8s ease,
                         backdrop-filter 0.8s ease;
         }
-        
+
         .navbar.is-scrolled {
             background: rgba(253, 252, 250, 0.92);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
         }
-        
+
         .navbar__brand {
             display: flex;
             align-items: center;
             text-decoration: none;
             flex-shrink: 0;
         }
-        
+
         .navbar__logo {
             font-family: 'LXGW WenKai', serif;
             font-size: 1.25rem;
@@ -56,11 +56,11 @@
             opacity: 0.85;
             transition: opacity 0.4s ease;
         }
-        
+
         .navbar__brand:hover .navbar__logo {
             opacity: 1;
         }
-        
+
         .navbar__nav {
             display: flex;
             align-items: center;
@@ -68,7 +68,7 @@
             margin: 0 auto;
             padding: 0 2rem;
         }
-        
+
         .navbar__link {
             position: relative;
             font-family: 'Noto Serif SC', serif;
@@ -80,11 +80,11 @@
             padding: 0.5rem 0;
             transition: color 0.4s ease;
         }
-        
+
         .navbar__link:hover {
             color: #3A3530;
         }
-        
+
         .navbar__link::after {
             content: '';
             position: absolute;
@@ -95,18 +95,18 @@
             background: #C9B896;
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         .navbar__link:hover::after {
             width: 100%;
         }
-        
+
         .navbar__actions {
             display: flex;
             align-items: center;
             gap: 1.5rem;
             flex-shrink: 0;
         }
-        
+
         .navbar__user {
             text-decoration: none;
             display: flex;
@@ -123,13 +123,13 @@
             cursor: pointer;
             transition: all 0.4s ease;
         }
-        
+
         .navbar__user:hover {
             border-color: #C9B896;
             color: #3A3530;
             background: rgba(201, 184, 150, 0.05);
         }
-        
+
         .navbar__user-placeholder {
             width: 20px;
             height: 20px;
@@ -139,13 +139,13 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .navbar__user-placeholder svg {
             width: 12px;
             height: 12px;
             stroke: #7A6E5F;
         }
-        
+
         .navbar__menu-btn {
             display: none;
             flex-direction: column;
@@ -159,7 +159,7 @@
             border: none;
             padding: 0;
         }
-        
+
         .navbar__menu-line {
             width: 24px;
             height: 1px;
@@ -167,7 +167,7 @@
             transition: all 0.4s ease;
             transform-origin: center;
         }
-        
+
         .navbar__mobile-menu {
             position: fixed;
             top: 60px;
@@ -187,13 +187,13 @@
             pointer-events: none;
             transition: opacity 0.8s ease, visibility 0.8s ease;
         }
-        
+
         .navbar__mobile-menu.is-open {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
         }
-        
+
         .navbar__mobile-menu .navbar__link {
             font-size: 1.5rem;
             font-weight: 300;
@@ -201,15 +201,15 @@
             padding: 1rem 0;
             letter-spacing: 0.5em;
         }
-        
+
         .navbar__mobile-menu .navbar__link:hover {
             color: #3A3530;
         }
-        
+
         .navbar__mobile-menu .navbar__link::after {
             display: none;
         }
-        
+
         @media (max-width: 768px) {
             .navbar__nav {
                 display: none;
@@ -226,7 +226,7 @@
                 transform: translateX(-50%);
             }
         }
-        
+
         @media (min-width: 769px) {
             .navbar__mobile-menu {
                 display: none !important;
@@ -239,29 +239,29 @@
             --bg-primary: #F8F6F1;
             --bg-secondary: #F2EFE8;
             --bg-tertiary: #EBE7DD;
-            
+
             /* 四阶墨色 */
             --ink-deep: #1A1A1A;
             --ink-medium: #4A4A4A;
             --ink-light: #7A6E5F;
             --ink-faint: #B5B5B5;
-            
+
             /* 宋金 */
             --gold-primary: #B89B6C;
             --gold-light: #D4C4A8;
-            
+
             /* 字体系统 */
             --font-display: 'LXGW WenKai', cursive;
             --font-serif: 'Noto Serif SC', serif;
             --font-sans: 'Noto Sans SC', sans-serif;
-            
+
             /* 时序系统 */
             --duration-instant: 0.15s;
             --duration-fast: 0.3s;
             --duration-normal: 0.8s;
             --duration-slow: 1.2s;
             --duration-ambient: 12s;
-            
+
             /* 缓动 */
             --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);
             --ease-water: cubic-bezier(0.4, 0, 0.2, 1);
@@ -289,7 +289,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.03;
             pointer-events: none;
@@ -302,8 +302,8 @@
             position: fixed;
             width: 60vw;
             height: 60vw;
-            background: radial-gradient(ellipse at center, 
-                rgba(232, 228, 220, 0.6) 0%, 
+            background: radial-gradient(ellipse at center,
+                rgba(232, 228, 220, 0.6) 0%,
                 transparent 70%);
             filter: blur(60px);
             animation: lightBreath var(--duration-ambient) var(--ease-breath) infinite;
@@ -334,7 +334,7 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .docs-label {
             font-family: var(--font-sans);
             font-size: 0.7rem;
@@ -344,7 +344,7 @@
             margin-bottom: 2rem;
             opacity: 0.8;
         }
-        
+
         /* 「典」主标题 - 如书法运笔 */
         .docs-title {
             font-family: var(--font-display);
@@ -369,11 +369,11 @@
             background: var(--gold-primary);
             opacity: 0.6;
         }
-        
+
         .docs-title .gold-char {
             color: var(--gold-primary);
         }
-        
+
         .docs-subtitle {
             font-family: var(--font-serif);
             font-size: 0.95rem;
@@ -383,14 +383,14 @@
             margin-top: 2.5rem;
             margin-bottom: 3rem;
         }
-        
+
         /* 搜索框 - 宋瓷风格 */
         .search-box {
             max-width: 480px;
             margin: 0 auto;
             position: relative;
         }
-        
+
         .search-input {
             width: 100%;
             padding: 1.2rem 3rem 1.2rem 1.8rem;
@@ -404,17 +404,17 @@
             outline: none;
             transition: all var(--duration-fast) var(--ease-water);
         }
-        
+
         .search-input::placeholder {
             color: var(--ink-faint);
         }
-        
+
         .search-input:focus {
             border-color: var(--gold-light);
             background: var(--bg-primary);
             box-shadow: 0 2px 20px rgba(184, 155, 108, 0.08);
         }
-        
+
         .search-icon {
             position: absolute;
             right: 1.5rem;
@@ -425,7 +425,7 @@
             pointer-events: none;
             opacity: 0.6;
         }
-        
+
         /* 三栏布局容器 */
         .docs-layout {
             display: flex;
@@ -436,7 +436,7 @@
             z-index: 1;
             gap: 4rem;
         }
-        
+
         /* ========== 左侧导航目录 ========== */
         .sidebar-left {
             width: 200px;
@@ -445,7 +445,7 @@
             top: 120px;
             height: fit-content;
         }
-        
+
         .sidebar-title {
             font-family: var(--font-sans);
             font-size: 0.75rem;
@@ -455,15 +455,15 @@
             padding-left: 1rem;
             opacity: 0.7;
         }
-        
+
         .toc-list {
             list-style: none;
         }
-        
+
         .toc-item {
             margin-bottom: 0.2rem;
         }
-        
+
         .toc-link {
             display: block;
             padding: 0.7rem 1rem;
@@ -475,38 +475,38 @@
             border-left: 0.5px solid transparent;
             transition: all var(--duration-fast) var(--ease-water);
         }
-        
+
         .toc-link:hover {
             color: var(--ink-deep);
             background: linear-gradient(90deg, rgba(184, 155, 108, 0.04), transparent);
         }
-        
+
         .toc-link.active {
             color: var(--gold-primary);
             border-left-color: var(--gold-primary);
             background: linear-gradient(90deg, rgba(184, 155, 108, 0.06), transparent);
         }
-        
+
         /* ========== 主内容区 ========== */
         .main-content {
             flex: 1;
             min-width: 0;
             max-width: 680px;
         }
-        
+
         .doc-section {
             margin-bottom: 8rem;
             scroll-margin-top: 120px;
         }
-        
+
         .doc-section:last-child {
             margin-bottom: 0;
         }
-        
+
         .section-header {
             margin-bottom: 3rem;
         }
-        
+
         .section-number {
             font-family: var(--font-display);
             font-size: 0.85rem;
@@ -515,7 +515,7 @@
             margin-bottom: 1rem;
             opacity: 0.8;
         }
-        
+
         .section-title {
             font-family: var(--font-display);
             font-size: clamp(1.6rem, 3vw, 2rem);
@@ -523,7 +523,7 @@
             letter-spacing: 0.12em;
             color: var(--ink-deep);
         }
-        
+
         /* 引用块 - 古籍批注风格 */
         .quote-block {
             padding: 2.5rem 2.5rem 2.5rem 3rem;
@@ -543,7 +543,7 @@
             background: linear-gradient(to bottom, var(--gold-primary), transparent);
             opacity: 0.3;
         }
-        
+
         .quote-text {
             font-family: var(--font-serif);
             font-size: clamp(0.95rem, 1.6vw, 1.05rem);
@@ -552,17 +552,17 @@
             font-weight: 300;
             letter-spacing: 0.02em;
         }
-        
+
         .quote-text strong {
             color: var(--ink-deep);
             font-weight: 400;
         }
-        
+
         .quote-text .highlight {
             color: var(--gold-primary);
             font-style: italic;
         }
-        
+
         /* 普通段落 */
         .doc-paragraph {
             font-family: var(--font-serif);
@@ -572,7 +572,7 @@
             margin-bottom: 1.8rem;
             letter-spacing: 0.02em;
         }
-        
+
         /* 三步流程图 */
         .steps-container {
             display: flex;
@@ -581,13 +581,13 @@
             margin: 3.5rem 0;
             padding: 2rem 0;
         }
-        
+
         .step-item {
             flex: 1;
             text-align: center;
             position: relative;
         }
-        
+
         .step-item:not(:last-child)::after {
             content: '';
             position: absolute;
@@ -598,7 +598,7 @@
             background: linear-gradient(90deg, var(--gold-primary), transparent);
             opacity: 0.3;
         }
-        
+
         .step-number {
             width: 70px;
             height: 70px;
@@ -615,13 +615,13 @@
             transition: all var(--duration-normal) var(--ease-water);
             background: var(--bg-primary);
         }
-        
+
         .step-item:hover .step-number {
             background: rgba(184, 155, 108, 0.08);
             transform: scale(1.05);
             border-color: var(--gold-light);
         }
-        
+
         .step-title {
             font-family: var(--font-display);
             font-size: 1.1rem;
@@ -630,7 +630,7 @@
             color: var(--ink-deep);
             margin-bottom: 0.8rem;
         }
-        
+
         .step-desc {
             font-family: var(--font-serif);
             font-size: 0.85rem;
@@ -638,7 +638,7 @@
             line-height: 1.9;
             letter-spacing: 0.02em;
         }
-        
+
         /* ========== 宋瓷风格卡片 ========== */
         .rights-grid {
             display: grid;
@@ -646,7 +646,7 @@
             gap: 1.5rem;
             margin: 2.5rem 0;
         }
-        
+
         .right-card {
             padding: 2rem;
             background: var(--bg-secondary);
@@ -655,7 +655,7 @@
             transition: all var(--duration-normal) var(--ease-water);
             position: relative;
             overflow: hidden;
-            box-shadow: 
+            box-shadow:
                 inset 0 1px 0 rgba(255,255,255,0.5),
                 0 1px 2px rgba(0,0,0,0.02);
         }
@@ -668,13 +668,13 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255,255,255,0.6), 
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255,255,255,0.6),
                 transparent);
             opacity: 0.8;
         }
-        
+
         .right-card::after {
             content: '';
             position: absolute;
@@ -688,20 +688,20 @@
             transition: transform var(--duration-normal) var(--ease-water);
             opacity: 0.6;
         }
-        
+
         .right-card:hover {
             background: var(--bg-primary);
             transform: translateY(-3px);
-            box-shadow: 
+            box-shadow:
                 inset 0 1px 0 rgba(255,255,255,0.5),
                 0 8px 30px rgba(184, 155, 108, 0.08);
             border-color: rgba(184, 155, 108, 0.15);
         }
-        
+
         .right-card:hover::after {
             transform: scaleY(1);
         }
-        
+
         .right-icon {
             font-family: var(--font-display);
             font-size: 1.6rem;
@@ -710,7 +710,7 @@
             font-weight: 300;
             opacity: 0.9;
         }
-        
+
         .right-title {
             font-family: var(--font-display);
             font-size: 1.05rem;
@@ -719,7 +719,7 @@
             color: var(--ink-deep);
             margin-bottom: 0.8rem;
         }
-        
+
         .right-desc {
             font-family: var(--font-serif);
             font-size: 0.9rem;
@@ -727,7 +727,7 @@
             line-height: 1.9;
             letter-spacing: 0.01em;
         }
-        
+
         /* 子标题 */
         .subsection-title {
             font-family: var(--font-display);
@@ -739,7 +739,7 @@
             padding-left: 1.2rem;
             border-left: 0.5px solid var(--gold-primary);
         }
-        
+
         /* 三合一授权模式 - 宋瓷卡片 */
         .license-modes-doc {
             display: grid;
@@ -747,7 +747,7 @@
             gap: 1.5rem;
             margin: 2rem 0;
         }
-        
+
         .license-mode-card {
             padding: 2rem 1.5rem;
             background: var(--bg-secondary);
@@ -755,7 +755,7 @@
             border-radius: 1px;
             text-align: center;
             transition: all var(--duration-normal) var(--ease-water);
-            box-shadow: 
+            box-shadow:
                 inset 0 1px 0 rgba(255,255,255,0.5),
                 0 1px 2px rgba(0,0,0,0.02);
         }
@@ -767,27 +767,27 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255,255,255,0.5), 
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255,255,255,0.5),
                 transparent);
         }
-        
+
         .license-mode-card:hover {
             border-color: rgba(184, 155, 108, 0.2);
             background: var(--bg-primary);
-            box-shadow: 
+            box-shadow:
                 inset 0 1px 0 rgba(255,255,255,0.5),
                 0 4px 20px rgba(184, 155, 108, 0.06);
             transform: translateY(-2px);
         }
-        
+
         .mode-icon {
             font-size: 1.5rem;
             margin-bottom: 1rem;
             opacity: 0.7;
         }
-        
+
         .mode-name {
             font-family: var(--font-display);
             font-size: 1rem;
@@ -795,7 +795,7 @@
             color: var(--ink-deep);
             margin-bottom: 0.5rem;
         }
-        
+
         .mode-price {
             font-family: var(--font-display);
             font-size: 1.2rem;
@@ -803,7 +803,7 @@
             margin-bottom: 1rem;
             letter-spacing: 0.05em;
         }
-        
+
         .mode-desc {
             font-family: var(--font-serif);
             font-size: 0.8rem;
@@ -811,14 +811,14 @@
             line-height: 1.7;
             letter-spacing: 0.01em;
         }
-        
+
         /* ========== 表格 - 淡化线条，留白呼吸 ========== */
         .scene-table {
             border: none;
             margin: 2.5rem 0;
             background: transparent;
         }
-        
+
         .scene-table-row {
             display: grid;
             grid-template-columns: 150px 100px 1fr;
@@ -831,30 +831,30 @@
         .scene-table-row:hover {
             background: rgba(184, 155, 108, 0.02);
         }
-        
+
         .scene-table-row:last-child {
             border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
         }
-        
+
         .scene-table-row.header {
             background: transparent;
             border-bottom: 0.5px solid rgba(184, 155, 108, 0.2);
             font-weight: 400;
         }
-        
+
         .scene-name {
             font-family: var(--font-display);
             color: var(--ink-deep);
             letter-spacing: 0.03em;
         }
-        
+
         .scene-multiplier {
             font-family: var(--font-display);
             font-size: 1.2rem;
             color: var(--gold-primary);
             letter-spacing: 0.05em;
         }
-        
+
         .scene-example {
             font-family: var(--font-serif);
             font-size: 0.9rem;
@@ -862,7 +862,7 @@
             text-align: right;
             letter-spacing: 0.01em;
         }
-        
+
         /* 混音示意图 - 宋瓷风格 */
         .remix-diagram {
             display: flex;
@@ -874,18 +874,18 @@
             background: var(--bg-secondary);
             border: 0.5px solid rgba(26, 26, 26, 0.05);
             border-radius: 1px;
-            box-shadow: 
+            box-shadow:
                 inset 0 1px 0 rgba(255,255,255,0.5),
                 0 2px 8px rgba(0,0,0,0.02);
         }
-        
+
         .remix-parents {
             display: flex;
             gap: 1.5rem;
             flex-wrap: wrap;
             justify-content: center;
         }
-        
+
         .parent-item {
             padding: 1.2rem 1.8rem;
             background: var(--bg-primary);
@@ -899,7 +899,7 @@
             border-color: rgba(184, 155, 108, 0.15);
             transform: translateY(-2px);
         }
-        
+
         .parent-label {
             font-family: var(--font-serif);
             font-size: 0.85rem;
@@ -907,20 +907,20 @@
             margin-bottom: 0.4rem;
             letter-spacing: 0.02em;
         }
-        
+
         .parent-share {
             font-family: var(--font-display);
             font-size: 1.4rem;
             color: var(--gold-primary);
             letter-spacing: 0.05em;
         }
-        
+
         .remix-arrow {
             font-size: 1.5rem;
             color: var(--gold-primary);
             opacity: 0.5;
         }
-        
+
         .remix-result {
             padding: 1.5rem 2.5rem;
             background: var(--bg-primary);
@@ -928,7 +928,7 @@
             text-align: center;
             border-radius: 1px;
         }
-        
+
         .result-label {
             font-family: var(--font-display);
             font-size: 1.1rem;
@@ -936,14 +936,14 @@
             color: var(--ink-deep);
             margin-bottom: 0.5rem;
         }
-        
+
         .result-desc {
             font-family: var(--font-serif);
             font-size: 0.85rem;
             color: var(--ink-light);
             letter-spacing: 0.01em;
         }
-        
+
         /* 熔断时间线 */
         .freeze-timeline {
             display: flex;
@@ -953,13 +953,13 @@
             padding-left: 2rem;
             border-left: 0.5px solid var(--gold-primary);
         }
-        
+
         .timeline-item {
             display: flex;
             align-items: center;
             gap: 1.5rem;
         }
-        
+
         .timeline-time {
             font-family: var(--font-display);
             font-size: 1.05rem;
@@ -967,14 +967,14 @@
             min-width: 90px;
             letter-spacing: 0.05em;
         }
-        
+
         .timeline-content {
             font-family: var(--font-serif);
             font-size: 0.95rem;
             color: var(--ink-medium);
             letter-spacing: 0.01em;
         }
-        
+
         /* ========== 代码块 - 淡墨底色，如古籍批注 ========== */
         code {
             font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
@@ -1003,17 +1003,17 @@
             line-height: 1.8;
             color: var(--ink-medium);
         }
-        
+
         /* FAQ 可折叠问答 */
         .faq-list {
             margin-top: 2.5rem;
         }
-        
+
         .faq-item {
             border-bottom: 0.5px solid rgba(26, 26, 26, 0.05);
             overflow: hidden;
         }
-        
+
         .faq-question {
             width: 100%;
             padding: 1.5rem 0;
@@ -1031,11 +1031,11 @@
             text-align: left;
             transition: color var(--duration-fast) var(--ease-water);
         }
-        
+
         .faq-question:hover {
             color: var(--gold-primary);
         }
-        
+
         .faq-icon {
             width: 24px;
             height: 24px;
@@ -1043,7 +1043,7 @@
             flex-shrink: 0;
             margin-left: 1rem;
         }
-        
+
         .faq-icon::before,
         .faq-icon::after {
             content: '';
@@ -1051,7 +1051,7 @@
             background: var(--gold-primary);
             transition: transform var(--duration-fast) var(--ease-water);
         }
-        
+
         .faq-icon::before {
             width: 10px;
             height: 0.5px;
@@ -1059,7 +1059,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        
+
         .faq-icon::after {
             width: 0.5px;
             height: 10px;
@@ -1067,23 +1067,23 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        
+
         .faq-item.active .faq-icon::after {
             transform: translate(-50%, -50%) rotate(90deg);
             opacity: 0;
         }
-        
+
         .faq-answer {
             max-height: 0;
             overflow: hidden;
             transition: max-height var(--duration-normal) var(--ease-water), padding var(--duration-normal) var(--ease-water);
         }
-        
+
         .faq-item.active .faq-answer {
             max-height: 500px;
             padding-bottom: 1.5rem;
         }
-        
+
         .faq-answer p {
             font-family: var(--font-serif);
             font-size: 0.95rem;
@@ -1092,84 +1092,37 @@
             padding-right: 2rem;
             letter-spacing: 0.01em;
         }
-        
-        /* ========== 右侧快速导航 ========== */
-        .sidebar-right {
-            width: 160px;
-            flex-shrink: 0;
-            position: sticky;
-            top: 120px;
-            height: fit-content;
-        }
-        
-        .quick-nav-title {
-            font-family: var(--font-sans);
-            font-size: 0.65rem;
-            letter-spacing: 0.25em;
-            color: var(--ink-light);
-            margin-bottom: 1.5rem;
-            opacity: 0.7;
-        }
-        
-        .quick-nav-list {
-            list-style: none;
-            margin-bottom: 2rem;
-        }
-        
-        .quick-nav-item {
-            margin-bottom: 0.5rem;
-        }
-        
-        .quick-nav-link {
-            font-family: var(--font-serif);
-            font-size: 0.8rem;
-            color: var(--ink-light);
-            text-decoration: none;
-            display: block;
-            padding: 0.3rem 0;
-            border-left: 0.5px solid transparent;
-            padding-left: 1rem;
-            margin-left: -1rem;
-            transition: all var(--duration-fast) var(--ease-water);
-            letter-spacing: 0.02em;
-        }
-        
-        .quick-nav-link:hover,
-        .quick-nav-link.active {
-            color: var(--gold-primary);
-            border-left-color: var(--gold-primary);
-        }
-        
-        /* 归顶按钮 - 宋瓷风格 */
+
         .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.8rem 1rem;
-            font-family: var(--font-display);
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            color: var(--ink-light);
-            background: transparent;
-            border: 0.5px solid rgba(26, 26, 26, 0.08);
-            border-radius: 1px;
+            justify-content: center;
+            background: var(--ink-deep);
+            border: none;
+            border-radius: 50%;
             cursor: pointer;
-            transition: all var(--duration-normal) var(--ease-water);
-            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all var(--duration-fast) var(--ease-water);
+            z-index: 1000;
         }
-        
+
         .back-to-top:hover {
-            color: var(--gold-primary);
-            border-color: var(--gold-primary);
-            background: rgba(184, 155, 108, 0.04);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
-        
+
         .back-to-top svg {
-            width: 14px;
-            height: 14px;
-            stroke: currentColor;
+            width: 20px;
+            height: 20px;
+            stroke: var(--bg-primary);
+            stroke-width: 1.5;
         }
-        
+
         /* ========== 移动端菜单 ========== */
         .mobile-menu-toggle {
             display: none;
@@ -1188,12 +1141,12 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             transition: all var(--duration-fast) var(--ease-water);
         }
-        
+
         .mobile-menu-toggle:hover {
             transform: scale(1.05);
             background: var(--gold-primary);
         }
-        
+
         .mobile-menu {
             display: none;
             position: fixed;
@@ -1212,17 +1165,17 @@
             pointer-events: none;
             transition: all var(--duration-fast) var(--ease-water);
         }
-        
+
         .mobile-menu.open {
             transform: translateY(0);
             opacity: 1;
             pointer-events: auto;
         }
-        
+
         .mobile-menu .toc-link {
             padding: 0.8rem 1rem;
         }
-        
+
         /* ========== 页脚 - 克制墨色 ========== */
         .footer {
             background: var(--bg-secondary);
@@ -1254,18 +1207,14 @@
         .footer-links a:hover {
             color: var(--gold-primary);
         }
-        
+
         /* ========== 响应式 ========== */
         @media (max-width: 1100px) {
-            .sidebar-right {
-                display: none;
-            }
-            
             .docs-layout {
                 gap: 3rem;
             }
         }
-        
+
         @media (max-width: 768px) {
             .docs-header {
                 padding: 6vh 6vw 4vh;
@@ -1278,44 +1227,44 @@
             .docs-subtitle {
                 letter-spacing: 0.3em;
             }
-            
+
             .docs-layout {
                 flex-direction: column;
                 padding: 0 6vw 8vh;
             }
-            
+
             .sidebar-left {
                 display: none;
             }
-            
+
             .mobile-menu-toggle {
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
-            
+
             .mobile-menu {
                 display: block;
             }
-            
+
             .main-content {
                 max-width: 100%;
             }
-            
+
             .doc-section {
                 margin-bottom: 5rem;
             }
-            
+
             /* 步骤流程图改为垂直 */
             .steps-container {
                 flex-direction: column;
                 gap: 2.5rem;
             }
-            
+
             .step-item:not(:last-child)::after {
                 display: none;
             }
-            
+
             /* 权益卡片改为单列 */
             .rights-grid {
                 grid-template-columns: 1fr;
@@ -1325,13 +1274,13 @@
             .license-modes-doc {
                 grid-template-columns: 1fr;
             }
-            
+
             /* 引用块调整 */
             .quote-block {
                 padding: 1.8rem;
                 margin: 1.8rem 0;
             }
-            
+
             .quote-text {
                 font-size: 0.95rem;
                 line-height: 2.2;
@@ -1347,14 +1296,14 @@
                 text-align: left;
             }
         }
-        
+
         /* 淡入动画 */
         .fade-up {
             opacity: 0;
             transform: translateY(30px);
             transition: all var(--duration-slow) var(--ease-leaf);
         }
-        
+
         .fade-up.visible {
             opacity: 1;
             transform: translateY(0);
@@ -1364,7 +1313,7 @@
 <body>
     <!-- 宣纸纹理背景 -->
     <div class="paper-texture"></div>
-    
+
     <!-- 窗棂光晕 -->
     <div class="hero-light--primary"></div>
     <div class="hero-light--secondary"></div>
@@ -1372,17 +1321,17 @@
     <!-- 东方美学导航栏 -->
     <nav class="navbar" id="navbar" role="navigation" aria-label="主导航">
         <div class="navbar__water-ripple" aria-hidden="true"></div>
-        
+
         <a href="index.html" class="navbar__brand" aria-label="返回首页">
             <span class="navbar__logo">ECHO</span>
         </a>
-        
+
         <div class="navbar__nav">
             <a href="index.html" class="navbar__link">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
             <a href="docs.html" class="navbar__link" aria-current="page">典</a>
         </div>
-        
+
         <div class="navbar__actions">
             <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包">
                 <span class="navbar__user-placeholder">
@@ -1393,19 +1342,19 @@
                 </span>
                 <span>入链</span>
             </button>
-            
+
             <button class="navbar__user navbar__user--connected" id="userMenu" type="button" aria-label="打开用户菜单" style="display: none;">
                 <img src="" alt="" class="navbar__user-avatar" id="userAvatar">
                 <span id="userName">吾</span>
             </button>
         </div>
-        
+
         <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
             <span class="navbar__menu-line"></span>
             <span class="navbar__menu-line"></span>
             <span class="navbar__menu-line"></span>
         </button>
-        
+
         <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
             <a href="index.html" class="navbar__link">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
@@ -1467,7 +1416,7 @@
                     <div class="section-number">壹</div>
                     <h2 class="section-title">ECHO何为</h2>
                 </div>
-                
+
                 <div class="quote-block">
                     <p class="quote-text">
                         <strong>非NFT，乃生灵也。</strong><br><br>
@@ -1476,7 +1425,7 @@
                         非拥有，乃相伴。非终焉，乃伊始。
                     </p>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     ECHO乃全新数字资产之协议，以「动态生长」入数字权益之域。每一份ECHO皆载创作者之心血，亦记每一次之用、每一次之流。时日推移，ECHO自进化，价值亦随流。
                 </p>
@@ -1491,11 +1440,11 @@
                     <div class="section-number">贰</div>
                     <h2 class="section-title">入门</h2>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     三步而已，即可启ECHO之旅。
                 </p>
-                
+
                 <div class="steps-container">
                     <div class="step-item">
                         <div class="step-number">一</div>
@@ -1513,7 +1462,7 @@
                         <p class="step-desc">依权益配置用作品，见证ECHO之生长</p>
                     </div>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     首用者宜从集市览起，知不同类型ECHO之作及其权益配置。每ECHO皆有独特之生长轨迹，择与汝共鸣之作，启一段数字相伴之旅。
                 </p>
@@ -1525,11 +1474,11 @@
                     <div class="section-number">叁</div>
                     <h2 class="section-title">铸造</h2>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     创作者可以ECHO协议生己之数字作品。铸造过程简而直观，兼供丰富之权益配置选项，令汝之创作能以最宜之法触达用者。
                 </p>
-                
+
                 <div class="quote-block">
                     <p class="quote-text">
                         <strong>铸造之序</strong><br><br>
@@ -1540,7 +1489,7 @@
                         五、待区块链之确认，作品即刻上线
                     </p>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     铸造ECHO需付少许Gas之费。建议用Layer 2之网以降成本。作品既铸，创作者可实时监作品之用况与收益之分。
                 </p>
@@ -1552,13 +1501,13 @@
                     <div class="section-number">肆</div>
                     <h2 class="section-title">权益</h2>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     ECHO独创之<strong>四权分离模型</strong>，将传统版权之「模糊权利」化为链上可编程、可验证、可流转之智能合约结构。每ECHO资产含四独立之权利维度，可灵活配置以成按需授权。
                 </p>
-                
+
                 <h3 class="subsection-title">四权架构</h3>
-                
+
                 <div class="rights-grid">
                     <div class="right-card">
                         <div class="right-icon">◈</div>
@@ -1581,13 +1530,13 @@
                         <p class="right-desc">资产收益之分配则。创作者分成、协作者分配、平台费用，链上实时结算。</p>
                     </div>
                 </div>
-                
+
                 <h3 class="subsection-title">三合一授权模式</h3>
-                
+
                 <p class="doc-paragraph">
                     ECHO之使用权支持三灵活授权模式，创作者可同时启多模式，令用者自主择之：
                 </p>
-                
+
                 <div class="license-modes-doc">
                     <div class="license-mode-card">
                         <div class="mode-icon">◉</div>
@@ -1608,13 +1557,13 @@
                         <div class="mode-desc">灵活租赁，30日起租。宜于短期项目、活动配乐。</div>
                     </div>
                 </div>
-                
+
                 <h3 class="subsection-title">场景差异化定价</h3>
-                
+
                 <p class="doc-paragraph">
                     购时择用之场景，系统自动算最终之价：
                 </p>
-                
+
                 <div class="scene-table">
                     <div class="scene-table-row header">
                         <div class="scene-name">使用场景</div>
@@ -1642,13 +1591,13 @@
                         <div class="scene-example">电视/网络广告</div>
                     </div>
                 </div>
-                
+
                 <h3 class="subsection-title">混音作品权属继承</h3>
-                
+
                 <p class="doc-paragraph">
                     ECHO支持多父资产混音创作，新作品自动承父资产之权益配置，并借智能合约自动分配收益：
                 </p>
-                
+
                 <div class="remix-diagram">
                     <div class="remix-parents">
                         <div class="parent-item">
@@ -1670,17 +1619,17 @@
                         <div class="result-desc">新 ECHO 资产，收益自动分配</div>
                     </div>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     <strong>混音之则：</strong>最多 5 父资产 | 48 时辰协商期 | 贡献度算法自动调分成
                 </p>
-                
+
                 <h3 class="subsection-title">License ECHO 机制</h3>
-                
+
                 <p class="doc-paragraph">
                     每次购授权皆生一License ECHO，为使用权之链上凭证：
                 </p>
-                
+
                 <div class="quote-block">
                     <p class="quote-text">
                         <strong>License ECHO 所含之信：</strong><br><br>
@@ -1691,17 +1640,17 @@
                         ◆ 授权条款之哈希
                     </p>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     每次用资产时，系统自动验License ECHO之有效性，以保合规之用。
                 </p>
-                
+
                 <h3 class="subsection-title">紧急撤销机制（熔断）</h3>
-                
+
                 <p class="doc-paragraph">
                     创作者于见非法用等紧急之时，可触发冻结之机制：
                 </p>
-                
+
                 <div class="freeze-timeline">
                     <div class="timeline-item">
                         <div class="timeline-time">T+0</div>
@@ -1724,11 +1673,11 @@
                     <div class="section-number">伍</div>
                     <h2 class="section-title">架构</h2>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     ECHO协议建于以太坊及兼容EVM之区块链网络之上，采模块化之设计，保系统之可扩展性与安全性。
                 </p>
-                
+
                 <div class="quote-block">
                     <p class="quote-text">
                         <strong>核心组件</strong><br><br>
@@ -1738,7 +1687,7 @@
                         ◆ <strong>前端 SDK：</strong> 开发者友好之集成方案
                     </p>
                 </div>
-                
+
                 <p class="doc-paragraph">
                     所有核心合约代码均已开源并通过第三方审计。ECHO协议遵去中心化之则，不依任何单节点或服务，保系统之长期稳定运行。
                 </p>
@@ -1750,7 +1699,7 @@
                     <div class="section-number">陆</div>
                     <h2 class="section-title">解惑</h2>
                 </div>
-                
+
                 <div class="faq-list">
                     <div class="faq-item">
                         <button class="faq-question">
@@ -1761,7 +1710,7 @@
                             <p>NFT者，静态之、不可变之数字资产，既生则固定不变。ECHO者，动态生长之数字权益，其元数据、价值、权益配置皆可随用而演变。ECHO更强调「用」而非「有」，乃更贴近现实经济模式之数字资产形态。</p>
                         </div>
                     </div>
-                    
+
                     <div class="faq-item">
                         <button class="faq-question">
                             ECHO可信乎
@@ -1771,7 +1720,7 @@
                             <p>ECHO之状态更新由智能合约自动执行，所有规则于既生之时即已定而公开。关键状态变更借预言机网络验证后上链，保数据之可信度。同时，所有历史记录永久存于区块链之上，可供随时审计。</p>
                         </div>
                     </div>
-                    
+
                     <div class="faq-item">
                         <button class="faq-question">
                             创作者何以获益
@@ -1781,7 +1730,7 @@
                             <p>ECHO支持多收益模式：首售、二次流转分成、按次使用费、订阅收入等。收益借智能合约实时分配，无需人工干预。创作者可于个人中心阅详细之收益报表与提现记录。</p>
                         </div>
                     </div>
-                    
+
                     <div class="faq-item">
                         <button class="faq-question">
                             ECHO容何类作品
@@ -1791,7 +1740,7 @@
                             <p>今ECHO主要支持音、视、文三类数字作品。未来将逐步扩展至视频、游戏资产、虚拟地产等更多类型。ECHO之协议设计具高度扩展性，可适配各种数字内容之形态。</p>
                         </div>
                     </div>
-                    
+
                     <div class="faq-item">
                         <button class="faq-question">
                             何以共建ECHO
@@ -1805,42 +1754,18 @@
             </section>
         </main>
 
-        <!-- 右侧快速导航 -->
-        <aside class="sidebar-right">
-            <div class="quick-nav-title">本页导航</div>
-            <ul class="quick-nav-list" id="quickNav">
-                <li class="quick-nav-item">
-                    <a href="#what-is-echo" class="quick-nav-link active">ECHO何为</a>
-                </li>
-                <li class="quick-nav-item">
-                    <a href="#quick-start" class="quick-nav-link">入门</a>
-                </li>
-                <li class="quick-nav-item">
-                    <a href="#minting" class="quick-nav-link">铸造</a>
-                </li>
-                <li class="quick-nav-item">
-                    <a href="#rights" class="quick-nav-link">权益</a>
-                </li>
-                <li class="quick-nav-item">
-                    <a href="#architecture" class="quick-nav-link">架构</a>
-                </li>
-                <li class="quick-nav-item">
-                    <a href="#faq" class="quick-nav-link">解惑</a>
-                </li>
-            </ul>
-            
-            <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-                    <path d="M18 15l-6-6-6 6"/>
-                </svg>
-                归顶
-            </button>
-        </aside>
     </div>
+
+    <!-- 归顶按钮 - 右下角浮动 -->
+    <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+    </button>
 
     <!-- 移动端菜单按钮 -->
     <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
-    
+
     <!-- 移动端菜单 -->
     <nav class="mobile-menu" id="mobileMenu">
         <ul class="toc-list">
@@ -1880,44 +1805,35 @@
             btn.addEventListener('click', () => {
                 const item = btn.parentElement;
                 const isActive = item.classList.contains('active');
-                
+
                 // 关闭所有其他项
                 document.querySelectorAll('.faq-item').forEach(i => {
                     i.classList.remove('active');
                 });
-                
+
                 // 切换当前项
                 if (!isActive) {
                     item.classList.add('active');
                 }
             });
         });
-        
+
         // 滚动监听 - 高亮当前章节
         const sections = document.querySelectorAll('.doc-section');
         const tocLinks = document.querySelectorAll('.toc-link');
-        const quickNavLinks = document.querySelectorAll('.quick-nav-link');
-        
+
         const observerOptions = {
             rootMargin: '-20% 0px -60% 0px',
             threshold: 0
         };
-        
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const id = entry.target.getAttribute('id');
-                    
+
                     // 更新左侧目录
                     tocLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('active');
-                        }
-                    });
-                    
-                    // 更新右侧快速导航
-                    quickNavLinks.forEach(link => {
                         link.classList.remove('active');
                         if (link.getAttribute('href') === `#${id}`) {
                             link.classList.add('active');
@@ -1926,31 +1842,31 @@
                 }
             });
         }, observerOptions);
-        
+
         sections.forEach(section => observer.observe(section));
-        
+
         // 移动端菜单
         const mobileMenuToggle = document.getElementById('mobileMenuToggle');
         const mobileMenu = document.getElementById('mobileMenu');
-        
+
         mobileMenuToggle.addEventListener('click', () => {
             mobileMenu.classList.toggle('open');
         });
-        
+
         // 点击菜单项后关闭菜单
         mobileMenu.querySelectorAll('.toc-link').forEach(link => {
             link.addEventListener('click', () => {
                 mobileMenu.classList.remove('open');
             });
         });
-        
+
         // 点击外部关闭菜单
         document.addEventListener('click', (e) => {
             if (!mobileMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
                 mobileMenu.classList.remove('open');
             }
         });
-        
+
         // 淡入动画
         const fadeObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -1959,32 +1875,32 @@
                 }
             });
         }, { threshold: 0.1 });
-        
+
         document.querySelectorAll('.doc-section, .step-item, .right-card, .faq-item').forEach(el => {
             el.classList.add('fade-up');
             fadeObserver.observe(el);
         });
-        
+
         // 导航栏滚动效果
         let lastScroll = 0;
         const navbar = document.getElementById('navbar');
-        
+
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
-            
+
             if (currentScroll > 50) {
                 navbar.classList.add('is-scrolled');
             } else {
                 navbar.classList.remove('is-scrolled');
             }
-            
+
             lastScroll = currentScroll;
         });
 
         // 移动端菜单切换
         const menuBtn = document.getElementById('menuBtn');
         const navbarMobileMenu = document.getElementById('mobileMenu');
-        
+
         menuBtn.addEventListener('click', () => {
             const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
             menuBtn.setAttribute('aria-expanded', !isExpanded);
