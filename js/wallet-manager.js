@@ -230,14 +230,10 @@
                 // 添加错误处理 - 如果头像加载失败，隐藏图片
                 userAvatar.onerror = function() {
                     this.style.display = 'none';
-                };
-                
-                // 添加加载成功处理
-                userAvatar.onload = function() {
-                    this.style.display = 'block';
+                    this.src = '';
                 };
             } else {
-                // 没有地址时隐藏头像
+                // 没有地址时隐藏头像并清空 src
                 userAvatar.src = '';
                 userAvatar.style.display = 'none';
             }
