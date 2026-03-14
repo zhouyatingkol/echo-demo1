@@ -825,7 +825,10 @@
         });
 
         // 页面加载时检查钱包连接
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 等待 walletManager 初始化
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
             // 绑定断开钱包按钮
             const disconnectBtn = document.querySelector('[data-action="disconnectWallet"]');
             if (disconnectBtn) {
@@ -837,13 +840,51 @@
                 });
             }
             
-            // 延迟检查，确保 wallet 已初始化
-            setTimeout(() => {
-                if (typeof walletManager === 'undefined' || !walletManager.isConnected) {
-                    // 未连接，跳转到登录页
-                    window.location.href = 'login.html';
+            // 绑定签名验证按钮
+            const verifyBtn = document.getElementById('verifyWalletBtn');
+            if (verifyBtn) {
+                verifyBtn.addEventListener('click', async () => {
+                    if (typeof walletManager !== 'undefined' && walletManager.isConnected) {
+                        try {
+                            const message = '验证 ECHO 身份 - ' + new Date().toISOString();
+                            const signature = await walletManager.signer.signMessage(message);
+                            alert('签名成功！\n' + signature.substring(0, 20) + '...');
+                        } catch (error) {
+                            console.error('签名失败:', error);
+                            alert('签名失败: ' + error.message);
+                        }
+                    } else {
+                        alert('请先连接钱包');
+                    }
+                });
+            }
+            
+            // 更新钱包信息显示
+            function updateWalletInfo() {
+                if (typeof walletManager !== 'undefined' && walletManager.isConnected) {
+                    // 更新地址
+                    const addressEl = document.getElementById('walletAddress');
+                    if (addressEl) {
+                        addressEl.textContent = walletManager.address || '0x...';
+                    }
+                    // 更新余额
+                    const balanceEl = document.getElementById('walletBalance');
+                    if (balanceEl && walletManager.balance) {
+                        balanceEl.textContent = parseFloat(walletManager.balance).toFixed(4) + ' MEER';
+                    }
                 }
-            }, 500);
+            }
+            
+            // 初始更新
+            updateWalletInfo();
+            
+            // 每秒检查更新余额
+            setInterval(updateWalletInfo, 2000);
+            
+            // 检查是否已连接
+            if (typeof walletManager === 'undefined' || !walletManager.isConnected) {
+                window.location.href = 'login.html';
+            }
         });
     </script>
     
