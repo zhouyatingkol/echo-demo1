@@ -682,8 +682,31 @@
             letter-spacing: 0.6em;
         }
         
+        /* CTA 按钮容器 */
+        .cta-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cta-btn--primary {
+            background: var(--gold-primary);
+            color: white;
+        }
+        
+        .cta-btn--primary:hover {
+            background: transparent;
+            color: var(--ink-deep);
+        }
+        
         /* 响应式 */
         @media (max-width: 768px) {
+            .cta-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
             .hero-slogan {
                 font-size: clamp(1rem, 4vw, 1.2rem);
                 letter-spacing: 0.1em;
@@ -716,7 +739,6 @@
         <div class="navbar__nav">
             <a href="index.html" class="navbar__link" aria-current="page">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
-            <a href="creator.html" class="navbar__link">铸</a>
             <a href="docs.html" class="navbar__link">典</a>
         </div>
         
@@ -746,7 +768,6 @@
         <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
             <a href="index.html" class="navbar__link">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
-            <a href="creator.html" class="navbar__link">铸</a>
             <a href="docs.html" class="navbar__link">典</a>
             <button class="navbar__user" id="mobileConnectWallet" type="button">
                 <span class="navbar__user-placeholder">
@@ -853,7 +874,10 @@
     <!-- CTA -->
     <section class="cta">
         <h2 class="cta-title">生此 ECHO</h2>
-        <a href="marketplace.html" class="cta-btn">采集</a>
+        <div class="cta-buttons">
+            <a href="creator.html" class="cta-btn cta-btn--primary">生</a>
+            <a href="marketplace.html" class="cta-btn">集</a>
+        </div>
     </section>
 
     <!-- 导航栏交互脚本 -->
