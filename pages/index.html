@@ -728,6 +728,15 @@
             justify-content: center;
             align-items: center;
         }
+
+        /* Hero 按钮容器 */
+        .hero-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
         
         .cta-btn--primary {
             background: var(--gold-primary);
@@ -837,10 +846,14 @@
                 <span class="subtitle-main">创作即生命，流转即生长</span>
             </div>
             
-            <button class="hero-cta" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
-                <span>入境</span>
-            </button>
-            <button class="navbar__user" id="heroWalletStatus" type="button" style="display: none;"><span>吾</span></button>
+            <div class="hero-buttons">
+                <button class="hero-cta" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+                    <span>入境</span>
+                </button>
+                <button class="navbar__user" id="heroWalletStatus" type="button" style="display: none;">
+                    <span>吾</span>
+                </button>
+            </div>
         </div>
     </section>
     
