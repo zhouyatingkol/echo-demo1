@@ -601,7 +601,7 @@
             border-color: var(--seal-red);
         }
 
-        /* ===== 三域选择 ===== */
+        /* ===== 三域选择 - 雅色系 ===== */
         .realm-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -615,76 +615,127 @@
             border-radius: 2px;
             cursor: pointer;
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            border: 2px solid transparent;
+            border: 1px solid rgba(184, 155, 108, 0.2);
+            background: var(--bg-primary);
         }
 
         .realm-card:hover {
             transform: translateY(-3px);
+            border-color: rgba(184, 155, 108, 0.5);
         }
 
         .realm-card.is-selected {
-            border-color: rgba(255, 255, 255, 0.8);
+            border-color: var(--seal-red);
             box-shadow: 
-                0 8px 30px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+                0 8px 30px rgba(160, 48, 32, 0.12),
+                inset 0 0 0 1px rgba(160, 48, 32, 0.1);
             transform: translateY(-3px);
         }
 
         .realm-card.is-selected::after {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
             border-radius: 2px;
             background: linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.4) 0%, 
+                rgba(160, 48, 32, 0.08) 0%, 
                 transparent 50%, 
-                rgba(255, 255, 255, 0.2) 100%);
+                rgba(160, 48, 32, 0.05) 100%);
             z-index: -1;
         }
 
+        /* 三域雅色 - 未选中态 */
         .realm-card--sound {
-            background: var(--realm-sound);
+            background: linear-gradient(180deg, #F5F0E8 0%, #F8F6F1 100%);
+        }
+
+        .realm-card--sound .realm-icon svg {
+            stroke: #B89B6C;
+        }
+
+        .realm-card--sound .realm-name {
+            color: var(--ink-deep);
+        }
+
+        .realm-card--sound .realm-desc {
+            color: var(--ink-light);
         }
 
         .realm-card--color {
-            background: var(--realm-color);
+            background: linear-gradient(180deg, #F0EBE5 0%, #F8F6F1 100%);
+        }
+
+        .realm-card--color .realm-icon svg {
+            stroke: #A87A6B;
+        }
+
+        .realm-card--color .realm-name {
+            color: var(--ink-deep);
+        }
+
+        .realm-card--color .realm-desc {
+            color: var(--ink-light);
         }
 
         .realm-card--text {
-            background: var(--realm-text);
+            background: linear-gradient(180deg, #EBEDE8 0%, #F8F6F1 100%);
+        }
+
+        .realm-card--text .realm-icon svg {
+            stroke: #6B7A6E;
+        }
+
+        .realm-card--text .realm-name {
+            color: var(--ink-deep);
+        }
+
+        .realm-card--text .realm-desc {
+            color: var(--ink-light);
+        }
+
+        /* 三域选中态 - 统一朱红系 */
+        .realm-card.is-selected .realm-icon svg {
+            stroke: var(--seal-red);
+        }
+
+        .realm-card.is-selected .realm-name {
+            color: var(--seal-red);
+        }
+
+        .realm-card.is-selected .realm-desc {
+            color: rgba(160, 48, 32, 0.7);
         }
 
         .realm-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             margin: 0 auto 1rem;
-            opacity: 0.9;
         }
 
         .realm-icon svg {
             width: 100%;
             height: 100%;
-            stroke: rgba(255, 255, 255, 0.95);
-            stroke-width: 0.5;
+            stroke-width: 0.8;
             fill: none;
+            transition: stroke 0.3s ease;
         }
 
         .realm-name {
             font-family: var(--font-display);
             font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.95);
             letter-spacing: 0.15em;
             margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
         }
 
         .realm-desc {
             font-family: var(--font-serif);
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.7);
             letter-spacing: 0.05em;
+            transition: color 0.3s ease;
         }
 
         .realm-check {
@@ -694,7 +745,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--ink-deep);
+            background: var(--seal-red);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -706,6 +757,13 @@
         .realm-card.is-selected .realm-check {
             opacity: 1;
             transform: scale(1);
+        }
+
+        .realm-check svg {
+            width: 12px;
+            height: 12px;
+            stroke: white;
+            stroke-width: 2;
         }
 
         .realm-check svg {
