@@ -474,6 +474,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    // 绑定首页 Hero 区域吾按钮
+    const heroWalletStatus = document.getElementById('heroWalletStatus');
+    if (heroWalletStatus) {
+        heroWalletStatus.addEventListener('click', () => {
+            if (walletManager.isConnected) {
+                window.location.href = 'profile.html';
+            } else {
+                walletManager.connect();
+            }
+        });
+    }
 });
 
 // 导出供其他模块使用
