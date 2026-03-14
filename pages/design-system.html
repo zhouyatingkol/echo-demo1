@@ -182,41 +182,24 @@
             line-height: 1.8;
         }
         
-        /* 朱红印章 - 毛笔涂抹自然边缘 */
+        /* 朱红印章 - 直接用原图，加毛笔边缘 */
         .hero-seal {
-            width: 52px;
-            height: 90px;
-            background: 
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='5'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.3'/%3E%3C/svg%3E"),
-                radial-gradient(ellipse at 30% 25%, rgba(255,80,60,0.3) 0%, transparent 40%),
-                radial-gradient(ellipse at 70% 75%, rgba(200,40,30,0.4) 0%, transparent 35%),
-                /* 与图片一致的鲜红色 */
-                #E60012;
-            background-blend-mode: overlay, normal, normal, normal;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 48px;
+            height: 84px;
+            background-image: url('../images/seal-gongsheng.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             position: relative;
             opacity: 0;
             transform: scale(0.8) rotate(-2deg);
             animation: sealStamp 0.8s var(--ease-ink) 1.2s forwards;
-            box-shadow: 
-                inset 0 0 30px rgba(0,0,0,0.25),
-                3px 4px 12px rgba(180, 40, 30, 0.3);
-            /* 毛笔涂抹边缘 */
-            filter: url(#brushEdge);
+            filter: url(#brushEdge) drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
         
-        /* 外层飞白轮廓 */
-        .hero-seal::before {
-            content: '';
-            position: absolute;
-            width: 110%;
-            height: 108%;
-            background: #E60012;
-            filter: url(#roughEdge);
-            opacity: 0.95;
-            z-index: -1;
+        /* 隐藏内部文字容器 */
+        .hero-seal-text-img {
+            display: none;
         }
         
         /* 斑驳内纹理 */
@@ -526,13 +509,8 @@
             }
             
             .hero-seal {
-                width: 42px;
-                height: 72px;
-            }
-            
-            .hero-seal-text-img {
-                width: 32px;
-                height: 58px;
+                width: 40px;
+                height: 70px;
             }
             
             .hero-slogan-wrapper {
