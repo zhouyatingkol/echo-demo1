@@ -401,49 +401,50 @@
         
         /* 朱红印章 - 手绘古朴效果 */
         .hero-seal {
-            width: 42px;
-            height: 78px;
-            background-color: #9B3020;
-            border-radius: 3px;
+            width: 40px;
+            height: 72px;
+            background-color: #A03020;
+            border-radius: 2px;
             position: relative;
             opacity: 0;
             transform: scale(0.8) rotate(-2deg);
             animation: sealStamp 0.8s var(--ease-ink) 1.2s forwards;
-            /* 不规则边缘效果 */
-            filter: url(#roughEdge);
-            /* 轻微的颜色变化 */
+            /* 简化的古朴效果 */
             box-shadow: 
-                inset 0 0 20px rgba(0,0,0,0.1),
-                1px 1px 3px rgba(0,0,0,0.15);
+                inset 0 0 15px rgba(0,0,0,0.15),
+                2px 2px 4px rgba(0,0,0,0.1);
+            /* 使用 clip-path 制造不规则边缘 */
+            clip-path: polygon(
+                5% 2%, 95% 0%, 98% 5%, 100% 95%, 
+                95% 100%, 5% 98%, 0% 95%, 2% 5%
+            );
         }
         
         /* 印章内部文字 - 竖排共生 */
         .hero-seal::before {
             content: '共';
             position: absolute;
-            top: 12px;
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'LXGW WenKai', serif;
-            font-size: 22px;
-            color: rgba(255, 255, 255, 0.9);
-            writing-mode: vertical-rl;
-            letter-spacing: 0.1em;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-size: 20px;
+            font-weight: 400;
+            color: rgba(248, 246, 241, 0.95);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
         .hero-seal::after {
             content: '生';
             position: absolute;
-            bottom: 12px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'LXGW WenKai', serif;
-            font-size: 22px;
-            color: rgba(255, 255, 255, 0.9);
-            writing-mode: vertical-rl;
-            letter-spacing: 0.1em;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-size: 20px;
+            font-weight: 400;
+            color: rgba(248, 246, 241, 0.95);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
         .hero-seal-text-img {
@@ -750,25 +751,6 @@
             </button>
         </div>
     </nav>
-
-    <!-- SVG Filters for seal -->
-    <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
-        <defs>
-            <!-- 粗糙边缘滤镜 - 模拟印泥崩缺感 -->
-            <filter id="roughEdge" x="-20%" y="-20%" width="140%" height="140%">
-                <!-- 生成噪点 -->
-                <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="3" result="noise"/>
-                <!-- 位移映射制造不规则边缘 -->
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
-                <!-- 轻微模糊让边缘更自然 -->
-                <feGaussianBlur stdDeviation="0.3" result="blur"/>
-                <!-- 调整对比度 -->
-                <feComponentTransfer>
-                    <feFuncA type="linear" slope="1.2" intercept="-0.1"/>
-                </feComponentTransfer>
-            </filter>
-        </defs>
-    </svg>
 
     <!-- HERO 区 -->
     <section class="hero">
