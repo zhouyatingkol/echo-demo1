@@ -337,14 +337,20 @@ class WalletManager {
      */
     updateUI() {
         const connectBtn = document.getElementById('walletConnect');
+        const mobileConnectBtn = document.getElementById('mobileWalletConnect');
         const walletStatus = document.querySelector('.wallet-status');
         
         if (this.isConnected && this.address) {
-            // 已连接状态
-            const shortAddress = this.address.slice(0, 6) + '...' + this.address.slice(-4);
+            // 已连接状态 - 显示"吾"，悬停显示地址
             if (connectBtn) {
-                connectBtn.textContent = shortAddress;
+                connectBtn.textContent = '吾';
+                connectBtn.setAttribute('data-address', this.address);
                 connectBtn.classList.add('connected');
+            }
+            if (mobileConnectBtn) {
+                mobileConnectBtn.textContent = '吾';
+                mobileConnectBtn.setAttribute('data-address', this.address);
+                mobileConnectBtn.classList.add('connected');
             }
             if (walletStatus) {
                 walletStatus.innerHTML = `已连接 | 余额: ${this.formatBalance(this.balance)} ${this.MEER_SYMBOL}`;
@@ -353,8 +359,14 @@ class WalletManager {
         } else {
             // 未连接状态
             if (connectBtn) {
-                connectBtn.textContent = '连接钱包';
+                connectBtn.textContent = '入链';
+                connectBtn.removeAttribute('data-address');
                 connectBtn.classList.remove('connected');
+            }
+            if (mobileConnectBtn) {
+                mobileConnectBtn.textContent = '入链';
+                mobileConnectBtn.removeAttribute('data-address');
+                mobileConnectBtn.classList.remove('connected');
             }
             if (walletStatus) {
                 walletStatus.innerHTML = '请先连接钱包 | 余额: --';
