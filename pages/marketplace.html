@@ -793,6 +793,11 @@
             <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包" onclick="window.location.href='login.html'">
                 <span>入链</span>
             </button>
+            
+            <button class="navbar__user navbar__user--connected" id="userMenu" type="button" aria-label="打开用户菜单" style="display: none;">
+                <img src="" alt="" class="navbar__user-avatar" id="userAvatar">
+                <span id="userName">吾</span>
+            </button>
         </div>
         
         <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
@@ -807,7 +812,10 @@
             <a href="docs.html" class="navbar__link">典</a>
             <button class="navbar__user" id="mobileConnectWallet" type="button">
                 <span>入链</span>
-            </a>
+            </button>
+            <button class="navbar__user navbar__user--connected" id="mobileUserMenu" type="button" style="display: none;">
+                <span>吾</span>
+            </button>
         </div>
     </nav>
 
@@ -852,7 +860,6 @@
     <!-- 极简筛选标签 -->
     <section class="filter-tags">
         <button class="filter-tag active">全</button>
-            <button class="navbar__user navbar__user--connected" id="mobileUserMenu" type="button" style="display: none;"><span>吾</span></button>
         <button class="filter-tag">新</button>
         <button class="filter-tag">热</button>
         <button class="filter-tag">值</button>
