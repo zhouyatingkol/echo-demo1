@@ -89,40 +89,41 @@
         /* ✨ 辨识度：首字强调 + 温润排版 */
         .hero-title {
             font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
-            font-size: clamp(2.2rem, 8vw, 5rem);
+            font-size: clamp(2rem, 7vw, 4.2rem);
             font-weight: 300;
-            letter-spacing: 0.18em;
-            line-height: 1.7;
+            letter-spacing: 0.28em;
+            line-height: 2;
             color: #1a1a1a;
             text-align: center;
         }
         
         .hero-title .first-char {
-            font-size: 1.4em;
+            font-size: 1.5em;
             font-weight: 400;
             color: #b8944f;
+            margin-right: 0.15em;
         }
         
         .hero-title span {
             display: inline-block;
             opacity: 0;
-            transform: translateY(20px);
-            animation: charFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform: translateY(30px);
+            animation: charFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         
         @keyframes charFadeIn {
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* 温润的副标题 */
+        /* 温润的副标题 - 禅意呼吸 */
         .hero-subtitle {
-            margin-top: 3.5rem;
-            font-size: 0.85rem;
+            margin-top: 4rem;
+            font-size: 0.8rem;
             color: #9e8b76;
-            letter-spacing: 0.35em;
-            font-style: italic;
+            letter-spacing: 0.5em;
+            font-weight: 300;
             opacity: 0;
-            animation: fadeIn 1s ease 1.5s forwards, breathe 5s ease-in-out 2.5s infinite;
+            animation: fadeIn 1.5s ease 2s forwards, breathe 8s ease-in-out 3.5s infinite;
         }
         
         @keyframes fadeIn { to { opacity: 1; } }
@@ -140,21 +141,23 @@
             animation: fadeIn 1s ease 2s forwards;
         }
         
+        /* 宋瓷质感按钮 */
         .enter-btn {
-            margin-top: 1rem;
-            padding: 1.1rem 3.5rem;
-            border: 0.5px solid rgba(26, 26, 26, 0.15);
+            margin-top: 2rem;
+            padding: 1.2rem 4rem;
+            border: 0.5px solid rgba(26, 26, 26, 0.08);
             background: transparent;
             font-family: inherit;
-            font-size: 0.75rem;
-            letter-spacing: 0.35em;
+            font-size: 0.7rem;
+            letter-spacing: 0.5em;
             color: #1a1a1a;
             cursor: pointer;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
             opacity: 0;
-            animation: fadeIn 1s ease 2.3s forwards;
+            animation: fadeIn 1.5s ease 2.5s forwards;
+            border-radius: 1px;
         }
         
         .enter-btn::before {
@@ -165,7 +168,7 @@
             background: #1a1a1a;
             transform: scaleX(0);
             transform-origin: right;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: -1;
         }
         
@@ -176,7 +179,8 @@
         
         .enter-btn:hover {
             color: #f7f4ed;
-            border-color: #1a1a1a;
+            border-color: rgba(26, 26, 26, 0.2);
+            letter-spacing: 0.6em;
         }
         
         .scroll-hint {
@@ -209,8 +213,8 @@
         }
         
         .section-poetic {
-            min-height: 80vh;
-            padding: 20vh 10vw;
+            min-height: 100vh;
+            padding: 25vh 12vw;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -219,44 +223,47 @@
         }
         
         .section-label {
-            font-size: 0.6rem;
-            letter-spacing: 0.5em;
+            font-size: 0.55rem;
+            letter-spacing: 0.8em;
             color: #b8944f;
-            margin-bottom: 4rem;
+            margin-bottom: 5rem;
             text-transform: uppercase;
-            opacity: 0.9;
+            opacity: 0.7;
+            font-weight: 300;
         }
         
         .section-title {
             font-family: 'Noto Serif SC', serif;
-            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-size: clamp(1.4rem, 3.5vw, 2.2rem);
             font-weight: 300;
-            line-height: 1.5;
-            margin-bottom: 4rem;
-            letter-spacing: 0.1em;
+            line-height: 1.8;
+            margin-bottom: 5rem;
+            letter-spacing: 0.15em;
         }
         
-        /* ✨ 辨识度：引用式左边框 + 温润排版 */
+        /* ✨ 禅意排版：更淡的边线 */
         .poem-block {
-            padding-left: 2.5rem;
-            border-left: 1px solid rgba(201, 168, 108, 0.25);
-            max-width: 600px;
+            padding-left: 3rem;
+            border-left: 0.5px solid rgba(184, 148, 79, 0.15);
+            max-width: 550px;
         }
         
         .poem-text {
-            font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+            font-size: clamp(0.9rem, 1.4vw, 1.05rem);
             font-weight: 300;
-            line-height: 2.8;
+            line-height: 3.2;
             color: #5a5248;
+            letter-spacing: 0.08em;
         }
         
         .poem-text p {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
         
         .emphasis {
             color: #1a1a1a;
             font-weight: 400;
+            letter-spacing: 0.12em;
         }
         
         .gold-accent {
@@ -325,39 +332,39 @@
             max-width: 480px;
         }
         
-        /* ✨ 辨识度：圆形数据 */
+        /* ✨ 禅意圆形数据 */
         .stat-row {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 4rem;
+            gap: 5rem;
             max-width: 900px;
         }
         
         .stat-circle {
-            width: 140px;
-            height: 140px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            border: 0.5px solid rgba(201, 168, 108, 0.25);
+            border: 0.5px solid rgba(184, 148, 79, 0.2);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: all 0.5s ease;
+            transition: all 0.8s ease;
         }
         
         .stat-circle:hover {
-            border-color: rgba(201, 168, 108, 0.5);
-            transform: scale(1.03);
-            background: rgba(201, 168, 108, 0.02);
+            border-color: rgba(184, 148, 79, 0.4);
+            transform: scale(1.05);
+            background: rgba(184, 148, 79, 0.02);
         }
         
         .stat-number {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 300;
             color: #1a1a1a;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.05em;
         }
         
         .stat-number.gold {
@@ -365,56 +372,59 @@
         }
         
         .stat-label {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: #9e8b76;
-            margin-top: 0.6rem;
-            letter-spacing: 0.25em;
+            margin-top: 0.8rem;
+            letter-spacing: 0.3em;
+            font-weight: 300;
         }
         
-        /* 温润的作品列表 */
+        /* 禅意作品列表 */
         .work-list {
-            max-width: 800px;
+            max-width: 700px;
         }
         
         .work-row {
-            padding: 3rem 0;
-            border-bottom: 0.5px solid rgba(26, 26, 26, 0.06);
+            padding: 3.5rem 0;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.04);
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            transition: all 0.4s ease;
+            transition: all 0.6s ease;
             cursor: pointer;
         }
         
         .work-row:hover {
-            padding-left: 1.5rem;
-            background: linear-gradient(90deg, rgba(201, 168, 108, 0.03), transparent);
+            padding-left: 2rem;
+            background: linear-gradient(90deg, rgba(184, 148, 79, 0.02), transparent);
         }
         
         .work-name {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 300;
-            letter-spacing: 0.06em;
-            transition: all 0.3s ease;
+            letter-spacing: 0.1em;
+            transition: all 0.4s ease;
         }
         
         .work-row:hover .work-name {
             color: #b8944f;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
         }
         
         .work-meta {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #9e8b76;
-            margin-top: 0.3rem;
-            letter-spacing: 0.05em;
+            margin-top: 0.5rem;
+            letter-spacing: 0.08em;
+            font-weight: 300;
         }
         
         .work-price {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #b8944f;
             font-style: italic;
-            transition: transform 0.3s ease;
+            transition: transform 0.4s ease;
+            letter-spacing: 0.05em;
         }
         
         .work-row:hover .work-price {
@@ -422,7 +432,7 @@
         }
         
         .cta-section {
-            min-height: 70vh;
+            min-height: 80vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -433,31 +443,32 @@
         
         .cta-title {
             font-family: 'Noto Serif SC', serif;
-            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-size: clamp(1.4rem, 3.5vw, 2.2rem);
             font-weight: 300;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            letter-spacing: 0.1em;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+            letter-spacing: 0.15em;
         }
         
         .cta-sub {
             color: #7a6e5f;
-            margin-bottom: 3.5rem;
-            font-size: 1rem;
-            letter-spacing: 0.1em;
+            margin-bottom: 4rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            font-weight: 300;
         }
         
         .footer {
-            padding: 8vh 10vw;
-            border-top: 0.5px solid rgba(26, 26, 26, 0.06);
+            padding: 10vh 10vw;
+            border-top: 0.5px solid rgba(26, 26, 26, 0.04);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
         .footer-logo {
-            font-size: 1rem;
-            letter-spacing: 0.4em;
+            font-size: 0.95rem;
+            letter-spacing: 0.5em;
             font-weight: 300;
         }
         
@@ -465,10 +476,11 @@
             margin-left: 3rem;
             text-decoration: none;
             color: #9e8b76;
-            font-size: 0.7rem;
-            letter-spacing: 0.15em;
-            transition: all 0.4s ease;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            transition: all 0.6s ease;
             position: relative;
+            font-weight: 300;
         }
         
         .footer-links a::after {
@@ -567,8 +579,8 @@
 </head>
 <body>
     <div class="paper-texture"></div>
-    <div class="song-pattern"></div>
     <div class="glow-soft"></div>
+    <div class="side-mark">ECHO</div>
     <div class="side-mark">ECHO</div>
 
     <!-- 顶部导航 -->
