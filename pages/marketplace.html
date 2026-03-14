@@ -761,7 +761,7 @@
             <a href="index.html" class="navbar__link">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
             <a href="docs.html" class="navbar__link">典</a>
-            <a href="login.html" class="navbar__user" id="mobileConnectWallet">
+            <button class="navbar__user" id="mobileConnectWallet" type="button">
                 <span>入链</span>
             </a>
         </div>
@@ -808,6 +808,7 @@
     <!-- 极简筛选标签 -->
     <section class="filter-tags">
         <button class="filter-tag active">全</button>
+            <button class="navbar__user navbar__user--connected" id="mobileUserMenu" type="button" style="display: none;"><span>吾</span></button>
         <button class="filter-tag">新</button>
         <button class="filter-tag">热</button>
         <button class="filter-tag">值</button>
@@ -937,5 +938,7 @@
             }
         }
     </style>
+    <!-- 钱包状态管理 -->
+    <script src="../js/wallet-manager.js"></script>
 </body>
 </html>

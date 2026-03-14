@@ -1,0 +1,479 @@
+/** 东方美学导航栏 - navbar.css
+ * 设计理念：极简、留白、呼吸感
+ * 风格意象：窗棂、竹简、印章
+ */
+
+/* ============================================
+   字体引入
+   ============================================ */
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&display=swap');
+
+/* ============================================
+   CSS 变量定义
+   ============================================ */
+:root {
+  /* 墨色体系 - 由淡至浓 */
+  --ink-lightest: rgba(26, 26, 26, 0.02);
+  --ink-lighter: rgba(26, 26, 26, 0.06);
+  --ink-light: #7A6E5F;
+  --ink-medium: #5A5045;
+  --ink-dark: #3A3530;
+  --ink-deep: #1a1a1a;
+  
+  /* 宋金色 - 东方雅致 */
+  --song-gold: #C9B896;
+  --song-gold-light: #D9C8A6;
+  --song-gold-deep: #A98B6F;
+  
+  /* 宣纸色 */
+  --rice-paper: #FDFCFA;
+  --rice-paper-warm: #F8F6F3;
+  
+  /* 字体 */
+  --font-title: 'LXGW WenKai', 'PingFang SC', serif;
+  --font-body: 'Noto Serif SC', 'Source Han Serif CN', 'SimSun', serif;
+  
+  /* 间距与尺寸 */
+  --nav-height: 60px;
+  --nav-padding-x: clamp(24px, 5vw, 80px);
+  --letter-spacing-breath: 0.3em;
+  
+  /* 动画时长 */
+  --duration-water: 0.8s;
+  --duration-breeze: 0.4s;
+}
+
+/* ============================================
+   导航栏容器
+   ============================================ */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--nav-padding-x);
+  
+  /* 初始透明背景 */
+  background: transparent;
+  
+  /* 过渡效果 - 如水波般柔和 */
+  transition: background var(--duration-water) cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow var(--duration-water) ease,
+              backdrop-filter var(--duration-water) ease;
+}
+
+/* 滚动后背景渐显 - 如宣纸渐显 */
+.navbar.scrolled {
+  background: rgba(253, 252, 250, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+}
+
+/* 更深度的滚动效果 */
+.navbar.scrolled-deep {
+  background: rgba(253, 252, 250, 0.98);
+  box-shadow: 0 1px 0 rgba(122, 110, 95, 0.1);
+}
+
+/* ============================================
+   品牌标识区域 - 左侧
+   ============================================ */
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.navbar__logo {
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--ink-dark);
+  letter-spacing: var(--letter-spacing-breath);
+  text-decoration: none;
+  
+  /* 印章般的克制呈现 */
+  opacity: 0.85;
+  transition: opacity var(--duration-breeze) ease;
+}
+
+.navbar__brand:hover .navbar__logo {
+  opacity: 1;
+}
+
+/* ============================================
+   导航链接区域 - 中间
+   ============================================ */
+.navbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.navbar__link {
+  position: relative;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--ink-light);
+  text-decoration: none;
+  letter-spacing: var(--letter-spacing-breath);
+  padding: 0.5rem 0;
+  
+  /* 水波般柔和的过渡 */
+  transition: color var(--duration-breeze) ease;
+}
+
+/* 当前页标记 - 淡墨小点 */
+.navbar__link--active::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -1.2em;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ink-light);
+  opacity: 0.5;
+}
+
+/* Hover 效果 - 字色加深 */
+.navbar__link:hover {
+  color: var(--ink-dark);
+}
+
+/* 下划线动画 - 宋金色细线从左滑入 */
+.navbar__link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0.5px;
+  background: var(--song-gold);
+  
+  /* 从左滑入的动画 */
+  transition: width var(--duration-breeze) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar__link:hover::after {
+  width: 100%;
+}
+
+/* 当前页 hover 不下划线 */
+.navbar__link--active:hover::after {
+  width: 0;
+}
+
+/* ============================================
+   用户区域 - 右侧
+   ============================================ */
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* 用户头像/连接按钮 */
+.navbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 2px;
+  
+  /* 淡墨边框，如窗棂 */
+  border: 0.5px solid rgba(122, 110, 95, 0.15);
+  background: transparent;
+  
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--ink-light);
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  
+  transition: all var(--duration-breeze) ease;
+}
+
+.navbar__user:hover {
+  border-color: var(--song-gold);
+  color: var(--ink-dark);
+  background: rgba(201, 184, 150, 0.05);
+}
+
+.navbar__user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  
+  /* 淡墨边框 */
+  border: 0.5px solid rgba(122, 110, 95, 0.2);
+}
+
+.navbar__user-placeholder {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(122, 110, 95, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar__user-placeholder svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--ink-light);
+}
+
+/* ============================================
+   移动端菜单按钮 - 三横如竹简
+   ============================================ */
+.navbar__menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  gap: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* 三横 - 如竹简纹理 */
+.navbar__menu-line {
+  width: 24px;
+  height: 1px;
+  background: var(--ink-light);
+  transition: all var(--duration-breeze) ease;
+  transform-origin: center;
+}
+
+/* 展开状态动画 */
+.navbar__menu-btn.active .navbar__menu-line:nth-child(1) {
+  transform: translateY(3.5px) rotate(45deg);
+  background: var(--ink-dark);
+}
+
+.navbar__menu-btn.active .navbar__menu-line:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar__menu-btn.active .navbar__menu-line:nth-child(3) {
+  transform: translateY(-3.5px) rotate(-45deg);
+  background: var(--ink-dark);
+}
+
+/* ============================================
+   移动端全屏菜单 - 淡墨遮罩
+   ============================================ */
+.navbar__mobile-menu {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  
+  /* 淡墨遮罩 */
+  background: rgba(253, 252, 250, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  
+  /* 默认隐藏 */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  
+  /* 如水般淡入 */
+  transition: opacity var(--duration-water) ease,
+              visibility var(--duration-water) ease;
+}
+
+.navbar__mobile-menu.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* 移动端导航链接 - 垂直排列 */
+.navbar__mobile-menu .navbar__link {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--ink-medium);
+  padding: 1rem 0;
+  
+  /* 垂直文字间距 */
+  letter-spacing: 0.5em;
+}
+
+.navbar__mobile-menu .navbar__link:hover {
+  color: var(--ink-dark);
+}
+
+.navbar__mobile-menu .navbar__link::after {
+  display: none;
+}
+
+/* 移动端用户区域 */
+.navbar__mobile-menu .navbar__user {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   水波动效动画关键帧
+   ============================================ */
+@keyframes water-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.15;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}
+
+/* 水波纹装饰元素 */
+.navbar__water-ripple {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(201, 184, 150, 0.3), 
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--duration-water) ease;
+}
+
+.navbar.scrolled .navbar__water-ripple {
+  opacity: 1;
+  animation: water-ripple 4s ease-in-out infinite;
+}
+
+/* ============================================
+   响应式适配
+   ============================================ */
+@media (max-width: 768px) {
+  .navbar {
+    height: var(--nav-height);
+  }
+  
+  /* 隐藏桌面端导航 */
+  .navbar__nav {
+    display: none;
+  }
+  
+  /* 隐藏桌面端用户操作 */
+  .navbar__actions {
+    display: none;
+  }
+  
+  /* 显示菜单按钮 */
+  .navbar__menu-btn {
+    display: flex;
+  }
+  
+  /* 品牌居中 */
+  .navbar__brand {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 769px) {
+  /* 桌面端隐藏移动端菜单 */
+  .navbar__mobile-menu {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   适配深色模式
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rice-paper: #1a1a1a;
+    --rice-paper-warm: #222220;
+    --ink-light: #9A9085;
+    --ink-medium: #B5ADA3;
+    --ink-dark: #D5CFC7;
+    --ink-deep: #F0EDE8;
+  }
+  
+  .navbar.scrolled,
+  .navbar.scrolled-deep {
+    background: rgba(26, 26, 26, 0.95);
+    box-shadow: 0 1px 0 rgba(154, 144, 133, 0.1);
+  }
+  
+  .navbar__mobile-menu {
+    background: rgba(26, 26, 26, 0.98);
+  }
+}
+
+/* ============================================
+   减少动画偏好支持
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .navbar,
+  .navbar__link,
+  .navbar__link::after,
+  .navbar__user,
+  .navbar__logo,
+  .navbar__menu-line {
+    transition: none !important;
+  }
+  
+  .navbar__water-ripple {
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   打印样式
+   ============================================ */
+@media print {
+  .navbar {
+    position: relative;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  
+  .navbar__actions,
+  .navbar__menu-btn {
+    display: none !important;
+  }
+}

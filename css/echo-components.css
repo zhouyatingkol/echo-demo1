@@ -1,0 +1,983 @@
+/**
+ * ECHO 东方美学组件库
+ * 基于 ECHO-东方美学设计系统 V1.0
+ * 核心理念：「生长」—— 克制、呼吸、过目不忘
+ * 
+ * @author 雨娃 - 设计总监
+ * @version 1.0.0
+ */
+
+/* ==========================================
+   1. 基础变量区
+   ========================================== */
+
+/* 字体导入 */
+@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap');
+
+:root {
+  /* --------------------------------------
+     1.1 色彩系统
+     -------------------------------------- */
+  
+  /* 宣纸质感 */
+  --bg-primary: #F8F6F1;      /* 暖白宣纸底色 */
+  --bg-secondary: #F2EFE8;    /* 微黄陈纸 */
+  --bg-tertiary: #EBE7DD;     /* 深一层 */
+  
+  /* 四阶墨色 */
+  --ink-deep: #1A1A1A;        /* 浓墨 - 主标题 */
+  --ink-medium: #4A4A4A;      /* 中墨 - 正文 */
+  --ink-light: #7A6E5F;       /* 淡墨 - 辅助 */
+  --ink-faint: #B5B5B5;       /* 极淡 - 占位 */
+  
+  /* 宋金 */
+  --gold-primary: #B89B6C;    /* 内敛古金 */
+  --gold-light: #D4C4A8;      /* 淡金 hover */
+  
+  /* 三域 */
+  --realm-sound: #8B9DC3;     /* 音 - 青瓷 */
+  --realm-color: #C9A9A6;     /* 色 - 粉瓷 */
+  --realm-text: #7A8B7C;      /* 文 - 墨绿 */
+  
+  /* --------------------------------------
+     1.2 字体系统
+     -------------------------------------- */
+  --font-display: 'LXGW WenKai', 'STKaiti', 'KaiTi', cursive;           /* 标题 - 文楷 */
+  --font-serif: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;          /* 正文 - 宋体 */
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; /* UI - 黑体 */
+  
+  /* 字间距 */
+  --tracking-hero: 0.28em;
+  --tracking-subtitle: 0.5em;
+  --tracking-body: 0.02em;
+  --tracking-tight: 0.01em;
+  
+  /* 行高 */
+  --leading-tight: 1.2;
+  --leading-relaxed: 1.8;
+  --leading-poetic: 2.5;
+  
+  /* --------------------------------------
+     1.3 留白系统
+     -------------------------------------- */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+  --space-4xl: 6rem;     /* 96px */
+  --space-5xl: 8rem;     /* 128px */
+  --space-breathe: 12vh; /* 呼吸间距 */
+  
+  /* --------------------------------------
+     1.4 时序系统
+     -------------------------------------- */
+  --duration-instant: 0.15s;   /* 微交互 */
+  --duration-fast: 0.3s;       /* hover */
+  --duration-normal: 0.8s;     /* 元素过渡 */
+  --duration-slow: 1.2s;       /* 页面切换 */
+  --duration-ambient: 12s;     /* 环境动画 */
+  
+  /* --------------------------------------
+     1.5 缓动曲线 - 东方美学
+     -------------------------------------- */
+  --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);      /* 墨晕 - 自然晕染 */
+  --ease-water: cubic-bezier(0.4, 0, 0.2, 1);        /* 水波 - 流畅涟漪 */
+  --ease-breath: cubic-bezier(0.45, 0, 0.55, 1);     /* 呼吸 - 生命律动 */
+  --ease-leaf: cubic-bezier(0.22, 1, 0.36, 1);       /* 叶落 - 优雅飘坠 */
+  
+  /* --------------------------------------
+     1.6 阴影与光效
+     -------------------------------------- */
+  --shadow-ink: 0 2px 8px rgba(26, 26, 26, 0.06);
+  --shadow-float: 0 4px 20px rgba(26, 26, 26, 0.08);
+  --shadow-ceramic: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --glow-gold: 0 0 30px rgba(184, 155, 108, 0.2);
+  
+  /* --------------------------------------
+     1.7 圆角与线条
+     -------------------------------------- */
+  --radius-subtle: 1px;      /* 宋瓷微圆角 */
+  --radius-soft: 4px;
+  --radius-pill: 9999px;
+  --border-ink: 0.5px;       /* 墨线细度 */
+}
+
+/* ==========================================
+   2. 布局工具类
+   ========================================== */
+
+/* 2.1 墨韵容器 - 50%+ 留白 */
+.container-ink {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  box-sizing: border-box;
+}
+
+.container-ink--narrow {
+  max-width: 960px;
+}
+
+.container-ink--wide {
+  max-width: 1600px;
+}
+
+/* 2.2 呼吸留白 - 垂直节奏 */
+.section-breathe {
+  padding-top: var(--space-breathe);
+  padding-bottom: var(--space-breathe);
+}
+
+.section-breathe--small {
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-3xl);
+}
+
+.section-breathe--large {
+  padding-top: 20vh;
+  padding-bottom: 20vh;
+}
+
+/* 2.3 宣纸网格 - 流动栅格 */
+.grid-paper {
+  display: grid;
+  gap: var(--space-xl);
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.grid-paper--gap-sm {
+  gap: var(--space-md);
+}
+
+.grid-paper--gap-lg {
+  gap: var(--space-3xl);
+}
+
+/* 网格跨列工具 */
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+.col-span-4 { grid-column: span 4; }
+.col-span-6 { grid-column: span 6; }
+.col-span-8 { grid-column: span 8; }
+.col-span-12 { grid-column: span 12; }
+
+/* 2.4 宣纸纹理背景 */
+.texture-rice::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==========================================
+   3. 组件
+   ========================================== */
+
+/* 3.1 宋瓷按钮 */
+.btn-ceramic {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: white;
+  background: linear-gradient(135deg, var(--ink-medium) 0%, var(--ink-deep) 100%);
+  border: none;
+  border-radius: var(--radius-subtle);
+  box-shadow: var(--shadow-ceramic);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* 顶部高光 - 釉面感 */
+.btn-ceramic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+  z-index: 1;
+}
+
+/* 光晕流动效果 */
+.btn-ceramic::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  transition: left var(--duration-slow) var(--ease-water);
+}
+
+.btn-ceramic:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-float);
+}
+
+.btn-ceramic:hover::after {
+  left: 100%;
+}
+
+.btn-ceramic:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-ceramic);
+}
+
+/* 幽灵瓷按钮 */
+.btn-ceramic--ghost {
+  background: transparent;
+  color: var(--ink-deep);
+  border: var(--border-ink) solid rgba(26, 26, 26, 0.15);
+  box-shadow: none;
+}
+
+.btn-ceramic--ghost::before {
+  display: none;
+}
+
+.btn-ceramic--ghost:hover {
+  border-color: var(--gold-light);
+  background: rgba(184, 155, 108, 0.04);
+}
+
+/* 小型瓷按钮 */
+.btn-ceramic--sm {
+  padding: 10px 20px;
+  font-size: 12px;
+}
+
+/* 大型瓷按钮 */
+.btn-ceramic--lg {
+  padding: 18px 48px;
+  font-size: 16px;
+  letter-spacing: 0.15em;
+}
+
+/* 3.2 瓷片卡片 */
+.card-porcelain {
+  position: relative;
+  background: var(--bg-primary);
+  border-radius: var(--radius-subtle);
+  border: var(--border-ink) solid rgba(26, 26, 26, 0.06);
+  box-shadow: var(--shadow-ink);
+  overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-water);
+}
+
+.card-porcelain:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-float);
+  border-color: rgba(184, 155, 108, 0.2);
+}
+
+.card-porcelain__image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--bg-secondary);
+}
+
+.card-porcelain__content {
+  padding: var(--space-lg);
+}
+
+.card-porcelain__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--ink-deep);
+  margin-bottom: var(--space-sm);
+  letter-spacing: var(--tracking-body);
+}
+
+.card-porcelain__desc {
+  font-family: var(--font-serif);
+  font-size: 0.875rem;
+  color: var(--ink-light);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+/* 3.3 宣纸输入框 */
+.input-rice {
+  width: 100%;
+  padding: 14px 18px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--ink-deep);
+  background: var(--bg-primary);
+  border: var(--border-ink) solid rgba(26, 26, 26, 0.1);
+  border-radius: var(--radius-subtle);
+  outline: none;
+  transition: all var(--duration-fast) var(--ease-ink);
+  box-sizing: border-box;
+}
+
+.input-rice::placeholder {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.input-rice:hover {
+  border-color: rgba(26, 26, 26, 0.15);
+}
+
+.input-rice:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 3px rgba(184, 155, 108, 0.1);
+}
+
+/* 输入框标签 */
+.input-rice__label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-light);
+  margin-bottom: var(--space-sm);
+  text-transform: uppercase;
+}
+
+/* 输入框组 */
+.input-rice__group {
+  position: relative;
+  margin-bottom: var(--space-lg);
+}
+
+/* 3.4 宋金标签 */
+.tag-gold {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--gold-primary);
+  background: rgba(184, 155, 108, 0.08);
+  border: var(--border-ink) solid rgba(184, 155, 108, 0.2);
+  border-radius: var(--radius-pill);
+  transition: all var(--duration-fast) var(--ease-water);
+}
+
+.tag-gold:hover {
+  background: rgba(184, 155, 108, 0.12);
+  border-color: rgba(184, 155, 108, 0.3);
+}
+
+/* 三域标签变体 */
+.tag-gold--sound {
+  color: var(--realm-sound);
+  background: rgba(139, 157, 195, 0.08);
+  border-color: rgba(139, 157, 195, 0.2);
+}
+
+.tag-gold--sound:hover {
+  background: rgba(139, 157, 195, 0.12);
+}
+
+.tag-gold--color {
+  color: var(--realm-color);
+  background: rgba(201, 169, 166, 0.08);
+  border-color: rgba(201, 169, 166, 0.2);
+}
+
+.tag-gold--color:hover {
+  background: rgba(201, 169, 166, 0.12);
+}
+
+.tag-gold--text {
+  color: var(--realm-text);
+  background: rgba(122, 139, 124, 0.08);
+  border-color: rgba(122, 139, 124, 0.2);
+}
+
+.tag-gold--text:hover {
+  background: rgba(122, 139, 124, 0.12);
+}
+
+/* 3.5 三域图标 */
+.icon-realm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.icon-realm svg {
+  width: 100%;
+  height: 100%;
+}
+
+.icon-realm--sound path,
+.icon-realm--sound line,
+.icon-realm--sound circle {
+  stroke: var(--realm-sound);
+  stroke-width: 0.5;
+}
+
+.icon-realm--color path,
+.icon-realm--color line,
+.icon-realm--color circle {
+  stroke: var(--realm-color);
+  stroke-width: 0.5;
+}
+
+.icon-realm--text path,
+.icon-realm--text line,
+.icon-realm--text circle {
+  stroke: var(--realm-text);
+  stroke-width: 0.5;
+}
+
+/* 图标尺寸变体 */
+.icon-realm--sm { width: 16px; height: 16px; }
+.icon-realm--md { width: 24px; height: 24px; }
+.icon-realm--lg { width: 32px; height: 32px; }
+.icon-realm--xl { width: 48px; height: 48px; }
+
+/* 3.6 朱红印章 */
+.seal-zhu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #C53030;
+  background: transparent;
+  border: 2px solid #C53030;
+  border-radius: 2px;
+  position: relative;
+  transform: rotate(-2deg);
+  transition: all var(--duration-fast) var(--ease-ink);
+}
+
+.seal-zhu::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid rgba(197, 48, 48, 0.3);
+  pointer-events: none;
+}
+
+.seal-zhu:hover {
+  background: rgba(197, 48, 48, 0.05);
+  transform: rotate(-1deg) scale(1.02);
+}
+
+/* 圆形印章 */
+.seal-zhu--round {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 12px;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 0.3em;
+}
+
+/* ==========================================
+   4. 动效类
+   ========================================== */
+
+/* 4.1 墨晕出现 */
+.animate-emerge {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(10px);
+  animation: emerge 2s var(--ease-ink) forwards;
+}
+
+@keyframes emerge {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* 延迟变体 */
+.animate-emerge--delay-1 { animation-delay: 0.2s; }
+.animate-emerge--delay-2 { animation-delay: 0.4s; }
+.animate-emerge--delay-3 { animation-delay: 0.6s; }
+.animate-emerge--delay-4 { animation-delay: 0.8s; }
+
+/* 4.2 呼吸效果 */
+.animate-breathe {
+  animation: breathe 8s var(--ease-breath) infinite;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.005);
+    opacity: 0.95;
+  }
+}
+
+/* 光晕呼吸 */
+.animate-breathe--glow {
+  animation: breatheGlow 12s var(--ease-breath) infinite;
+}
+
+@keyframes breatheGlow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* 4.3 水波 Hover */
+.hover-water {
+  position: relative;
+  overflow: hidden;
+}
+
+.hover-water::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(184, 155, 108, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width var(--duration-normal) var(--ease-water),
+              height var(--duration-normal) var(--ease-water);
+}
+
+.hover-water:hover::before {
+  width: 300%;
+  height: 300%;
+}
+
+/* 4.4 叶落入场 */
+.animate-fall {
+  opacity: 0;
+  transform: translateY(-20px) rotate(-5deg);
+  animation: fall 1.2s var(--ease-leaf) forwards;
+}
+
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) rotate(-5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+}
+
+/* 4.5 页面切换 - 翻书效果 */
+.animate-page-enter {
+  opacity: 0;
+  transform: scale(1.02) translateX(20px);
+  filter: blur(4px);
+  animation: pageEnter 0.8s var(--ease-ink) forwards;
+}
+
+@keyframes pageEnter {
+  0% {
+    opacity: 0;
+    transform: scale(1.02) translateX(20px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+    filter: blur(0);
+  }
+}
+
+.animate-page-exit {
+  animation: pageExit 0.6s var(--ease-ink) forwards;
+}
+
+@keyframes pageExit {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98) translateX(-20px);
+    filter: blur(4px);
+  }
+}
+
+/* 4.6 金线划过 */
+.animate-gold-line {
+  position: relative;
+}
+
+.animate-gold-line::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--gold-primary);
+  transition: width var(--duration-normal) var(--ease-water),
+              left var(--duration-normal) var(--ease-water);
+}
+
+.animate-gold-line:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* ==========================================
+   5. 工具类
+   ========================================== */
+
+/* 5.1 墨阶文字色 */
+.text-ink-deep {
+  color: var(--ink-deep);
+}
+
+.text-ink-medium {
+  color: var(--ink-medium);
+}
+
+.text-ink-light {
+  color: var(--ink-light);
+}
+
+.text-ink-faint {
+  color: var(--ink-faint);
+}
+
+/* 5.2 宣纸背景 */
+.bg-rice-paper {
+  background-color: var(--bg-primary);
+}
+
+.bg-rice-paper--secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-rice-paper--tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+/* 5.3 墨线边框 */
+.border-ink {
+  border: var(--border-ink) solid rgba(26, 26, 26, 0.1);
+}
+
+.border-ink--light {
+  border-color: rgba(26, 26, 26, 0.06);
+}
+
+.border-ink--medium {
+  border-color: rgba(26, 26, 26, 0.1);
+}
+
+.border-ink--heavy {
+  border-color: rgba(26, 26, 26, 0.2);
+}
+
+/* 单边墨线 */
+.border-ink-t { border-top: var(--border-ink) solid rgba(26, 26, 26, 0.1); }
+.border-ink-b { border-bottom: var(--border-ink) solid rgba(26, 26, 26, 0.1); }
+.border-ink-l { border-left: var(--border-ink) solid rgba(26, 26, 26, 0.1); }
+.border-ink-r { border-right: var(--border-ink) solid rgba(26, 26, 26, 0.1); }
+
+/* 5.4 字体工具 */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* 5.5 字间距 */
+.tracking-hero {
+  letter-spacing: var(--tracking-hero);
+}
+
+.tracking-subtitle {
+  letter-spacing: var(--tracking-subtitle);
+}
+
+.tracking-body {
+  letter-spacing: var(--tracking-body);
+}
+
+/* 5.6 行高 */
+.leading-tight {
+  line-height: var(--leading-tight);
+}
+
+.leading-relaxed {
+  line-height: var(--leading-relaxed);
+}
+
+.leading-poetic {
+  line-height: var(--leading-poetic);
+}
+
+/* 5.7 可见性 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 5.8 过渡预设 */
+.transition-ink {
+  transition: all var(--duration-normal) var(--ease-ink);
+}
+
+.transition-water {
+  transition: all var(--duration-normal) var(--ease-water);
+}
+
+.transition-breath {
+  transition: all var(--duration-slow) var(--ease-breath);
+}
+
+.transition-instant {
+  transition: all var(--duration-instant) var(--ease-ink);
+}
+
+/* ==========================================
+   6. Hero 区组件
+   ========================================== */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero__texture {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+/* 窗棂光晕 */
+.hero__light {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(ellipse at center, 
+    rgba(232, 228, 220, 0.6) 0%, 
+    transparent 70%);
+  filter: blur(60px);
+  animation: lightBreath 12s var(--ease-breath) infinite;
+  pointer-events: none;
+}
+
+.hero__light--primary {
+  top: -20%;
+  right: -10%;
+}
+
+.hero__light--secondary {
+  bottom: -30%;
+  left: -20%;
+  animation-delay: -6s;
+}
+
+@keyframes lightBreath {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Hero 主标题 */
+.hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 12vw, 8rem);
+  font-weight: 300;
+  color: var(--ink-deep);
+  letter-spacing: var(--tracking-hero);
+  margin: 0;
+  position: relative;
+}
+
+/* 金色下划线如印章 */
+.hero__title::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 0.5px;
+  background: var(--gold-primary);
+  opacity: 0.6;
+}
+
+/* Hero 副标题 */
+.hero__subtitle {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  color: var(--ink-light);
+  letter-spacing: var(--tracking-subtitle);
+  margin-top: var(--space-4xl);
+  text-align: center;
+}
+
+/* Hero CTA 按钮 */
+.hero__cta {
+  position: relative;
+  margin-top: var(--space-3xl);
+  padding: 1.2rem 4rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: var(--tracking-subtitle);
+  color: var(--ink-deep);
+  background: transparent;
+  border: var(--border-ink) solid rgba(26, 26, 26, 0.08);
+  border-radius: var(--radius-subtle);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all var(--duration-slow) var(--ease-leaf);
+}
+
+.hero__cta:hover {
+  border-color: var(--gold-light);
+  letter-spacing: 0.6em;
+}
+
+.hero__cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(184, 155, 108, 0.1), 
+    transparent);
+  transition: left 1.5s var(--ease-water);
+}
+
+.hero__cta:hover::before {
+  left: 100%;
+}
+
+/* ==========================================
+   7. 响应式断点
+   ========================================== */
+
+@media (max-width: 768px) {
+  :root {
+    --space-breathe: 8vh;
+  }
+  
+  .container-ink {
+    padding: 0 var(--space-md);
+  }
+  
+  .grid-paper {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-md);
+  }
+  
+  .col-span-2,
+  .col-span-3,
+  .col-span-4,
+  .col-span-6,
+  .col-span-8 {
+    grid-column: span 4;
+  }
+  
+  .hero__subtitle {
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+  }
+  
+  .btn-ceramic--lg {
+    padding: 14px 32px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-paper {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .col-span-2,
+  .col-span-3,
+  .col-span-4,
+  .col-span-6,
+  .col-span-8,
+  .col-span-12 {
+    grid-column: span 2;
+  }
+  
+  .seal-zhu--round {
+    width: 48px;
+    height: 48px;
+    font-size: 10px;
+  }
+}
