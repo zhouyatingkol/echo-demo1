@@ -149,6 +149,21 @@
             visibility: visible;
         }
         
+        /* 首页 Hero 区域吾按钮 */
+        #heroWalletStatus {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.5em;
+            text-indent: 0.5em;
+            border-color: rgba(122, 110, 95, 0.2);
+            background: transparent;
+        }
+        
+        #heroWalletStatus:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+        }
+        
         .navbar__user-placeholder {
             width: 20px;
             height: 20px;
@@ -404,14 +419,14 @@
             border-bottom: none;
         }
         
-        /* 主内容 */
+        /* 主内容 - 东方美学层次 */
         .hero-content {
             position: relative;
             z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3rem;
+            gap: 4rem;  /* 主节奏：四字间距 */
             text-align: center;
         }
         
@@ -420,9 +435,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.5rem;  /* 文印之间，一寸留白 */
             flex-wrap: wrap;
-            /* 移除动画，直接显示 */
             opacity: 1;
             transform: none;
             filter: none;
@@ -430,24 +444,23 @@
         
         .hero-slogan {
             font-family: var(--font-display);
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-size: clamp(1.1rem, 2.5vw, 1.6rem);  /* 更内敛的字号 */
             font-weight: 300;
             color: var(--ink-deep);
-            letter-spacing: 0.2em;
-            line-height: 1.8;
+            letter-spacing: 0.25em;  /* 字间呼吸 */
+            line-height: 1.6;
         }
         
-        /* 朱红印章 - 使用图片 + SVG 滤镜 */
+        /* 朱红印章 */
         .hero-seal {
-            width: 48px;
-            height: 84px;
+            width: 40px;  /* 稍小，更精致 */
+            height: 70px;
             background-image: url('../images/seal-gongsheng.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             position: relative;
             opacity: 1;
-            /* 整体调色：降低亮度、饱和度，偏向暗朱红 */
             filter: url(#brushEdge) brightness(0.75) saturate(0.85) sepia(0.15);
         }
         
@@ -470,11 +483,6 @@
                 transform: scale(1) rotate(0deg);
             }
         }
-            100% { 
-                opacity: 1; 
-                transform: scale(1) rotate(0deg);
-            }
-        }
         
         @keyframes emerge {
             0% { opacity: 0; transform: translateY(30px); filter: blur(10px); }
@@ -484,51 +492,54 @@
         /* ECHO 品牌 */
         .hero-brand {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 5vw, 3rem);
+            font-size: clamp(1.8rem, 4vw, 2.6rem);  /* 更克制 */
             font-weight: 400;
             color: var(--ink-medium);
-            letter-spacing: 0.5em;
+            letter-spacing: 0.8em;  /* 疏朗大气 */
+            text-indent: 0.8em;  /* 视觉居中补偿 */
             text-transform: uppercase;
             opacity: 0;
-            animation: fadeIn 1.5s ease 1s forwards;
+            animation: fadeIn 1.5s ease 0.8s forwards;
+            margin-top: -1rem;  /* 向上微收 */
         }
         
         @keyframes fadeIn {
             to { opacity: 1; }
         }
         
-        /* 底部小字 */
+        /* 副标题 */
         .hero-subtitle {
             opacity: 0;
-            animation: fadeIn 1.5s ease 1.5s forwards;
+            animation: fadeIn 1.5s ease 1.2s forwards;
+            margin-top: -1.5rem;  /* 向上收拢 */
         }
         
         .subtitle-main {
             font-family: var(--font-serif);
-            font-size: 0.85rem;
+            font-size: 0.8rem;  /* 更小巧 */
             color: var(--ink-light);
-            letter-spacing: 0.15em;
+            letter-spacing: 0.2em;  /* 疏朗 */
             font-weight: 300;
-            line-height: 2;
+            line-height: 1.8;
         }
         
-        /* 宋瓷按钮 */
+        /* 入境按钮 - 宋瓷克制 */
         .hero-cta {
-            margin-top: 1rem;
             position: relative;
-            padding: 1.2rem 4rem;
+            padding: 1rem 3rem;  /* 更内敛的尺寸 */
             font-family: var(--font-serif);
-            font-size: 0.85rem;
-            letter-spacing: 0.5em;
+            font-size: 0.8rem;  /* 小巧 */
+            letter-spacing: 0.6em;  /* 字间疏朗 */
+            text-indent: 0.6em;  /* 视觉居中 */
             color: var(--ink-deep);
             background: transparent;
-            border: 0.5px solid rgba(26, 26, 26, 0.08);
+            border: 0.5px solid rgba(122, 110, 95, 0.25);  /* 淡墨边框 */
             border-radius: 1px;
             cursor: pointer;
             overflow: hidden;
-            transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
             opacity: 0;
-            animation: fadeInUp 1.5s cubic-bezier(0.23, 1, 0.32, 1) 2s forwards;
+            animation: fadeInUp 1.5s cubic-bezier(0.23, 1, 0.32, 1) 1.5s forwards;
         }
         
         @keyframes fadeInUp {
@@ -541,6 +552,30 @@
             position: absolute;
             top: 0;
             left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(184, 155, 108, 0.08), 
+                transparent);
+            transition: left 1.2s ease;
+        }
+        
+        .hero-cta:hover::before {
+            left: 100%;
+        }
+        
+        .hero-cta:hover {
+            border-color: var(--gold-primary);
+            letter-spacing: 0.7em;
+            color: var(--ink-deep);
+            background: rgba(184, 155, 108, 0.03);
+        }
+        
+        .hero-cta span {
+            position: relative;
+            z-index: 2;
+        }
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, 
@@ -734,8 +769,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2.5rem;  /* 东方呼吸感，留白克制 */
-            margin-top: 3rem;
+            gap: 1.5rem;  /* 入境与吾，一寸间距 */
+            margin-top: 2rem;  /* 与上文留白 */
         }
         
         .cta-btn--primary {
