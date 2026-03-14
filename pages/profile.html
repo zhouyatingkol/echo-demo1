@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吾 - ECHO</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chinese-fonts/lxgwwenkai/dist/LXGWWenKai-Regular/result.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F0EDE6;
+            --bg-card: #FAFAF8;
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #8A8A8A;
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
+            --cinnabar: #A03020;
+            --font-serif: 'LXGW WenKai', serif;
+            --font-sans: 'Inter', sans-serif;
+            --ease-ink: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background-color: var(--bg-primary);
+            color: var(--ink-deep);
+            line-height: 1.8;
+            letter-spacing: 0.05em;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            transition: all 0.6s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(248, 246, 241, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+            padding: 1rem 5vw;
+        }
+
+        .navbar__brand {
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+            text-decoration: none;
+        }
+
+        .navbar__nav {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .navbar__link {
+            font-size: 0.9rem;
+            color: var(--ink-medium);
+            text-decoration: none;
+            letter-spacing: 0.15em;
+            position: relative;
+            transition: color 0.4s ease;
+        }
+
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold-primary);
+            transition: width 0.4s ease;
+        }
+
+        .navbar__link:hover,
+        .navbar__link.active {
+            color: var(--cinnabar);
+        }
+
+        .navbar__link:hover::after,
+        .navbar__link.active::after {
+            width: 100%;
+        }
+
+        .navbar__user {
+            font-size: 0.85rem;
+            color: var(--cinnabar);
+            letter-spacing: 0.1em;
+        }
+
+        /* Hero */
+        .profile-hero {
+            padding: 20vh 10vw 10vh;
+            text-align: center;
+        }
+
+        .profile-title {
+            font-size: 3rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+        }
+
+        .profile-subtitle {
+            font-size: 1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+        }
+
+        /* Tab 导航 */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            padding: 2rem 0;
+            border-bottom: 0.5px solid rgba(0,0,0,0.08);
+            margin: 0 10vw;
+        }
+
+        .tab-btn {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: var(--ink-light);
+            background: none;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.2em;
+            padding: 0.5rem 1rem;
+            position: relative;
+            transition: color 0.4s ease;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 1px;
+            background: var(--cinnabar);
+            transition: width 0.4s ease;
+        }
+
+        .tab-btn:hover,
+        .tab-btn.active {
+            color: var(--ink-deep);
+        }
+
+        .tab-btn.active::after {
+            width: 100%;
+        }
+
+        /* 内容区 */
+        .tab-content {
+            display: none;
+            padding: 4rem 10vw;
+            min-height: 50vh;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 资产卡片网格 */
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .asset-card {
+            background: var(--bg-card);
+            border-radius: 2px;
+            overflow: hidden;
+            transition: transform 0.6s var(--ease-ink);
+            border: 0.5px solid rgba(0,0,0,0.06);
+        }
+
+        .asset-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .asset-cover {
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, var(--bg-secondary), #E8E5DE);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--ink-light);
+        }
+
+        .asset-info {
+            padding: 1.5rem;
+        }
+
+        .asset-name {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        .asset-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+        }
+
+        .asset-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+        }
+
+        .asset-type--sound { background: #8B9DC3; color: white; }
+        .asset-type--color { background: #C9A9A6; color: white; }
+        .asset-type--text { background: #7A8B7C; color: white; }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 8rem 2rem;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: var(--gold-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-text {
+            font-size: 1.1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-sub {
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            opacity: 0.7;
+        }
+
+        /* 收益统计 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto 4rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 2px;
+            border: 0.5px solid rgba(0,0,0,0.06);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--cinnabar);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
+
+        /* 设置按钮 */
+        .settings-btn {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            background: transparent;
+            border: 0.5px solid rgba(0,0,0,0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            z-index: 1001;
+        }
+
+        .settings-btn:hover {
+            color: var(--cinnabar);
+            border-color: var(--cinnabar);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .navbar__nav {
+                display: none;
+            }
+
+            .profile-hero {
+                padding: 15vh 5vw 8vh;
+            }
+
+            .profile-title {
+                font-size: 2rem;
+            }
+
+            .tab-nav {
+                gap: 2rem;
+                margin: 0 5vw;
+            }
+
+            .tab-content {
+                padding: 2rem 5vw;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .asset-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 设置按钮 -->
+    <button class="settings-btn" title="置">置</button>
+
+    <!-- 导航栏 -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="navbar__brand">ECHO</a>
+        <div class="navbar__nav">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+        </div>
+        <span class="navbar__user">吾</span>
+    </nav>
+
+    <!-- Hero -->
+    <header class="profile-hero">
+        <h1 class="profile-title">吾</h1>
+        <p class="profile-subtitle">此间天地，皆是所缘</p>
+    </header>
+
+    <!-- Tab 导航 -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="holdings">有</button>
+        <button class="tab-btn" data-tab="created">创</button>
+        <button class="tab-btn" data-tab="earnings">益</button>
+    </nav>
+
+    <!-- 有 - 持有资产 -->
+    <section class="tab-content active" id="holdings">
+        <div class="asset-grid">
+            <div class="asset-card">
+                <div class="asset-cover">音</div>
+                <div class="asset-info">
+                    <h3 class="asset-name">夏日微风</h3>
+                    <div class="asset-meta">
+                        <span class="asset-type asset-type--sound">音</span>
+                        <span>2,880 ECHO</span>
+                    </div>
+                </div>
+            </div>
+            <div class="asset-card">
+                <div class="asset-cover">色</div>
+                <div class="asset-info">
+                    <h3 class="asset-name">晨光初现</h3>
+                    <div class="asset-meta">
+                        <span class="asset-type asset-type--color">色</span>
+                        <span>1,500 ECHO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 创 - 创作资产 -->
+    <section class="tab-content" id="created">
+        <div class="asset-grid">
+            <div class="asset-card">
+                <div class="asset-cover">文</div>
+                <div class="asset-info">
+                    <h3 class="asset-name">山水之间</h3>
+                    <div class="asset-meta">
+                        <span class="asset-type asset-type--text">文</span>
+                        <span>流转 12 次</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 益 - 收益统计 -->
+    <section class="tab-content" id="earnings">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">12.5K</div>
+                <div class="stat-label">总收益</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">28</div>
+                <div class="stat-label">流转次数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">6</div>
+                <div class="stat-label">创作数</div>
+            </div>
+        </div>
+        
+        <div class="empty-state">
+            <div class="empty-text">收益随流而长</div>
+            <div class="empty-sub">每次流转，皆有增益</div>
+        </div>
+    </section>
+
+    <!-- 浮动铸造按钮 -->
+    <a href="creator.html" class="fab-create" title="铸">铸</a>
+    <style>
+        .fab-create {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            background: #A03020;
+            color: #F8F6F1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.2rem;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(160, 48, 32, 0.3);
+            transition: all 0.4s ease;
+            z-index: 1000;
+        }
+        .fab-create:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(160, 48, 32, 0.4);
+        }
+        @media (max-width: 768px) {
+            .fab-create {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                width: 48px;
+                height: 48px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+
+    <script>
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Tab 切换
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
