@@ -1,0 +1,497 @@
+/** ========================================
+ * ECHO Toast Components
+ * 提示反馈组件 - 山水意境风格
+ * ======================================== */
+
+/* ---------- 基础变量 ---------- */
+:root {
+  --toast-paper: #F5F3EF;
+  --toast-ink: #2A2520;
+  --toast-ink-light: #9A9590;
+  --toast-gold: #C9A86C;
+  --toast-gold-soft: #D4B896;
+  --toast-stone: #E8E4DE;
+  --toast-success: #7A8B7C;
+  --toast-error: #B07070;
+  --toast-warning: #C9A86C;
+  --toast-info: #8B9DC3;
+}
+
+/* ========================================
+   1. Toast 容器
+   ======================================== */
+
+.toast-container {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  pointer-events: none;
+}
+
+.toast-container.bottom-center {
+  top: auto;
+  bottom: 2rem;
+  right: 50%;
+  transform: translateX(50%);
+  align-items: center;
+}
+
+.toast-container.bottom-right {
+  top: auto;
+  bottom: 2rem;
+}
+
+/* ========================================
+   2. Toast 基础样式
+   ======================================== */
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  min-width: 320px;
+  max-width: 480px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 243, 239, 0.95) 100%);
+  border: 0.5px solid var(--toast-stone);
+  border-radius: 4px;
+  box-shadow: 
+    0 4px 20px rgba(42, 37, 32, 0.08),
+    0 1px 3px rgba(42, 37, 32, 0.04);
+  backdrop-filter: blur(20px);
+  pointer-events: all;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast.hiding {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+/* 左侧装饰线 */
+.toast::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--toast-gold);
+}
+
+.toast.success::before {
+  background: var(--toast-success);
+}
+
+.toast.error::before {
+  background: var(--toast-error);
+}
+
+.toast.warning::before {
+  background: var(--toast-warning);
+}
+
+.toast.info::before {
+  background: var(--toast-info);
+}
+
+/* ========================================
+   3. Toast 内容
+   ======================================== */
+
+.toast-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  background: rgba(201, 168, 108, 0.1);
+  color: var(--toast-gold);
+}
+
+.toast.success .toast-icon {
+  background: rgba(122, 139, 124, 0.1);
+  color: var(--toast-success);
+}
+
+.toast.error .toast-icon {
+  background: rgba(176, 112, 112, 0.1);
+  color: var(--toast-error);
+}
+
+.toast.warning .toast-icon {
+  background: rgba(201, 168, 108, 0.1);
+  color: var(--toast-warning);
+}
+
+.toast.info .toast-icon {
+  background: rgba(139, 157, 195, 0.1);
+  color: var(--toast-info);
+}
+
+.toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-title {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--toast-ink);
+  margin-bottom: 0.25rem;
+}
+
+.toast-message {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  color: var(--toast-ink-light);
+  line-height: 1.5;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--toast-ink-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.toast-close:hover {
+  background: rgba(42, 37, 32, 0.05);
+  color: var(--toast-ink);
+}
+
+/* 自动关闭进度条 */
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(201, 168, 108, 0.2);
+}
+
+.toast-progress-bar {
+  height: 100%;
+  background: var(--toast-gold);
+  width: 100%;
+  transform-origin: left;
+}
+
+.toast.success .toast-progress-bar {
+  background: var(--toast-success);
+}
+
+.toast.error .toast-progress-bar {
+  background: var(--toast-error);
+}
+
+.toast.warning .toast-progress-bar {
+  background: var(--toast-warning);
+}
+
+.toast.info .toast-progress-bar {
+  background: var(--toast-info);
+}
+
+/* ========================================
+   4. 成功反馈 Toast
+   ======================================== */
+
+/* 铸造成功 */
+.toast-mint-success .toast-title::before {
+  content: '已呈';
+}
+
+.toast-mint-success .toast-message::before {
+  content: '归于境中';
+}
+
+/* 购买成功 */
+.toast-purchase-success .toast-title::before {
+  content: '已入';
+}
+
+.toast-purchase-success .toast-message::before {
+  content: '归于吾藏';
+}
+
+/* 收藏成功 */
+.toast-favorite-success .toast-title::before {
+  content: '已藏';
+}
+
+.toast-favorite-success .toast-message::before {
+  content: '心有所属';
+}
+
+/* ========================================
+   5. 错误处理 Toast
+   ======================================== */
+
+/* 网络错误 */
+.toast-network-error .toast-title::before {
+  content: '网络不畅';
+}
+
+.toast-network-error .toast-message::before {
+  content: '再试一次';
+}
+
+/* 合约错误 */
+.toast-contract-error .toast-title::before {
+  content: '链上繁忙';
+}
+
+.toast-contract-error .toast-message::before {
+  content: '稍后再试';
+}
+
+/* 用户取消 */
+.toast-user-cancel .toast-title::before {
+  content: '已止';
+}
+
+.toast-user-cancel .toast-message::before {
+  content: '随时可再入';
+}
+
+/* ========================================
+   6. 轻量提示 - Snackbar
+   ======================================== */
+
+.snackbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: linear-gradient(135deg, rgba(42, 37, 32, 0.9) 0%, rgba(58, 52, 46, 0.9) 100%);
+  border-radius: 4px;
+  color: var(--toast-paper);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
+  box-shadow: 0 4px 20px rgba(42, 37, 32, 0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.snackbar.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.snackbar-icon {
+  font-size: 1rem;
+}
+
+/* ========================================
+   7. 模态确认框
+   ======================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(42, 37, 32, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 400px;
+  background: linear-gradient(135deg, #F5F3EF 0%, #EDE9E2 100%);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.75rem;
+  background: rgba(201, 168, 108, 0.1);
+  color: var(--toast-gold);
+}
+
+.modal-icon.error {
+  background: rgba(176, 112, 112, 0.1);
+  color: var(--toast-error);
+}
+
+.modal-title {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: var(--toast-ink);
+  margin-bottom: 0.75rem;
+}
+
+.modal-message {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.9375rem;
+  letter-spacing: 0.05em;
+  color: var(--toast-ink-light);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.modal-btn-primary {
+  background: var(--toast-gold);
+  color: white;
+}
+
+.modal-btn-primary:hover {
+  background: var(--toast-gold-soft);
+  transform: translateY(-1px);
+}
+
+.modal-btn-secondary {
+  background: transparent;
+  color: var(--toast-ink-light);
+  border: 0.5px solid var(--toast-stone);
+}
+
+.modal-btn-secondary:hover {
+  background: rgba(42, 37, 32, 0.05);
+  color: var(--toast-ink);
+}
+
+/* ========================================
+   8. 响应式适配
+   ======================================== */
+
+@media (max-width: 640px) {
+  .toast-container {
+    top: 1rem;
+    right: 1rem;
+    left: 1rem;
+  }
+  
+  .toast-container.bottom-center,
+  .toast-container.bottom-right {
+    right: 1rem;
+    left: 1rem;
+    transform: none;
+  }
+  
+  .toast {
+    min-width: auto;
+    max-width: none;
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .toast-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+  
+  .toast-title {
+    font-size: 0.9375rem;
+  }
+  
+  .toast-message {
+    font-size: 0.8125rem;
+  }
+  
+  .modal-content {
+    padding: 1.5rem;
+  }
+  
+  .modal-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+  
+  .modal-title {
+    font-size: 1.125rem;
+  }
+  
+  .modal-message {
+    font-size: 0.875rem;
+  }
+}
+
+/* 动画定义 */
+@keyframes toastProgress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+.toast.auto-close .toast-progress-bar {
+  animation: toastProgress 5s linear forwards;
+}
+
+.toast.auto-close.fast .toast-progress-bar {
+  animation: toastProgress 3s linear forwards;
+}

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>集 - ECHO</title>
     <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/mobile-optimizations.css">
     <style>
         /* ===== 色彩系统 ===== */
         :root {
@@ -649,58 +650,216 @@
             padding: 8px;
         }
 
+        /* ===== 引入统一交互状态样式 ===== */
+        @import url('../assets/styles/loading.css');
+        @import url('../assets/styles/empty-state.css');
+        @import url('../assets/styles/toast.css');
+
         /* ===== 状态提示 - 东方文案 ===== */
         .loading-state,
         .error-state,
-        .empty-state {
+        .empty-state-market {
             text-align: center;
-            padding: 80px 40px;
+            padding: 100px 40px;
             color: var(--ink-light);
         }
 
-        .loading-state::before {
-            content: '墨';
-            display: block;
-            font-family: var(--font-display);
-            font-size: 2rem;
-            margin-bottom: 20px;
-            animation: ink-flow 2s ease-in-out infinite;
-            color: var(--ink-faint);
+        /* 加载状态 - 墨染中 */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
         }
 
-        @keyframes ink-flow {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+        .loading-state .ink-dots {
+            position: relative;
+            width: 80px;
+            height: 80px;
         }
 
-        .loading-state p {
+        .loading-state .ink-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, var(--gold-primary) 0%, var(--gold-light) 70%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: inkFloat 2s ease-in-out infinite;
+        }
+
+        .loading-state .ink-dot:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); animation-delay: 0s; }
+        .loading-state .ink-dot:nth-child(2) { top: 25%; right: 10%; animation-delay: 0.3s; }
+        .loading-state .ink-dot:nth-child(3) { bottom: 25%; right: 10%; animation-delay: 0.6s; }
+        .loading-state .ink-dot:nth-child(4) { bottom: 0; left: 50%; transform: translateX(-50%); animation-delay: 0.9s; }
+        .loading-state .ink-dot:nth-child(5) { bottom: 25%; left: 10%; animation-delay: 1.2s; }
+        .loading-state .ink-dot:nth-child(6) { top: 25%; left: 10%; animation-delay: 1.5s; }
+
+        @keyframes inkFloat {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-8px) scale(1.15); opacity: 1; box-shadow: 0 0 20px rgba(184, 155, 108, 0.5); }
+        }
+
+        .loading-state .loading-text {
             font-family: var(--font-display);
+            font-size: 1.25rem;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+        }
+
+        .loading-state .loading-subtext {
+            font-family: var(--font-serif);
+            font-size: 0.875rem;
             letter-spacing: 0.15em;
+            color: var(--ink-light);
+        }
+
+        /* 错误状态 - 网络不畅 */
+        .error-state .error-visual {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .error-state .error-mark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(160, 48, 32, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .error-state .error-icon {
+            font-family: var(--font-display);
             font-size: 2rem;
-            display: block;
-            margin-bottom: 16px;
             color: var(--vermilion);
         }
 
-        .error-state p {
+        .error-state .error-title {
             font-family: var(--font-display);
-            letter-spacing: 0.1em;
+            font-size: 1.25rem;
+            letter-spacing: 0.2em;
+            color: var(--ink-deep);
+            margin-bottom: 0.5rem;
         }
 
-        .empty-state .empty-icon {
+        .error-state .error-subtitle {
+            font-family: var(--font-serif);
+            font-size: 0.9375rem;
+            letter-spacing: 0.1em;
+            color: var(--ink-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .error-state .retry-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
             font-family: var(--font-display);
-            font-size: 2rem;
-            display: block;
-            margin-bottom: 16px;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            color: var(--ink-medium);
+            cursor: pointer;
+            transition: all var(--transition-medium);
+        }
+
+        .error-state .retry-btn:hover {
+            background: var(--gold-primary);
+            color: #fff;
+            border-color: var(--gold-primary);
+        }
+
+        /* 空状态 - 暂无笔墨 */
+        .empty-state-market {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .empty-state-market .empty-visual {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 2rem;
+        }
+
+        .empty-state-market .brush-stroke {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border: 1.5px solid var(--bg-tertiary);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .empty-state-market .brush-stroke::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--gold-light);
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+
+        .empty-state-market .empty-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--ink-light);
+            opacity: 0.5;
+        }
+
+        .empty-state-market .empty-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-state-market .empty-subtitle {
+            font-family: var(--font-serif);
+            font-size: 0.9375rem;
+            letter-spacing: 0.15em;
+            color: var(--ink-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state-market .empty-hint {
+            font-size: 0.8125rem;
+            letter-spacing: 0.1em;
             color: var(--ink-faint);
         }
 
-        .empty-state p {
-            font-family: var(--font-display);
-            letter-spacing: 0.1em;
+        /* Toast 容器 */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            pointer-events: none;
         }
 
         /* ===== 页脚 ===== */
@@ -866,23 +1025,41 @@
 
     <!-- 主内容区 -->
     <main class="marketplace-container">
-        <!-- 加载状态 -->
+        <!-- 加载状态 - 墨染中 -->
         <div id="loadingState" class="loading-state">
-            <p>尚待笔墨...</p>
+            <div class="ink-dots">
+                <div class="ink-dot"></div>
+                <div class="ink-dot"></div>
+                <div class="ink-dot"></div>
+                <div class="ink-dot"></div>
+                <div class="ink-dot"></div>
+                <div class="ink-dot"></div>
+            </div>
+            <div class="loading-text">墨染中</div>
+            <div class="loading-subtext">山水渐显</div>
         </div>
 
-        <!-- 错误状态 -->
+        <!-- 错误状态 - 网络不畅 -->
         <div id="errorState" class="error-state hidden">
-            <span class="error-icon">×</span>
-            <p id="errorText">墨未研就，请再试</p>
-            <button class="btn-celadon" onclick="marketplace.loadAssets()">重试</button>
+            <div class="error-visual">
+                <div class="error-mark">
+                    <span class="error-icon">✕</span>
+                </div>
+            </div>
+            <div class="error-title">网络不畅</div>
+            <div class="error-subtitle">再试一次</div>
+            <button class="retry-btn" onclick="marketplace.loadAssets()">重试</button>
         </div>
 
-        <!-- 空状态 -->
-        <div id="emptyState" class="empty-state hidden">
-            <span class="empty-icon">空</span>
-            <p>未觅得踪迹</p>
-            <button class="btn-celadon" onclick="marketplace.clearFilters()">重寻</button>
+        <!-- 空状态 - 暂无笔墨 -->
+        <div id="emptyState" class="empty-state-market hidden">
+            <div class="empty-visual">
+                <div class="brush-stroke"></div>
+                <div class="empty-icon">✍</div>
+            </div>
+            <div class="empty-title">暂无笔墨</div>
+            <div class="empty-subtitle">随缘而待</div>
+            <div class="empty-hint">可试他词以寻之</div>
         </div>
 
         <!-- 资产网格 -->
@@ -988,7 +1165,87 @@
             }
         }
     </style>
+    <!-- Toast 容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Toast 提示脚本 -->
+    <script>
+        // Toast 提示系统
+        const Toast = {
+            container: document.getElementById('toastContainer'),
+            
+            show(type, title, message, duration = 5000) {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '!' : 'i';
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">${icon}</div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                    <div class="toast-progress"><div class="toast-progress-bar" style="animation: toastProgress ${duration}ms linear forwards;"></div></div>
+                `;
+                
+                // 添加动画样式
+                if (!document.getElementById('toastAnim')) {
+                    const style = document.createElement('style');
+                    style.id = 'toastAnim';
+                    style.textContent = `
+                        @keyframes toastProgress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+                        .toast { 
+                            display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem 1.5rem; 
+                            min-width: 320px; max-width: 480px; background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,243,239,0.95) 100%); 
+                            border: 0.5px solid var(--bg-tertiary); border-radius: 4px; box-shadow: 0 4px 20px rgba(42,37,32,0.08); 
+                            backdrop-filter: blur(20px); opacity: 0; transform: translateX(100%); 
+                            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; 
+                        }
+                        .toast.show { opacity: 1; transform: translateX(0); }
+                        .toast::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold-primary); }
+                        .toast.success::before { background: var(--realm-text); }
+                        .toast.error::before { background: var(--vermilion); }
+                        .toast-icon { flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; 
+                            border-radius: 50%; font-size: 1.25rem; background: rgba(184,155,108,0.1); color: var(--gold-primary); }
+                        .toast.success .toast-icon { background: rgba(122,139,124,0.1); color: var(--realm-text); }
+                        .toast.error .toast-icon { background: rgba(160,48,32,0.1); color: var(--vermilion); }
+                        .toast-content { flex: 1; }
+                        .toast-title { font-family: var(--font-display); font-size: 1rem; font-weight: 500; letter-spacing: 0.1em; color: var(--ink-deep); margin-bottom: 0.25rem; }
+                        .toast-message { font-family: var(--font-serif); font-size: 0.875rem; letter-spacing: 0.05em; color: var(--ink-light); }
+                        .toast-close { flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; 
+                            background: none; border: none; color: var(--ink-light); cursor: pointer; transition: all 0.2s ease; border-radius: 4px; }
+                        .toast-close:hover { background: rgba(42,37,32,0.05); color: var(--ink-deep); }
+                        .toast-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(184,155,108,0.2); }
+                        .toast-progress-bar { height: 100%; background: var(--gold-primary); width: 100%; transform-origin: left; }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                this.container.appendChild(toast);
+                setTimeout(() => toast.classList.add('show'), 10);
+                
+                if (duration > 0) {
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 400);
+                    }, duration);
+                }
+            },
+            
+            // 快捷方法
+            mintSuccess() { this.show('success', '已呈', '归于境中'); },
+            purchaseSuccess() { this.show('success', '已入', '归于吾藏'); },
+            favoriteSuccess() { this.show('success', '已藏', '心有所属'); },
+            networkError() { this.show('error', '网络不畅', '再试一次'); },
+            contractError() { this.show('error', '链上繁忙', '稍后再试'); },
+            userCancel() { this.show('info', '已止', '随时可再入'); }
+        };
+    </script>
+
     <!-- 钱包状态管理 -->
     <script src="../js/wallet-manager.js"></script>
+    <!-- 移动端导航 -->
+    <script src="../js/mobile-nav.js"></script>
 </body>
 </html>

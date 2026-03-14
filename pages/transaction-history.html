@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>笔墨记录 - ECHO</title>
+    
+    <!-- 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+    
+    <!-- 组件样式 -->
+    <link rel="stylesheet" href="../css/echo-components.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', 'Source Han Serif CN', serif;
+            background: var(--bg-primary, #F8F6F1);
+            color: var(--ink-deep, #1A1A1A);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* 宣纸纹理背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* 主内容区 */
+        .history-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 24px 80px;
+        }
+        
+        /* 页面标题 */
+        .page-header {
+            text-align: center;
+            margin-bottom: 64px;
+            padding-bottom: 48px;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+        }
+        
+        .page-title {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 32px;
+            font-weight: 400;
+            color: var(--ink-deep, #1A1A1A);
+            letter-spacing: 0.3em;
+            margin-bottom: 12px;
+        }
+        
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--ink-light, #7A6E5F);
+            letter-spacing: 0.15em;
+        }
+        
+        /* 筛选栏 */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .filter-tab {
+            padding: 10px 20px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            color: var(--ink-light, #7A6E5F);
+            background: transparent;
+            border: 0.5px solid transparent;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-tab:hover {
+            color: var(--ink-deep, #1A1A1A);
+        }
+        
+        .filter-tab.active {
+            color: var(--ink-deep, #1A1A1A);
+            border-color: rgba(26, 26, 26, 0.15);
+            background: rgba(26, 26, 26, 0.02);
+        }
+        
+        .filter-stats {
+            font-size: 13px;
+            color: var(--ink-light, #7A6E5F);
+            letter-spacing: 0.05em;
+        }
+        
+        /* 交易表格 */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .history-table__header {
+            display: grid;
+            grid-template-columns: 160px 120px 1fr 120px 100px;
+            gap: 16px;
+            padding: 16px 24px;
+            background: rgba(26, 26, 26, 0.02);
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.08);
+        }
+        
+        .history-table__col {
+            font-size: 12px;
+            color: var(--ink-light, #7A6E5F);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        .history-table__body {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .history-item {
+            display: grid;
+            grid-template-columns: 160px 120px 1fr 120px 100px;
+            gap: 16px;
+            padding: 24px;
+            border-bottom: 0.5px solid rgba(26, 26, 26, 0.04);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .history-item:hover {
+            background: rgba(184, 155, 108, 0.02);
+        }
+        
+        .history-item__time {
+            font-size: 13px;
+            color: var(--ink-light, #7A6E5F);
+            letter-spacing: 0.05em;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .history-item__date {
+            font-family: 'LXGW WenKai', serif;
+            color: var(--ink-medium, #5A5045);
+        }
+        
+        .history-item__type {
+            display: flex;
+            align-items: center;
+        }
+        
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            border-radius: 2px;
+            border: 0.5px solid;
+        }
+        
+        .type-badge--mint {
+            color: #2D7D46;
+            background: rgba(45, 125, 70, 0.06);
+            border-color: rgba(45, 125, 70, 0.2);
+        }
+        
+        .type-badge--buy {
+            color: #8B4513;
+            background: rgba(139, 69, 19, 0.06);
+            border-color: rgba(139, 69, 19, 0.2);
+        }
+        
+        .type-badge--sell {
+            color: #2B579A;
+            background: rgba(43, 87, 154, 0.06);
+            border-color: rgba(43, 87, 154, 0.2);
+        }
+        
+        .type-badge--transfer {
+            color: var(--ink-medium, #5A5045);
+            background: rgba(26, 26, 26, 0.04);
+            border-color: rgba(26, 26, 26, 0.1);
+        }
+        
+        .type-badge__icon {
+            font-size: 14px;
+        }
+        
+        .history-item__asset {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .asset-thumb {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-secondary, #F2EFE8);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .asset-thumb__icon {
+            font-size: 20px;
+            opacity: 0.5;
+        }
+        
+        .asset-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+        
+        .asset-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .asset-info__name {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 15px;
+            color: var(--ink-deep, #1A1A1A);
+            letter-spacing: 0.05em;
+        }
+        
+        .asset-info__id {
+            font-size: 12px;
+            color: var(--ink-faint, #B5B5B5);
+            font-family: monospace;
+        }
+        
+        .history-item__amount {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 16px;
+            color: var(--ink-deep, #1A1A1A);
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .amount-unit {
+            font-size: 12px;
+            color: var(--ink-light, #7A6E5F);
+            margin-left: 4px;
+        }
+        
+        .history-item__status {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            border-radius: 999px;
+        }
+        
+        .status-badge--success {
+            color: #2D7D46;
+            background: rgba(45, 125, 70, 0.08);
+        }
+        
+        .status-badge--pending {
+            color: #B8860B;
+            background: rgba(184, 134, 11, 0.08);
+        }
+        
+        .status-badge--failed {
+            color: #C53030;
+            background: rgba(197, 48, 48, 0.08);
+        }
+        
+        .status-badge__dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .status-badge--success .status-badge__dot {
+            background: #2D7D46;
+        }
+        
+        .status-badge--pending .status-badge__dot {
+            background: #B8860B;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .status-badge--failed .status-badge__dot {
+            background: #C53030;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 120px 24px;
+        }
+        
+        .empty-state__icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 32px;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            opacity: 0.3;
+        }
+        
+        .empty-state__title {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 20px;
+            color: var(--ink-deep, #1A1A1A);
+            letter-spacing: 0.2em;
+            margin-bottom: 12px;
+        }
+        
+        .empty-state__desc {
+            font-size: 14px;
+            color: var(--ink-light, #7A6E5F);
+            letter-spacing: 0.1em;
+            margin-bottom: 32px;
+        }
+        
+        .empty-state__btn {
+            padding: 12px 32px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 14px;
+            letter-spacing: 0.15em;
+            color: white;
+            background: linear-gradient(135deg, var(--ink-medium, #5A5045) 0%, var(--ink-deep, #1A1A1A) 100%);
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.4s ease;
+        }
+        
+        .empty-state__btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(26, 26, 26, 0.15);
+        }
+        
+        /* 加载状态 */
+        .loading-state {
+            text-align: center;
+            padding: 80px 24px;
+        }
+        
+        .loading-state__spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 24px;
+            border: 1px solid rgba(26, 26, 26, 0.1);
+            border-top-color: var(--song-gold, #C9B896);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-state__text {
+            font-size: 14px;
+            color: var(--ink-light, #7A6E5F);
+            letter-spacing: 0.1em;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 0.5px solid rgba(26, 26, 26, 0.06);
+        }
+        
+        .pagination__btn {
+            padding: 8px 16px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 13px;
+            color: var(--ink-light, #7A6E5F);
+            background: transparent;
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination__btn:hover:not(:disabled) {
+            color: var(--ink-deep, #1A1A1A);
+            border-color: rgba(26, 26, 26, 0.2);
+        }
+        
+        .pagination__btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .pagination__page {
+            padding: 8px 14px;
+            font-size: 13px;
+            color: var(--ink-light, #7A6E5F);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .pagination__page:hover {
+            color: var(--ink-deep, #1A1A1A);
+            background: rgba(26, 26, 26, 0.03);
+        }
+        
+        .pagination__page.active {
+            color: var(--ink-deep, #1A1A1A);
+            background: rgba(26, 26, 26, 0.06);
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .history-container {
+                padding: 100px 16px 60px;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .history-table__header {
+                display: none;
+            }
+            
+            .history-item {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 20px 16px;
+                border: 0.5px solid rgba(26, 26, 26, 0.06);
+                margin-bottom: 12px;
+                border-radius: 2px;
+            }
+            
+            .history-item__time,
+            .history-item__type,
+            .history-item__asset,
+            .history-item__amount,
+            .history-item__status {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .history-item__time::before,
+            .history-item__type::before,
+            .history-item__asset::before,
+            .history-item__amount::before,
+            .history-item__status::before {
+                content: attr(data-label);
+                font-size: 12px;
+                color: var(--ink-light, #7A6E5F);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar scrolled">
+        <a href="index-new.html" class="navbar__brand">
+            <span class="navbar__logo">ECHO</span>
+        </a>
+        
+        <div class="navbar__nav">
+            <a href="market/music-market.html" class="navbar__link">市场</a>
+            <a href="creator/mint.html" class="navbar__link">创作</a>
+            <a href="user/my-assets.html" class="navbar__link">吾作</a>
+        </div>
+        
+        <div class="navbar__actions">
+            <div class="navbar__user" id="userMenu" style="display: none;">
+                <div class="navbar__user-placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                    </svg>
+                </div>
+                <span id="userName">吾</span>
+            </div>
+            <button class="navbar__user" id="connectWallet">
+                <span>连接</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="history-container">
+        <!-- 页面标题 -->
+        <header class="page-header">
+            <h1 class="page-title">笔墨记录</h1>
+            <p class="page-subtitle">您的铸造、交易与流转轨迹</p>
+        </header>
+        
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">全部</button>
+                <button class="filter-tab" data-filter="mint">铸造</button>
+                <button class="filter-tab" data-filter="buy">购入</button>
+                <button class="filter-tab" data-filter="sell">售出</button>
+                <button class="filter-tab" data-filter="transfer">流转</button>
+            </div>
+            <span class="filter-stats" id="filterStats">共 0 笔记录</span>
+        </div>
+        
+        <!-- 交易列表 -->
+        <div id="historyContent">
+            <!-- 加载状态 -->
+            <div class="loading-state" id="loadingState">
+                <div class="loading-state__spinner"></div>
+                <p class="loading-state__text">正在载入笔墨...</p>
+            </div>
+            
+            <!-- 空状态 -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-state__icon">🖋️</div>
+                <h2 class="empty-state__title">尚无笔墨</h2>
+                <p class="empty-state__desc">您的交易记录将在此留痕</p>
+                <a href="market/music-market.html" class="empty-state__btn">
+                    探索市场
+                </a>
+            </div>
+            
+            <!-- 交易表格 -->
+            <div class="history-table" id="historyTable" style="display: none;">
+                <div class="history-table__header">
+                    <span class="history-table__col">时间</span>
+                    <span class="history-table__col">类型</span>
+                    <span class="history-table__col">作品</span>
+                    <span class="history-table__col">金额</span>
+                    <span class="history-table__col">状态</span>
+                </div>
+                <div class="history-table__body" id="historyList">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 分页 -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button class="pagination__btn" id="prevBtn" onclick="changePage(-1)">上一页</button>
+                <div id="pageNumbers"></div>
+                <button class="pagination__btn" id="nextBtn" onclick="changePage(1)">下一页></button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Wallet Manager -->
+    <script src="../js/wallet-manager.js"></script>
+    
+    <script>
+        // 模拟交易数据（实际应从合约获取）
+        let allTransactions = [];
+        let filteredTransactions = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let currentFilter = 'all';
+        
+        // 类型标签配置
+        const typeConfig = {
+            mint: { label: '铸造', icon: '⚒️', class: 'type-badge--mint' },
+            buy: { label: '购入', icon: '📥', class: 'type-badge--buy' },
+            sell: { label: '售出', icon: '📤', class: 'type-badge--sell' },
+            transfer: { label: '流转', icon: '↗️', class: 'type-badge--transfer' }
+        };
+        
+        // 状态标签配置
+        const statusConfig = {
+            success: { label: '成功', class: 'status-badge--success' },
+            pending: { label: '确认中', class: 'status-badge--pending' },
+            failed: { label: '失败', class: 'status-badge--failed' }
+        };
+        
+        // 生成模拟数据
+        function generateMockData() {
+            const types = ['mint', 'buy', 'sell', 'transfer'];
+            const statuses = ['success', 'success', 'success', 'pending'];
+            const names = [
+                '山水清音', '月夜思', '春江花月夜', '平沙落雁', '梅花三弄',
+                '高山流水', '阳关三叠', '渔舟唱晚', '胡笳十八拍', '广陵散'
+            ];
+            
+            const data = [];
+            const now = Date.now();
+            
+            for (let i = 0; i < 25; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                const date = new Date(now - Math.random() * 30 * 24 * 60 * 60 * 1000);
+                
+                data.push({
+                    id: `tx_${Date.now()}_${i}`,
+                    type: type,
+                    status: status,
+                    name: names[Math.floor(Math.random() * names.length)],
+                    tokenId: Math.floor(Math.random() * 1000) + 1,
+                    amount: type === 'mint' ? 0 : (Math.random() * 10 + 0.5).toFixed(2),
+                    date: date,
+                    txHash: '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('')
+                });
+            }
+            
+            // 按时间排序
+            return data.sort((a, b) => b.date - a.date);
+        }
+        
+        // 格式化日期
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        
+        // 格式化时间
+        function formatTime(date) {
+            const h = String(date.getHours()).padStart(2, '0');
+            const m = String(date.getMinutes()).padStart(2, '0');
+            return `${h}:${m}`;
+        }
+        
+        // 渲染交易列表
+        function renderHistory() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredTransactions.slice(start, end);
+            
+            const listEl = document.getElementById('historyList');
+            
+            if (pageData.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            listEl.innerHTML = pageData.map(tx => {
+                const typeInfo = typeConfig[tx.type];
+                const statusInfo = statusConfig[tx.status];
+                
+                return `
+                    <div class="history-item" onclick="viewDetail('${tx.id}')"
+                         data-label="">
+                        <div class="history-item__time" data-label="时间">
+                            <span class="history-item__date">${formatDate(tx.date)}</span>
+                            <span>${formatTime(tx.date)}</span>
+                        </div>
+                        <div class="history-item__type" data-label="类型">
+                            <span class="type-badge ${typeInfo.class}">
+                                <span class="type-badge__icon">${typeInfo.icon}</span>
+                                ${typeInfo.label}
+                            </span>
+                        </div>
+                        <div class="history-item__asset" data-label="作品">
+                            <div class="asset-thumb">
+                                <span class="asset-thumb__icon">🎵</span>
+                            </div>
+                            <div class="asset-info">
+                                <span class="asset-info__name">${tx.name}</span>
+                                <span class="asset-info__id">Token #${tx.tokenId}</span>
+                            </div>
+                        </div>
+                        <div class="history-item__amount" data-label="金额">
+                            ${tx.amount > 0 ? `<span>${tx.amount}</span><span class="amount-unit">MEER</span>` : '<span style="color: var(--ink-light);">—</span>'}
+                        </div>
+                        <div class="history-item__status" data-label="状态">
+                            <span class="status-badge ${statusInfo.class}">
+                                <span class="status-badge__dot"></span>
+                                ${statusInfo.label}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('historyTable').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'none';
+            
+            updatePagination();
+            updateStats();
+        }
+        
+        // 显示空状态
+        function showEmptyState() {
+            document.getElementById('historyTable').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('pagination').style.display = 'none';
+            updateStats();
+        }
+        
+        // 更新分页
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+            
+            // 生成页码
+            let pages = [];
+            const maxVisible = 5;
+            
+            if (totalPages <= maxVisible) {
+                for (let i = 1; i <= totalPages; i++) pages.push(i);
+            } else {
+                if (currentPage <= 3) {
+                    pages = [1, 2, 3, 4, '...', totalPages];
+                } else if (currentPage >= totalPages - 2) {
+                    pages = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+                } else {
+                    pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+                }
+            }
+            
+            document.getElementById('pageNumbers').innerHTML = pages.map(p => {
+                if (p === '...') return '<span class="pagination__page">...</span>';
+                return `<span class="pagination__page ${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</span>`;
+            }).join('');
+        }
+        
+        // 更新统计
+        function updateStats() {
+            document.getElementById('filterStats').textContent = `共 ${filteredTransactions.length} 笔记录`;
+        }
+        
+        // 切换筛选
+        function filterTransactions(type) {
+            currentFilter = type;
+            currentPage = 1;
+            
+            // 更新标签样式
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.filter === type);
+            });
+            
+            // 筛选数据
+            if (type === 'all') {
+                filteredTransactions = [...allTransactions];
+            } else {
+                filteredTransactions = allTransactions.filter(tx => tx.type === type);
+            }
+            
+            renderHistory();
+        }
+        
+        // 切换页面
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+            const newPage = currentPage + delta;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderHistory();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        // 跳转到页
+        function goToPage(page) {
+            currentPage = page;
+            renderHistory();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // 查看详情
+        function viewDetail(txId) {
+            const tx = allTransactions.find(t => t.id === txId);
+            if (tx) {
+                // 可以打开详情弹窗或跳转
+                console.log('查看交易详情:', tx);
+                showToast(`交易哈希: ${tx.txHash.slice(0, 20)}...`);
+            }
+        }
+        
+        // 显示提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 12px 24px;
+                background: var(--ink-deep, #1A1A1A);
+                color: white;
+                font-size: 14px;
+                letter-spacing: 0.1em;
+                border-radius: 2px;
+                z-index: 10000;
+                animation: fadeInUp 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+        
+        // 加载数据
+        async function loadData() {
+            // 模拟加载延迟
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            allTransactions = generateMockData();
+            filteredTransactions = [...allTransactions];
+            
+            renderHistory();
+        }
+        
+        // 事件监听
+        document.addEventListener('DOMContentLoaded', () => {
+            // 绑定筛选标签点击
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => filterTransactions(tab.dataset.filter));
+            });
+            
+            // 检查钱包连接状态
+            if (window.EchoWallet && window.EchoWallet.isConnected()) {
+                loadData();
+            } else {
+                // 未连接也显示模拟数据
+                loadData();
+            }
+        });
+        
+        // 监听钱包连接事件
+        window.addEventListener('echo:walletConnected', () => {
+            loadData();
+        });
+    </script>
+</body>
+</html>

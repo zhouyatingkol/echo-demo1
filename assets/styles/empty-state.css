@@ -1,0 +1,546 @@
+/** ========================================
+ * ECHO Empty State Components
+ * 空状态组件 - 东方意境风格
+ * ======================================== */
+
+/* ---------- 基础变量 ---------- */
+:root {
+  --empty-paper: #F5F3EF;
+  --empty-ink: #2A2520;
+  --empty-ink-light: #9A9590;
+  --empty-gold: #C9A86C;
+  --empty-gold-soft: #D4B896;
+  --empty-stone: #E8E4DE;
+  --empty-silk: #E8E2D6;
+}
+
+/* ========================================
+   1. 空状态基础样式
+   ======================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  min-height: 400px;
+  position: relative;
+}
+
+.empty-state::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.3'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* ========================================
+   2. 市场无结果 - 暂无笔墨
+   ======================================== */
+
+.empty-market {
+  --empty-accent: var(--empty-ink-light);
+}
+
+.empty-market .empty-visual {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 2rem;
+}
+
+/* 毛笔笔刷效果 */
+.empty-market .brush-stroke {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border: 1.5px solid var(--empty-stone);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.empty-market .brush-stroke::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--empty-gold-soft);
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+.empty-market .empty-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  color: var(--empty-ink-light);
+  opacity: 0.5;
+}
+
+.empty-market .empty-title {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: var(--empty-ink);
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-market .empty-title::before {
+  content: '暂无笔墨';
+}
+
+.empty-market .empty-subtitle {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.9375rem;
+  letter-spacing: 0.15em;
+  color: var(--empty-ink-light);
+  position: relative;
+  z-index: 1;
+}
+
+.empty-market .empty-subtitle::before {
+  content: '随缘而待';
+}
+
+.empty-market .empty-hint {
+  margin-top: 1.5rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  color: var(--empty-ink-light);
+  opacity: 0.7;
+}
+
+/* ========================================
+   3. 个人中心无作品 - 尚无印记
+   ======================================== */
+
+.empty-assets {
+  --empty-accent: var(--empty-gold);
+}
+
+.empty-assets .empty-visual {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin-bottom: 2rem;
+}
+
+/* 印章轮廓 */
+.empty-assets .seal-outline {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border: 2px solid var(--empty-gold-soft);
+  opacity: 0.4;
+}
+
+.empty-assets .seal-outline::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 1px solid var(--empty-gold);
+  opacity: 0.3;
+}
+
+.empty-assets .empty-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: var(--empty-gold);
+  opacity: 0.6;
+}
+
+.empty-assets .empty-title {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: var(--empty-ink);
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-assets .empty-title::before {
+  content: '尚无印记';
+}
+
+.empty-assets .empty-subtitle {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.9375rem;
+  letter-spacing: 0.15em;
+  color: var(--empty-ink-light);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-assets .empty-subtitle::before {
+  content: '由此而生';
+}
+
+.empty-assets .empty-action {
+  position: relative;
+  z-index: 1;
+}
+
+.empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, var(--empty-gold) 0%, var(--empty-gold-soft) 100%);
+  color: white;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.9375rem;
+  letter-spacing: 0.15em;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(201, 168, 108, 0.3);
+}
+
+.empty-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(201, 168, 108, 0.4);
+}
+
+.empty-cta::after {
+  content: '→';
+  transition: transform 0.3s ease;
+}
+
+.empty-cta:hover::after {
+  transform: translateX(4px);
+}
+
+/* ========================================
+   4. 收藏为空 - 心有所待
+   ======================================== */
+
+.empty-favorites {
+  --empty-accent: var(--empty-gold);
+}
+
+.empty-favorites .empty-visual {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 2rem;
+}
+
+/* 心形轮廓 */
+.empty-favorites .heart-outline {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 1.5px solid var(--empty-gold-soft);
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+.empty-favorites .heart-outline::before,
+.empty-favorites .heart-outline::after {
+  content: '';
+  position: absolute;
+  border: 1px solid var(--empty-gold);
+  border-radius: 50%;
+  opacity: 0.3;
+}
+
+.empty-favorites .heart-outline::before {
+  width: 50px;
+  height: 50px;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.empty-favorites .heart-outline::after {
+  width: 40px;
+  height: 40px;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.empty-favorites .empty-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: var(--empty-gold);
+  opacity: 0.5;
+}
+
+.empty-favorites .empty-title {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: var(--empty-ink);
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-favorites .empty-title::before {
+  content: '心有所待';
+}
+
+.empty-favorites .empty-subtitle {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.9375rem;
+  letter-spacing: 0.15em;
+  color: var(--empty-ink-light);
+  position: relative;
+  z-index: 1;
+}
+
+.empty-favorites .empty-subtitle::before {
+  content: '随缘而集';
+}
+
+/* ========================================
+   5. 搜索结果为空
+   ======================================== */
+
+.empty-search .empty-visual {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 2rem;
+}
+
+.empty-search .search-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.empty-search .search-ripple::before,
+.empty-search .search-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--empty-stone);
+  border-radius: 50%;
+  animation: ripple 3s ease-out infinite;
+}
+
+.empty-search .search-ripple::after {
+  animation-delay: 1.5s;
+}
+
+@keyframes ripple {
+  0% {
+    width: 40px;
+    height: 40px;
+    opacity: 0.6;
+  }
+  100% {
+    width: 120px;
+    height: 120px;
+    opacity: 0;
+  }
+}
+
+.empty-search .empty-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: var(--empty-ink-light);
+  opacity: 0.5;
+}
+
+.empty-search .empty-title {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--empty-ink);
+  margin-bottom: 0.5rem;
+}
+
+.empty-search .empty-subtitle {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
+  color: var(--empty-ink-light);
+}
+
+/* ========================================
+   6. 通用空状态变体
+   ======================================== */
+
+/* 紧凑型 */
+.empty-state.compact {
+  min-height: auto;
+  padding: 2rem 1.5rem;
+}
+
+.empty-state.compact .empty-visual {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1rem;
+}
+
+.empty-state.compact .empty-title {
+  font-size: 1.125rem;
+  letter-spacing: 0.2em;
+}
+
+.empty-state.compact .empty-subtitle {
+  font-size: 0.8125rem;
+}
+
+/* 卡片内空状态 */
+.empty-state.card {
+  background: linear-gradient(135deg, rgba(245, 243, 239, 0.8) 0%, rgba(237, 233, 226, 0.8) 100%);
+  border-radius: 8px;
+  border: 0.5px solid var(--empty-stone);
+  min-height: 280px;
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .empty-state {
+    --empty-paper: #1a1a2e;
+    --empty-ink: #F5F3EF;
+    --empty-ink-light: #9A9590;
+    --empty-gold: #C9A86C;
+    --empty-stone: #3a3a4e;
+  }
+}
+
+/* ========================================
+   7. 加载失败/错误空状态
+   ======================================== */
+
+.empty-error .empty-visual {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1.5rem;
+}
+
+.empty-error .error-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(176, 112, 112, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-error .empty-icon {
+  font-size: 1.75rem;
+  color: #B07070;
+  opacity: 0.7;
+}
+
+.empty-error .empty-title {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--empty-ink);
+  margin-bottom: 0.5rem;
+}
+
+.empty-error .empty-subtitle {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.1em;
+  color: var(--empty-ink-light);
+  margin-bottom: 1.5rem;
+}
+
+.empty-error .retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: transparent;
+  border: 0.5px solid var(--empty-stone);
+  border-radius: 4px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  color: var(--empty-ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.empty-error .retry-btn:hover {
+  background: rgba(201, 168, 108, 0.1);
+  border-color: var(--empty-gold);
+}
+
+/* ========================================
+   8. 响应式适配
+   ======================================== */
+
+@media (max-width: 640px) {
+  .empty-state {
+    padding: 3rem 1.5rem;
+    min-height: 320px;
+  }
+  
+  .empty-state .empty-visual {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .empty-state .empty-title {
+    font-size: 1.25rem;
+    letter-spacing: 0.2em;
+  }
+  
+  .empty-state .empty-subtitle {
+    font-size: 0.875rem;
+  }
+  
+  .empty-cta {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+}

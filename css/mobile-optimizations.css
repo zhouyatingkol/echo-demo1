@@ -1,0 +1,1018 @@
+/**
+ * ECHO 移动端优化样式
+ * Mobile Optimization Stylesheet
+ * 
+ * 包含：
+ * 1. 导航栏移动端优化
+ * 2. 各页面响应式修复
+ * 3. 触摸优化
+ * 4. 字体适配
+ */
+
+/* ========================================
+   0. 基础触摸优化 (全局)
+   ======================================== */
+
+/* 禁用移动端hover效果，使用active替代 */
+@media (hover: none) and (pointer: coarse) {
+    /* 移除所有hover效果 */
+    *:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* 保留按钮点击反馈 */
+    button:active,
+    a:active,
+    .btn-ceramic:active,
+    .btn-celadon:active,
+    .realm-card:active,
+    .rights-card:active,
+    .asset-card:active,
+    .similar-card:active {
+        transform: scale(0.98) !important;
+        opacity: 0.9 !important;
+    }
+    
+    /* 触摸反馈效果 */
+    .touch-feedback {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .touch-feedback::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(160, 48, 32, 0.15);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.3s ease, height 0.3s ease;
+    }
+    
+    .touch-feedback:active::after {
+        width: 200%;
+        height: 200%;
+    }
+}
+
+/* 确保最小点击区域 44px */
+button,
+a,
+.navbar__link,
+.filter-tag,
+.price-option,
+.setting-option,
+.page-number,
+.realm-card,
+.rights-card,
+.rights-toggle,
+.player-btn,
+.tab-btn {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* 表单元素触摸优化 */
+input,
+select,
+textarea {
+    font-size: 16px; /* 防止iOS缩放 */
+}
+
+/* ========================================
+   1. 字体适配
+   ======================================== */
+
+/* 小屏幕字体缩放 */
+@media (max-width: 768px) {
+    html {
+        font-size: 18px;
+    }
+    
+    /* Hero标题缩小 */
+    .hero-title,
+    .creator-title,
+    .profile-title {
+        font-size: clamp(1.8rem, 8vw, 2.5rem) !important;
+        letter-spacing: 0.2em !important;
+    }
+    
+    /* 副标题调整 */
+    .hero-subtitle,
+    .creator-subtitle,
+    .profile-subtitle {
+        font-size: 0.9rem !important;
+        letter-spacing: 0.1em !important;
+    }
+    
+    /* 正文保持可读性 */
+    body {
+        font-size: 0.9rem;
+        line-height: 1.7;
+    }
+    
+    /* 卡片标题 */
+    .asset-title,
+    .card-title,
+    .rights-name {
+        font-size: 0.95rem !important;
+    }
+    
+    /* 小文字保持清晰 */
+    .asset-type,
+    .card-meta,
+    .rights-summary,
+    .form-hint {
+        font-size: 0.75rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 16px;
+    }
+    
+    .hero-title,
+    .creator-title,
+    .profile-title {
+        font-size: clamp(1.6rem, 7vw, 2rem) !important;
+    }
+}
+
+/* ========================================
+   2. 导航栏移动端优化
+   ======================================== */
+
+@media (max-width: 768px) {
+    .navbar {
+        height: 56px;
+        padding: 0 16px;
+    }
+    
+    .navbar__logo {
+        font-size: 1.1rem;
+        letter-spacing: 0.2em;
+    }
+    
+    .navbar__menu-btn {
+        width: 44px;
+        height: 44px;
+        display: flex !important;
+    }
+    
+    .navbar__mobile-menu {
+        top: 56px;
+        padding: 2rem 1rem;
+        gap: 1.5rem;
+    }
+    
+    .navbar__mobile-menu .navbar__link {
+        font-size: 1.3rem;
+        letter-spacing: 0.4em;
+        padding: 0.75rem 0;
+    }
+    
+    .navbar__mobile-menu .navbar__user {
+        margin-top: 1rem;
+        padding: 0.75rem 2rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* ========================================
+   3. Marketplace 页面响应式修复
+   ======================================== */
+
+@media (max-width: 768px) {
+    .marketplace-hero {
+        padding: 100px 20px 40px;
+    }
+    
+    .search-filter-bar {
+        flex-direction: column;
+        padding: 20px;
+        gap: 12px;
+    }
+    
+    .search-box {
+        min-width: 100%;
+        max-width: 100%;
+    }
+    
+    .search-box input {
+        padding: 12px 16px 12px 44px;
+        font-size: 0.9rem;
+    }
+    
+    .filter-group {
+        width: 100%;
+        justify-content: stretch;
+    }
+    
+    .filter-select {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 32px 10px 14px;
+        font-size: 0.85rem;
+    }
+    
+    .filter-tags {
+        padding: 16px 20px;
+        gap: 8px;
+    }
+    
+    .filter-tag {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        flex: 1;
+        text-align: center;
+    }
+    
+    /* 卡片网格单列 */
+    .asset-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+        padding: 20px;
+        max-width: 100%;
+    }
+    
+    .asset-card {
+        padding: 20px;
+    }
+    
+    .asset-cover {
+        margin-bottom: 12px;
+    }
+    
+    .asset-title {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+    
+    .asset-creator {
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+    }
+    
+    .asset-meta {
+        padding-top: 10px;
+    }
+    
+    /* 分页优化 */
+    .pagination {
+        padding: 40px 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .page-numbers {
+        order: -1;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .page-number {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* 浮动按钮优化 */
+    .fab-create {
+        width: 48px;
+        height: 48px;
+        font-size: 1rem;
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-group {
+        flex-direction: column;
+    }
+    
+    .filter-select {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   4. Creator 页面响应式修复
+   ======================================== */
+
+@media (max-width: 768px) {
+    .creator-page {
+        padding-top: 72px;
+    }
+    
+    .creator-hero {
+        padding: 6vh 5vw 4vh;
+    }
+    
+    .creator-hero::before {
+        height: 40px;
+    }
+    
+    /* 步骤指示器优化 */
+    .step-indicator {
+        padding: 2rem 1rem;
+        gap: 0.5rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+        scrollbar-width: none;
+    }
+    
+    .step-indicator::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .step {
+        flex-shrink: 0;
+    }
+    
+    .step-dot {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+    }
+    
+    .step-line {
+        width: 24px;
+        min-width: 16px;
+    }
+    
+    /* 表单全宽 */
+    .creator-form {
+        padding: 0 16px;
+        max-width: 100%;
+    }
+    
+    .form-section {
+        padding: 1.5rem !important;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .form-input {
+        padding: 0.875rem 1rem;
+        font-size: 16px; /* 防止iOS缩放 */
+    }
+    
+    .form-textarea {
+        min-height: 100px;
+    }
+    
+    /* 上传区域 */
+    .upload-area {
+        padding: 2rem 1.5rem;
+    }
+    
+    .upload-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* 三域选择单列 */
+    .realm-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+    
+    .realm-card {
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-align: left;
+    }
+    
+    .realm-icon {
+        margin: 0;
+        flex-shrink: 0;
+    }
+    
+    .realm-check {
+        top: 0.6rem;
+        right: 0.6rem;
+    }
+    
+    /* 定价输入 */
+    .price-input-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .price-input {
+        max-width: 100%;
+    }
+    
+    .price-options {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .price-option {
+        flex: 1;
+        min-width: 60px;
+        padding: 0.6rem 0.8rem;
+    }
+    
+    /* 权益卡片单列 */
+    .rights-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+    
+    .rights-card {
+        overflow: hidden;
+    }
+    
+    .rights-header {
+        padding: 1rem;
+    }
+    
+    .rights-seal {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .rights-name {
+        flex-direction: row !important;
+        align-items: baseline;
+        gap: 0.5rem;
+    }
+    
+    .rights-name-primary {
+        font-size: 1.1rem;
+    }
+    
+    .rights-name-secondary {
+        font-size: 0.75rem !important;
+    }
+    
+    .rights-summary {
+        font-size: 0.75rem;
+    }
+    
+    .rights-settings {
+        padding: 0 1rem 1rem;
+    }
+    
+    .settings-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .settings-options {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+    }
+    
+    .setting-option {
+        flex-shrink: 0;
+        min-width: 100px;
+    }
+    
+    /* 提交按钮 */
+    .form-submit {
+        padding: 2rem 0;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        max-width: 300px;
+        padding: 1rem 2rem;
+        font-size: 0.95rem;
+    }
+    
+    /* 隐藏印章装饰 */
+    .seal-decoration {
+        display: none;
+    }
+}
+
+/* ========================================
+   5. Asset Detail 页面响应式修复
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* 资产详情改为垂直布局 */
+    .asset-detail-grid,
+    .grid.grid-cols-1.lg\\:grid-cols-2 {
+        grid-template-columns: 1fr !important;
+        gap: 2rem;
+    }
+    
+    .min-h-screen.pt-32 {
+        padding-top: 100px;
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+    
+    /* 返回按钮 */
+    .back-btn {
+        margin-bottom: 1.5rem;
+        font-size: 0.8rem;
+    }
+    
+    /* 资产预览 */
+    .asset-preview {
+        aspect-ratio: 1;
+        max-height: 400px;
+    }
+    
+    .asset-placeholder .icon {
+        font-size: 2.5rem;
+    }
+    
+    .asset-placeholder .text {
+        font-size: 0.85rem;
+    }
+    
+    /* 播放器控件 */
+    .player-controls {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+    
+    .player-btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .player-time {
+        font-size: 0.7rem;
+    }
+    
+    /* 缩略图 */
+    .flex.gap-3.mt-4 {
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .w-16.h-16 {
+        width: 48px;
+        height: 48px;
+    }
+    
+    /* 资产信息垂直布局 */
+    .relative .absolute.-top-4.-right-4 {
+        position: static;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .status-seal {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto;
+    }
+    
+    .status-seal .char-single {
+        font-size: 1.1rem;
+    }
+    
+    /* 标题和信息 */
+    .font-display.text-4xl.lg\\:text-5xl {
+        font-size: 1.75rem !important;
+        letter-spacing: 0.1em;
+        margin-bottom: 1rem;
+    }
+    
+    .flex.items-center.gap-4.mb-8 {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* 价格和操作按钮 */
+    .fade-in.delay-300.flex.items-baseline {
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .text-3xl.font-display {
+        font-size: 1.75rem !important;
+    }
+    
+    .fade-in.delay-400.flex.gap-4 {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn-ceramic {
+        width: 100%;
+        padding: 1rem 2rem;
+    }
+    
+    /* 确权信息区 */
+    .py-20.px-\\[8vw\\] {
+        padding: 3rem 5vw;
+    }
+    
+    .seal-mark {
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .font-display.text-3xl {
+        font-size: 1.5rem !important;
+        margin-top: 1.5rem;
+    }
+    
+    /* 四权配置 */
+    .grid.grid-cols-2.lg\\:grid-cols-4 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem;
+    }
+    
+    .right-card {
+        padding: 1.25rem 0.75rem;
+    }
+    
+    .right-icon {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .right-name {
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+    }
+    
+    .right-desc {
+        font-size: 0.65rem;
+        line-height: 1.5;
+    }
+    
+    /* 链上凭证网格 */
+    .grid.grid-cols-1.lg\\:grid-cols-2.gap-8 {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+    
+    .celadon-card.p-8 {
+        padding: 1.5rem;
+    }
+    
+    .nft-info-row {
+        padding: 0.75rem 0;
+    }
+    
+    .nft-info-label,
+    .nft-info-value {
+        font-size: 0.8rem;
+    }
+    
+    /* 权属图谱 */
+    .graph-container {
+        min-height: 150px;
+    }
+    
+    .graph-node {
+        width: 60px;
+        height: 60px;
+        font-size: 0.65rem;
+    }
+    
+    .graph-node .node-label {
+        font-size: 0.7rem;
+    }
+    
+    .graph-line.w-24 {
+        width: 60px;
+    }
+    
+    /* 流转历史 */
+    .timeline {
+        padding-left: 32px;
+    }
+    
+    .timeline::before {
+        left: 8px;
+    }
+    
+    .timeline-item::before {
+        left: -32px;
+        width: 8px;
+        height: 8px;
+    }
+    
+    .timeline-item {
+        padding-bottom: 2rem;
+    }
+    
+    .timeline-date {
+        font-size: 0.65rem;
+    }
+    
+    .timeline-title {
+        font-size: 0.9rem;
+    }
+    
+    .timeline-desc {
+        font-size: 0.75rem;
+    }
+    
+    /* 流转统计 */
+    .grid.grid-cols-3.gap-4 {
+        gap: 0.5rem;
+    }
+    
+    .text-center.p-6 {
+        padding: 1rem;
+    }
+    
+    .font-display.text-2xl {
+        font-size: 1.25rem !important;
+    }
+    
+    /* 同类推荐 */
+    .grid.grid-cols-2.md\\:grid-cols-4 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem;
+    }
+    
+    .similar-card .card-info {
+        padding: 1rem;
+    }
+    
+    .similar-card .card-title {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .similar-card .card-meta {
+        font-size: 0.7rem;
+    }
+    
+    .similar-card .card-price {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* 操作区 */
+    .flex.flex-col.sm\\:flex-row {
+        flex-direction: column !important;
+    }
+    
+    .btn-ceramic.text-base.px-12.py-4 {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* 四权配置在小屏幕上改为单列 */
+    .grid.grid-cols-2.lg\\:grid-cols-4 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .right-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-align: left;
+        padding: 1rem;
+    }
+    
+    .right-icon {
+        margin: 0;
+        flex-shrink: 0;
+    }
+    
+    .right-card > div:not(.right-icon) {
+        flex: 1;
+    }
+}
+
+/* ========================================
+   6. Profile 页面响应式修复
+   ======================================== */
+
+@media (max-width: 768px) {
+    .profile-hero {
+        padding: 15vh 5vw 8vh;
+    }
+    
+    /* Tab导航优化 */
+    .tab-nav {
+        gap: 0;
+        margin: 0;
+        padding: 0;
+        border-bottom: none;
+        background: var(--bg-secondary);
+        position: sticky;
+        top: 56px;
+        z-index: 100;
+    }
+    
+    .tab-btn {
+        flex: 1;
+        padding: 1rem 0.5rem;
+        font-size: 1rem;
+        border-bottom: 2px solid transparent;
+    }
+    
+    .tab-btn::after {
+        display: none;
+    }
+    
+    .tab-btn.active {
+        border-bottom-color: var(--cinnabar);
+        background: rgba(160, 48, 32, 0.05);
+    }
+    
+    .tab-content {
+        padding: 1.5rem 5vw;
+    }
+    
+    /* 统计数据改为垂直布局或横向滚动 */
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        padding: 1rem 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+    }
+    
+    /* 资产网格 */
+    .asset-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem;
+    }
+    
+    .asset-card {
+        border-radius: 4px;
+    }
+    
+    .asset-cover {
+        aspect-ratio: 1;
+    }
+    
+    .asset-info {
+        padding: 0.875rem;
+    }
+    
+    .asset-name {
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+        letter-spacing: 0.05em;
+    }
+    
+    .asset-meta {
+        font-size: 0.7rem;
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: flex-start;
+    }
+    
+    .asset-type {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+        padding: 4rem 1rem;
+    }
+    
+    .empty-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-text {
+        font-size: 1rem;
+    }
+    
+    .empty-sub {
+        font-size: 0.8rem;
+    }
+    
+    /* 设置按钮 */
+    .settings-btn {
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 36px;
+        height: 36px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* 更小的屏幕上资产网格保持两列但更小 */
+    .asset-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem;
+    }
+    
+    .asset-info {
+        padding: 0.625rem;
+    }
+    
+    .asset-name {
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================
+   7. 通用组件移动端优化
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* 页脚优化 */
+    footer {
+        padding: 2rem 5vw !important;
+    }
+    
+    footer .flex {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    footer .font-display {
+        font-size: 1.1rem;
+        letter-spacing: 0.3em;
+    }
+    
+    footer .flex.gap-8 {
+        gap: 1.5rem;
+    }
+    
+    /* 加载和空状态 */
+    .loading-state,
+    .error-state,
+    .empty-state {
+        padding: 60px 20px;
+    }
+    
+    .loading-state::before,
+    .error-state .error-icon,
+    .empty-state .empty-icon {
+        font-size: 1.5rem;
+    }
+    
+    /* 禁用部分复杂动画 */
+    .paper-texture {
+        opacity: 0.2;
+    }
+    
+    /* 优化滚动性能 */
+    * {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ========================================
+   8. 深色模式支持（可选）
+   ======================================== */
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+    /* 移动端深色模式适配（如需要） */
+}
+
+/* ========================================
+   9. 减少动画偏好支持
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

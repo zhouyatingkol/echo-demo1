@@ -414,6 +414,8 @@
             opacity: 0;
         }
     </style>
+    <!-- Ethers.js v6 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
 </head>
 <body>
     <!-- 导航栏 -->
@@ -499,37 +501,47 @@
     </main>
 
     <script>
-        // MetaMask 连接
-        function connectMetaMask() {
-            if (typeof window.ethereum !== 'undefined') {
-                window.ethereum.request({ method: 'eth_requestAccounts' })
-                    .then(accounts => {
-                        console.log('Connected:', accounts[0]);
-                        // 登录成功后跳转到个人中心
-                        window.location.href = 'profile.html';
-                    })
-                    .catch(err => {
-                        console.error('Connection failed:', err);
-                        alert('连接失败，请重试');
-                    });
-            } else {
-                alert('请先安装 MetaMask 插件');
-                window.open('https://metamask.io/', '_blank');
+        // 等待钱包管理器初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 如果已经连接，直接跳转到个人中心
+            if (window.EchoWallet && window.EchoWallet.isConnected()) {
+                window.location.href = 'profile.html';
             }
+        });
+
+        // MetaMask 连接 - 使用 EchoWallet API
+        async function connectMetaMask() {
+            if (typeof window.EchoWallet === 'undefined') {
+                alert('系统初始化中，请稍候...');
+                return;
+            }
+            
+            const result = await window.EchoWallet.connect();
+            if (result.success) {
+                // 连接成功，跳转到个人中心
+                window.location.href = 'profile.html';
+            }
+            // 错误处理已在 wallet-manager 中通过 Toast 显示
         }
 
-        // WalletConnect 连接
-        function connectWalletConnect() {
-            alert('WalletConnect 功能即将上线');
+        // WalletConnect 连接（预留）
+        async function connectWalletConnect() {
+            window.EchoWallet?.showToast({
+                title: '待时而动',
+                message: 'WalletConnect 功能即将上线',
+                type: 'info'
+            });
         }
 
-        // 邮箱登录
+        // 邮箱登录（预留）
         function handleEmailLogin(event) {
             event.preventDefault();
             const email = event.target.querySelector('input').value;
-            console.log('Email login:', email);
-            // 模拟登录成功
-            alert('验证码已发送至 ' + email);
+            window.EchoWallet?.showToast({
+                title: '墨已留',
+                message: `验证码将发送至 ${email}`,
+                type: 'info'
+            });
         }
     </script>
     <!-- 钱包状态管理 -->
