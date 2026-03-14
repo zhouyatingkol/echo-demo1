@@ -338,6 +338,7 @@ class WalletManager {
     updateUI() {
         const connectBtn = document.getElementById('walletConnect');
         const mobileConnectBtn = document.getElementById('mobileWalletConnect');
+        const heroWalletStatus = document.getElementById('heroWalletStatus');
         const walletStatus = document.querySelector('.wallet-status');
         
         if (this.isConnected && this.address) {
@@ -351,6 +352,12 @@ class WalletManager {
                 mobileConnectBtn.textContent = '吾';
                 mobileConnectBtn.setAttribute('data-address', this.address);
                 mobileConnectBtn.classList.add('connected');
+            }
+            if (heroWalletStatus) {
+                heroWalletStatus.textContent = '吾';
+                heroWalletStatus.setAttribute('data-address', this.address);
+                heroWalletStatus.classList.add('connected');
+                heroWalletStatus.style.display = 'inline-flex';
             }
             if (walletStatus) {
                 walletStatus.innerHTML = `已连接 | 余额: ${this.formatBalance(this.balance)} ${this.MEER_SYMBOL}`;
@@ -367,6 +374,11 @@ class WalletManager {
                 mobileConnectBtn.textContent = '入链';
                 mobileConnectBtn.removeAttribute('data-address');
                 mobileConnectBtn.classList.remove('connected');
+            }
+            if (heroWalletStatus) {
+                heroWalletStatus.textContent = '入链';
+                heroWalletStatus.removeAttribute('data-address');
+                heroWalletStatus.classList.remove('connected');
             }
             if (walletStatus) {
                 walletStatus.innerHTML = '请先连接钱包 | 余额: --';
