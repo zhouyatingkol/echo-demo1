@@ -217,10 +217,16 @@
     // 更新用户菜单
     function updateUserMenu() {
         const userAvatar = document.getElementById('userAvatar');
-        if (userAvatar && currentState.address) {
-            // 使用 Blockies 生成头像或使用默认
-            userAvatar.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${currentState.address}`;
-            userAvatar.alt = formatAddress(currentState.address);
+        if (userAvatar) {
+            if (currentState.address) {
+                // 使用 identicon 生成头像
+                userAvatar.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${currentState.address}`;
+                userAvatar.alt = formatAddress(currentState.address);
+                userAvatar.style.display = 'block';
+            } else {
+                // 没有地址时隐藏头像
+                userAvatar.style.display = 'none';
+            }
         }
     }
     
