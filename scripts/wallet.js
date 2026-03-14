@@ -48,20 +48,37 @@ class WalletManager {
      */
     async connect() {
         try {
+            console.log('Connecting wallet...');
+            
             // 检查是否安装了 MetaMask
             if (!window.ethereum) {
                 this.showError('请安装 MetaMask 或其他 Web3 钱包');
-                return false;
+                return { success: false, error: 'NO_WALLET' };
             }
             
-            // 请求连接
-            const accounts = await window.ethereum.request({
-                method: 'eth_requestAccounts'
-            });
+            // 请求连接 - 这会触发 MetaMask 弹窗
+            console.log('Requesting accounts...');
+            let accounts;
+            try {
+                accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+            } catch (requestError) {
+                console.error('eth_requestAccounts error:', requestError);
+                // 用户拒绝或出错
+                if (requestError.code === 4001) {
+                    this.showError('用户拒绝了连接请求');
+                } else {
+                    this.showError('请求账户失败: ' + requestError.message);
+                }
+                return { success: false, error: requestError.code };
+            }
             
-            if (accounts.length === 0) {
+            console.log('Accounts received:', accounts);
+            
+            if (!accounts || accounts.length === 0) {
                 this.showError('未获得账户访问权限');
-                return false;
+                return { success: false, error: 'NO_ACCOUNTS' };
             }
             
             // 使用 ethers.js 创建 provider 和 signer
@@ -75,6 +92,7 @@ class WalletManager {
             
             // 检查是否在正确的链上
             if (!this.isCorrectChain()) {
+                console.log('Switching to Qitmeer chain...');
                 await this.switchChain();
             }
             
@@ -90,12 +108,13 @@ class WalletManager {
             localStorage.setItem('wallet_connected', 'true');
             localStorage.setItem('wallet_address', this.address);
             
-            return true;
+            console.log('Wallet connected successfully:', this.address);
+            return { success: true, address: this.address };
             
         } catch (error) {
             console.error('连接钱包失败:', error);
             this.showError('连接钱包失败: ' + error.message);
-            return false;
+            return { success: false, error: error.message };
         }
     }
     
