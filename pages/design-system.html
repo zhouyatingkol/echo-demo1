@@ -182,43 +182,25 @@
             line-height: 1.8;
         }
         
-        /* 朱红印章 - 暗朱红底色，白色字 */
+        /* 朱红印章 - 整体调色，浑然一体 */
         .hero-seal {
             width: 48px;
             height: 84px;
-            background: 
-                /* 做旧纹理 */
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='5'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.3'/%3E%3C/svg%3E"),
-                /* 不规则深浅 */
-                radial-gradient(ellipse at 30% 25%, rgba(160,70,55,0.4) 0%, transparent 45%),
-                radial-gradient(ellipse at 70% 75%, rgba(120,40,30,0.5) 0%, transparent 40%),
-                /* 暗朱红底色 */
-                #9B3022;
-            background-blend-mode: overlay, normal, normal, normal;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-image: url('../images/seal-gongsheng.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             position: relative;
             opacity: 0;
             transform: scale(0.8) rotate(-2deg);
             animation: sealStamp 0.8s var(--ease-ink) 1.2s forwards;
-            /* 毛笔涂抹边缘 */
-            filter: url(#brushEdge);
+            /* 整体调色：降低亮度、饱和度，偏向暗朱红 */
+            filter: url(#brushEdge) brightness(0.75) saturate(0.85) sepia(0.15);
         }
         
-        /* 共生字 - 用原图作为蒙版，显示白色 */
+        /* 隐藏文字容器 */
         .hero-seal-text-img {
-            width: 36px;
-            height: 68px;
-            background: rgba(255, 255, 255, 0.95);
-            mask-image: url('../images/seal-gongsheng.png');
-            -webkit-mask-image: url('../images/seal-gongsheng.png');
-            mask-size: contain;
-            -webkit-mask-size: contain;
-            mask-repeat: no-repeat;
-            -webkit-mask-repeat: no-repeat;
-            mask-position: center;
-            -webkit-mask-position: center;
+            display: none;
         }
         
         /* 斑驳内纹理 */
