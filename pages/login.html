@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>入 — ECHO</title>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CSS变量 ===== */
+        :root {
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F2EFE8;
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #7A6E5F;
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
+            --seal-red: #A03020;
+            --font-display: 'LXGW WenKai', cursive;
+            --font-serif: 'Noto Serif SC', serif;
+            --ease-ink: cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-water: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 20px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            color: var(--ink-deep);
+            line-height: 1.8;
+            min-height: 100vh;
+            letter-spacing: 0.02em;
+        }
+
+        /* ===== 导航栏 ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+        }
+
+        .navbar__brand {
+            text-decoration: none;
+        }
+
+        .navbar__logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: var(--ink-deep);
+            letter-spacing: 0.3em;
+            text-decoration: none;
+            opacity: 0.85;
+        }
+
+        .navbar__nav {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .navbar__link {
+            position: relative;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--ink-light);
+            text-decoration: none;
+            letter-spacing: 0.3em;
+            padding: 0.5rem 0;
+            transition: color 0.4s ease;
+        }
+
+        .navbar__link:hover {
+            color: var(--ink-deep);
+        }
+
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: var(--gold-primary);
+            transition: width 0.4s var(--ease-water);
+        }
+
+        .navbar__link:hover::after {
+            width: 100%;
+        }
+
+        /* ===== 主体区域 ===== */
+        .entry-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 24px 60px;
+            position: relative;
+        }
+
+        /* 背景装饰 */
+        .entry-bg-decoration {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            pointer-events: none;
+            opacity: 0.03;
+        }
+
+        .entry-bg-decoration::before {
+            content: '入';
+            font-family: var(--font-display);
+            font-size: 500px;
+            color: var(--ink-deep);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* ===== Hero区 ===== */
+        .entry-hero {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .entry-title {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+            margin-bottom: 16px;
+        }
+
+        .entry-subtitle {
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            font-weight: 300;
+        }
+
+        /* ===== 登录卡片 ===== */
+        .entry-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-secondary);
+            border: 0.5px solid rgba(122, 110, 95, 0.08);
+            border-radius: 2px;
+            padding: 48px 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 卡片装饰线 */
+        .entry-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                var(--gold-primary), 
+                transparent);
+        }
+
+        .entry-seal {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 32px;
+            border: 1.5px solid var(--seal-red);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--seal-red);
+            background: rgba(160, 48, 32, 0.04);
+        }
+
+        .entry-card-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.2em;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        /* ===== 钱包连接按钮 ===== */
+        .wallet-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .wallet-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg-primary);
+            border: 0.5px solid rgba(122, 110, 95, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.4s var(--ease-water);
+            text-align: left;
+            width: 100%;
+        }
+
+        .wallet-btn:hover {
+            border-color: var(--gold-primary);
+            background: rgba(184, 155, 108, 0.04);
+            transform: translateY(-1px);
+        }
+
+        .wallet-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .wallet-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .wallet-info {
+            flex: 1;
+        }
+
+        .wallet-name {
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+
+        .wallet-desc {
+            font-family: var(--font-serif);
+            font-size: 0.7rem;
+            color: var(--ink-light);
+            letter-spacing: 0.02em;
+        }
+
+        /* ===== 分隔线 ===== */
+        .entry-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 32px 0;
+            color: var(--ink-light);
+        }
+
+        .entry-divider::before,
+        .entry-divider::after {
+            content: '';
+            flex: 1;
+            height: 0.5px;
+            background: rgba(122, 110, 95, 0.15);
+        }
+
+        .entry-divider span {
+            font-family: var(--font-serif);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+        }
+
+        /* ===== 邮箱登录 ===== */
+        .email-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-family: var(--font-serif);
+            font-size: 0.85rem;
+            color: var(--ink-deep);
+            background: var(--bg-primary);
+            border: 0.5px solid rgba(122, 110, 95, 0.1);
+            border-radius: 2px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: var(--ink-light);
+            opacity: 0.6;
+        }
+
+        .form-input:focus {
+            border-color: var(--gold-primary);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            color: var(--bg-primary);
+            background: var(--ink-deep);
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.8s var(--ease-ink);
+            margin-top: 8px;
+        }
+
+        .submit-btn:hover {
+            background: var(--gold-primary);
+        }
+
+        /* ===== 底部链接 ===== */
+        .entry-footer {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 0.5px solid rgba(122, 110, 95, 0.08);
+        }
+
+        .entry-footer-text {
+            font-family: var(--font-serif);
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            letter-spacing: 0.05em;
+        }
+
+        .entry-footer-link {
+            color: var(--gold-primary);
+            text-decoration: none;
+            border-bottom: 0.5px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .entry-footer-link:hover {
+            border-color: var(--gold-primary);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .entry-title {
+                font-size: 2.2rem;
+            }
+
+            .entry-card {
+                padding: 36px 24px;
+            }
+
+            .entry-bg-decoration::before {
+                font-size: 300px;
+            }
+        }
+
+        /* ===== 加载动画 ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .entry-hero,
+        .entry-card {
+            animation: fadeIn 0.8s var(--ease-ink) forwards;
+        }
+
+        .entry-card {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="navbar__brand">
+            <span class="navbar__logo">ECHO</span>
+        </a>
+        <div class="navbar__nav">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+        </div>
+        <div class="navbar__actions">
+            <!-- 在登录页面不显示入链按钮 -->
+        </div>
+    </nav>
+
+    <!-- 主体 -->
+    <main class="entry-container">
+        <!-- 背景装饰 -->
+        <div class="entry-bg-decoration"></div>
+
+        <!-- Hero -->
+        <div class="entry-hero">
+            <h1 class="entry-title">入</h1>
+            <p class="entry-subtitle">由此而入，开启你的数字旅程</p>
+        </div>
+
+        <!-- 登录卡片 -->
+        <div class="entry-card">
+            <!-- 印章 -->
+            <div class="entry-seal">入</div>
+
+            <h2 class="entry-card-title">选择入口</h2>
+
+            <!-- Web3 钱包 -->
+            <div class="wallet-list">
+                <button class="wallet-btn" onclick="connectMetaMask()">
+                    <div class="wallet-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M22 12C22 6.48 17.52 2 12 2S2 6.48 2 12s4.48 10 10 10 10-4.48 10-10z" fill="#E2761B" opacity="0.2"/>
+                            <path d="M12 6v12M6 12h12" stroke="#E2761B" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="wallet-info">
+                        <div class="wallet-name">MetaMask</div>
+                        <div class="wallet-desc">浏览器钱包插件</div>
+                    </div>
+                </button>
+
+                <button class="wallet-btn" onclick="connectWalletConnect()">
+                    <div class="wallet-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#3B99FC" opacity="0.2"/>
+                            <path d="M8 12h8M12 8v8" stroke="#3B99FC" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="wallet-info">
+                        <div class="wallet-name">WalletConnect</div>
+                        <div class="wallet-desc">扫码连接手机钱包</div>
+                    </div>
+                </button>
+            </div>
+
+            <!-- 分隔线 -->
+            <div class="entry-divider">
+                <span>或</span>
+            </div>
+
+            <!-- 邮箱登录 -->
+            <form class="email-form" onsubmit="handleEmailLogin(event)">
+                <input type="email" class="form-input" placeholder="输入邮箱地址" required>
+                <button type="submit" class="submit-btn">入</button>
+            </form>
+
+            <!-- 底部 -->
+            <div class="entry-footer">
+                <p class="entry-footer-text">
+                    尚未结缘？<a href="#" class="entry-footer-link">由此而生</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // MetaMask 连接
+        function connectMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.request({ method: 'eth_requestAccounts' })
+                    .then(accounts => {
+                        console.log('Connected:', accounts[0]);
+                        // 登录成功后跳转到个人中心
+                        window.location.href = 'profile.html';
+                    })
+                    .catch(err => {
+                        console.error('Connection failed:', err);
+                        alert('连接失败，请重试');
+                    });
+            } else {
+                alert('请先安装 MetaMask 插件');
+                window.open('https://metamask.io/', '_blank');
+            }
+        }
+
+        // WalletConnect 连接
+        function connectWalletConnect() {
+            alert('WalletConnect 功能即将上线');
+        }
+
+        // 邮箱登录
+        function handleEmailLogin(event) {
+            event.preventDefault();
+            const email = event.target.querySelector('input').value;
+            console.log('Email login:', email);
+            // 模拟登录成功
+            alert('验证码已发送至 ' + email);
+        }
+    </script>
+</body>
+</html>
