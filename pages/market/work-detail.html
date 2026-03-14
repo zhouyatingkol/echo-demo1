@@ -1197,6 +1197,227 @@
         }
     </style>
     <script>
+        // ==================== 授权购买功能 ====================
+        
+        // 当前选中的授权类型
+        let selectedLicenseType = 'onetime';
+        
+        // 价格配置
+        const priceConfig = {
+            onetime: 100,
+            peruse: 0.5,
+            timed: 10
+        };
+        
+        // 场景倍率
+        const multipliers = {
+            0: 1.0,   // 个人
+            1: 1.5,   // 游戏
+            2: 2.0,   // AI
+            3: 3.0,   // 商业
+            4: 2.5,   // 广播
+            5: 1.2    // 流媒体
+        };
+        
+        // 获取 URL 参数
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                id: params.get('id') || '1'
+            };
+        }
+        
+        // 打开购买模态框
+        function openLicenseModal() {
+            // 检查钱包连接
+            if (!walletManager.isConnected) {
+                walletManager.connect().then(result => {
+                    if (result.success) {
+                        document.getElementById('licenseModal').style.display = 'flex';
+                        updatePrice();
+                    }
+                });
+            } else {
+                document.getElementById('licenseModal').style.display = 'flex';
+                updatePrice();
+            }
+        }
+        
+        // 关闭购买模态框
+        function closeLicenseModal() {
+            document.getElementById('licenseModal').style.display = 'none';
+            resetLicenseModal();
+        }
+        
+        // 重置模态框
+        function resetLicenseModal() {
+            selectedLicenseType = 'onetime';
+            document.querySelectorAll('.license-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector('[data-type="onetime"]').classList.add('selected');
+            document.getElementById('quantitySection').style.display = 'none';
+            document.getElementById('quantityInput').value = 100;
+            document.getElementById('usageTypeSelect').value = '0';
+            document.getElementById('licenseTxStatus').style.display = 'none';
+            document.getElementById('licenseBuyBtn').style.display = 'block';
+            document.getElementById('licenseBuyBtn').disabled = false;
+            document.getElementById('licenseBuyBtn').textContent = '确认购买';
+            document.getElementById('licenseTxLink').style.display = 'none';
+            updatePrice();
+        }
+        
+        // 选择授权类型
+        function selectLicenseType(type) {
+            selectedLicenseType = type;
+            
+            // 更新 UI
+            document.querySelectorAll('.license-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+            
+            // 显示/隐藏数量选择
+            const quantitySection = document.getElementById('quantitySection');
+            const quantityLabel = document.getElementById('quantityLabel');
+            const quantityInput = document.getElementById('quantityInput');
+            
+            if (type === 'onetime') {
+                quantitySection.style.display = 'none';
+            } else if (type === 'peruse') {
+                quantitySection.style.display = 'block';
+                quantityLabel.textContent = '使用次数';
+                quantityInput.value = 100;
+            } else if (type === 'timed') {
+                quantitySection.style.display = 'block';
+                quantityLabel.textContent = '租赁天数';
+                quantityInput.value = 30;
+            }
+            
+            updatePrice();
+        }
+        
+        // 调整数量
+        function adjustQuantity(delta) {
+            const input = document.getElementById('quantityInput');
+            let value = parseInt(input.value) + delta;
+            if (value < 1) value = 1;
+            input.value = value;
+            updatePrice();
+        }
+        
+        // 更新价格显示
+        function updatePrice() {
+            const usageType = parseInt(document.getElementById('usageTypeSelect').value);
+            const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+            const multiplier = multipliers[usageType];
+            
+            let basePrice = priceConfig[selectedLicenseType];
+            let quantityLabel = '';
+            
+            if (selectedLicenseType === 'onetime') {
+                quantityLabel = '';
+            } else if (selectedLicenseType === 'peruse') {
+                basePrice = basePrice * quantity;
+                quantityLabel = ` (${quantity}次)`;
+            } else if (selectedLicenseType === 'timed') {
+                basePrice = basePrice * quantity;
+                quantityLabel = ` (${quantity}天)`;
+            }
+            
+            const adjustedPrice = basePrice * multiplier;
+            const platformFee = adjustedPrice * 0.05;
+            const totalPrice = adjustedPrice + platformFee;
+            
+            // 更新显示
+            document.getElementById('basePriceDisplay').textContent = basePrice.toFixed(2) + ' MEER' + quantityLabel;
+            document.getElementById('multiplierDisplay').textContent = '×' + multiplier.toFixed(1);
+            document.getElementById('platformFeeDisplay').textContent = platformFee.toFixed(2) + ' MEER';
+            document.getElementById('totalPriceDisplay').textContent = totalPrice.toFixed(2) + ' MEER';
+        }
+        
+        // 购买授权
+        async function purchaseLicense() {
+            const btn = document.getElementById('licenseBuyBtn');
+            const txStatus = document.getElementById('licenseTxStatus');
+            
+            // 检查网络
+            if (!walletManager.isCorrectNetwork) {
+                showToast('请切换到 Qitmeer 主网', 'error');
+                const switched = await walletManager.switchToQitmeer();
+                if (!switched) return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '处理中...';
+            txStatus.style.display = 'block';
+            
+            try {
+                // 获取参数
+                const assetId = getUrlParams().id;
+                const usageType = parseInt(document.getElementById('usageTypeSelect').value);
+                const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+                
+                // 初始化合约服务
+                const provider = walletManager.provider;
+                const signer = walletManager.signer;
+                
+                if (!contractService.isInitialized) {
+                    await contractService.initialize(provider, signer);
+                }
+                
+                // 调用购买函数
+                let result;
+                
+                switch (selectedLicenseType) {
+                    case 'onetime':
+                        result = await contractService.purchaseOneTime(assetId, usageType);
+                        break;
+                    case 'peruse':
+                        result = await contractService.purchasePerUse(assetId, usageType, quantity);
+                        break;
+                    case 'timed':
+                        result = await contractService.purchaseTimed(assetId, usageType, quantity);
+                        break;
+                }
+                
+                // 显示成功
+                txStatus.innerHTML = `
+                    <div class="license-tx-icon">✅</div>
+                    <div class="license-tx-message">购买成功！License ID: ${result.licenseId}</div>
+                `;
+                
+                btn.style.display = 'none';
+                
+                // 显示交易链接
+                const txLink = document.getElementById('licenseTxLink');
+                txLink.href = walletManager.getTransactionUrl(result.txHash);
+                txLink.style.display = 'block';
+                
+                showToast('授权购买成功！', 'success');
+                
+            } catch (error) {
+                console.error('[ECHO] Purchase failed:', error);
+                
+                txStatus.innerHTML = `
+                    <div class="license-tx-icon">❌</div>
+                    <div class="license-tx-message">${error.message || '购买失败'}</div>
+                `;
+                
+                btn.disabled = false;
+                btn.textContent = '重试';
+                
+                showToast(error.message || '购买失败', 'error');
+            }
+        }
+        
+        // 点击模态框外部关闭
+        document.getElementById('licenseModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLicenseModal();
+            }
+        });
+        
         // 滚动淡入动画
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {

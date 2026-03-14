@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO 合约测试</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .section {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.5rem 0;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .status {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .log {
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 ECHO 合约测试</h1>
+    
+    <div class="section">
+        <h2>1. 钱包连接测试</h2>
+        <button id="connectBtn" onclick="connectWallet()">连接 MetaMask</button>
+        <div id="walletStatus" class="status info" style="display: none;"></div>
+    </div>
+
+    <div class="section">
+        <h2>2. 网络检查</h2>
+        <p>期望网络: Qitmeer Mainnet (Chain ID: 813)</p>
+        <div id="networkStatus" class="status info">未连接</div>
+        <button id="switchNetworkBtn" onclick="switchNetwork()" style="display: none;">切换到 Qitmeer</button>
+    </div>
+
+    <div class="section">
+        <h2>3. 合约读取测试</h2>
+        <button id="readContractBtn" onclick="testReadContract()" disabled>测试读取合约</button>
+        <div id="readResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>4. 日志输出</h2>
+        <div id="logs" class="log"></div>
+    </div>
+
+    <script>
+        // 合约配置
+        const CONTRACT_CONFIG = {
+            network: {
+                name: 'Qitmeer Mainnet',
+                chainId: 813,
+                chainIdHex: '0x32d',
+                rpcUrl: 'https://qng.rpc.qitmeer.io',
+                currency: 'MEER'
+            },
+            contracts: {
+                ECHOAssetV2V3: {
+                    address: '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce'
+                },
+                LicenseNFTV3: {
+                    address: '0x2f79b56047050FD2Ee7C62d2d0fe644c15c68e23'
+                }
+            }
+        };
+
+        // 简化 ABI
+        const ECHO_ASSET_ABI = [
+            "function getCurrentTokenId() view returns (uint256)",
+            "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated) metadata, tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue) blueprint, address creator, uint256 version)"
+        ];
+
+        const LICENSE_ABI = [
+            "function platformFeeRate() view returns (uint256)",
+            "function usageMultipliers(uint8 usageType) view returns (uint256)",
+            "function getAssetBasePrice(uint256 assetId) view returns (uint256)"
+        ];
+
+        let provider = null;
+        let signer = null;
+        let address = null;
+
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'blue';
+            logs.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+        }
+
+        async function connectWallet() {
+            try {
+                log('正在连接钱包...');
+
+                if (!window.ethereum) {
+                    throw new Error('请安装 MetaMask');
+                }
+
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                address = accounts[0];
+
+                log(`钱包连接成功: ${address}`, 'success');
+
+                // 更新 UI
+                document.getElementById('walletStatus').style.display = 'block';
+                document.getElementById('walletStatus').className = 'status success';
+                document.getElementById('walletStatus').textContent = `已连接: ${address}`;
+                document.getElementById('connectBtn').textContent = '重新连接';
+
+                // 检查网络
+                await checkNetwork();
+
+                // 启用读取测试按钮
+                document.getElementById('readContractBtn').disabled = false;
+
+            } catch (error) {
+                log(`连接失败: ${error.message}`, 'error');
+                document.getElementById('walletStatus').style.display = 'block';
+                document.getElementById('walletStatus').className = 'status error';
+                document.getElementById('walletStatus').textContent = error.message;
+            }
+        }
+
+        async function checkNetwork() {
+            try {
+                const network = await provider.getNetwork();
+                const chainId = Number(network.chainId);
+
+                log(`当前网络 Chain ID: ${chainId}`);
+
+                if (chainId === CONTRACT_CONFIG.network.chainId) {
+                    log('✅ 已在 Qitmeer 主网', 'success');
+                    document.getElementById('networkStatus').className = 'status success';
+                    document.getElementById('networkStatus').textContent = '✅ 已在 Qitmeer 主网 (Chain ID: 813)';
+                    document.getElementById('switchNetworkBtn').style.display = 'none';
+                } else {
+                    log(`⚠️ 当前在错误的网络 (Chain ID: ${chainId})`, 'error');
+                    document.getElementById('networkStatus').className = 'status error';
+                    document.getElementById('networkStatus').textContent = `⚠️ 错误网络 (Chain ID: ${chainId})`;
+                    document.getElementById('switchNetworkBtn').style.display = 'inline-block';
+                }
+            } catch (error) {
+                log(`网络检查失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function switchNetwork() {
+            try {
+                log('正在切换到 Qitmeer 主网...');
+
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: CONTRACT_CONFIG.network.chainIdHex }],
+                });
+
+                log('✅ 网络切换成功', 'success');
+                await checkNetwork();
+
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    // 需要添加网络
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: CONTRACT_CONFIG.network.chainIdHex,
+                                chainName: CONTRACT_CONFIG.network.name,
+                                nativeCurrency: {
+                                    name: CONTRACT_CONFIG.network.currency,
+                                    symbol: CONTRACT_CONFIG.network.currency,
+                                    decimals: 18
+                                },
+                                rpcUrls: [CONTRACT_CONFIG.network.rpcUrl],
+                                blockExplorerUrls: ['https://qng.qitmeer.io']
+                            }],
+                        });
+                        log('✅ 网络添加成功', 'success');
+                    } catch (addError) {
+                        log(`添加网络失败: ${addError.message}`, 'error');
+                    }
+                } else {
+                    log(`切换网络失败: ${switchError.message}`, 'error');
+                }
+            }
+        }
+
+        async function testReadContract() {
+            try {
+                log('正在测试合约读取...');
+
+                // 创建只读合约实例
+                const echoContract = new ethers.Contract(
+                    CONTRACT_CONFIG.contracts.ECHOAssetV2V3.address,
+                    ECHO_ASSET_ABI,
+                    provider
+                );
+
+                const licenseContract = new ethers.Contract(
+                    CONTRACT_CONFIG.contracts.LicenseNFTV3.address,
+                    LICENSE_ABI,
+                    provider
+                );
+
+                // 测试读取当前 Token ID
+                log('读取 ECHOAssetV2V3.getCurrentTokenId()...');
+                const currentTokenId = await echoContract.getCurrentTokenId();
+                log(`✅ 当前 Token ID: ${currentTokenId.toString()}`, 'success');
+
+                // 测试读取平台费率
+                log('读取 LicenseNFTV3.platformFeeRate()...');
+                const feeRate = await licenseContract.platformFeeRate();
+                log(`✅ 平台费率: ${feeRate.toString()}`, 'success');
+
+                // 测试读取使用场景倍率
+                log('读取 LicenseNFTV3.usageMultipliers(0)...');
+                const multiplier = await licenseContract.usageMultipliers(0);
+                log(`✅ 个人使用倍率: ${multiplier.toString()}`, 'success');
+
+                // 显示结果
+                document.getElementById('readResult').innerHTML = `
+                    <div class="status success">
+                        <h3>合约读取成功</h3>
+                        <pre>${JSON.stringify({
+                            currentTokenId: currentTokenId.toString(),
+                            platformFeeRate: feeRate.toString(),
+                            usageMultiplier: multiplier.toString()
+                        }, null, 2)}</pre>
+                    </div>
+                `;
+
+            } catch (error) {
+                log(`合约读取失败: ${error.message}`, 'error');
+                document.getElementById('readResult').innerHTML = `
+                    <div class="status error">
+                        <h3>合约读取失败</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 监听网络变化
+        if (window.ethereum) {
+            window.ethereum.on('chainChanged', () => {
+                log('网络已切换，刷新页面...');
+                window.location.reload();
+            });
+        }
+
+        log('页面加载完成，等待连接钱包...');
+    </script>
+</body>
+</html>
