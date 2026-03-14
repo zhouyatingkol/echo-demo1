@@ -216,28 +216,7 @@
     
     // 更新用户菜单
     function updateUserMenu() {
-        const userAvatar = document.getElementById('userAvatar');
         const userMenu = document.getElementById('userMenu');
-        
-        if (userAvatar) {
-            if (currentState.address) {
-                // 使用 identicon 生成头像
-                const avatarUrl = `https://api.dicebear.com/7.x/identicon/svg?seed=${currentState.address}`;
-                userAvatar.src = avatarUrl;
-                userAvatar.alt = formatAddress(currentState.address);
-                userAvatar.style.display = 'block';
-                
-                // 添加错误处理 - 如果头像加载失败，隐藏图片
-                userAvatar.onerror = function() {
-                    this.style.display = 'none';
-                    this.src = '';
-                };
-            } else {
-                // 没有地址时隐藏头像并清空 src
-                userAvatar.src = '';
-                userAvatar.style.display = 'none';
-            }
-        }
         
         // 确保 userMenu 的显示状态正确
         if (userMenu) {
