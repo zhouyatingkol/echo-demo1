@@ -140,6 +140,33 @@
       color: var(--ink-deep);
     }
     
+    /* 钱包连接后悬停显示地址 */
+    .navbar__btn.connected {
+      position: relative;
+    }
+    
+    .navbar__btn.connected::after {
+      content: attr(data-address);
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      padding: 0.5rem 0.75rem;
+      background: var(--ink-deep);
+      color: white;
+      font-size: 0.7rem;
+      font-family: monospace;
+      border-radius: 2px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .navbar__btn.connected:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    
     .navbar__btn--primary {
       background: var(--ink-deep);
       color: var(--bg-primary);
@@ -481,11 +508,10 @@
     <div class="navbar__nav">
       <a href="index.html">境</a>
       <a href="marketplace.html">集</a>
-      <a href="creator.html">铸</a>
       <a href="docs.html">典</a>
     </div>
     <div class="navbar__actions">
-      <button class="navbar__btn" id="connectWallet">入链</button>
+      <button class="navbar__btn" id="walletConnect">入链</button>
     </div>
   </nav>
 
@@ -588,6 +614,8 @@
   </div>
 
   <!-- Wallet Manager -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="../scripts/wallet.js"></script>
   <script src="../js/wallet-manager.js"></script>
   
   <script>

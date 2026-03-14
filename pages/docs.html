@@ -129,7 +129,34 @@
             color: #3A3530;
             background: rgba(201, 184, 150, 0.05);
         }
-
+        
+        /* 钱包连接后悬停显示地址 */
+        .navbar__user.connected {
+            position: relative;
+        }
+        
+        .navbar__user.connected::after {
+            content: attr(data-address);
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            padding: 0.5rem 0.75rem;
+            background: var(--ink-deep);
+            color: white;
+            font-size: 0.7rem;
+            font-family: monospace;
+            border-radius: 2px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar__user.connected:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
         .navbar__user-placeholder {
             width: 20px;
             height: 20px;
@@ -1388,12 +1415,8 @@
         </div>
 
         <div class="navbar__actions">
-            <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包" onclick="window.location.href='login.html'">
+            <button class="navbar__user" id="walletConnect" type="button" aria-label="连接钱包">
                 <span>入链</span>
-            </button>
-
-            <button class="navbar__user navbar__user--connected" id="userMenu" type="button" aria-label="打开用户菜单" style="display: none;">
-                <span id="userName">吾</span>
             </button>
         </div>
 
@@ -1407,11 +1430,8 @@
             <a href="index.html" class="navbar__link">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
             <a href="docs.html" class="navbar__link">典</a>
-            <button class="navbar__user" id="mobileConnectWallet" type="button">
+            <button class="navbar__user" id="mobileWalletConnect" type="button">
                 <span>入链</span>
-            </button>
-            <button class="navbar__user navbar__user--connected" id="mobileUserMenu" type="button" style="display: none;">
-                <span>吾</span>
             </button>
         </div>
     </nav>
@@ -1989,6 +2009,8 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="../scripts/wallet.js"></script>
     <!-- 钱包状态管理 -->
     <script src="../js/wallet-manager.js"></script>
 </body>

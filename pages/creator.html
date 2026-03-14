@@ -183,6 +183,33 @@
             background: rgba(201, 184, 150, 0.05);
         }
 
+        /* 钱包连接后悬停显示地址 */
+        .navbar__user.connected {
+            position: relative;
+        }
+
+        .navbar__user.connected::after {
+            content: attr(data-address);
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            padding: 0.5rem 0.75rem;
+            background: var(--ink-deep);
+            color: white;
+            font-size: 0.7rem;
+            font-family: monospace;
+            border-radius: 2px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .navbar__user.connected:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
         .navbar__user-placeholder {
             width: 20px;
             height: 20px;
@@ -399,11 +426,11 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(184, 155, 108, 0.3) 20%, 
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(184, 155, 108, 0.3) 20%,
                 rgba(160, 48, 32, 0.2) 50%,
-                rgba(184, 155, 108, 0.3) 80%, 
+                rgba(184, 155, 108, 0.3) 80%,
                 transparent 100%);
             opacity: 0;
             transition: opacity 0.6s ease;
@@ -628,7 +655,7 @@
 
         .realm-card.is-selected {
             border-color: var(--seal-red);
-            box-shadow: 
+            box-shadow:
                 0 8px 30px rgba(107, 91, 79, 0.12),
                 inset 0 0 0 1px rgba(107, 91, 79, 0.1);
             transform: translateY(-3px);
@@ -642,9 +669,9 @@
             right: -1px;
             bottom: -1px;
             border-radius: 2px;
-            background: linear-gradient(135deg, 
-                rgba(160, 48, 32, 0.08) 0%, 
-                transparent 50%, 
+            background: linear-gradient(135deg,
+                rgba(160, 48, 32, 0.08) 0%,
+                transparent 50%,
                 rgba(160, 48, 32, 0.05) 100%);
             z-index: -1;
         }
@@ -887,11 +914,11 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(184, 155, 108, 0.3) 30%, 
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(184, 155, 108, 0.3) 30%,
                 rgba(184, 155, 108, 0.5) 50%,
-                rgba(184, 155, 108, 0.3) 70%, 
+                rgba(184, 155, 108, 0.3) 70%,
                 transparent 100%);
             opacity: 0;
             transition: opacity 0.4s ease;
@@ -908,22 +935,22 @@
 
         .rights-card.is-enabled {
             border-color: rgba(107, 91, 79, 0.4);
-            background: linear-gradient(135deg, 
-                rgba(107, 91, 79, 0.03) 0%, 
+            background: linear-gradient(135deg,
+                rgba(107, 91, 79, 0.03) 0%,
                 var(--bg-primary) 50%,
                 rgba(107, 91, 79, 0.03) 100%);
-            box-shadow: 
+            box-shadow:
                 0 8px 32px rgba(107, 91, 79, 0.08),
                 inset 0 0 0 1px rgba(107, 91, 79, 0.05);
         }
 
         .rights-card.is-enabled::before {
             opacity: 1;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(107, 91, 79, 0.35) 30%, 
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(107, 91, 79, 0.35) 30%,
                 rgba(107, 91, 79, 0.5) 50%,
-                rgba(107, 91, 79, 0.35) 70%, 
+                rgba(107, 91, 79, 0.35) 70%,
                 transparent 100%);
         }
 
@@ -983,16 +1010,16 @@
             transform: translateY(-50%);
             width: 1px;
             height: 40%;
-            background: linear-gradient(180deg, 
-                transparent 0%, 
-                rgba(122, 110, 95, 0.2) 50%, 
+            background: linear-gradient(180deg,
+                transparent 0%,
+                rgba(122, 110, 95, 0.2) 50%,
                 transparent 100%);
         }
 
         .rights-card.is-enabled .rights-header::after {
-            background: linear-gradient(180deg, 
-                transparent 0%, 
-                rgba(107, 91, 79, 0.35) 50%, 
+            background: linear-gradient(180deg,
+                transparent 0%,
+                rgba(107, 91, 79, 0.35) 50%,
                 transparent 100%);
         }
 
@@ -1090,8 +1117,8 @@
             border-top: 0.5px solid rgba(26, 26, 26, 0.06);
             display: none;
             position: relative;
-            background: linear-gradient(180deg, 
-                rgba(250, 248, 245, 0.5) 0%, 
+            background: linear-gradient(180deg,
+                rgba(250, 248, 245, 0.5) 0%,
                 transparent 100%);
         }
 
@@ -1120,9 +1147,9 @@
             transform: translateX(-50%);
             width: 40px;
             height: 4px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(107, 91, 79, 0.2) 50%, 
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(107, 91, 79, 0.2) 50%,
                 transparent 100%);
             border-radius: 2px;
         }
@@ -1411,12 +1438,8 @@
         </div>
 
         <div class="navbar__actions">
-            <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包" onclick="window.location.href='login.html'">
+            <button class="navbar__user" id="walletConnect" type="button" aria-label="连接钱包">
                 <span>入链</span>
-            </button>
-            
-            <button class="navbar__user navbar__user--connected" id="userMenu" type="button" aria-label="打开用户菜单" style="display: none;">
-                <span id="userName">吾</span>
             </button>
         </div>
 
@@ -1430,11 +1453,8 @@
             <a href="index.html" class="navbar__link">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
             <a href="docs.html" class="navbar__link">典</a>
-            <button class="navbar__user" id="mobileConnectWallet" type="button">
+            <button class="navbar__user" id="mobileWalletConnect" type="button">
                 <span>入链</span>
-            </button>
-            <button class="navbar__user navbar__user--connected" id="mobileUserMenu" type="button" style="display: none;">
-                <span>吾</span>
             </button>
         </div>
     </nav>
@@ -1591,7 +1611,7 @@
                 <div class="form-group">
                     <label class="form-label">权</label>
                     <div class="rights-intro">四权分离，各得其所</div>
-                    
+
                     <!-- 用：使用权 -->
                     <div class="rights-card" data-right="usage">
                         <div class="rights-header">
@@ -1626,7 +1646,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- 衍：衍生权 -->
                     <div class="rights-card" data-right="derivative">
                         <div class="rights-header">
@@ -1662,7 +1682,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- 扩：扩展权 -->
                     <div class="rights-card" data-right="extension">
                         <div class="rights-header">
@@ -1697,7 +1717,7 @@
                             <div class="settings-note">自动扩展条款，七日通知期护之</div>
                         </div>
                     </div>
-                    
+
                     <!-- 益：收益权 -->
                     <div class="rights-card" data-right="revenue">
                         <div class="rights-header">
@@ -1941,6 +1961,8 @@
         });
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="../scripts/wallet.js"></script>
     <!-- 钱包状态管理 -->
     <script src="../js/wallet-manager.js"></script>
     <!-- 移动端导航 -->
