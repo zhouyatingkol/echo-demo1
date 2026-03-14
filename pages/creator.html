@@ -733,90 +733,217 @@
         }
 
         .rights-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            display: flex;
+            flex-direction: column;
             gap: 1rem;
         }
 
-        .rights-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.8rem;
-            padding: 1.2rem;
+        .rights-card {
             background: var(--bg-primary);
             border-radius: 2px;
             border: 0.5px solid rgba(26, 26, 26, 0.06);
-            cursor: pointer;
+            overflow: hidden;
             transition: all 0.4s ease;
         }
 
-        .rights-item:hover {
+        .rights-card:hover {
             border-color: var(--gold-primary);
-            transform: translateY(-2px);
         }
 
-        .rights-item.is-checked {
+        .rights-card.is-enabled {
             border-color: var(--cinnabar);
-            background: rgba(160, 48, 32, 0.02);
         }
 
-        .rights-icon {
-            font-size: 1.4rem;
+        .rights-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem;
+            cursor: pointer;
+        }
+
+        .rights-symbol {
+            font-size: 1.6rem;
             color: var(--ink-light);
             flex-shrink: 0;
             transition: color 0.3s ease;
         }
 
-        .rights-item.is-checked .rights-icon {
+        .rights-card.is-enabled .rights-symbol {
             color: var(--cinnabar);
         }
 
-        .rights-content {
+        .rights-info {
             flex: 1;
         }
 
-        .rights-title {
+        .rights-name {
             font-family: var(--font-display);
             font-size: 1rem;
             color: var(--ink-deep);
-            letter-spacing: 0.15em;
-            margin-bottom: 0.4rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.3rem;
         }
 
-        .rights-item.is-checked .rights-title {
+        .rights-card.is-enabled .rights-name {
             color: var(--cinnabar);
         }
 
-        .rights-desc {
+        .rights-summary {
             font-family: var(--font-serif);
             font-size: 0.75rem;
             color: var(--ink-medium);
-            letter-spacing: 0.05em;
-            line-height: 1.6;
-            margin-bottom: 0.5rem;
-        }
-
-        .rights-detail {
-            font-family: var(--font-sans);
-            font-size: 0.65rem;
-            color: var(--ink-light);
             letter-spacing: 0.02em;
         }
 
-        .rights-modes {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+        /* 开关 */
+        .rights-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+            cursor: pointer;
         }
 
-        .mode-tag {
-            display: inline-block;
-            padding: 2px 8px;
-            font-size: 0.65rem;
-            color: var(--gold-primary);
-            border: 0.5px solid var(--gold-primary);
-            border-radius: 2px;
+        .rights-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 26, 26, 0.1);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .rights-toggle input:checked + .toggle-slider {
+            background: var(--cinnabar);
+        }
+
+        .rights-toggle input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* 详细设置 */
+        .rights-settings {
+            padding: 0 1.2rem 1.2rem;
+            border-top: 0.5px solid rgba(26, 26, 26, 0.06);
+            display: none;
+        }
+
+        .rights-card.is-enabled .rights-settings {
+            display: block;
+        }
+
+        .settings-label {
+            font-family: var(--font-serif);
+            font-size: 0.75rem;
+            color: var(--ink-light);
             letter-spacing: 0.05em;
+            margin: 1rem 0 0.8rem;
+        }
+
+        .settings-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .setting-option {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            padding: 0.8rem 1rem;
+            background: var(--bg-secondary);
+            border: 0.5px solid transparent;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .setting-option:hover {
+            border-color: var(--gold-primary);
+        }
+
+        .setting-option.is-selected {
+            border-color: var(--cinnabar);
+            background: rgba(160, 48, 32, 0.05);
+        }
+
+        .option-name {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.1em;
+        }
+
+        .option-desc {
+            font-family: var(--font-serif);
+            font-size: 0.65rem;
+            color: var(--ink-light);
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .settings-col {
+            flex: 1;
+        }
+
+        .settings-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .settings-input input {
+            width: 60px;
+            padding: 0.5rem;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            color: var(--ink-deep);
+            background: var(--bg-secondary);
+            border: 0.5px solid rgba(26, 26, 26, 0.1);
+            border-radius: 2px;
+            text-align: center;
+        }
+
+        .input-unit {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            color: var(--ink-light);
+        }
+
+        .settings-note {
+            font-family: var(--font-serif);
+            font-size: 0.7rem;
+            color: var(--ink-light);
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 0.5px dashed rgba(26, 26, 26, 0.1);
         }
 
         /* ===== 提交按钮 ===== */
@@ -1130,45 +1257,137 @@
                 <div class="form-group">
                     <label class="form-label">权</label>
                     <div class="rights-intro">四权分离，各得其所</div>
-                    <div class="rights-grid">
-                        <div class="rights-item is-checked" data-right="usage">
-                            <div class="rights-icon">◈</div>
-                            <div class="rights-content">
-                                <div class="rights-title">用</div>
-                                <div class="rights-desc">特定场景、时限、次数内可用</div>
-                                <div class="rights-modes">
-                                    <span class="mode-tag">断</span>
-                                    <span class="mode-tag">次</span>
-                                    <span class="mode-tag">时</span>
+                    
+                    <!-- 用：使用权 -->
+                    <div class="rights-card" data-right="usage">
+                        <div class="rights-header">
+                            <div class="rights-symbol">◈</div>
+                            <div class="rights-info">
+                                <div class="rights-name">用 · 使用权</div>
+                                <div class="rights-summary">许他人于特定场景、时限、次数内用之</div>
+                            </div>
+                            <label class="rights-toggle">
+                                <input type="checkbox" checked data-right="usage">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="rights-settings">
+                            <div class="settings-label">授权模式（可多选）</div>
+                            <div class="settings-options">
+                                <div class="setting-option is-selected">
+                                    <span class="option-name">断</span>
+                                    <span class="option-desc">买断制 · 永久使用</span>
+                                </div>
+                                <div class="setting-option">
+                                    <span class="option-name">次</span>
+                                    <span class="option-desc">按次计费 · 用几何付几何</span>
+                                </div>
+                                <div class="setting-option">
+                                    <span class="option-name">时</span>
+                                    <span class="option-desc">限时授权 · 30日起租</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="rights-item" data-right="derivative">
-                            <div class="rights-icon">◇</div>
-                            <div class="rights-content">
-                                <div class="rights-title">衍</div>
-                                <div class="rights-desc"> remix、翻唱、改编之权</div>
-                                <div class="rights-detail">多父资产混音，自动收益分配</div>
+                    </div>
+                    
+                    <!-- 衍：衍生权 -->
+                    <div class="rights-card" data-right="derivative">
+                        <div class="rights-header">
+                            <div class="rights-symbol">◇</div>
+                            <div class="rights-info">
+                                <div class="rights-name">衍 · 衍生权</div>
+                                <div class="rights-summary">许他人基于此作生 remix、翻唱、改编之作</div>
                             </div>
+                            <label class="rights-toggle">
+                                <input type="checkbox" data-right="derivative">
+                                <span class="toggle-slider"></span>
+                            </label>
                         </div>
-                        <div class="rights-item" data-right="extension">
-                            <div class="rights-icon">◎</div>
-                            <div class="rights-content">
-                                <div class="rights-title">扩</div>
-                                <div class="rights-desc">跨平台、跨媒体、跨地域</div>
-                                <div class="rights-detail">自动扩展条款，七日通知期</div>
-                            </div>
-                        </div>
-                        <div class="rights-item" data-right="revenue">
-                            <div class="rights-icon">◉</div>
-                            <div class="rights-content">
-                                <div class="rights-title">益</div>
-                                <div class="rights-desc">资产收益之分配则</div>
-                                <div class="rights-detail">创作者分成，链上实时结算</div>
+                        <div class="rights-settings">
+                            <div class="settings-row">
+                                <div class="settings-col">
+                                    <div class="settings-label">原作分成</div>
+                                    <div class="settings-input">
+                                        <input type="number" value="10" min="0" max="50">
+                                        <span class="input-unit">%</span>
+                                    </div>
+                                </div>
+                                <div class="settings-col">
+                                    <div class="settings-label">最大父资产数</div>
+                                    <div class="settings-input">
+                                        <input type="number" value="3" min="1" max="10">
+                                        <span class="input-unit">个</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <p class="form-hint">勾选则启，留空则禁</p>
+                    
+                    <!-- 扩：扩展权 -->
+                    <div class="rights-card" data-right="extension">
+                        <div class="rights-header">
+                            <div class="rights-symbol">◎</div>
+                            <div class="rights-info">
+                                <div class="rights-name">扩 · 扩展权</div>
+                                <div class="rights-summary">许跨平台、跨媒体、跨地域之用</div>
+                            </div>
+                            <label class="rights-toggle">
+                                <input type="checkbox" data-right="extension">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="rights-settings">
+                            <div class="settings-options">
+                                <div class="setting-option">
+                                    <span class="option-name">台</span>
+                                    <span class="option-desc">跨平台使用</span>
+                                </div>
+                                <div class="setting-option">
+                                    <span class="option-name">介</span>
+                                    <span class="option-desc">跨媒体改编</span>
+                                </div>
+                                <div class="setting-option">
+                                    <span class="option-name">域</span>
+                                    <span class="option-desc">跨地域发行</span>
+                                </div>
+                            </div>
+                            <div class="settings-note">自动扩展条款，七日通知期护之</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 益：收益权 -->
+                    <div class="rights-card" data-right="revenue">
+                        <div class="rights-header">
+                            <div class="rights-symbol">◉</div>
+                            <div class="rights-info">
+                                <div class="rights-name">益 · 收益权</div>
+                                <div class="rights-summary">定资产收益之分配则</div>
+                            </div>
+                            <label class="rights-toggle">
+                                <input type="checkbox" checked data-right="revenue">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="rights-settings">
+                            <div class="settings-row">
+                                <div class="settings-col">
+                                    <div class="settings-label">创作者分成</div>
+                                    <div class="settings-input">
+                                        <input type="number" value="85" min="50" max="95">
+                                        <span class="input-unit">%</span>
+                                    </div>
+                                </div>
+                                <div class="settings-col">
+                                    <div class="settings-label">平台费用</div>
+                                    <div class="settings-input">
+                                        <input type="number" value="10" min="5" max="20" readonly>
+                                        <span class="input-unit">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-note">链上实时结算，无需人工干预</div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -1294,14 +1513,24 @@
             updateStepIndicator(3, priceInput.value !== '');
         });
 
-        // 权益选择
-        const rightsItems = document.querySelectorAll('.rights-item');
+        // 权益选择 - 新的卡片式开关
+        const rightsCards = document.querySelectorAll('.rights-card');
+        const rightsToggles = document.querySelectorAll('.rights-toggle input');
 
-        rightsItems.forEach(item => {
-            item.addEventListener('click', () => {
-                item.classList.toggle('is-checked');
-                const hasChecked = document.querySelectorAll('.rights-item.is-checked').length > 0;
-                updateStepIndicator(4, hasChecked);
+        rightsToggles.forEach(toggle => {
+            toggle.addEventListener('change', () => {
+                const card = toggle.closest('.rights-card');
+                card.classList.toggle('is-enabled', toggle.checked);
+                const hasEnabled = document.querySelectorAll('.rights-card.is-enabled').length > 0;
+                updateStepIndicator(4, hasEnabled);
+            });
+        });
+
+        // 设置选项点击
+        const settingOptions = document.querySelectorAll('.setting-option');
+        settingOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                option.classList.toggle('is-selected');
             });
         });
 
