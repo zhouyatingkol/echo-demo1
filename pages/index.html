@@ -398,53 +398,21 @@
             line-height: 1.8;
         }
         
-        /* 朱红印章 - 古朴手绘效果 */
+        /* 朱红印章 - 使用图片 + SVG 滤镜 */
         .hero-seal {
-            width: 38px;
-            height: 70px;
-            background-color: #A03020;
+            width: 48px;
+            height: 84px;
+            background-image: url('../images/seal-gongsheng.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             position: relative;
             opacity: 1;
-            /* 自然的不规则边缘 - 模拟手工篆刻 */
-            clip-path: polygon(
-                8% 3%, 92% 1%, 96% 6%, 98% 30%, 100% 55%, 97% 85%, 93% 98%, 
-                50% 100%, 7% 97%, 2% 88%, 0% 60%, 3% 25%, 6% 8%
-            );
-            /* 内部阴影营造印泥质感 */
-            box-shadow: 
-                inset 2px 2px 8px rgba(0,0,0,0.2),
-                inset -1px -1px 4px rgba(0,0,0,0.1);
+            /* 整体调色：降低亮度、饱和度，偏向暗朱红 */
+            filter: url(#brushEdge) brightness(0.75) saturate(0.85) sepia(0.15);
         }
         
-        /* 印章内部文字 - 竖排共生 */
-        .hero-seal::before {
-            content: '共';
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'LXGW WenKai', serif;
-            font-size: 22px;
-            font-weight: 400;
-            color: rgba(248, 246, 241, 0.95);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-            letter-spacing: 0;
-        }
-        
-        .hero-seal::after {
-            content: '生';
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'LXGW WenKai', serif;
-            font-size: 22px;
-            font-weight: 400;
-            color: rgba(248, 246, 241, 0.95);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-            letter-spacing: 0;
-        }
-        
+        /* 隐藏文字容器 */
         .hero-seal-text-img {
             display: none;
         }
@@ -749,6 +717,17 @@
             </button>
         </div>
     </nav>
+
+    <!-- SVG Filters for seal -->
+    <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+        <defs>
+            <!-- 毛笔涂抹边缘 -->
+            <filter id="brushEdge" x="-20%" y="-15%" width="140%" height="130%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+        </defs>
+    </svg>
 
     <!-- HERO 区 -->
     <section class="hero">
