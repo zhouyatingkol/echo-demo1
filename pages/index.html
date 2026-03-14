@@ -5,8 +5,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ECHO — 万物有灵，皆可生长</title>
     <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
-    <link href="../css/navbar.css" rel="stylesheet">
     <style>
+        /* ===== 导航栏样式（内嵌确保加载） ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.8s ease,
+                        backdrop-filter 0.8s ease;
+        }
+        
+        .navbar.is-scrolled {
+            background: rgba(253, 252, 250, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+        }
+        
+        .navbar__brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .navbar__logo {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #3A3530;
+            letter-spacing: 0.3em;
+            text-decoration: none;
+            opacity: 0.85;
+            transition: opacity 0.4s ease;
+        }
+        
+        .navbar__brand:hover .navbar__logo {
+            opacity: 1;
+        }
+        
+        .navbar__nav {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .navbar__link {
+            position: relative;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #7A6E5F;
+            text-decoration: none;
+            letter-spacing: 0.3em;
+            padding: 0.5rem 0;
+            transition: color 0.4s ease;
+        }
+        
+        .navbar__link:hover {
+            color: #3A3530;
+        }
+        
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: #C9B896;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .navbar__link:hover::after {
+            width: 100%;
+        }
+        
+        .navbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .navbar__user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2px;
+            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            background: transparent;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.8rem;
+            color: #7A6E5F;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        
+        .navbar__user:hover {
+            border-color: #C9B896;
+            color: #3A3530;
+            background: rgba(201, 184, 150, 0.05);
+        }
+        
+        .navbar__user-placeholder {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(122, 110, 95, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar__user-placeholder svg {
+            width: 12px;
+            height: 12px;
+            stroke: #7A6E5F;
+        }
+        
+        .navbar__menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            gap: 6px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .navbar__menu-line {
+            width: 24px;
+            height: 1px;
+            background: #7A6E5F;
+            transition: all 0.4s ease;
+            transform-origin: center;
+        }
+        
+        .navbar__mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(253, 252, 250, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .navbar__mobile-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        .navbar__mobile-menu .navbar__link {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #5A5045;
+            padding: 1rem 0;
+            letter-spacing: 0.5em;
+        }
+        
+        .navbar__mobile-menu .navbar__link:hover {
+            color: #3A3530;
+        }
+        
+        .navbar__mobile-menu .navbar__link::after {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar__nav {
+                display: none;
+            }
+            .navbar__actions {
+                display: none;
+            }
+            .navbar__menu-btn {
+                display: flex;
+            }
+            .navbar__brand {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .navbar__mobile-menu {
+                display: none !important;
+            }
+        }
         :root {
             /* 宣纸质感 */
             --bg-primary: #F8F6F1;
