@@ -1,0 +1,204 @@
+<!-- 东方美学导航栏 - navbar.html
+     设计理念：极简、留白、呼吸感
+     风格意象：窗棂、竹简、印章
+-->
+
+<!-- 导航栏组件 -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="主导航">
+  
+  <!-- 水波纹装饰线 -->
+  <div class="navbar__water-ripple" aria-hidden="true"></div>
+  
+  <!-- 左侧：品牌标识 -->
+  <a href="/" class="navbar__brand" aria-label="返回首页">
+    <span class="navbar__logo">ECHO</span>
+  </a>
+  
+  <!-- 中间：导航链接（轻声细语的入口） -->
+  <div class="navbar__nav">
+    <a href="/" class="navbar__link">
+      境
+    </a>
+    <a href="/market" class="navbar__link">
+      西市
+    </a>
+    <a href="/mint" class="navbar__link">
+      东市
+    </a>
+    <a href="/docs" class="navbar__link">
+      典
+    </a>
+  </div>
+  
+  <!-- 右侧：用户操作 -->
+  <div class="navbar__actions">
+    <!-- 未连接状态 -->
+    <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包">
+      <span class="navbar__user-placeholder">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </span>
+      <span>入链</span>
+    </button>
+    
+    <!-- 已连接状态（默认隐藏，JS 控制显示） -->
+    <button class="navbar__user navbar__user--connected" id="userMenu" type="button" aria-label="打开用户菜单" style="display: none;">
+      <img src="" alt="" class="navbar__user-avatar" id="userAvatar">
+      <span id="userName">吾</span>
+    </button>
+  </div>
+  
+  <!-- 移动端菜单按钮：三横如竹简 -->
+  <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
+    <span class="navbar__menu-line"></span>
+    <span class="navbar__menu-line"></span>
+    <span class="navbar__menu-line"></span>
+  </button>
+  
+  <!-- 移动端全屏菜单：淡墨遮罩 -->
+  <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
+    <a href="/" class="navbar__link">
+      境
+    </a>
+    <a href="/market" class="navbar__link">
+      西市
+    </a>
+    <a href="/mint" class="navbar__link">
+      东市
+    </a>
+    <a href="/docs" class="navbar__link">
+      典
+    </a>
+    
+    <!-- 移动端用户按钮 -->
+    <button class="navbar__user" id="mobileConnectWallet" type="button">
+      <span class="navbar__user-placeholder">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </span>
+      <span>入链</span>
+    </button>
+  </div>
+  
+</nav>
+
+<!-- 页面内容占位（演示用） -->
+<main style="min-height: 200vh; padding-top: 100px; background: linear-gradient(180deg, #FDFCFA 0%, #F8F6F3 100%);">
+  <div style="max-width: 800px; margin: 0 auto; padding: 2rem; font-family: 'Noto Serif SC', serif; color: #7A6E5F; line-height: 2; letter-spacing: 0.1em;">
+    <h1 style="font-family: 'LXGW WenKai', serif; font-weight: 400; font-size: 2rem; margin-bottom: 2rem; color: #3A3530;">东方美学导航栏</h1>
+    <p style="margin-bottom: 1.5rem;">
+      此导航栏采用极简东方设计理念，留白优先，不抢视线。
+    </p>
+    <p style="margin-bottom: 1.5rem;">
+      向下滚动查看背景渐显效果——如宣纸渐显般柔和自然。
+    </p>
+    <p style="margin-bottom: 1.5rem;">
+      悬停导航项查看下划线滑入动画，宋金色细线自左滑入，如水波荡漾。
+    </p>
+    <p>
+      窗棂意象的边框、竹简般的菜单按钮、印章式的品牌呈现——
+      每一处细节皆为东方美学的当代表达。
+    </p>
+  </div>
+</main>
+
+<!-- 引入样式 -->
+<link rel="stylesheet" href="../css/navbar.css">
+
+<!-- 交互脚本 -->
+<script>
+(function() {
+  'use strict';
+  
+  // 导航栏滚动效果
+  const navbar = document.getElementById('navbar');
+  let lastScrollY = 0;
+  let ticking = false;
+  
+  function updateNavbar() {
+    const scrollY = window.scrollY;
+    
+    if (scrollY > 10) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+    
+    if (scrollY > 100) {
+      navbar.classList.add('scrolled-deep');
+    } else {
+      navbar.classList.remove('scrolled-deep');
+    }
+    
+    ticking = false;
+  }
+  
+  window.addEventListener('scroll', function() {
+    lastScrollY = window.scrollY;
+    if (!ticking) {
+      window.requestAnimationFrame(updateNavbar);
+      ticking = true;
+    }
+  });
+  
+  // 移动端菜单切换
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  let isMenuOpen = false;
+  
+  function toggleMenu() {
+    isMenuOpen = !isMenuOpen;
+    menuBtn.classList.toggle('active', isMenuOpen);
+    mobileMenu.classList.toggle('active', isMenuOpen);
+    menuBtn.setAttribute('aria-expanded', isMenuOpen);
+    mobileMenu.setAttribute('aria-hidden', !isMenuOpen);
+    
+    // 防止背景滚动
+    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+  }
+  
+  menuBtn.addEventListener('click', toggleMenu);
+  
+  // 点击菜单项后关闭菜单
+  const mobileLinks = mobileMenu.querySelectorAll('.navbar__link');
+  mobileLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      if (isMenuOpen) toggleMenu();
+    });
+  });
+  
+  // ESC 键关闭菜单
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && isMenuOpen) {
+      toggleMenu();
+    }
+  });
+  
+  // 连接钱包演示（可替换为实际的钱包连接逻辑）
+  const connectBtn = document.getElementById('connectWallet');
+  const mobileConnectBtn = document.getElementById('mobileConnectWallet');
+  const userMenu = document.getElementById('userMenu');
+  
+  function handleConnect() {
+    // 模拟连接成功
+    console.log('连接钱包...');
+    
+    // 隐藏连接按钮，显示用户菜单
+    connectBtn.style.display = 'none';
+    if (mobileConnectBtn) mobileConnectBtn.style.display = 'none';
+    userMenu.style.display = 'flex';
+    
+    // 模拟用户信息
+    document.getElementById('userName').textContent = '墨客';
+    document.getElementById('userAvatar').src = 'https://api.dicebear.com/7.x/shapes/svg?seed=echo&backgroundColor=F8F6F3';
+  }
+  
+  if (connectBtn) connectBtn.addEventListener('click', handleConnect);
+  if (mobileConnectBtn) mobileConnectBtn.addEventListener('click', handleConnect);
+  
+})();
+</script>
