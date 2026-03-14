@@ -182,12 +182,12 @@
             line-height: 1.8;
         }
         
-        /* 朱红印章 - 手绘篆刻风格 */
+        /* 朱红印章 - 不规则印泥 */
         .hero-seal {
-            width: 40px;
-            height: 70px;
-            background: #A03020;
-            border: 2px solid #7A2018;
+            width: 44px;
+            height: 76px;
+            background: #B03020;
+            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -196,37 +196,49 @@
             transform: scale(0.8) rotate(-3deg);
             animation: sealStamp 0.8s var(--ease-ink) 1.2s forwards;
             box-shadow: 
-                inset 0 0 15px rgba(0,0,0,0.2),
-                2px 2px 6px rgba(160, 48, 32, 0.3);
+                inset 0 0 20px rgba(0,0,0,0.25),
+                2px 3px 8px rgba(160, 48, 32, 0.35);
             overflow: hidden;
+            /* 不规则边缘 - 使用 mask */
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 44 76' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 2 Q8 0 22 1 Q36 0 41 3 Q43 10 42 22 Q43 38 42 54 Q43 68 40 73 Q35 76 22 75 Q8 76 4 73 Q1 65 2 52 Q1 35 2 18 Q1 8 3 2Z' fill='white'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 44 76' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 2 Q8 0 22 1 Q36 0 41 3 Q43 10 42 22 Q43 38 42 54 Q43 68 40 73 Q35 76 22 75 Q8 76 4 73 Q1 65 2 52 Q1 35 2 18 Q1 8 3 2Z' fill='white'/%3E%3C/svg%3E");
+            -webkit-mask-size: cover;
+            mask-size: cover;
         }
         
-        /* 内边框 */
+        /* 内边框 - 也不规则 */
         .hero-seal::before {
             content: '';
             position: absolute;
-            inset: 2px;
-            border: 1px solid rgba(255,255,255,0.2);
+            inset: 3px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 1px;
             pointer-events: none;
+            /* 内边框也做不规则 */
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 38 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 1 Q6 0 19 1 Q32 0 36 2 Q38 8 37 19 Q38 34 37 50 Q38 62 35 68 Q30 70 19 69 Q6 70 3 68 Q0 61 1 49 Q0 33 1 17 Q0 7 2 1Z' fill='white'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 38 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 1 Q6 0 19 1 Q32 0 36 2 Q38 8 37 19 Q38 34 37 50 Q38 62 35 68 Q30 70 19 69 Q6 70 3 68 Q0 61 1 49 Q0 33 1 17 Q0 7 2 1Z' fill='white'/%3E%3C/svg%3E");
         }
         
-        /* 强烈做旧纹理 */
+        /* 强烈做旧纹理 + 深浅变化 */
         .hero-seal::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
-            opacity: 0.5;
+            background: 
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='6' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E"),
+                radial-gradient(ellipse at 30% 20%, rgba(200,60,40,0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(140,30,20,0.4) 0%, transparent 40%);
+            opacity: 0.6;
             mix-blend-mode: overlay;
         }
         
         /* 手绘 SVG 共生 */
         .hero-seal-svg {
-            width: 32px;
-            height: 60px;
+            width: 34px;
+            height: 64px;
             position: relative;
             z-index: 1;
-            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
         }
         
         .hero-seal-svg path {
@@ -494,13 +506,13 @@
             }
             
             .hero-seal {
-                width: 32px;
-                height: 56px;
+                width: 36px;
+                height: 62px;
             }
             
             .hero-seal-svg {
-                width: 26px;
-                height: 48px;
+                width: 28px;
+                height: 52px;
             }
             
             .hero-slogan-wrapper {
@@ -535,28 +547,29 @@
                 <div class="hero-slogan-wrapper">
                     <span class="hero-slogan">万物有灵，皆可生长</span>
                     <div class="hero-seal">
-                        <svg class="hero-seal-svg" viewBox="0 0 24 40">
-                            <!-- 共 - 清晰篆书风格 -->
-                            <!-- 顶部两竖弧 -->
-                            <path d="M7 6 Q7 4 9 4 Q11 4 11 6 L11 14" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M13 6 Q13 4 15 4 Q17 4 17 6 L17 14" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
-                            <!-- 中间横 -->
-                            <path d="M6 14 Q12 15 18 14" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
-                            <!-- 中间竖 -->
-                            <path d="M12 14 L12 22" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
-                            <!-- 八字底 -->
-                            <path d="M12 22 L7 28" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M12 22 L17 28" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
+                        <svg class="hero-seal-svg" viewBox="0 0 24 48">
+                            <defs>
+                                <filter id="roughPaper" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise"/>
+                                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G"/>
+                                </filter>
+                            </defs>
                             
-                            <!-- 生 - 清晰篆书风格 -->
-                            <!-- 顶部撇/点 -->
-                            <path d="M14 32 Q16 31 17 33" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/>
-                            <!-- 中间竖 -->
-                            <path d="M12 30 L12 38" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+                            <!-- 共 - 上 -->
+                            <!-- 廿头 -->
+                            <path d="M8 5 L8 12 M16 5 L16 12" stroke="rgba(255,255,255,0.95)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(%23roughPaper)"/>
+                            <path d="M6 8 Q12 9 18 8" stroke="rgba(255,255,255,0.95)" stroke-width="2" stroke-linecap="round" fill="none" filter="url(%23roughPaper)"/>
+                            <!-- 八字底 -->
+                            <path d="M8 12 Q7 16 8 20" stroke="rgba(255,255,255,0.95)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(%23roughPaper)"/>
+                            <path d="M16 12 Q17 16 16 20" stroke="rgba(255,255,255,0.95)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(%23roughPaper)"/>
+                            
+                            <!-- 生 - 下 -->
                             <!-- 三横 -->
-                            <path d="M6 32 Q12 33 18 32" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.8" stroke-linecap="round"/>
-                            <path d="M6 35 Q12 36 18 35" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.8" stroke-linecap="round"/>
-                            <path d="M6 38 Q12 39 18 38" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M6 30 Q12 31 18 30" stroke="rgba(255,255,255,0.95)" stroke-width="2" stroke-linecap="round" fill="none" filter="url(%23roughPaper)"/>
+                            <path d="M5 36 Q12 37 19 36" stroke="rgba(255,255,255,0.95)" stroke-width="2" stroke-linecap="round" fill="none" filter="url(%23roughPaper)"/>
+                            <path d="M4 42 Q12 43 20 42" stroke="rgba(255,255,255,0.95)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(%23roughPaper)"/>
+                            <!-- 中竖 -->
+                            <path d="M12 24 L12 42" stroke="rgba(255,255,255,0.95)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(%23roughPaper)"/>
                         </svg>
                     </div>
                 </div>
