@@ -1179,15 +1179,20 @@
                 toast.className = `toast ${type}`;
                 const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '!' : 'i';
                 
+                // XSS防护：使用textContent而不是innerHTML
                 toast.innerHTML = `
                     <div class="toast-icon">${icon}</div>
                     <div class="toast-content">
-                        <div class="toast-title">${title}</div>
-                        <div class="toast-message">${message}</div>
+                        <div class="toast-title"></div>
+                        <div class="toast-message"></div>
                     </div>
-                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                    <button class="toast-close">×</button>
                     <div class="toast-progress"><div class="toast-progress-bar" style="animation: toastProgress ${duration}ms linear forwards;"></div></div>
                 `;
+                
+                toast.querySelector('.toast-title').textContent = title;
+                toast.querySelector('.toast-message').textContent = message;
+                toast.querySelector('.toast-close').onclick = function() { this.parentElement.remove(); };
                 
                 // 添加动画样式
                 if (!document.getElementById('toastAnim')) {

@@ -619,6 +619,17 @@
     <script src="../js/wallet-manager.js"></script>
     
     <script>
+        // XSS防护：HTML转义函数
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+        
         // 模拟交易数据（实际应从合约获取）
         let allTransactions = [];
         let filteredTransactions = [];
@@ -706,12 +717,20 @@
                 const typeInfo = typeConfig[tx.type];
                 const statusInfo = statusConfig[tx.status];
                 
+                // XSS防护：转义所有动态内容
+                const safeId = escapeHtml(tx.id);
+                const safeName = escapeHtml(tx.name);
+                const safeTokenId = escapeHtml(tx.tokenId);
+                const safeAmount = tx.amount > 0 ? escapeHtml(tx.amount) : '';
+                const safeDate = escapeHtml(formatDate(tx.date));
+                const safeTime = escapeHtml(formatTime(tx.date));
+                
                 return `
-                    <div class="history-item" onclick="viewDetail('${tx.id}')"
+                    <div class="history-item" onclick="viewDetail('${safeId}')"
                          data-label="">
                         <div class="history-item__time" data-label="时间">
-                            <span class="history-item__date">${formatDate(tx.date)}</span>
-                            <span>${formatTime(tx.date)}</span>
+                            <span class="history-item__date">${safeDate}</span>
+                            <span>${safeTime}</span>
                         </div>
                         <div class="history-item__type" data-label="类型">
                             <span class="type-badge ${typeInfo.class}">
@@ -724,12 +743,12 @@
                                 <span class="asset-thumb__icon">🎵</span>
                             </div>
                             <div class="asset-info">
-                                <span class="asset-info__name">${tx.name}</span>
-                                <span class="asset-info__id">Token #${tx.tokenId}</span>
+                                <span class="asset-info__name">${safeName}</span>
+                                <span class="asset-info__id">Token #${safeTokenId}</span>
                             </div>
                         </div>
                         <div class="history-item__amount" data-label="金额">
-                            ${tx.amount > 0 ? `<span>${tx.amount}</span><span class="amount-unit">MEER</span>` : '<span style="color: var(--ink-light);">—</span>'}
+                            ${tx.amount > 0 ? `<span>${safeAmount}</span><span class="amount-unit">MEER</span>` : '<span style="color: var(--ink-light);">—</span>'}
                         </div>
                         <div class="history-item__status" data-label="状态">
                             <span class="status-badge ${statusInfo.class}">
@@ -790,7 +809,8 @@
             
             document.getElementById('pageNumbers').innerHTML = pages.map(p => {
                 if (p === '...') return '<span class="pagination__page">...</span>';
-                return `<span class="pagination__page ${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</span>`;
+                const safePage = escapeHtml(p);
+                return `<span class="pagination__page ${p === currentPage ? 'active' : ''}" onclick="goToPage(${safePage})">${safePage}</span>`;
             }).join('');
         }
         

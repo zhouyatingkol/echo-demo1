@@ -529,7 +529,13 @@
             // 更新缩略图
             if (info.image) {
                 const visual = document.getElementById('assetVisual');
-                visual.innerHTML = `<img src="${info.image}" alt="作品缩略图" class="asset-card__image">`;
+                // XSS防护：创建img元素而不是使用innerHTML
+                const img = document.createElement('img');
+                img.src = info.image;
+                img.alt = '作品缩略图';
+                img.className = 'asset-card__image';
+                visual.innerHTML = '';
+                visual.appendChild(img);
             }
             
             // 显示交易哈希
