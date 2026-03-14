@@ -848,7 +848,18 @@
                         try {
                             const message = '验证 ECHO 身份 - ' + new Date().toISOString();
                             const signature = await walletManager.signer.signMessage(message);
-                            alert('签名成功！\n' + signature.substring(0, 20) + '...');
+                            
+                            // 更新验证状态显示
+                            const verifyStatus = document.getElementById('verifyStatus');
+                            if (verifyStatus) {
+                                verifyStatus.innerHTML = '<span style="color: #2d5a27;">✓ 已验证</span>';
+                            }
+                            
+                            // 保存验证状态到本地存储
+                            localStorage.setItem('echo_verified', 'true');
+                            localStorage.setItem('echo_verify_time', new Date().toISOString());
+                            
+                            alert('签名成功！身份已验证');
                         } catch (error) {
                             console.error('签名失败:', error);
                             alert('签名失败: ' + error.message);
@@ -857,6 +868,14 @@
                         alert('请先连接钱包');
                     }
                 });
+            }
+            
+            // 检查本地存储的验证状态
+            if (localStorage.getItem('echo_verified') === 'true') {
+                const verifyStatus = document.getElementById('verifyStatus');
+                if (verifyStatus) {
+                    verifyStatus.innerHTML = '<span style="color: #2d5a27;">✓ 已验证</span>';
+                }
             }
             
             // 更新钱包信息显示
