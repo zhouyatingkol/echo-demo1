@@ -357,8 +357,9 @@
         }
 
         .step-dot--active {
-            background: var(--ink-deep);
+            background: var(--seal-red);
             color: var(--bg-primary);
+            box-shadow: 0 4px 16px rgba(160, 48, 32, 0.25);
         }
 
         .step-dot--completed {
@@ -386,6 +387,29 @@
             margin-bottom: 2rem;
             border-radius: 2px;
             border: 0.5px solid rgba(26, 26, 26, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(184, 155, 108, 0.3) 20%, 
+                rgba(160, 48, 32, 0.2) 50%,
+                rgba(184, 155, 108, 0.3) 80%, 
+                transparent 100%);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .form-section:hover::before {
+            opacity: 1;
         }
 
         .form-group {
@@ -457,12 +481,12 @@
 
         .upload-area:hover {
             border-color: var(--gold-primary);
-            background: rgba(184, 155, 108, 0.02);
+            background: linear-gradient(135deg, rgba(184, 155, 108, 0.03) 0%, rgba(160, 48, 32, 0.02) 100%);
         }
 
         .upload-area.is-dragover {
-            border-color: var(--gold-primary);
-            background: rgba(184, 155, 108, 0.05);
+            border-color: var(--seal-red);
+            background: linear-gradient(135deg, rgba(160, 48, 32, 0.05) 0%, rgba(184, 155, 108, 0.05) 100%);
         }
 
         .upload-icon {
@@ -599,8 +623,26 @@
         }
 
         .realm-card.is-selected {
-            border-color: var(--ink-deep);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 8px 30px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+            transform: translateY(-3px);
+        }
+
+        .realm-card.is-selected::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 2px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.4) 0%, 
+                transparent 50%, 
+                rgba(255, 255, 255, 0.2) 100%);
+            z-index: -1;
         }
 
         .realm-card--sound {
@@ -717,9 +759,10 @@
         }
 
         .price-option.is-selected {
-            background: var(--ink-deep);
+            background: var(--seal-red);
             color: var(--bg-primary);
-            border-color: var(--ink-deep);
+            border-color: var(--seal-red);
+            box-shadow: 0 4px 12px rgba(160, 48, 32, 0.2);
         }
 
         /* ===== 权益设置 ===== */
@@ -1296,7 +1339,7 @@
                             <div class="rights-symbol">◇</div>
                             <div class="rights-info">
                                 <div class="rights-name">衍 · 衍生权</div>
-                                <div class="rights-summary">许他人基于此作生 remix、翻唱、改编之作</div>
+                                <div class="rights-summary">许再创作、改编、融合之权</div>
                             </div>
                             <label class="rights-toggle">
                                 <input type="checkbox" data-right="derivative">
