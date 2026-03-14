@@ -560,6 +560,34 @@
             transform: translateY(-5px);
         }
         
+        /* 三域卡片背景色 */
+        .feature-card--sound {
+            background: #7BA7B8;
+        }
+        
+        .feature-card--sound .feature-title,
+        .feature-card--sound .feature-desc {
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .feature-card--color {
+            background: #C87E5F;
+        }
+        
+        .feature-card--color .feature-title,
+        .feature-card--color .feature-desc {
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .feature-card--text {
+            background: #5C6B5C;
+        }
+        
+        .feature-card--text .feature-title,
+        .feature-card--text .feature-desc {
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
         .feature-icon {
             width: 48px;
             height: 48px;
@@ -763,9 +791,9 @@
         <h2 class="section-title">三生</h2>
         
         <div class="features-grid">
-            <div class="feature-card">
+            <div class="feature-card feature-card--sound">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#7BA7B8" stroke-width="0.5">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="0.5">
                         <path d="M12 4v16M8 8c-2 2-2 6 0 8M16 6c3 3 3 9 0 12"/>
                     </svg>
                 </div>
@@ -773,21 +801,21 @@
                 <p class="feature-desc">声之所至，心之所向<br>每一音符，都是时间的纹路</p>
             </div>
             
-            <div class="feature-card">
+            <div class="feature-card feature-card--color">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#C87E5F" stroke-width="0.5">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="0.5">
                         <circle cx="12" cy="12" r="8" opacity="0.3"/>
                         <circle cx="12" cy="12" r="5" opacity="0.6"/>
-                        <circle cx="12" cy="12" r="2" fill="#C87E5F" opacity="0.9"/>
+                        <circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.8)" opacity="0.9"/>
                     </svg>
                 </div>
                 <h3 class="feature-title">色</h3>
                 <p class="feature-desc">一笔一世界，一色一乾坤<br>视觉的诗，无需翻译</p>
             </div>
             
-            <div class="feature-card">
+            <div class="feature-card feature-card--text">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#5C6B5C" stroke-width="0.5">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="0.5">
                         <line x1="6" y1="4" x2="6" y2="20"/>
                         <line x1="12" y1="4" x2="12" y2="20"/>
                         <line x1="18" y1="4" x2="18" y2="20"/>
@@ -802,14 +830,16 @@
     <!-- 关于 -->
     <section class="about">
         <p class="about-text">
-            非 NFT，乃生灵
+            非 NFT，乃生灵<br>
+            随用而生，随流而长<br>
+            归于你，不止于你
         </p>
     </section>
     
     <!-- CTA -->
     <section class="cta">
         <h2 class="cta-title">铸此 ECHO</h2>
-        <a href="marketplace.html" class="cta-btn">去集</a>
+        <a href="marketplace.html" class="cta-btn">入集</a>
     </section>
 
     <!-- 导航栏交互脚本 -->
