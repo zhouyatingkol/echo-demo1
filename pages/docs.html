@@ -3,13 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文档 — ECHO</title>
+    <title>典 — ECHO</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- 字体系统：霞鹜文楷 + 思源宋体 -->
     <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@200;300;400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/styles/global.css">
     <style>
+        /* ===== 导航栏样式（内嵌确保加载） ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.8s ease,
+                        backdrop-filter 0.8s ease;
+        }
+        
+        .navbar.is-scrolled {
+            background: rgba(253, 252, 250, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+        }
+        
+        .navbar__brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .navbar__logo {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #3A3530;
+            letter-spacing: 0.3em;
+            text-decoration: none;
+            opacity: 0.85;
+            transition: opacity 0.4s ease;
+        }
+        
+        .navbar__brand:hover .navbar__logo {
+            opacity: 1;
+        }
+        
+        .navbar__nav {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .navbar__link {
+            position: relative;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #7A6E5F;
+            text-decoration: none;
+            letter-spacing: 0.3em;
+            padding: 0.5rem 0;
+            transition: color 0.4s ease;
+        }
+        
+        .navbar__link:hover {
+            color: #3A3530;
+        }
+        
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: #C9B896;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .navbar__link:hover::after {
+            width: 100%;
+        }
+        
+        .navbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .navbar__user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2px;
+            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            background: transparent;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.8rem;
+            color: #7A6E5F;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        
+        .navbar__user:hover {
+            border-color: #C9B896;
+            color: #3A3530;
+            background: rgba(201, 184, 150, 0.05);
+        }
+        
+        .navbar__user-placeholder {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(122, 110, 95, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar__user-placeholder svg {
+            width: 12px;
+            height: 12px;
+            stroke: #7A6E5F;
+        }
+        
+        .navbar__menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            gap: 6px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .navbar__menu-line {
+            width: 24px;
+            height: 1px;
+            background: #7A6E5F;
+            transition: all 0.4s ease;
+            transform-origin: center;
+        }
+        
+        .navbar__mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(253, 252, 250, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .navbar__mobile-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        .navbar__mobile-menu .navbar__link {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #5A5045;
+            padding: 1rem 0;
+            letter-spacing: 0.5em;
+        }
+        
+        .navbar__mobile-menu .navbar__link:hover {
+            color: #3A3530;
+        }
+        
+        .navbar__mobile-menu .navbar__link::after {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar__nav {
+                display: none;
+            }
+            .navbar__actions {
+                display: none;
+            }
+            .navbar__menu-btn {
+                display: flex;
+            }
+            .navbar__brand {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .navbar__mobile-menu {
+                display: none !important;
+            }
+        }
+
         /* ========== 东方美学色彩系统 ========== */
         :root {
             /* 宣纸质感 */
@@ -122,7 +340,7 @@
             opacity: 0.8;
         }
         
-        /* 「文档」主标题 - 如书法运笔 */
+        /* 「典」主标题 - 如书法运笔 */
         .docs-title {
             font-family: var(--font-display);
             font-size: clamp(3rem, 8vw, 5rem);
@@ -917,7 +1135,7 @@
             border-left-color: var(--gold-primary);
         }
         
-        /* 回到顶部按钮 - 宋瓷风格 */
+        /* 归顶按钮 - 宋瓷风格 */
         .back-to-top {
             display: flex;
             align-items: center;
@@ -945,33 +1163,6 @@
             width: 14px;
             height: 14px;
             stroke: currentColor;
-        }
-        
-        /* ========== 导航栏 - 克制墨色 ========== */
-        .navbar {
-            background: linear-gradient(to bottom, rgba(248, 246, 241, 0.98), rgba(248, 246, 241, 0.9));
-            border-bottom: 0.5px solid rgba(26, 26, 26, 0.04);
-        }
-
-        .nav-logo {
-            font-family: var(--font-display);
-            color: var(--ink-deep);
-            letter-spacing: 0.15em;
-        }
-
-        .nav-link {
-            font-family: var(--font-serif);
-            color: var(--ink-light);
-            letter-spacing: 0.05em;
-            transition: color var(--duration-fast) var(--ease-water);
-        }
-
-        .nav-link:hover {
-            color: var(--ink-deep);
-        }
-
-        .nav-link.active {
-            color: var(--gold-primary);
         }
         
         /* ========== 移动端菜单 ========== */
@@ -1031,17 +1222,27 @@
         .footer {
             background: var(--bg-secondary);
             border-top: 0.5px solid rgba(26, 26, 26, 0.04);
+            padding: 3rem 5vw;
+            text-align: center;
         }
 
         .footer-logo {
             font-family: var(--font-display);
             color: var(--ink-deep);
             letter-spacing: 0.15em;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
         }
 
         .footer-links a {
             font-family: var(--font-serif);
             color: var(--ink-light);
+            text-decoration: none;
             transition: color var(--duration-fast) var(--ease-water);
         }
 
@@ -1163,24 +1364,66 @@
     <div class="hero-light--primary"></div>
     <div class="hero-light--secondary"></div>
 
-    <!-- 顶部导航栏 -->
-    <nav class="navbar">
-        <a href="index.html" class="nav-logo">ECHO</a>
-        <div class="nav-links">
-            <a href="market/market.html" class="nav-link">市场</a>
-            <a href="creator/creator.html" class="nav-link">创作</a>
-            <a href="user/profile.html" class="nav-link">我的</a>
-            <a href="docs.html" class="nav-link active">文档</a>
+    <!-- 东方美学导航栏 -->
+    <nav class="navbar" id="navbar" role="navigation" aria-label="主导航">
+        <div class="navbar__water-ripple" aria-hidden="true"></div>
+        
+        <a href="index.html" class="navbar__brand" aria-label="返回首页">
+            <span class="navbar__logo">ECHO</span>
+        </a>
+        
+        <div class="navbar__nav">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link" aria-current="page">典</a>
+        </div>
+        
+        <div class="navbar__actions">
+            <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包">
+                <span class="navbar__user-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span>入链</span>
+            </button>
+            
+            <button class="navbar__user navbar__user--connected" id="userMenu" type="button" aria-label="打开用户菜单" style="display: none;">
+                <img src="" alt="" class="navbar__user-avatar" id="userAvatar">
+                <span id="userName">吾</span>
+            </button>
+        </div>
+        
+        <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+        </button>
+        
+        <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+            <button class="navbar__user" id="mobileConnectWallet" type="button">
+                <span class="navbar__user-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span>入链</span>
+            </button>
         </div>
     </nav>
 
     <!-- 文档标题区 - 东方美学 Hero -->
     <header class="docs-header">
         <div class="docs-label">Documentation</div>
-        <h1 class="docs-title">文档</h1>
-        <p class="docs-subtitle">知所从来，明所从来</p>
+        <h1 class="docs-title">典</h1>
+        <p class="docs-subtitle">知来处，明去处</p>
         <div class="search-box">
-            <input type="text" class="search-input" placeholder="搜索文档...">
+            <input type="text" class="search-input" placeholder="寻觅...">
             <span class="search-icon">⌕</span>
         </div>
     </header>
@@ -1189,125 +1432,125 @@
     <div class="docs-layout">
         <!-- 左侧导航目录 -->
         <aside class="sidebar-left">
-            <div class="sidebar-title">目录</div>
+            <div class="sidebar-title">目</div>
             <ul class="toc-list">
                 <li class="toc-item">
-                    <a href="#what-is-echo" class="toc-link active">什么是 ECHO</a>
+                    <a href="#what-is-echo" class="toc-link active">ECHO何为</a>
                 </li>
                 <li class="toc-item">
-                    <a href="#quick-start" class="toc-link">快速开始</a>
+                    <a href="#quick-start" class="toc-link">入门</a>
                 </li>
                 <li class="toc-item">
-                    <a href="#minting" class="toc-link">生成指南</a>
+                    <a href="#minting" class="toc-link">铸造</a>
                 </li>
                 <li class="toc-item">
-                    <a href="#rights" class="toc-link">权益说明</a>
+                    <a href="#rights" class="toc-link">权益</a>
                 </li>
                 <li class="toc-item">
-                    <a href="#architecture" class="toc-link">技术架构</a>
+                    <a href="#architecture" class="toc-link">架构</a>
                 </li>
                 <li class="toc-item">
-                    <a href="#faq" class="toc-link">常见问题</a>
+                    <a href="#faq" class="toc-link">解惑</a>
                 </li>
             </ul>
         </aside>
 
         <!-- 主内容区 -->
         <main class="main-content">
-            <!-- 第一章：什么是 ECHO -->
+            <!-- 第一章：ECHO何为 -->
             <section id="what-is-echo" class="doc-section">
                 <div class="section-header">
                     <div class="section-number">壹</div>
-                    <h2 class="section-title">什么是 ECHO</h2>
+                    <h2 class="section-title">ECHO何为</h2>
                 </div>
                 
                 <div class="quote-block">
                     <p class="quote-text">
-                        <strong>不是 NFT，是活着的权益。</strong><br><br>
-                        NFT 是静态的收藏，是被封存的标本。<br>
-                        ECHO 是<span class="highlight">活着</span>的权益，是随使用生长的数字生命。<br><br>
-                        不是拥有，而是相伴。不是结束，而是开始。
+                        <strong>非NFT，乃生灵也。</strong><br><br>
+                        NFT者，静物也，封存之标本。<br>
+                        ECHO者，<span class="highlight">生灵</span>也，随用而生，随流而长。<br><br>
+                        非拥有，乃相伴。非终焉，乃伊始。
                     </p>
                 </div>
                 
                 <p class="doc-paragraph">
-                    ECHO 是一种全新的数字资产协议，它将「动态生长」引入数字权益领域。每一份 ECHO 都承载着创作者的心血，同时也记录着每一次使用、每一次流转的痕迹。随着时间推移，ECHO 会不断进化，价值也会随之流动。
+                    ECHO乃全新数字资产之协议，以「动态生长」入数字权益之域。每一份ECHO皆载创作者之心血，亦记每一次之用、每一次之流。时日推移，ECHO自进化，价值亦随流。
                 </p>
                 <p class="doc-paragraph">
-                    我们相信，真正的数字资产不应该是一张静态的图片或一段固定的代码，而应该是一个有生命力、能与使用者互动、能随时间增值的数字实体。ECHO，就是数字世界的生命形态。
+                    吾等信之，真数字资产非静止之图、固定之码，乃有生命力、能与用者互动、能随时而增之数字实体。ECHO者，数字世界之生命形态也。
                 </p>
             </section>
 
-            <!-- 第二章：快速开始 -->
+            <!-- 第二章：入门 -->
             <section id="quick-start" class="doc-section">
                 <div class="section-header">
                     <div class="section-number">贰</div>
-                    <h2 class="section-title">快速开始</h2>
+                    <h2 class="section-title">入门</h2>
                 </div>
                 
                 <p class="doc-paragraph">
-                    只需三步，即可开启你的 ECHO 之旅。
+                    三步而已，即可启ECHO之旅。
                 </p>
                 
                 <div class="steps-container">
                     <div class="step-item">
                         <div class="step-number">一</div>
-                        <h3 class="step-title">连接钱包</h3>
-                        <p class="step-desc">使用 MetaMask 或其他兼容钱包连接 ECHO 平台</p>
+                        <h3 class="step-title">连钱包</h3>
+                        <p class="step-desc">以MetaMask或其他兼容钱包连ECHO之境</p>
                     </div>
                     <div class="step-item">
                         <div class="step-number">二</div>
-                        <h3 class="step-title">获取 ECHO</h3>
-                        <p class="step-desc">在市场上购买心仪的 ECHO 作品，或生成你自己的</p>
+                        <h3 class="step-title">取ECHO</h3>
+                        <p class="step-desc">于集市购心仪之作，或生汝己之ECHO</p>
                     </div>
                     <div class="step-item">
                         <div class="step-number">三</div>
-                        <h3 class="step-title">开始使用</h3>
-                        <p class="step-desc">根据权益配置使用作品，见证 ECHO 的生长</p>
+                        <h3 class="step-title">始用之</h3>
+                        <p class="step-desc">依权益配置用作品，见证ECHO之生长</p>
                     </div>
                 </div>
                 
                 <p class="doc-paragraph">
-                    首次使用者建议从市场浏览开始，了解不同类型的 ECHO 作品及其权益配置。每个 ECHO 都有独特的生长轨迹，选择与你共鸣的作品，开启一段数字相伴之旅。
+                    首用者宜从集市览起，知不同类型ECHO之作及其权益配置。每ECHO皆有独特之生长轨迹，择与汝共鸣之作，启一段数字相伴之旅。
                 </p>
             </section>
 
-            <!-- 第三章：生成指南 -->
+            <!-- 第三章：铸造 -->
             <section id="minting" class="doc-section">
                 <div class="section-header">
                     <div class="section-number">叁</div>
-                    <h2 class="section-title">生成指南</h2>
+                    <h2 class="section-title">铸造</h2>
                 </div>
                 
                 <p class="doc-paragraph">
-                    创作者可以通过 ECHO 协议生成自己的数字作品。生成过程简单直观，同时提供丰富的权益配置选项，让你的创作能够以最适合的方式触达用户。
+                    创作者可以ECHO协议生己之数字作品。铸造过程简而直观，兼供丰富之权益配置选项，令汝之创作能以最宜之法触达用者。
                 </p>
                 
                 <div class="quote-block">
                     <p class="quote-text">
-                        <strong>生成步骤</strong><br><br>
-                        一、准备作品素材（音频、图像、文字等）<br>
-                        二、配置作品元数据（名称、描述、类型）<br>
-                        三、设置权益模式（使用权、衍生权、扩展权、收益权）<br>
-                        四、确认生成参数并提交<br>
-                        五、等待区块链确认，作品即刻上线
+                        <strong>铸造之序</strong><br><br>
+                        一、备作品素材（音、图、文等）<br>
+                        二、配作品元数据（名、述、类）<br>
+                        三、设权益模式（使用权、衍生权、扩展权、收益权）<br>
+                        四、确认铸造参数而提交<br>
+                        五、待区块链之确认，作品即刻上线
                     </p>
                 </div>
                 
                 <p class="doc-paragraph">
-                    生成 ECHO 需要支付少量 Gas 费用。建议使用 Layer 2 网络以降低成本。作品生成后，创作者可以实时监控作品的使用情况和收益分配。
+                    铸造ECHO需付少许Gas之费。建议用Layer 2之网以降成本。作品既铸，创作者可实时监作品之用况与收益之分。
                 </p>
             </section>
 
-            <!-- 第四章：权益说明 -->
+            <!-- 第四章：权益 -->
             <section id="rights" class="doc-section">
                 <div class="section-header">
                     <div class="section-number">肆</div>
-                    <h2 class="section-title">权益说明</h2>
+                    <h2 class="section-title">权益</h2>
                 </div>
                 
                 <p class="doc-paragraph">
-                    ECHO 独创的<strong>四权分离模型</strong>，将传统版权的"模糊权利"转化为链上可编程、可验证、可流转的智能合约结构。每个 ECHO 资产包含四个独立的权利维度，可灵活配置实现按需授权。
+                    ECHO独创之<strong>四权分离模型</strong>，将传统版权之「模糊权利」化为链上可编程、可验证、可流转之智能合约结构。每ECHO资产含四独立之权利维度，可灵活配置以成按需授权。
                 </p>
                 
                 <h3 class="subsection-title">四权架构</h3>
@@ -1316,29 +1559,29 @@
                     <div class="right-card">
                         <div class="right-icon">◈</div>
                         <h3 class="right-title">使用权</h3>
-                        <p class="right-desc">允许在特定场景、时间、次数内使用资产。支持买断、按次、限时三种授权模式。</p>
+                        <p class="right-desc">许于特定场景、时间、次数内用资产。支持买断、按次、限时三授权模式。</p>
                     </div>
                     <div class="right-card">
                         <div class="right-icon">◇</div>
                         <h3 class="right-title">衍生权</h3>
-                        <p class="right-desc">基于原作创作 remix、翻唱、改编的权利。支持多父资产混音，自动收益分配。</p>
+                        <p class="right-desc">基于原作生remix、翻唱、改编之权。支持多父资产混音，自动收益分配。</p>
                     </div>
                     <div class="right-card">
                         <div class="right-icon">◎</div>
                         <h3 class="right-title">扩展权</h3>
-                        <p class="right-desc">跨平台、跨媒体、跨地域使用的权利。自动扩展条款，7天通知期保护。</p>
+                        <p class="right-desc">跨平台、跨媒体、跨地域用之权。自动扩展条款，7日通知期护之。</p>
                     </div>
                     <div class="right-card">
                         <div class="right-icon">◉</div>
                         <h3 class="right-title">收益权</h3>
-                        <p class="right-desc">资产收益的分配规则。创作者分成、协作者分配、平台费用，链上实时结算。</p>
+                        <p class="right-desc">资产收益之分配则。创作者分成、协作者分配、平台费用，链上实时结算。</p>
                     </div>
                 </div>
                 
                 <h3 class="subsection-title">三合一授权模式</h3>
                 
                 <p class="doc-paragraph">
-                    ECHO 的使用权支持三种灵活授权模式，创作者可同时开启多种模式，让用户自主选择：
+                    ECHO之使用权支持三灵活授权模式，创作者可同时启多模式，令用者自主择之：
                 </p>
                 
                 <div class="license-modes-doc">
@@ -1346,26 +1589,26 @@
                         <div class="mode-icon">◉</div>
                         <div class="mode-name">买断制</div>
                         <div class="mode-price">100 ECHO 起</div>
-                        <div class="mode-desc">一次性付费，永久使用。适合长期使用需求，如品牌主题曲。</div>
+                        <div class="mode-desc">一次性付费，永久使用。宜于长期用之需，如品牌主题曲。</div>
                     </div>
                     <div class="license-mode-card">
                         <div class="mode-icon">◍</div>
                         <div class="mode-name">按次计费</div>
                         <div class="mode-price">0.5 ECHO/次 起</div>
-                        <div class="mode-desc">用多少付多少，无使用不付费。适合偶尔使用的场景。</div>
+                        <div class="mode-desc">用几何付几何，无用不付费。宜于偶用之场景。</div>
                     </div>
                     <div class="license-mode-card">
                         <div class="mode-icon">◐</div>
                         <div class="mode-name">限时授权</div>
-                        <div class="mode-price">10 ECHO/天 起</div>
-                        <div class="mode-desc">灵活租赁，30天起租。适合短期项目、活动配乐。</div>
+                        <div class="mode-price">10 ECHO/日 起</div>
+                        <div class="mode-desc">灵活租赁，30日起租。宜于短期项目、活动配乐。</div>
                     </div>
                 </div>
                 
                 <h3 class="subsection-title">场景差异化定价</h3>
                 
                 <p class="doc-paragraph">
-                    购买时选择使用场景，系统自动计算最终价格：
+                    购时择用之场景，系统自动算最终之价：
                 </p>
                 
                 <div class="scene-table">
@@ -1399,7 +1642,7 @@
                 <h3 class="subsection-title">混音作品权属继承</h3>
                 
                 <p class="doc-paragraph">
-                    ECHO 支持多父资产混音创作，新作品自动继承父资产的权益配置，并通过智能合约自动分配收益：
+                    ECHO支持多父资产混音创作，新作品自动承父资产之权益配置，并借智能合约自动分配收益：
                 </p>
                 
                 <div class="remix-diagram">
@@ -1425,61 +1668,61 @@
                 </div>
                 
                 <p class="doc-paragraph">
-                    <strong>混音规则：</strong>最多 5 个父资产 | 48 小时协商期 | 贡献度算法自动调分成
+                    <strong>混音之则：</strong>最多 5 父资产 | 48 时辰协商期 | 贡献度算法自动调分成
                 </p>
                 
                 <h3 class="subsection-title">License ECHO 机制</h3>
                 
                 <p class="doc-paragraph">
-                    每次购买授权都会生成一个 License ECHO，作为使用权的链上凭证：
+                    每次购授权皆生一License ECHO，为使用权之链上凭证：
                 </p>
                 
                 <div class="quote-block">
                     <p class="quote-text">
-                        <strong>License ECHO 包含信息：</strong><br><br>
-                        ◆ 授权类型（买断/按次/限时）<br>
-                        ◆ 使用场景限制<br>
+                        <strong>License ECHO 所含之信：</strong><br><br>
+                        ◆ 授权之类型（买断/按次/限时）<br>
+                        ◆ 使用场景之限<br>
                         ◆ 有效期与使用次数<br>
-                        ◆ 是否可转让及转让版税<br>
-                        ◆ 授权条款哈希
+                        ◆ 可否转让及转让版税<br>
+                        ◆ 授权条款之哈希
                     </p>
                 </div>
                 
                 <p class="doc-paragraph">
-                    每次使用资产时，系统自动验证 License ECHO 的有效性，确保合规使用。
+                    每次用资产时，系统自动验License ECHO之有效性，以保合规之用。
                 </p>
                 
                 <h3 class="subsection-title">紧急撤销机制（熔断）</h3>
                 
                 <p class="doc-paragraph">
-                    创作者在发现非法使用等紧急情况时，可触发冻结机制：
+                    创作者于见非法用等紧急之时，可触发冻结之机制：
                 </p>
                 
                 <div class="freeze-timeline">
                     <div class="timeline-item">
                         <div class="timeline-time">T+0</div>
-                        <div class="timeline-content">创作者触发冻结，立即生效</div>
+                        <div class="timeline-content">创作者触发冻结，即刻生效</div>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-time">T+0~7日</div>
-                        <div class="timeline-content">被授权方可提交申诉与辩护</div>
+                        <div class="timeline-content">被授权方可呈申诉与辩护</div>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-time">T+7日</div>
-                        <div class="timeline-content">社区陪审团仲裁，最终裁决</div>
+                        <div class="timeline-content">社区陪审团仲裁，终裁决</div>
                     </div>
                 </div>
             </section>
 
-            <!-- 第五章：技术架构 -->
+            <!-- 第五章：架构 -->
             <section id="architecture" class="doc-section">
                 <div class="section-header">
                     <div class="section-number">伍</div>
-                    <h2 class="section-title">技术架构</h2>
+                    <h2 class="section-title">架构</h2>
                 </div>
                 
                 <p class="doc-paragraph">
-                    ECHO 协议构建于以太坊及兼容 EVM 的区块链网络之上，采用模块化设计，确保系统的可扩展性与安全性。
+                    ECHO协议建于以太坊及兼容EVM之区块链网络之上，采模块化之设计，保系统之可扩展性与安全性。
                 </p>
                 
                 <div class="quote-block">
@@ -1488,70 +1731,70 @@
                         ◆ <strong>智能合约层：</strong> ERC-721 扩展标准，支持动态元数据更新<br>
                         ◆ <strong>预言机网络：</strong> 链下数据验证与上链<br>
                         ◆ <strong>索引服务：</strong> 高效查询 ECHO 状态与历史<br>
-                        ◆ <strong>前端 SDK：</strong> 开发者友好的集成方案
+                        ◆ <strong>前端 SDK：</strong> 开发者友好之集成方案
                     </p>
                 </div>
                 
                 <p class="doc-paragraph">
-                    所有核心合约代码均已开源并通过第三方审计。ECHO 协议遵循去中心化原则，不依赖任何单一节点或服务，确保系统的长期稳定运行。
+                    所有核心合约代码均已开源并通过第三方审计。ECHO协议遵去中心化之则，不依任何单节点或服务，保系统之长期稳定运行。
                 </p>
             </section>
 
-            <!-- 第六章：常见问题 -->
+            <!-- 第六章：解惑 -->
             <section id="faq" class="doc-section">
                 <div class="section-header">
                     <div class="section-number">陆</div>
-                    <h2 class="section-title">常见问题</h2>
+                    <h2 class="section-title">解惑</h2>
                 </div>
                 
                 <div class="faq-list">
                     <div class="faq-item">
                         <button class="faq-question">
-                            ECHO 和 NFT 有什么区别？
+                            ECHO与NFT何异
                             <span class="faq-icon"></span>
                         </button>
                         <div class="faq-answer">
-                            <p>NFT 是静态的、不可变的数字资产，一旦生成便固定不变。ECHO 是动态生长的数字权益，其元数据、价值、权益配置都可以随使用而演变。ECHO 更强调「使用」而非「拥有」，是一种更贴近现实经济模式的数字资产形态。</p>
+                            <p>NFT者，静态之、不可变之数字资产，既生则固定不变。ECHO者，动态生长之数字权益，其元数据、价值、权益配置皆可随用而演变。ECHO更强调「用」而非「有」，乃更贴近现实经济模式之数字资产形态。</p>
                         </div>
                     </div>
                     
                     <div class="faq-item">
                         <button class="faq-question">
-                            如何确保 ECHO 的动态更新是可信的？
+                            ECHO可信乎
                             <span class="faq-icon"></span>
                         </button>
                         <div class="faq-answer">
-                            <p>ECHO 的状态更新由智能合约自动执行，所有规则在生成时即已确定并公开。关键状态变更通过预言机网络验证后上链，确保数据的可信度。同时，所有历史记录永久保存在区块链上，可供随时审计。</p>
+                            <p>ECHO之状态更新由智能合约自动执行，所有规则于既生之时即已定而公开。关键状态变更借预言机网络验证后上链，保数据之可信度。同时，所有历史记录永久存于区块链之上，可供随时审计。</p>
                         </div>
                     </div>
                     
                     <div class="faq-item">
                         <button class="faq-question">
-                            创作者如何获得收益？
+                            创作者何以获益
                             <span class="faq-icon"></span>
                         </button>
                         <div class="faq-answer">
-                            <p>ECHO 支持多种收益模式：首次销售、二次流转分成、按次使用费、订阅收入等。收益通过智能合约实时分配，无需人工干预。创作者可以在个人中心查看详细的收益报表和提现记录。</p>
+                            <p>ECHO支持多收益模式：首售、二次流转分成、按次使用费、订阅收入等。收益借智能合约实时分配，无需人工干预。创作者可于个人中心阅详细之收益报表与提现记录。</p>
                         </div>
                     </div>
                     
                     <div class="faq-item">
                         <button class="faq-question">
-                            ECHO 支持哪些类型的数字作品？
+                            ECHO容何类作品
                             <span class="faq-icon"></span>
                         </button>
                         <div class="faq-answer">
-                            <p>目前 ECHO 主要支持音乐、视觉艺术、文字三类数字作品。未来将逐步扩展至视频、游戏资产、虚拟地产等更多类型。ECHO 的协议设计具有高度扩展性，可以适配各种数字内容形态。</p>
+                            <p>今ECHO主要支持音、视、文三类数字作品。未来将逐步扩展至视频、游戏资产、虚拟地产等更多类型。ECHO之协议设计具高度扩展性，可适配各种数字内容之形态。</p>
                         </div>
                     </div>
                     
                     <div class="faq-item">
                         <button class="faq-question">
-                            如何参与 ECHO 生态建设？
+                            何以共建ECHO
                             <span class="faq-icon"></span>
                         </button>
                         <div class="faq-answer">
-                            <p>您可以通过以下方式参与：成为创作者生成 ECHO 作品、作为用户购买和使用 ECHO、为协议贡献代码、参与社区治理投票、成为节点运营者提供索引服务。ECHO 是一个开放生态，欢迎各种形式的贡献。</p>
+                            <p>汝可以下法参与：为创作者生ECHO作品、为用者购而用ECHO、为协议贡献代码、参与社区治理投票、为节点运营者供索引服务。ECHO乃开放之生态，欢迎各种形式之贡献。</p>
                         </div>
                     </div>
                 </div>
@@ -1563,22 +1806,22 @@
             <div class="quick-nav-title">本页导航</div>
             <ul class="quick-nav-list" id="quickNav">
                 <li class="quick-nav-item">
-                    <a href="#what-is-echo" class="quick-nav-link active">什么是 ECHO</a>
+                    <a href="#what-is-echo" class="quick-nav-link active">ECHO何为</a>
                 </li>
                 <li class="quick-nav-item">
-                    <a href="#quick-start" class="quick-nav-link">快速开始</a>
+                    <a href="#quick-start" class="quick-nav-link">入门</a>
                 </li>
                 <li class="quick-nav-item">
-                    <a href="#minting" class="quick-nav-link">生成指南</a>
+                    <a href="#minting" class="quick-nav-link">铸造</a>
                 </li>
                 <li class="quick-nav-item">
-                    <a href="#rights" class="quick-nav-link">权益说明</a>
+                    <a href="#rights" class="quick-nav-link">权益</a>
                 </li>
                 <li class="quick-nav-item">
-                    <a href="#architecture" class="quick-nav-link">技术架构</a>
+                    <a href="#architecture" class="quick-nav-link">架构</a>
                 </li>
                 <li class="quick-nav-item">
-                    <a href="#faq" class="quick-nav-link">常见问题</a>
+                    <a href="#faq" class="quick-nav-link">解惑</a>
                 </li>
             </ul>
             
@@ -1586,7 +1829,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
                     <path d="M18 15l-6-6-6 6"/>
                 </svg>
-                回到顶部
+                归顶
             </button>
         </aside>
     </div>
@@ -1598,22 +1841,22 @@
     <nav class="mobile-menu" id="mobileMenu">
         <ul class="toc-list">
             <li class="toc-item">
-                <a href="#what-is-echo" class="toc-link active">什么是 ECHO</a>
+                <a href="#what-is-echo" class="toc-link active">ECHO何为</a>
             </li>
             <li class="toc-item">
-                <a href="#quick-start" class="toc-link">快速开始</a>
+                <a href="#quick-start" class="toc-link">入门</a>
             </li>
             <li class="toc-item">
-                <a href="#minting" class="toc-link">生成指南</a>
+                <a href="#minting" class="toc-link">铸造</a>
             </li>
             <li class="toc-item">
-                <a href="#rights" class="toc-link">权益说明</a>
+                <a href="#rights" class="toc-link">权益</a>
             </li>
             <li class="toc-item">
-                <a href="#architecture" class="toc-link">技术架构</a>
+                <a href="#architecture" class="toc-link">架构</a>
             </li>
             <li class="toc-item">
-                <a href="#faq" class="toc-link">常见问题</a>
+                <a href="#faq" class="toc-link">解惑</a>
             </li>
         </ul>
     </nav>
@@ -1622,7 +1865,7 @@
     <footer class="footer">
         <div class="footer-logo">ECHO</div>
         <div class="footer-links">
-            <a href="docs.html">文档</a>
+            <a href="docs.html">典</a>
             <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
         </div>
     </footer>
@@ -1720,20 +1963,28 @@
         
         // 导航栏滚动效果
         let lastScroll = 0;
-        const navbar = document.querySelector('.navbar');
+        const navbar = document.getElementById('navbar');
         
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
             
-            if (currentScroll > 100) {
-                navbar.style.background = 'rgba(248, 246, 241, 0.98)';
-                navbar.style.backdropFilter = 'blur(10px)';
+            if (currentScroll > 50) {
+                navbar.classList.add('is-scrolled');
             } else {
-                navbar.style.background = 'linear-gradient(to bottom, rgba(248, 246, 241, 0.98), rgba(248, 246, 241, 0.9))';
-                navbar.style.backdropFilter = 'none';
+                navbar.classList.remove('is-scrolled');
             }
             
             lastScroll = currentScroll;
+        });
+
+        // 移动端菜单切换
+        const menuBtn = document.getElementById('menuBtn');
+        const navbarMobileMenu = document.getElementById('mobileMenu');
+        
+        menuBtn.addEventListener('click', () => {
+            const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+            menuBtn.setAttribute('aria-expanded', !isExpanded);
+            navbarMobileMenu.classList.toggle('is-open');
         });
     </script>
 </body>
