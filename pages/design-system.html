@@ -182,86 +182,82 @@
             line-height: 1.8;
         }
         
-        /* 朱红印章 - 古朴不规则印泥 */
+        /* 朱红印章 - 毛笔涂抹自然边缘 */
         .hero-seal {
-            width: 48px;
-            height: 84px;
+            width: 52px;
+            height: 90px;
             background: 
-                /* 做旧纹理叠加 */
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3' numOctaves='6'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
-                /* 深浅不均的底色 */
-                radial-gradient(ellipse at 25% 20%, rgba(200,70,50,0.5) 0%, transparent 45%),
-                radial-gradient(ellipse at 75% 70%, rgba(120,30,20,0.6) 0%, transparent 40%),
-                radial-gradient(ellipse at 50% 50%, rgba(160,45,35,0.3) 0%, transparent 60%),
-                /* 基础朱红色 */
-                #A03528;
-            background-blend-mode: overlay, normal, normal, normal, normal;
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='5'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E"),
+                radial-gradient(ellipse at 30% 25%, rgba(190,65,50,0.4) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 75%, rgba(130,35,25,0.5) 0%, transparent 35%),
+                #9B3022;
+            background-blend-mode: overlay, normal, normal, normal;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             opacity: 0;
-            transform: scale(0.8) rotate(-3deg);
+            transform: scale(0.8) rotate(-2deg);
             animation: sealStamp 0.8s var(--ease-ink) 1.2s forwards;
             box-shadow: 
-                inset 0 0 25px rgba(0,0,0,0.3),
-                2px 3px 10px rgba(140, 40, 30, 0.4);
-            /* 不规则边缘 */
-            clip-path: polygon(
-                8% 2%, 25% 0%, 50% 1%, 75% 0%, 94% 3%,
-                98% 15%, 96% 35%, 99% 55%, 97% 75%, 95% 92%,
-                80% 98%, 55% 99%, 30% 98%, 10% 96%, 2% 88%,
-                1% 70%, 3% 50%, 0% 30%, 2% 12%
-            );
+                inset 0 0 30px rgba(0,0,0,0.35),
+                3px 4px 12px rgba(130, 40, 30, 0.35);
+            /* 毛笔涂抹边缘 - SVG filter 实现飞白 */
+            filter: url(#brushEdge);
         }
         
-        /* 内边框 - 也不规则 */
+        /* 外层飞白轮廓 */
         .hero-seal::before {
             content: '';
             position: absolute;
-            inset: 4px;
-            border: 1px solid rgba(255,255,255,0.12);
-            clip-path: polygon(
-                10% 5%, 30% 2%, 55% 4%, 80% 2%, 92% 6%,
-                95% 20%, 93% 40%, 96% 60%, 94% 80%, 92% 92%,
-                75% 96%, 50% 95%, 25% 97%, 8% 94%, 4% 85%,
-                5% 65%, 3% 45%, 6% 25%
-            );
+            width: 110%;
+            height: 108%;
+            background: #9B3022;
+            filter: url(#roughEdge);
+            opacity: 0.9;
+            z-index: -1;
         }
         
-        /* 斑驳痕迹 */
+        /* 斑驳内纹理 */
         .hero-seal::after {
             content: '';
             position: absolute;
             width: 100%;
             height: 100%;
             background: 
-                /* 边缘磨损 */
-                radial-gradient(circle at 5% 15%, transparent 0%, transparent 8%, rgba(160,45,35,0.9) 12%),
-                radial-gradient(circle at 92% 8%, transparent 0%, transparent 6%, rgba(140,35,25,0.8) 10%),
-                radial-gradient(circle at 8% 88%, transparent 0%, transparent 10%, rgba(150,40,30,0.9) 14%),
-                radial-gradient(circle at 95% 92%, transparent 0%, transparent 7%, rgba(130,30,20,0.8) 11%),
+                /* 边缘飞白 */
+                radial-gradient(circle at 8% 12%, rgba(255,255,255,0.15) 0%, transparent 15%),
+                radial-gradient(circle at 92% 8%, rgba(255,255,255,0.12) 0%, transparent 12%),
+                radial-gradient(circle at 5% 88%, rgba(255,255,255,0.1) 0%, transparent 18%),
+                radial-gradient(circle at 95% 92%, rgba(255,255,255,0.13) 0%, transparent 14%),
                 /* 内部深浅 */
-                radial-gradient(ellipse at 35% 35%, rgba(180,60,45,0.4) 0%, transparent 30%),
-                radial-gradient(ellipse at 65% 60%, rgba(110,25,18,0.5) 0%, transparent 25%);
-            opacity: 0.7;
-            mix-blend-mode: multiply;
+                radial-gradient(ellipse at 40% 35%, rgba(170,55,40,0.5) 0%, transparent 25%),
+                radial-gradient(ellipse at 60% 65%, rgba(110,30,20,0.4) 0%, transparent 20%);
+            opacity: 0.8;
+            mix-blend-mode: soft-light;
             pointer-events: none;
         }
         
-        /* 共生文字图片 */
+        /* 共生文字 */
         .hero-seal-text-img {
-            width: 36px;
-            height: 68px;
-            background-image: url('https://zhouyatingkol.github.io/echo-demo1/images/seal-gongsheng.png');
+            width: 38px;
+            height: 72px;
+            background-image: url('../images/seal-gongsheng.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             position: relative;
             z-index: 1;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-            /* 轻微不规则 */
-            transform: scale(0.98) rotate(0.5deg);
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+            transform: scale(0.97);
+        }
+        
+        /* SVG filter 隐藏 */
+        .seal-filters {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
         }
         
         .hero-seal-svg path {
@@ -529,13 +525,13 @@
             }
             
             .hero-seal {
-                width: 40px;
-                height: 70px;
+                width: 42px;
+                height: 72px;
             }
             
             .hero-seal-text-img {
-                width: 30px;
-                height: 56px;
+                width: 32px;
+                height: 58px;
             }
             
             .hero-slogan-wrapper {
@@ -557,6 +553,22 @@
     </style>
 </head>
 <body>
+    <!-- SVG Filters for seal -->
+    <svg class="seal-filters" aria-hidden="true">
+        <defs>
+            <!-- 毛笔涂抹边缘 -->
+            <filter id="brushEdge" x="-20%" y="-15%" width="140%" height="130%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+            <!-- 粗糙边缘 -->
+            <filter id="roughEdge" x="-30%" y="-20%" width="160%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="5" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+        </defs>
+    </svg>
+    
     <!-- HERO 区 -->
     <section class="hero">
         <div class="hero-texture"></div>
