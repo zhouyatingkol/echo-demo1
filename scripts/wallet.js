@@ -442,10 +442,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (connectBtn) {
         connectBtn.addEventListener('click', () => {
             if (walletManager.isConnected) {
-                // 如果已连接，可以显示菜单（断开、查看等）
-                if (confirm('是否断开钱包连接？')) {
-                    walletManager.disconnect();
-                }
+                // 已连接状态：点击进入个人中心
+                window.location.href = 'profile.html';
+            } else {
+                // 未连接状态：连接钱包
+                walletManager.connect();
+            }
+        });
+    }
+    
+    // 绑定移动端连接按钮
+    const mobileConnectBtn = document.getElementById('mobileWalletConnect');
+    if (mobileConnectBtn) {
+        mobileConnectBtn.addEventListener('click', () => {
+            if (walletManager.isConnected) {
+                window.location.href = 'profile.html';
             } else {
                 walletManager.connect();
             }

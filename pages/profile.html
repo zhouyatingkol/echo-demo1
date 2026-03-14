@@ -854,17 +854,30 @@
 
         // 页面加载时检查钱包连接
         document.addEventListener('DOMContentLoaded', () => {
-            // 延迟检查，确保 wallet-manager 已初始化
+            // 绑定断开钱包按钮
+            const disconnectBtn = document.querySelector('[data-action="disconnectWallet"]');
+            if (disconnectBtn) {
+                disconnectBtn.addEventListener('click', () => {
+                    if (typeof walletManager !== 'undefined') {
+                        walletManager.disconnect();
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+            
+            // 延迟检查，确保 wallet 已初始化
             setTimeout(() => {
-                if (!window.EchoWallet || !window.EchoWallet.isConnected()) {
+                if (typeof walletManager === 'undefined' || !walletManager.isConnected) {
                     // 未连接，跳转到登录页
                     window.location.href = 'login.html';
                 }
             }, 500);
         });
     </script>
+    
     <!-- 钱包状态管理 -->
-    <script src="../js/wallet-manager.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="../scripts/wallet.js"></script>
     <!-- 移动端导航 -->
     <script src="../js/mobile-nav.js"></script>
 </body>
