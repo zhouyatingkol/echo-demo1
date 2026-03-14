@@ -18,22 +18,23 @@
                     },
                     colors: {
                         // 宣纸底色
-                        'paper': '#f7f4ed',
-                        'paper-deep': '#f0ece3',
+                        'paper': '#F8F6F1',
+                        'paper-deep': '#F2EFE8',
                         // 四阶墨色
-                        'ink-100': '#5a5248',
-                        'ink-200': '#3d3832',
+                        'ink-100': '#7A6E5F',
+                        'ink-200': '#4A4A4A',
                         'ink-300': '#2a2622',
-                        'ink-400': '#1a1a1a',
-                        // 暗朱红印章
-                        'seal': '#8b3a3a',
-                        'seal-light': '#a85d5d',
-                        // 宋瓷色调
-                        'celadon': '#c5d1c8',
-                        'celadon-deep': '#9eb0a2',
-                        'ru-blue': '#a8c4c9',
-                        'gold': '#b8944f',
-                        'clay': '#9e8b76',
+                        'ink-400': '#1A1A1A',
+                        // 朱红印章
+                        'seal': '#A03020',
+                        'seal-light': '#c45a4a',
+                        // 宋金
+                        'gold': '#B89B6C',
+                        'gold-light': '#D4C4A8',
+                        // 三域色
+                        'realm-sound': '#8B9DC3',
+                        'realm-color': '#C9A9A6',
+                        'realm-text': '#7A8B7C',
                     },
                     animation: {
                         'breathe': 'breathe 12s ease-in-out infinite',
@@ -62,9 +63,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
-            background: #f7f4ed;
-            color: #1a1a1a;
+            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            background: #F8F6F1;
+            color: #1A1A1A;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
@@ -77,21 +78,10 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
         
-        /* 竹简纹理背景 */
-        .bamboo-texture {
-            background: repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 48px,
-                rgba(139, 58, 58, 0.03) 48px,
-                rgba(139, 58, 58, 0.03) 50px
-            );
-        }
-        
         /* 宋瓷质感卡片 */
         .celadon-card {
             background: linear-gradient(135deg, #faf9f7 0%, #f5f3ef 100%);
-            border: 0.5px solid rgba(158, 139, 118, 0.15);
+            border: 0.5px solid rgba(184, 155, 108, 0.15);
             border-radius: 2px;
             position: relative;
             overflow: hidden;
@@ -102,47 +92,54 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(180deg, rgba(197, 209, 200, 0.1) 0%, transparent 50%, rgba(197, 209, 200, 0.05) 100%);
+            background: linear-gradient(180deg, rgba(184, 155, 108, 0.05) 0%, transparent 50%, rgba(184, 155, 108, 0.03) 100%);
             pointer-events: none;
         }
         
         .celadon-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 60px rgba(26, 26, 26, 0.06);
-            border-color: rgba(158, 139, 118, 0.25);
+            border-color: rgba(184, 155, 108, 0.25);
         }
         
-        /* 共生印章样式 */
+        /* 印章框 */
         .seal-mark {
-            width: 80px;
-            height: 80px;
-            border: 2px solid #8b3a3a;
-            color: #8b3a3a;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            position: relative;
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border: 1px solid rgba(160, 48, 32, 0.4);
+            border-radius: 2px;
+            color: #A03020;
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.2em;
             animation: sealPulse 12s ease-in-out infinite;
         }
         
-        .seal-mark::before {
+        /* 状态印章 */
+        .status-seal {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border: 2px solid #A03020;
+            color: #A03020;
+            font-family: 'LXGW WenKai', serif;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            position: relative;
+        }
+        
+        .status-seal::before {
             content: '';
             position: absolute;
             top: 4px; left: 4px; right: 4px; bottom: 4px;
-            border: 0.5px solid rgba(139, 58, 58, 0.3);
+            border: 0.5px solid rgba(160, 48, 32, 0.3);
         }
         
-        .seal-mark .char-top {
-            font-size: 0.85rem;
-            margin-bottom: 0.1rem;
-        }
-        
-        .seal-mark .char-bottom {
-            font-size: 1.1rem;
+        .status-seal .char-single {
+            font-size: 1.5rem;
         }
         
         /* 四权卡片 */
@@ -150,42 +147,42 @@
             padding: 2rem 1.5rem;
             text-align: center;
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 0.5px solid rgba(158, 139, 118, 0.1);
-            background: rgba(247, 244, 237, 0.5);
+            border: 0.5px solid rgba(184, 155, 108, 0.1);
+            background: rgba(248, 246, 241, 0.5);
         }
         
         .right-card:hover {
-            background: rgba(197, 209, 200, 0.15);
-            border-color: rgba(158, 139, 118, 0.3);
+            background: rgba(184, 155, 108, 0.1);
+            border-color: rgba(184, 155, 108, 0.3);
         }
         
         .right-card.active {
-            background: rgba(139, 58, 58, 0.05);
-            border-color: rgba(139, 58, 58, 0.2);
+            background: rgba(160, 48, 32, 0.05);
+            border-color: rgba(160, 48, 32, 0.2);
         }
         
         .right-card.active .right-icon {
-            color: #8b3a3a;
+            color: #A03020;
         }
         
         .right-icon {
             font-size: 1.5rem;
-            color: #9e8b76;
+            color: #B89B6C;
             margin-bottom: 1rem;
             transition: all 0.8s ease;
         }
         
         .right-name {
-            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            font-family: 'LXGW WenKai', serif;
             font-size: 0.95rem;
             letter-spacing: 0.15em;
-            color: #3d3832;
+            color: #1A1A1A;
             margin-bottom: 0.5rem;
         }
         
         .right-desc {
             font-size: 0.75rem;
-            color: #7a6e5f;
+            color: #7A6E5F;
             letter-spacing: 0.05em;
         }
         
@@ -204,8 +201,8 @@
             width: 2px;
             background: repeating-linear-gradient(
                 to bottom,
-                #9e8b76 0px,
-                #9e8b76 8px,
+                #B89B6C 0px,
+                #B89B6C 8px,
                 transparent 8px,
                 transparent 16px
             );
@@ -225,47 +222,47 @@
             top: 0.5rem;
             width: 10px;
             height: 10px;
-            background: #f7f4ed;
-            border: 1.5px solid #8b3a3a;
+            background: #F8F6F1;
+            border: 1.5px solid #A03020;
             border-radius: 50%;
             transition: all 0.8s ease;
         }
         
         .timeline-item:hover::before {
-            background: #8b3a3a;
+            background: #A03020;
             transform: scale(1.2);
         }
         
         .timeline-date {
             font-size: 0.7rem;
-            color: #9e8b76;
+            color: #B89B6C;
             letter-spacing: 0.15em;
             margin-bottom: 0.5rem;
         }
         
         .timeline-title {
-            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            font-family: 'LXGW WenKai', serif;
             font-size: 1rem;
             letter-spacing: 0.1em;
-            color: #2a2622;
+            color: #1A1A1A;
             margin-bottom: 0.3rem;
         }
         
         .timeline-desc {
             font-size: 0.8rem;
-            color: #5a5248;
+            color: #7A6E5F;
             line-height: 1.8;
         }
         
         /* 宋瓷质感按钮 */
         .btn-ceramic {
             padding: 1rem 3rem;
-            border: 0.5px solid rgba(158, 139, 118, 0.3);
-            background: linear-gradient(135deg, #faf9f7 0%, #f0ece3 100%);
-            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            border: 0.5px solid rgba(26, 26, 26, 0.3);
+            background: transparent;
+            font-family: 'LXGW WenKai', serif;
             font-size: 0.9rem;
             letter-spacing: 0.3em;
-            color: #3d3832;
+            color: #1A1A1A;
             cursor: pointer;
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
@@ -278,7 +275,7 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: #8b3a3a;
+            background: #B89B6C;
             transform: scaleX(0);
             transform-origin: right;
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -291,23 +288,23 @@
         }
         
         .btn-ceramic:hover {
-            color: #f7f4ed;
-            border-color: rgba(139, 58, 58, 0.5);
-            letter-spacing: 0.35em;
+            color: #F8F6F1;
+            border-color: #B89B6C;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #8b3a3a 0%, #a85d5d 100%);
-            color: #f7f4ed;
-            border-color: rgba(139, 58, 58, 0.5);
+            background: #A03020;
+            color: #F8F6F1;
+            border-color: #A03020;
         }
         
         .btn-primary::before {
-            background: #1a1a1a;
+            background: #1A1A1A;
         }
         
         .btn-primary:hover {
-            color: #f7f4ed;
+            color: #F8F6F1;
+            border-color: #1A1A1A;
         }
         
         /* 权属图谱 */
@@ -324,14 +321,14 @@
             height: 80px;
             border-radius: 50%;
             background: linear-gradient(135deg, #faf9f7 0%, #f0ece3 100%);
-            border: 1px solid rgba(158, 139, 118, 0.3);
+            border: 1px solid rgba(184, 155, 108, 0.3);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             font-size: 0.7rem;
             letter-spacing: 0.05em;
-            color: #5a5248;
+            color: #7A6E5F;
             position: relative;
             transition: all 0.8s ease;
             cursor: pointer;
@@ -339,13 +336,13 @@
         
         .graph-node:hover {
             transform: scale(1.1);
-            border-color: #8b3a3a;
-            box-shadow: 0 10px 40px rgba(139, 58, 58, 0.1);
+            border-color: #A03020;
+            box-shadow: 0 10px 40px rgba(160, 48, 32, 0.1);
         }
         
         .graph-node.current {
-            background: linear-gradient(135deg, rgba(139, 58, 58, 0.1) 0%, rgba(139, 58, 58, 0.05) 100%);
-            border-color: #8b3a3a;
+            background: linear-gradient(135deg, rgba(160, 48, 32, 0.1) 0%, rgba(160, 48, 32, 0.05) 100%);
+            border-color: #A03020;
         }
         
         .graph-node .node-label {
@@ -357,16 +354,157 @@
         .graph-line {
             position: absolute;
             height: 1px;
-            background: linear-gradient(90deg, transparent, #9e8b76, transparent);
+            background: linear-gradient(90deg, transparent, #B89B6C, transparent);
             opacity: 0.4;
         }
         
-        /* 渐变文字 */
-        .gradient-text {
-            background: linear-gradient(135deg, #1a1a1a 0%, #5a5248 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        /* 导航栏样式 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.8s ease,
+                        backdrop-filter 0.8s ease;
+        }
+        
+        .navbar.is-scrolled {
+            background: rgba(248, 246, 241, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+        }
+        
+        .navbar__brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .navbar__logo {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: 0.3em;
+            text-decoration: none;
+            opacity: 0.85;
+            transition: opacity 0.4s ease;
+        }
+        
+        .navbar__brand:hover .navbar__logo {
+            opacity: 1;
+        }
+        
+        .navbar__nav {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .navbar__link {
+            position: relative;
+            font-family: 'LXGW WenKai', serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #7A6E5F;
+            text-decoration: none;
+            letter-spacing: 0.2em;
+            padding: 0.5rem 0;
+            transition: color 0.4s ease;
+        }
+        
+        .navbar__link:hover {
+            color: #1A1A1A;
+        }
+        
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: #B89B6C;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .navbar__link:hover::after {
+            width: 100%;
+        }
+        
+        .navbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .navbar__user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2px;
+            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            background: transparent;
+            font-family: 'LXGW WenKai', serif;
+            font-size: 0.8rem;
+            color: #7A6E5F;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        
+        .navbar__user:hover {
+            border-color: #B89B6C;
+            color: #1A1A1A;
+            background: rgba(184, 155, 108, 0.05);
+        }
+        
+        .navbar__user-placeholder {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(122, 110, 95, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar__user-placeholder svg {
+            width: 12px;
+            height: 12px;
+            stroke: #7A6E5F;
+        }
+        
+        /* 返回按钮 */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'LXGW WenKai', serif;
+            font-size: 0.85rem;
+            color: #7A6E5F;
+            letter-spacing: 0.2em;
+            text-decoration: none;
+            transition: color 0.4s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .back-btn:hover {
+            color: #1A1A1A;
         }
         
         /* 淡入动画 */
@@ -389,18 +527,9 @@
         .divider-ink {
             width: 60px;
             height: 1px;
-            background: linear-gradient(90deg, transparent, #9e8b76, transparent);
+            background: linear-gradient(90deg, transparent, #B89B6C, transparent);
             margin: 2rem 0;
             opacity: 0.5;
-        }
-        
-        /* 回纹装饰 */
-        .huiwen-pattern {
-            width: 100px;
-            height: 20px;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h10v10H0zM10 10h10v10H10z' fill='%238b3a3a' fill-opacity='0.3'/%3E%3C/svg%3E");
-            background-repeat: repeat-x;
-            opacity: 0.6;
         }
         
         /* NFT 信息卡片 */
@@ -408,7 +537,7 @@
             display: flex;
             justify-content: space-between;
             padding: 1rem 0;
-            border-bottom: 0.5px solid rgba(158, 139, 118, 0.15);
+            border-bottom: 0.5px solid rgba(184, 155, 108, 0.15);
         }
         
         .nft-info-row:last-child {
@@ -417,13 +546,13 @@
         
         .nft-info-label {
             font-size: 0.8rem;
-            color: #9e8b76;
+            color: #B89B6C;
             letter-spacing: 0.1em;
         }
         
         .nft-info-value {
             font-size: 0.85rem;
-            color: #2a2622;
+            color: #1A1A1A;
             letter-spacing: 0.05em;
             font-family: 'LXGW WenKai', serif;
         }
@@ -433,7 +562,7 @@
             position: relative;
             overflow: hidden;
             border-radius: 2px;
-            background: linear-gradient(135deg, #f0ece3 0%, #e8e2d6 100%);
+            background: linear-gradient(135deg, #F2EFE8 0%, #EBE7DD 100%);
             aspect-ratio: 1;
         }
         
@@ -452,7 +581,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #9e8b76;
+            color: #B89B6C;
         }
         
         .asset-placeholder .icon {
@@ -466,41 +595,158 @@
             letter-spacing: 0.2em;
         }
         
+        /* 同类推荐卡片 */
+        .similar-card {
+            background: linear-gradient(135deg, #faf9f7 0%, #f5f3ef 100%);
+            border: 0.5px solid rgba(184, 155, 108, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        
+        .similar-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(26, 26, 26, 0.06);
+            border-color: rgba(184, 155, 108, 0.3);
+        }
+        
+        .similar-card .card-image {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #F2EFE8 0%, #EBE7DD 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #B89B6C;
+            font-size: 2rem;
+        }
+        
+        .similar-card .card-info {
+            padding: 1.5rem;
+        }
+        
+        .similar-card .card-title {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            color: #1A1A1A;
+            margin-bottom: 0.5rem;
+        }
+        
+        .similar-card .card-meta {
+            font-size: 0.75rem;
+            color: #7A6E5F;
+            letter-spacing: 0.05em;
+        }
+        
+        .similar-card .card-price {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1rem;
+            color: #A03020;
+            letter-spacing: 0.1em;
+            margin-top: 0.5rem;
+        }
+        
+        /* 播放器控件简化 */
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(248, 246, 241, 0.8);
+            border-top: 0.5px solid rgba(184, 155, 108, 0.15);
+        }
+        
+        .player-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 0.5px solid rgba(184, 155, 108, 0.3);
+            border-radius: 50%;
+            color: #1A1A1A;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        
+        .player-btn:hover {
+            background: rgba(184, 155, 108, 0.1);
+            border-color: #B89B6C;
+        }
+        
+        .player-progress {
+            flex: 1;
+            height: 2px;
+            background: rgba(184, 155, 108, 0.2);
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .player-progress-bar {
+            height: 100%;
+            background: #B89B6C;
+            width: 30%;
+        }
+        
+        .player-time {
+            font-size: 0.75rem;
+            color: #7A6E5F;
+            letter-spacing: 0.05em;
+            font-family: 'LXGW WenKai', serif;
+        }
+        
         @media (max-width: 768px) {
-            .seal-mark {
-                width: 60px;
-                height: 60px;
+            .navbar__nav {
+                display: none;
             }
-            .seal-mark .char-top { font-size: 0.65rem; }
-            .seal-mark .char-bottom { font-size: 0.85rem; }
+            .status-seal {
+                width: 48px;
+                height: 48px;
+            }
+            .status-seal .char-single {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="paper-texture"></div>
     
-    <!-- 顶部导航 -->
-    <nav class="fixed top-0 left-0 right-0 z-50 px-[5vw] py-6 flex justify-between items-center" style="background: linear-gradient(to bottom, rgba(247,244,237,0.98), rgba(247,244,237,0.9));">
-        <a href="index.html" class="font-display text-lg tracking-[0.3em] text-ink-400 no-underline font-light">ECHO</a>
-        <div class="flex gap-8">
-            <a href="market.html" class="text-sm tracking-widest text-ink-100 hover:text-ink-400 transition-all duration-800 relative group">
-                市场
-                <span class="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-gold transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="creator.html" class="text-sm tracking-widest text-ink-100 hover:text-ink-400 transition-all duration-800 relative group">
-                创作
-                <span class="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-gold transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="docs.html" class="text-sm tracking-widest text-ink-100 hover:text-ink-400 transition-all duration-800 relative group">
-                文档
-                <span class="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-gold transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="profile.html" class="text-sm tracking-widest text-seal border border-seal/30 px-4 py-1 rounded-sm hover:bg-seal hover:text-paper transition-all duration-500">登录</a>
+    <!-- 导航栏 -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="navbar__brand">
+            <span class="navbar__logo">ECHO</span>
+        </a>
+        
+        <div class="navbar__nav">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+        </div>
+        
+        <div class="navbar__actions">
+            <button class="navbar__user" id="connectWallet">
+                <span class="navbar__user-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span>入链</span>
+            </button>
         </div>
     </nav>
 
     <!-- Hero 区 -->
     <section class="min-h-screen pt-32 pb-20 px-[8vw] relative z-10">
+        <!-- 返回按钮 -->
+        <a href="marketplace.html" class="back-btn">
+            <span>←</span>
+            <span>归</span>
+        </a>
+        
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <!-- 左侧：资产预览图 -->
             <div class="fade-in">
@@ -511,31 +757,41 @@
                     </div>
                 </div>
                 
+                <!-- 简化的播放器控件 -->
+                <div class="mt-4">
+                    <div class="player-controls">
+                        <button class="player-btn">▶</button>
+                        <div class="player-progress">
+                            <div class="player-progress-bar"></div>
+                        </div>
+                        <span class="player-time">01:23 / 04:56</span>
+                    </div>
+                </div>
+                
                 <!-- 缩略图列表 -->
                 <div class="flex gap-3 mt-4">
-                    <div class="w-16 h-16 bg-paper-deep border border-clay/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
-                    <div class="w-16 h-16 bg-paper-deep border border-clay/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
-                    <div class="w-16 h-16 bg-paper-deep border border-clay/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
+                    <div class="w-16 h-16 bg-paper-deep border border-gold/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
+                    <div class="w-16 h-16 bg-paper-deep border border-gold/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
+                    <div class="w-16 h-16 bg-paper-deep border border-gold/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
                 </div>
             </div>
             
             <!-- 右侧：资产信息 -->
             <div class="relative">
-                <!-- 共生印章 -->
+                <!-- 状态印章 -->
                 <div class="absolute -top-4 -right-4 lg:right-0">
-                    <div class="seal-mark">
-                        <span class="char-top">共</span>
-                        <span class="char-bottom">生</span>
+                    <div class="status-seal">
+                        <span class="char-single">待缘</span>
                     </div>
                 </div>
                 
                 <div class="fade-in delay-100">
-                    <div class="text-xs tracking-[0.4em] text-clay mb-4">数字艺术作品</div>
+                    <div class="text-xs tracking-[0.4em] text-gold mb-4">数字艺术作品</div>
                     <h1 class="font-display text-4xl lg:text-5xl tracking-[0.15em] text-ink-400 mb-6 leading-tight">
                         山水清音
                     </h1>
                     <div class="flex items-center gap-4 mb-8">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-celadon to-celadon-deep flex items-center justify-center text-white text-sm">
+                        <div class="w-10 h-10 rounded-full bg-realm-sound flex items-center justify-center text-white text-sm">
                             墨
                         </div>
                         <div>
@@ -555,13 +811,22 @@
                 
                 <div class="fade-in delay-300 flex items-baseline gap-2 mb-8">
                     <span class="text-3xl font-display text-seal tracking-wider">2,880</span>
-                    <span class="text-sm text-clay tracking-widest">ECHO</span>
+                    <span class="text-sm text-gold tracking-widest">ECHO</span>
+                </div>
+                
+                <!-- 配（分配）信息 -->
+                <div class="fade-in delay-300 mb-8 p-4 border border-gold/20 rounded-sm">
+                    <div class="flex items-center gap-2 text-sm text-ink-100">
+                        <span>配</span>
+                        <span class="text-gold">·</span>
+                        <span>创作者获 5%</span>
+                    </div>
                 </div>
                 
                 <!-- 操作按钮 -->
                 <div class="fade-in delay-400 flex gap-4">
-                    <button class="btn-ceramic btn-primary">缘起</button>
-                    <button class="btn-ceramic">播种</button>
+                    <button class="btn-ceramic btn-primary">结缘</button>
+                    <button class="btn-ceramic">衍</button>
                 </div>
             </div>
         </div>
@@ -571,9 +836,8 @@
     <section class="py-20 px-[8vw] bg-paper-deep relative z-10">
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-16 fade-in">
-                <div class="text-xs tracking-[0.5em] text-clay mb-4">VERIFICATION</div>
-                <h2 class="font-display text-3xl tracking-[0.2em] text-ink-400">确权信息</h2>
-                <div class="huiwen-pattern mx-auto mt-6"></div>
+                <span class="seal-mark">非物，乃灵</span>
+                <h2 class="font-display text-3xl tracking-[0.2em] text-ink-400 mt-8">确权</h2>
             </div>
             
             <!-- 四权配置 -->
@@ -589,7 +853,7 @@
                     <div class="right-card active">
                         <div class="right-icon">◎</div>
                         <div class="right-name">衍生权</div>
-                        <div class="right-desc">二次创作<br> remix 授权</div>
+                        <div class="right-desc">二次创作<br>remix 授权</div>
                     </div>
                     <div class="right-card">
                         <div class="right-icon">○</div>
@@ -607,33 +871,33 @@
             <!-- License NFT 信息 -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="celadon-card p-8 fade-in delay-200">
-                    <h3 class="font-display text-lg tracking-[0.15em] text-ink-300 mb-6">License NFT</h3>
+                    <h3 class="font-display text-lg tracking-[0.15em] text-ink-300 mb-6">链上凭证</h3>
                     
                     <div class="nft-info-row">
-                        <span class="nft-info-label">合约地址</span>
+                        <span class="nft-info-label">合约</span>
                         <span class="nft-info-value">0x7a23...8f91</span>
                     </div>
                     <div class="nft-info-row">
-                        <span class="nft-info-label">Token ID</span>
+                        <span class="nft-info-label">编号</span>
                         <span class="nft-info-value">#8848</span>
                     </div>
                     <div class="nft-info-row">
-                        <span class="nft-info-label">标准协议</span>
+                        <span class="nft-info-label">协议</span>
                         <span class="nft-info-value">ERC-6551</span>
                     </div>
                     <div class="nft-info-row">
-                        <span class="nft-info-label">铸造时间</span>
+                        <span class="nft-info-label">铸造</span>
                         <span class="nft-info-value">2026.03.12</span>
                     </div>
                     <div class="nft-info-row">
-                        <span class="nft-info-label">区块链</span>
+                        <span class="nft-info-label">链</span>
                         <span class="nft-info-value">Ethereum</span>
                     </div>
                 </div>
                 
                 <!-- 权属图谱 -->
                 <div class="celadon-card p-8 fade-in delay-300">
-                    <h3 class="font-display text-lg tracking-[0.15em] text-ink-300 mb-6">权属图谱</h3>
+                    <h3 class="font-display text-lg tracking-[0.15em] text-ink-300 mb-6">源流</h3>
                     
                     <div class="graph-container">
                         <!-- 父节点 -->
@@ -660,14 +924,14 @@
                         <div class="absolute right-4 top-1/2 -translate-y-1/2">
                             <div class="graph-node opacity-50">
                                 <span>?</span>
-                                <span class="node-label">待生</span>
+                                <span class="node-label">待衍</span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="text-center mt-4">
-                        <p class="text-xs text-clay tracking-widest">本作品源自「山水系列」母本</p>
-                        <p class="text-xs text-clay tracking-widest mt-1">尚无二度衍生作品</p>
+                        <p class="text-xs text-gold tracking-widest">本作品源自「山水系列」母本</p>
+                        <p class="text-xs text-gold tracking-widest mt-1">尚无二度衍生作品</p>
                     </div>
                 </div>
             </div>
@@ -675,32 +939,31 @@
     </section>
 
     <!-- 流转历史区 -->
-    <section class="py-20 px-[8vw] bamboo-texture relative z-10">
+    <section class="py-20 px-[8vw] bg-paper relative z-10">
         <div class="max-w-3xl mx-auto">
             <div class="text-center mb-16 fade-in">
-                <div class="text-xs tracking-[0.5em] text-clay mb-4">PROVENANCE</div>
-                <h2 class="font-display text-3xl tracking-[0.2em] text-ink-400">流转历史</h2>
-                <div class="huiwen-pattern mx-auto mt-6"></div>
+                <span class="seal-mark">随流而长</span>
+                <h2 class="font-display text-3xl tracking-[0.2em] text-ink-400 mt-8">流转</h2>
             </div>
             
             <div class="celadon-card p-8 lg:p-12 fade-in delay-100">
                 <div class="timeline">
                     <div class="timeline-item">
                         <div class="timeline-date">2026.03.12 14:32</div>
-                        <div class="timeline-title">铸造诞生</div>
-                        <div class="timeline-desc">创作者「墨客」在 ECHO 平台完成作品铸造，生成唯一 License NFT</div>
+                        <div class="timeline-title">铸</div>
+                        <div class="timeline-desc">创作者「墨客」生此 ECHO，链上存证</div>
                     </div>
                     
                     <div class="timeline-item">
                         <div class="timeline-date">2026.03.12 15:08</div>
-                        <div class="timeline-title">首发定价</div>
-                        <div class="timeline-desc">作品进入市场，初始定价 2,880 ECHO</div>
+                        <div class="timeline-title">入集</div>
+                        <div class="timeline-desc">作品入市，标价 2,880 ECHO</div>
                     </div>
                     
                     <div class="timeline-item">
                         <div class="timeline-date">当前</div>
-                        <div class="timeline-title">待缘起</div>
-                        <div class="timeline-desc">作品正在市场中等待第一位收藏者</div>
+                        <div class="timeline-title">待缘</div>
+                        <div class="timeline-desc">作品静候有缘人</div>
                     </div>
                 </div>
             </div>
@@ -709,68 +972,122 @@
             <div class="grid grid-cols-3 gap-4 mt-8 fade-in delay-200">
                 <div class="text-center p-6">
                     <div class="font-display text-2xl text-ink-300 mb-2">1</div>
-                    <div class="text-xs text-clay tracking-widest">持有次数</div>
+                    <div class="text-xs text-gold tracking-widest">持有</div>
                 </div>
                 <div class="text-center p-6">
                     <div class="font-display text-2xl text-ink-300 mb-2">0</div>
-                    <div class="text-xs text-clay tracking-widest">流转次数</div>
+                    <div class="text-xs text-gold tracking-widest">流转</div>
                 </div>
                 <div class="text-center p-6">
                     <div class="font-display text-2xl text-seal mb-2">2,880</div>
-                    <div class="text-xs text-clay tracking-widest">当前价格</div>
+                    <div class="text-xs text-gold tracking-widest">标价</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 同类推荐区 -->
+    <section class="py-20 px-[8vw] bg-paper-deep relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="font-display text-3xl tracking-[0.2em] text-ink-400">同类</h2>
+                <div class="divider-ink mx-auto mt-6"></div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 fade-in delay-100">
+                <div class="similar-card">
+                    <div class="card-image">◈</div>
+                    <div class="card-info">
+                        <div class="card-title">云起时</div>
+                        <div class="card-meta">墨客</div>
+                        <div class="card-price">1,680 ECHO</div>
+                    </div>
+                </div>
+                <div class="similar-card">
+                    <div class="card-image" style="background: linear-gradient(135deg, #C9A9A6 0%, #b89895 100%);">◉</div>
+                    <div class="card-info">
+                        <div class="card-title">山静日长</div>
+                        <div class="card-meta">青岚</div>
+                        <div class="card-price">2,240 ECHO</div>
+                    </div>
+                </div>
+                <div class="similar-card">
+                    <div class="card-image" style="background: linear-gradient(135deg, #7A8B7C 0%, #6a7b6c 100%);">◎</div>
+                    <div class="card-info">
+                        <div class="card-title">溪山行旅</div>
+                        <div class="card-meta">墨染</div>
+                        <div class="card-price">3,200 ECHO</div>
+                    </div>
+                </div>
+                <div class="similar-card">
+                    <div class="card-image">○</div>
+                    <div class="card-info">
+                        <div class="card-title">烟雨江南</div>
+                        <div class="card-meta">水墨</div>
+                        <div class="card-price">待缘</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- 操作区 -->
-    <section class="py-20 px-[8vw] bg-paper-deep relative z-10">
+    <section class="py-20 px-[8vw] bg-paper relative z-10">
         <div class="max-w-2xl mx-auto text-center">
             <div class="fade-in">
-                <div class="seal-mark mx-auto mb-8">
-                    <span class="char-top">待</span>
-                    <span class="char-bottom">缘</span>
+                <div class="status-seal mx-auto mb-8">
+                    <span class="char-single">待缘</span>
                 </div>
                 
-                <h2 class="font-display text-2xl tracking-[0.2em] text-ink-400 mb-4">缘起此作</h2>
+                <h2 class="font-display text-2xl tracking-[0.2em] text-ink-400 mb-4">结缘此作</h2>
                 <p class="text-ink-100 tracking-wide mb-8 text-sm leading-loose">
-                    每一次缘起，都是一场与艺术的相遇。<br>
-                    此作品等待有缘人，共同开启新的篇章。
+                    每一次结缘，都是一场与艺术的相遇。<br>
+                    此作品静候有缘人，共启新章。
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <button class="btn-ceramic btn-primary text-base px-12 py-4">
-                        <span class="mr-2">◈</span> 缘起 — 2,880 ECHO
+                        <span class="mr-2">◈</span> 结缘 — 2,880 ECHO
                     </button>
                     <button class="btn-ceramic text-base px-12 py-4">
-                        <span class="mr-2">◉</span> 播种衍生
+                        <span class="mr-2">◉</span> 衍
                     </button>
                 </div>
                 
-                <div class="mt-12 text-xs text-clay tracking-widest">
-                    <p>缘起后您将获得该作品的完整四权配置</p>
-                    <p class="mt-2">每次流转，创作者将获得 5% 版税收益</p>
+                <div class="mt-12 text-xs text-gold tracking-widest">
+                    <p>结缘后您将获得该作品的完整四权配置</p>
+                    <p class="mt-2">每次流转，创作者将获 5% 之配</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- 页脚 -->
-    <footer class="py-16 px-[8vw] border-t border-clay/10 relative z-10">
+    <footer class="py-16 px-[8vw] border-t border-gold/10 relative z-10">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="font-display text-lg tracking-[0.5em] text-ink-400">ECHO</div>
             <div class="flex gap-8">
-                <a href="docs.html" class="text-xs tracking-[0.2em] text-clay hover:text-ink-400 transition-colors duration-500">文档</a>
-                <a href="#" class="text-xs tracking-[0.2em] text-clay hover:text-ink-400 transition-colors duration-500">GitHub</a>
-                <a href="#" class="text-xs tracking-[0.2em] text-clay hover:text-ink-400 transition-colors duration-500">社区</a>
+                <a href="docs.html" class="text-xs tracking-[0.2em] text-gold hover:text-ink-400 transition-colors duration-500">典</a>
+                <a href="#" class="text-xs tracking-[0.2em] text-gold hover:text-ink-400 transition-colors duration-500">源</a>
+                <a href="#" class="text-xs tracking-[0.2em] text-gold hover:text-ink-400 transition-colors duration-500">社</a>
             </div>
         </div>
-        <div class="text-center mt-12 text-xs text-clay/60 tracking-widest">
-            © 2026 ECHO. 动态数字生命
+        <div class="text-center mt-12 text-xs text-gold/60 tracking-widest">
+            © 2026 ECHO · 万物有灵，皆可生长
         </div>
     </footer>
 
     <script>
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('is-scrolled');
+            } else {
+                navbar.classList.remove('is-scrolled');
+            }
+        });
+        
         // 滚动淡入动画
         const observerOptions = {
             threshold: 0.1,
@@ -803,11 +1120,10 @@
         // 按钮点击反馈
         document.querySelectorAll('.btn-ceramic').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                // 创建涟漪效果
                 const ripple = document.createElement('span');
                 ripple.style.cssText = `
                     position: absolute;
-                    background: rgba(139, 58, 58, 0.2);
+                    background: rgba(160, 48, 32, 0.2);
                     border-radius: 50%;
                     transform: scale(0);
                     animation: ripple 0.6s ease-out;
