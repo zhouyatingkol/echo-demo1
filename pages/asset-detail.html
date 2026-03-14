@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资产详情 — ECHO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@200;300;400;500&family=LXGW+WenKai:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Noto Serif SC', 'Cormorant Garamond', 'serif'],
+                        display: ['LXGW WenKai', 'Noto Serif SC', 'serif'],
+                    },
+                    colors: {
+                        // 宣纸底色
+                        'paper': '#f7f4ed',
+                        'paper-deep': '#f0ece3',
+                        // 四阶墨色
+                        'ink-100': '#5a5248',
+                        'ink-200': '#3d3832',
+                        'ink-300': '#2a2622',
+                        'ink-400': '#1a1a1a',
+                        // 暗朱红印章
+                        'seal': '#8b3a3a',
+                        'seal-light': '#a85d5d',
+                        // 宋瓷色调
+                        'celadon': '#c5d1c8',
+                        'celadon-deep': '#9eb0a2',
+                        'ru-blue': '#a8c4c9',
+                        'gold': '#b8944f',
+                        'clay': '#9e8b76',
+                    },
+                    animation: {
+                        'breathe': 'breathe 12s ease-in-out infinite',
+                        'seal-pulse': 'sealPulse 12s ease-in-out infinite',
+                        'fade-up': 'fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        breathe: {
+                            '0%, 100%': { opacity: '0.85' },
+                            '50%': { opacity: '1' },
+                        },
+                        sealPulse: {
+                            '0%, 100%': { transform: 'scale(1)', opacity: '0.9' },
+                            '50%': { transform: 'scale(1.02)', opacity: '1' },
+                        },
+                        fadeUp: {
+                            from: { opacity: '0', transform: 'translateY(30px)' },
+                            to: { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
+            background: #f7f4ed;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 宣纸纹理 */
+        .paper-texture {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.4;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        /* 竹简纹理背景 */
+        .bamboo-texture {
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 48px,
+                rgba(139, 58, 58, 0.03) 48px,
+                rgba(139, 58, 58, 0.03) 50px
+            );
+        }
+        
+        /* 宋瓷质感卡片 */
+        .celadon-card {
+            background: linear-gradient(135deg, #faf9f7 0%, #f5f3ef 100%);
+            border: 0.5px solid rgba(158, 139, 118, 0.15);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .celadon-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(197, 209, 200, 0.1) 0%, transparent 50%, rgba(197, 209, 200, 0.05) 100%);
+            pointer-events: none;
+        }
+        
+        .celadon-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(26, 26, 26, 0.06);
+            border-color: rgba(158, 139, 118, 0.25);
+        }
+        
+        /* 共生印章样式 */
+        .seal-mark {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #8b3a3a;
+            color: #8b3a3a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            position: relative;
+            animation: sealPulse 12s ease-in-out infinite;
+        }
+        
+        .seal-mark::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 0.5px solid rgba(139, 58, 58, 0.3);
+        }
+        
+        .seal-mark .char-top {
+            font-size: 0.85rem;
+            margin-bottom: 0.1rem;
+        }
+        
+        .seal-mark .char-bottom {
+            font-size: 1.1rem;
+        }
+        
+        /* 四权卡片 */
+        .right-card {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 0.5px solid rgba(158, 139, 118, 0.1);
+            background: rgba(247, 244, 237, 0.5);
+        }
+        
+        .right-card:hover {
+            background: rgba(197, 209, 200, 0.15);
+            border-color: rgba(158, 139, 118, 0.3);
+        }
+        
+        .right-card.active {
+            background: rgba(139, 58, 58, 0.05);
+            border-color: rgba(139, 58, 58, 0.2);
+        }
+        
+        .right-card.active .right-icon {
+            color: #8b3a3a;
+        }
+        
+        .right-icon {
+            font-size: 1.5rem;
+            color: #9e8b76;
+            margin-bottom: 1rem;
+            transition: all 0.8s ease;
+        }
+        
+        .right-name {
+            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.15em;
+            color: #3d3832;
+            margin-bottom: 0.5rem;
+        }
+        
+        .right-desc {
+            font-size: 0.75rem;
+            color: #7a6e5f;
+            letter-spacing: 0.05em;
+        }
+        
+        /* 竹简时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: repeating-linear-gradient(
+                to bottom,
+                #9e8b76 0px,
+                #9e8b76 8px,
+                transparent 8px,
+                transparent 16px
+            );
+            opacity: 0.4;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 3rem;
+            transition: all 0.8s ease;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -44px;
+            top: 0.5rem;
+            width: 10px;
+            height: 10px;
+            background: #f7f4ed;
+            border: 1.5px solid #8b3a3a;
+            border-radius: 50%;
+            transition: all 0.8s ease;
+        }
+        
+        .timeline-item:hover::before {
+            background: #8b3a3a;
+            transform: scale(1.2);
+        }
+        
+        .timeline-date {
+            font-size: 0.7rem;
+            color: #9e8b76;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-title {
+            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            color: #2a2622;
+            margin-bottom: 0.3rem;
+        }
+        
+        .timeline-desc {
+            font-size: 0.8rem;
+            color: #5a5248;
+            line-height: 1.8;
+        }
+        
+        /* 宋瓷质感按钮 */
+        .btn-ceramic {
+            padding: 1rem 3rem;
+            border: 0.5px solid rgba(158, 139, 118, 0.3);
+            background: linear-gradient(135deg, #faf9f7 0%, #f0ece3 100%);
+            font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            color: #3d3832;
+            cursor: pointer;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+        
+        .btn-ceramic::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #8b3a3a;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: -1;
+        }
+        
+        .btn-ceramic:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        .btn-ceramic:hover {
+            color: #f7f4ed;
+            border-color: rgba(139, 58, 58, 0.5);
+            letter-spacing: 0.35em;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8b3a3a 0%, #a85d5d 100%);
+            color: #f7f4ed;
+            border-color: rgba(139, 58, 58, 0.5);
+        }
+        
+        .btn-primary::before {
+            background: #1a1a1a;
+        }
+        
+        .btn-primary:hover {
+            color: #f7f4ed;
+        }
+        
+        /* 权属图谱 */
+        .graph-container {
+            position: relative;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .graph-node {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #faf9f7 0%, #f0ece3 100%);
+            border: 1px solid rgba(158, 139, 118, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            color: #5a5248;
+            position: relative;
+            transition: all 0.8s ease;
+            cursor: pointer;
+        }
+        
+        .graph-node:hover {
+            transform: scale(1.1);
+            border-color: #8b3a3a;
+            box-shadow: 0 10px 40px rgba(139, 58, 58, 0.1);
+        }
+        
+        .graph-node.current {
+            background: linear-gradient(135deg, rgba(139, 58, 58, 0.1) 0%, rgba(139, 58, 58, 0.05) 100%);
+            border-color: #8b3a3a;
+        }
+        
+        .graph-node .node-label {
+            font-family: 'LXGW WenKai', serif;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+        
+        .graph-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #9e8b76, transparent);
+            opacity: 0.4;
+        }
+        
+        /* 渐变文字 */
+        .gradient-text {
+            background: linear-gradient(135deg, #1a1a1a 0%, #5a5248 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 淡入动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .fade-in.visible {
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        
+        /* 分隔线 */
+        .divider-ink {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #9e8b76, transparent);
+            margin: 2rem 0;
+            opacity: 0.5;
+        }
+        
+        /* 回纹装饰 */
+        .huiwen-pattern {
+            width: 100px;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h10v10H0zM10 10h10v10H10z' fill='%238b3a3a' fill-opacity='0.3'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            opacity: 0.6;
+        }
+        
+        /* NFT 信息卡片 */
+        .nft-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 0.5px solid rgba(158, 139, 118, 0.15);
+        }
+        
+        .nft-info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .nft-info-label {
+            font-size: 0.8rem;
+            color: #9e8b76;
+            letter-spacing: 0.1em;
+        }
+        
+        .nft-info-value {
+            font-size: 0.85rem;
+            color: #2a2622;
+            letter-spacing: 0.05em;
+            font-family: 'LXGW WenKai', serif;
+        }
+        
+        /* 资产预览图容器 */
+        .asset-preview {
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+            background: linear-gradient(135deg, #f0ece3 0%, #e8e2d6 100%);
+            aspect-ratio: 1;
+        }
+        
+        .asset-preview::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(26, 26, 26, 0.03) 100%);
+            pointer-events: none;
+        }
+        
+        .asset-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #9e8b76;
+        }
+        
+        .asset-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .asset-placeholder .text {
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+        }
+        
+        @media (max-width: 768px) {
+            .seal-mark {
+                width: 60px;
+                height: 60px;
+            }
+            .seal-mark .char-top { font-size: 0.65rem; }
+            .seal-mark .char-bottom { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-texture"></div>
+    
+    <!-- 顶部导航 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 px-[5vw] py-6 flex justify-between items-center" style="background: linear-gradient(to bottom, rgba(247,244,237,0.98), rgba(247,244,237,0.9));">
+        <a href="index.html" class="font-display text-lg tracking-[0.3em] text-ink-400 no-underline font-light">ECHO</a>
+        <div class="flex gap-8">
+            <a href="market.html" class="text-sm tracking-widest text-ink-100 hover:text-ink-400 transition-all duration-800 relative group">
+                市场
+                <span class="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-gold transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="creator.html" class="text-sm tracking-widest text-ink-100 hover:text-ink-400 transition-all duration-800 relative group">
+                创作
+                <span class="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-gold transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="docs.html" class="text-sm tracking-widest text-ink-100 hover:text-ink-400 transition-all duration-800 relative group">
+                文档
+                <span class="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-gold transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="profile.html" class="text-sm tracking-widest text-seal border border-seal/30 px-4 py-1 rounded-sm hover:bg-seal hover:text-paper transition-all duration-500">登录</a>
+        </div>
+    </nav>
+
+    <!-- Hero 区 -->
+    <section class="min-h-screen pt-32 pb-20 px-[8vw] relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            <!-- 左侧：资产预览图 -->
+            <div class="fade-in">
+                <div class="asset-preview shadow-2xl">
+                    <div class="asset-placeholder">
+                        <div class="icon">◈</div>
+                        <div class="text">资产预览</div>
+                    </div>
+                </div>
+                
+                <!-- 缩略图列表 -->
+                <div class="flex gap-3 mt-4">
+                    <div class="w-16 h-16 bg-paper-deep border border-clay/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
+                    <div class="w-16 h-16 bg-paper-deep border border-clay/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
+                    <div class="w-16 h-16 bg-paper-deep border border-clay/20 rounded-sm cursor-pointer hover:border-seal/50 transition-all duration-500"></div>
+                </div>
+            </div>
+            
+            <!-- 右侧：资产信息 -->
+            <div class="relative">
+                <!-- 共生印章 -->
+                <div class="absolute -top-4 -right-4 lg:right-0">
+                    <div class="seal-mark">
+                        <span class="char-top">共</span>
+                        <span class="char-bottom">生</span>
+                    </div>
+                </div>
+                
+                <div class="fade-in delay-100">
+                    <div class="text-xs tracking-[0.4em] text-clay mb-4">数字艺术作品</div>
+                    <h1 class="font-display text-4xl lg:text-5xl tracking-[0.15em] text-ink-400 mb-6 leading-tight">
+                        山水清音
+                    </h1>
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-celadon to-celadon-deep flex items-center justify-center text-white text-sm">
+                            墨
+                        </div>
+                        <div>
+                            <div class="text-sm text-ink-200 tracking-widest">创作者</div>
+                            <div class="text-base text-ink-400 tracking-wide">墨客</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="divider-ink fade-in delay-200"></div>
+                
+                <div class="fade-in delay-200 mb-8">
+                    <p class="text-ink-100 leading-loose tracking-wide text-sm">
+                        此作品以水墨山水为灵感，融合现代数字艺术技法，呈现东方美学的当代表达。每一笔皆蕴含山水之灵，每一色都承载着诗意栖居的向往。
+                    </p>
+                </div>
+                
+                <div class="fade-in delay-300 flex items-baseline gap-2 mb-8">
+                    <span class="text-3xl font-display text-seal tracking-wider">2,880</span>
+                    <span class="text-sm text-clay tracking-widest">ECHO</span>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="fade-in delay-400 flex gap-4">
+                    <button class="btn-ceramic btn-primary">缘起</button>
+                    <button class="btn-ceramic">播种</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 确权信息区 -->
+    <section class="py-20 px-[8vw] bg-paper-deep relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <div class="text-xs tracking-[0.5em] text-clay mb-4">VERIFICATION</div>
+                <h2 class="font-display text-3xl tracking-[0.2em] text-ink-400">确权信息</h2>
+                <div class="huiwen-pattern mx-auto mt-6"></div>
+            </div>
+            
+            <!-- 四权配置 -->
+            <div class="celadon-card p-8 lg:p-12 mb-12 fade-in delay-100">
+                <h3 class="font-display text-xl tracking-[0.15em] text-ink-300 mb-8 text-center">四权配置</h3>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="right-card active">
+                        <div class="right-icon">◉</div>
+                        <div class="right-name">使用权</div>
+                        <div class="right-desc">个人欣赏<br>非商业使用</div>
+                    </div>
+                    <div class="right-card active">
+                        <div class="right-icon">◎</div>
+                        <div class="right-name">衍生权</div>
+                        <div class="right-desc">二次创作<br> remix 授权</div>
+                    </div>
+                    <div class="right-card">
+                        <div class="right-icon">○</div>
+                        <div class="right-name">扩展权</div>
+                        <div class="right-desc">商业使用<br>品牌联名</div>
+                    </div>
+                    <div class="right-card active">
+                        <div class="right-icon">◈</div>
+                        <div class="right-name">收益权</div>
+                        <div class="right-desc">流转分成<br>收益共享</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- License NFT 信息 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="celadon-card p-8 fade-in delay-200">
+                    <h3 class="font-display text-lg tracking-[0.15em] text-ink-300 mb-6">License NFT</h3>
+                    
+                    <div class="nft-info-row">
+                        <span class="nft-info-label">合约地址</span>
+                        <span class="nft-info-value">0x7a23...8f91</span>
+                    </div>
+                    <div class="nft-info-row">
+                        <span class="nft-info-label">Token ID</span>
+                        <span class="nft-info-value">#8848</span>
+                    </div>
+                    <div class="nft-info-row">
+                        <span class="nft-info-label">标准协议</span>
+                        <span class="nft-info-value">ERC-6551</span>
+                    </div>
+                    <div class="nft-info-row">
+                        <span class="nft-info-label">铸造时间</span>
+                        <span class="nft-info-value">2026.03.12</span>
+                    </div>
+                    <div class="nft-info-row">
+                        <span class="nft-info-label">区块链</span>
+                        <span class="nft-info-value">Ethereum</span>
+                    </div>
+                </div>
+                
+                <!-- 权属图谱 -->
+                <div class="celadon-card p-8 fade-in delay-300">
+                    <h3 class="font-display text-lg tracking-[0.15em] text-ink-300 mb-6">权属图谱</h3>
+                    
+                    <div class="graph-container">
+                        <!-- 父节点 -->
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                            <div class="graph-node">
+                                <span>源</span>
+                                <span class="node-label">母本</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 连接线 -->
+                        <div class="graph-line w-24 left-24 top-1/2"></div>
+                        
+                        <!-- 当前节点 -->
+                        <div class="graph-node current z-10">
+                            <span class="text-seal">本</span>
+                            <span class="node-label text-seal">当前</span>
+                        </div>
+                        
+                        <!-- 连接线 -->
+                        <div class="graph-line w-24 right-24 top-1/2"></div>
+                        
+                        <!-- 子节点占位 -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                            <div class="graph-node opacity-50">
+                                <span>?</span>
+                                <span class="node-label">待生</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-xs text-clay tracking-widest">本作品源自「山水系列」母本</p>
+                        <p class="text-xs text-clay tracking-widest mt-1">尚无二度衍生作品</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 流转历史区 -->
+    <section class="py-20 px-[8vw] bamboo-texture relative z-10">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <div class="text-xs tracking-[0.5em] text-clay mb-4">PROVENANCE</div>
+                <h2 class="font-display text-3xl tracking-[0.2em] text-ink-400">流转历史</h2>
+                <div class="huiwen-pattern mx-auto mt-6"></div>
+            </div>
+            
+            <div class="celadon-card p-8 lg:p-12 fade-in delay-100">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">2026.03.12 14:32</div>
+                        <div class="timeline-title">铸造诞生</div>
+                        <div class="timeline-desc">创作者「墨客」在 ECHO 平台完成作品铸造，生成唯一 License NFT</div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">2026.03.12 15:08</div>
+                        <div class="timeline-title">首发定价</div>
+                        <div class="timeline-desc">作品进入市场，初始定价 2,880 ECHO</div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">当前</div>
+                        <div class="timeline-title">待缘起</div>
+                        <div class="timeline-desc">作品正在市场中等待第一位收藏者</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 流转统计 -->
+            <div class="grid grid-cols-3 gap-4 mt-8 fade-in delay-200">
+                <div class="text-center p-6">
+                    <div class="font-display text-2xl text-ink-300 mb-2">1</div>
+                    <div class="text-xs text-clay tracking-widest">持有次数</div>
+                </div>
+                <div class="text-center p-6">
+                    <div class="font-display text-2xl text-ink-300 mb-2">0</div>
+                    <div class="text-xs text-clay tracking-widest">流转次数</div>
+                </div>
+                <div class="text-center p-6">
+                    <div class="font-display text-2xl text-seal mb-2">2,880</div>
+                    <div class="text-xs text-clay tracking-widest">当前价格</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 操作区 -->
+    <section class="py-20 px-[8vw] bg-paper-deep relative z-10">
+        <div class="max-w-2xl mx-auto text-center">
+            <div class="fade-in">
+                <div class="seal-mark mx-auto mb-8">
+                    <span class="char-top">待</span>
+                    <span class="char-bottom">缘</span>
+                </div>
+                
+                <h2 class="font-display text-2xl tracking-[0.2em] text-ink-400 mb-4">缘起此作</h2>
+                <p class="text-ink-100 tracking-wide mb-8 text-sm leading-loose">
+                    每一次缘起，都是一场与艺术的相遇。<br>
+                    此作品等待有缘人，共同开启新的篇章。
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="btn-ceramic btn-primary text-base px-12 py-4">
+                        <span class="mr-2">◈</span> 缘起 — 2,880 ECHO
+                    </button>
+                    <button class="btn-ceramic text-base px-12 py-4">
+                        <span class="mr-2">◉</span> 播种衍生
+                    </button>
+                </div>
+                
+                <div class="mt-12 text-xs text-clay tracking-widest">
+                    <p>缘起后您将获得该作品的完整四权配置</p>
+                    <p class="mt-2">每次流转，创作者将获得 5% 版税收益</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="py-16 px-[8vw] border-t border-clay/10 relative z-10">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="font-display text-lg tracking-[0.5em] text-ink-400">ECHO</div>
+            <div class="flex gap-8">
+                <a href="docs.html" class="text-xs tracking-[0.2em] text-clay hover:text-ink-400 transition-colors duration-500">文档</a>
+                <a href="#" class="text-xs tracking-[0.2em] text-clay hover:text-ink-400 transition-colors duration-500">GitHub</a>
+                <a href="#" class="text-xs tracking-[0.2em] text-clay hover:text-ink-400 transition-colors duration-500">社区</a>
+            </div>
+        </div>
+        <div class="text-center mt-12 text-xs text-clay/60 tracking-widest">
+            © 2026 ECHO. 动态数字生命
+        </div>
+    </footer>
+
+    <script>
+        // 滚动淡入动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // 四权卡片悬停效果
+        document.querySelectorAll('.right-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // 按钮点击反馈
+        document.querySelectorAll('.btn-ceramic').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // 创建涟漪效果
+                const ripple = document.createElement('span');
+                ripple.style.cssText = `
+                    position: absolute;
+                    background: rgba(139, 58, 58, 0.2);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+        
+        // 添加涟漪动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
