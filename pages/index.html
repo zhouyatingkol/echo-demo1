@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
     <link href="../assets/fonts/local-fonts.css" rel="stylesheet">
+    <link href="../css/navbar.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -583,25 +584,56 @@
     <div class="side-mark">ECHO</div>
     <div class="side-mark">ECHO</div>
 
-    <!-- 顶部导航 -->
-    <nav style="position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 2rem 5vw; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(247,244,237,0.95), transparent);">
-        <a href="index.html" style="font-family: 'Noto Serif SC', serif; font-size: 1.1rem; letter-spacing: 0.3em; color: #1a1a1a; text-decoration: none; font-weight: 300;">ECHO</a>
-        <div style="display: flex; gap: 3rem;">
-            <a href="market/market.html" style="font-size: 0.9rem; letter-spacing: 0.12em; color: #7a6e5f; text-decoration: none; transition: all 0.3s; position: relative;">
-                市场
-                <span style="position: absolute; bottom: -4px; left: 0; width: 0; height: 0.5px; background: #b8944f; transition: width 0.3s;"></span>
-            </a>
-            <a href="creator/creator.html" style="font-size: 0.9rem; letter-spacing: 0.12em; color: #7a6e5f; text-decoration: none; transition: all 0.3s; position: relative;">
-                创作
-                <span style="position: absolute; bottom: -4px; left: 0; width: 0; height: 0.5px; background: #b8944f; transition: width 0.3s;"></span>
-            </a>
-            <a href="docs.html" style="font-size: 0.9rem; letter-spacing: 0.12em; color: #7a6e5f; text-decoration: none; transition: all 0.3s; position: relative;">
-                文档
-                <span style="position: absolute; bottom: -4px; left: 0; width: 0; height: 0.5px; background: #b8944f; transition: width 0.3s;"></span>
-            </a>
-            <a href="user/profile.html" style="font-size: 0.85rem; letter-spacing: 0.1em; color: #b8944f; text-decoration: none; transition: all 0.3s; padding: 0.4rem 1.2rem; border: 0.5px solid #b8944f; border-radius: 2px;">
-                登录
-            </a>
+    <!-- 顶部导航 - 东方美学 -->
+    <nav class="navbar" id="navbar" role="navigation" aria-label="主导航">
+        <div class="navbar__water-ripple" aria-hidden="true"></div>
+        
+        <a href="/" class="navbar__brand" aria-label="返回首页">
+            <span class="navbar__logo">ECHO</span>
+        </a>
+        
+        <div class="navbar__nav">
+            <a href="index.html" class="navbar__link" aria-current="page">境</a>
+            <a href="marketplace.html" class="navbar__link">西市</a>
+            <a href="docs.html" class="navbar__link">典</a>
+        </div>
+        
+        <div class="navbar__actions">
+            <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包">
+                <span class="navbar__user-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span>入链</span>
+            </button>
+            
+            <button class="navbar__user navbar__user--connected" id="userMenu" type="button" aria-label="打开用户菜单" style="display: none;">
+                <img src="" alt="" class="navbar__user-avatar" id="userAvatar">
+                <span id="userName">吾</span>
+            </button>
+        </div>
+        
+        <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+        </button>
+        
+        <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">西市</a>
+            <a href="docs.html" class="navbar__link">典</a>
+            <button class="navbar__user" id="mobileConnectWallet" type="button">
+                <span class="navbar__user-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span>入链</span>
+            </button>
         </div>
     </nav>
 
