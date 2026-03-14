@@ -130,6 +130,15 @@ npx hardhat verify --network qitmeerTestnet <address>
 - 提现到部署钱包
 - 建议准备 5-10 MEER（包含 Gas 费用）
 
+**当前 ECHO 部署钱包**（雨娃）：
+```
+地址: 0xD9B32068A1B316A5D26Ae50DADD7527F3a1fa3C2
+网络: MEER 主网 (Chain ID: 813)
+用途: ECHO Protocol 合约部署与测试
+```
+
+> 提示: 如需给雨娃充值 MEER，转账到上述地址即可。
+
 #### 2. 最终检查清单
 
 - [ ] 合约已通过完整测试
