@@ -1,93 +1,126 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔥 热门榜单 - ECHO Music</title>
+  <title>榜 - ECHO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&family=LXGW+WenKai:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/styles/xuanzhi-theme.css">
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="../../frontend/js/i18n.js" defer></script>
+  <script src="../../frontend/js/wallet-state.js" defer></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { background: #0a0a0a; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-      color: #fff;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    
-    /* 暗色主题容器 */
-    .charts-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    h1 {
+    /* 页面特定样式 */
+    .page-header {
+      padding: 60px 0 40px;
       text-align: center;
-      margin-bottom: 30px;
-      font-size: 32px;
-      background: linear-gradient(90deg, #ff6b6b, #ffd700);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    }
+    
+    .page-title {
+      font-family: var(--font-wenkai);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+    }
+    
+    .page-subtitle {
+      font-size: 1rem;
+      color: var(--ink-light);
     }
     
     /* 榜单类型标签 */
     .chart-tabs {
       display: flex;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       flex-wrap: wrap;
       justify-content: center;
     }
     
     .chart-tab {
-      padding: 12px 24px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 25px;
+      padding: 10px 24px;
+      background: var(--bg-card);
+      border: 1px solid rgba(122, 110, 95, 0.15);
+      font-family: var(--font-serif);
+      font-size: 0.9rem;
+      color: var(--ink-light);
       cursor: pointer;
-      transition: all 0.3s ease;
-      border: 1px solid transparent;
+      transition: all var(--transition-fast);
     }
     
     .chart-tab:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.2);
+      border-color: var(--gold-primary);
+      color: var(--ink-deep);
     }
     
     .chart-tab.active {
-      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-      border-color: transparent;
-      box-shadow: 0 4px 15px rgba(0,212,255,0.3);
+      background: var(--seal-red);
+      border-color: var(--seal-red);
+      color: white;
     }
     
     /* 时间筛选 */
     .time-filter {
       display: flex;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       justify-content: center;
     }
     
     .time-btn {
       padding: 8px 20px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      color: #888;
+      background: transparent;
+      border: 1px solid rgba(122, 110, 95, 0.2);
+      font-family: var(--font-serif);
+      font-size: 0.85rem;
+      color: var(--ink-light);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all var(--transition-fast);
     }
     
     .time-btn:hover {
-      background: rgba(255,255,255,0.1);
-      color: #ccc;
+      border-color: var(--gold-primary);
+      color: var(--ink-deep);
     }
     
     .time-btn.active {
-      background: rgba(0,212,255,0.2);
-      border-color: #00d4ff;
-      color: #00d4ff;
+      background: var(--gold-faint);
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+    }
+    
+    /* 连接钱包提示 */
+    .connect-prompt {
+      text-align: center;
+      padding: 80px 20px;
+      background: var(--bg-secondary);
+      border: 1px dashed rgba(122, 110, 95, 0.2);
+    }
+    
+    .connect-prompt-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    
+    .connect-prompt p {
+      color: var(--ink-light);
+      margin-bottom: 24px;
+    }
+    
+    .connect-btn {
+      padding: 12px 32px;
+      background: var(--seal-red);
+      border: none;
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      color: white;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    
+    .connect-btn:hover {
+      background: #802820;
     }
     
     /* 榜单头部 */
@@ -95,36 +128,34 @@
       display: flex;
       align-items: center;
       padding: 16px 24px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 12px 12px 0 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      font-size: 14px;
-      color: #888;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid rgba(122, 110, 95, 0.1);
+      font-size: 0.85rem;
+      color: var(--ink-light);
     }
     
     .header-rank { width: 60px; text-align: center; }
     .header-info { flex: 1; }
     .header-stats { width: 150px; text-align: center; }
-    .header-score { width: 120px; text-align: center; }
+    .header-score { width: 100px; text-align: center; }
     
     /* 榜单列表 */
     .chart-list {
-      background: rgba(255,255,255,0.05);
-      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid rgba(122, 110, 95, 0.1);
       overflow: hidden;
-      margin-bottom: 30px;
     }
     
     .chart-item {
       display: flex;
       align-items: center;
       padding: 16px 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      transition: background 0.2s ease;
+      border-bottom: 1px solid rgba(122, 110, 95, 0.06);
+      transition: background var(--transition-fast);
     }
     
     .chart-item:hover {
-      background: rgba(255,255,255,0.08);
+      background: var(--bg-secondary);
     }
     
     .chart-item:last-child {
@@ -134,26 +165,26 @@
     /* 排名样式 */
     .rank {
       width: 60px;
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 1.25rem;
+      font-weight: 600;
       text-align: center;
-      color: #00d4ff;
+      color: var(--ink-medium);
+      font-family: var(--font-wenkai);
     }
     
     .rank.top1 {
-      color: #ffd700;
-      font-size: 28px;
-      text-shadow: 0 0 10px rgba(255,215,0,0.5);
+      color: var(--gold-primary);
+      font-size: 1.5rem;
     }
     
     .rank.top2 {
-      color: #c0c0c0;
-      font-size: 26px;
+      color: var(--ink-medium);
+      font-size: 1.4rem;
     }
     
     .rank.top3 {
-      color: #cd7f32;
-      font-size: 24px;
+      color: #A67C52;
+      font-size: 1.3rem;
     }
     
     /* 音乐信息 */
@@ -167,13 +198,12 @@
     .music-cover {
       width: 56px;
       height: 56px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #00d4ff20, #7b2cbf20);
+      background: var(--bg-tertiary);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 1.5rem;
+      border: 1px solid rgba(122, 110, 95, 0.1);
     }
     
     .music-details {
@@ -181,29 +211,31 @@
     }
     
     .music-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: #fff;
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--ink-deep);
     }
     
     .music-meta {
-      font-size: 13px;
-      color: #888;
+      font-size: 0.8rem;
+      color: var(--ink-light);
       display: flex;
       gap: 12px;
       align-items: center;
     }
     
     .music-artist {
-      color: #00d4ff;
+      color: var(--gold-primary);
     }
     
     .genre-tag {
-      background: rgba(123,44,191,0.3);
+      display: inline-block;
       padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
+      font-size: 0.7rem;
+      background: var(--gold-faint);
+      color: var(--gold-primary);
+      border: 1px solid rgba(184, 155, 108, 0.3);
     }
     
     /* 统计数据 */
@@ -212,8 +244,8 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      font-size: 12px;
-      color: #888;
+      font-size: 0.75rem;
+      color: var(--ink-light);
       text-align: center;
     }
     
@@ -224,334 +256,157 @@
     }
     
     .stat-value {
-      color: #fff;
+      color: var(--ink-deep);
       font-weight: 500;
     }
     
     /* 热度分数 */
     .hot-score {
-      width: 120px;
+      width: 100px;
       text-align: center;
-      font-weight: bold;
-      font-size: 16px;
-    }
-    
-    .hot-score.high {
-      color: #ff4757;
-    }
-    
-    .hot-score.medium {
-      color: #ffa502;
-    }
-    
-    .hot-score.low {
-      color: #2ed573;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--seal-red);
+      font-family: var(--font-wenkai);
     }
     
     /* 加载和空状态 */
     .loading {
       text-align: center;
       padding: 60px 20px;
-      color: #888;
+      color: var(--ink-light);
     }
     
     .empty-state {
       text-align: center;
       padding: 60px 20px;
-      color: #888;
+      color: var(--ink-light);
     }
     
     .empty-state-icon {
-      font-size: 48px;
+      font-size: 3rem;
       margin-bottom: 16px;
-    }
-    
-    /* 连接钱包提示 */
-    .connect-prompt {
-      text-align: center;
-      padding: 60px 20px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 16px;
-      margin: 20px 0;
-    }
-    
-    .connect-btn {
-      margin-top: 20px;
-      padding: 14px 32px;
-      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      transition: opacity 0.3s;
-    }
-    
-    .connect-btn:hover {
-      opacity: 0.9;
     }
     
     /* 响应式 */
     @media (max-width: 768px) {
       .chart-header { display: none; }
       .stats-info { display: none; }
-      .header-stats { display: none; }
+      .rank { width: 40px; font-size: 1.1rem; }
+      .rank.top1 { font-size: 1.3rem; }
+      .hot-score { width: 70px; font-size: 0.85rem; }
       .chart-tabs { gap: 8px; }
-      .chart-tab { padding: 10px 16px; font-size: 14px; }
-      .rank { width: 40px; font-size: 20px; }
-      .rank.top1 { font-size: 24px; }
-      .hot-score { width: 80px; font-size: 14px; }
+      .chart-tab { padding: 8px 16px; font-size: 0.85rem; }
     }
   </style>
-  <script src="../../frontend/js/theme-switcher.js" defer></script>
-  <script src="../../frontend/js/i18n.js" defer></script>
-  <link rel="stylesheet" href="frontend/css/global.css">
-  <link rel="stylesheet" href="frontend/css/theme.css"
-  <link rel="stylesheet" href="frontend/css/navbar.css">
-  <link rel="stylesheet" href="frontend/css/mobile.css">
-  <script src="../../frontend/js/wallet-state.js" defer></script>
-  <script>
-    // PRELOAD_THEME: Force dark theme before page render
-    document.documentElement.setAttribute("data-theme", "dark");
-  </script>
 </head>
-<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="../creator/mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">生成</a><a href="../user/dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="../user/my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
-<nav class="navbar">
-  <div class="nav-container">
-    <a href="../index.html" class="nav-logo">🎵 ECHO Music</a>
-    
-    <div class="nav-links">
-      <a href="discover.html" class="nav-link">发现</a>
-      <a href="music-market.html" class="nav-link">市场</a>
-      <a href="charts.html" class="nav-link">榜单</a>
-      <a href="../creator/mint-music.html" class="nav-link">生成</a>
-      <a href="dashboard-analytics.html" class="nav-link">数据</a>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar" id="navbar">
+    <a href="../index.html" class="navbar__brand">ECHO<span>·</span>榜</a>
+    <div class="navbar__nav">
+      <a href="discover.html" class="navbar__link">探</a>
+      <a href="music-market.html" class="navbar__link">集</a>
+      <a href="charts.html" class="navbar__link is-active">榜</a>
+      <a href="../creator/mint-music.html" class="navbar__link">铸</a>
+      <a href="../user/dashboard.html" class="navbar__link">境</a>
     </div>
-    
-    <div class="nav-right">
-      <button id="themeToggle" class="nav-control" onclick="toggleTheme()">🌓</button>
-      <select id="langSelect" class="nav-control" onchange="changeLanguage(this.value)">
-        <option value="zh">中文</option>
-        <option value="en">English</option>
-      </select>
-      <button id="connectBtn" class="wallet-btn">连接钱包</button>
-    </div>
-  </div>
-</nav><nav style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;">
-  <div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;">
-    <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a>
-    <div style="display: flex; gap: 8px; flex: 1;">
-      <a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
-      <a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
-      <a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
-      <a href="../creator/mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">生成</a>
-      <a href="dashboard-analytics.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">数据</a>
-    </div>
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <button id="themeToggle" onclick="toggleTheme()" style="padding: 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 16px; cursor: pointer;">🌓</button>
-      <select id="langSelect" onchange="changeLanguage(this.value)" style="padding: 8px 28px 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 13px; cursor: pointer; appearance: none; -webkit-appearance: none;">
-        <option value="zh" style="background: #1a1a2e;">中文</option>
-        <option value="en" style="background: #1a1a2e;">EN</option>
-      </select>
-      <button id="connectBtn" style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; font-weight: 500;">连接钱包</button>
-    </div>
-  </div>
-</nav>
-<div style="height: 80px;"></div><body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="../creator/mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">生成</a><a href="../user/dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="../user/my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
+    <button class="navbar__action" id="connectBtn" onclick="connectWallet()">入链</button>
+  </nav>
 
--->
-<nav style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;">
-  <div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;">
-    <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-      🎵 ECHO Music
-    </a>
-    
-    <div style="display: flex; gap: 8px; flex: 1;">
-      <a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
-      <a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
-      <a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
-      <a href="../creator/mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">生成</a>
-      <a href="dashboard-analytics.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">数据</a>
-    </div>
-    
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <button id="themeToggle" onclick="toggleTheme()" title="切换主题"
-        style="padding: 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; min-width: 40px; height: 36px;"
-        onmouseover="this.style.background='rgba(255,255,255,0.25)'" 
-        onmouseout="this.style.background='rgba(255,255,255,0.15)'">
-        🌓
-      </button>
-      
-      <select id="langSelect" onchange="changeLanguage(this.value)"
-        style="padding: 8px 28px 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 13px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"%3e%3cpolyline points=\"6 9 12 15 18 9\"%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; height: 36px;">
-        <option value="zh" style="background: #1a1a2e; color: #fff;">中文</option>
-        <option value="en" style="background: #1a1a2e; color: #fff;">EN</option>
-      </select>
-      
-      <button id="connectBtn" onclick="if(window.walletManager && walletManager.isWalletConnected()){walletManager.disconnect();}else{walletManager.connect();}"
-        style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; transition: all 0.3s; font-weight: 500; white-space: nowrap; height: 36px;"
-        onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)'" 
-        onmouseout="this.style.opacity='1'; this.style.transform='none'">
-        连接钱包
-      </button>
-    </div>
-  </div>
-</nav>
-
-<div style="height: 80px;"></div>
-  <div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;">
-    <!-- Logo -->
-    <a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-      🎵 ECHO Music
-    </a>
-    
-    <!-- 导航链接 -->
-    <div style="display: flex; gap: 8px; flex: 1;">
-      <a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">发现</a>
-      <a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">市场</a>
-      <a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">榜单</a>
-      <a href="../creator/mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">生成</a>
-      <a href="dashboard-analytics.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px; transition: all 0.3s;">数据</a>
-    </div>
-    
-    <!-- 右侧控制区 -->
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <!-- 主题切换 -->
-      <button id="themeToggle" onclick="toggleTheme()" title="切换主题"
-        style="padding: 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; min-width: 40px; height: 36px;"
-        onmouseover="this.style.background='rgba(255,255,255,0.25)'" 
-        onmouseout="this.style.background='rgba(255,255,255,0.15)'">
-        🌓
-      </button>
-      
-      <!-- 语言切换 -->
-      <select id="langSelect" onchange="changeLanguage(this.value)"
-        style="padding: 8px 28px 8px 12px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 13px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"%3e%3cpolyline points=\"6 9 12 15 18 9\"%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; height: 36px;">
-        <option value="zh" style="background: #1a1a2e; color: #fff;">中文</option>
-        <option value="en" style="background: #1a1a2e; color: #fff;">EN</option>
-      </select>
-      
-      <!-- 钱包按钮 -->
-      <button id="connectBtn" onclick="if(window.walletManager && walletManager.isWalletConnected()){walletManager.disconnect();}else{walletManager.connect();}"
-        style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; transition: all 0.3s; font-weight: 500; white-space: nowrap; height: 36px;"
-        onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)'" 
-        onmouseout="this.style.opacity='1'; this.style.transform='none'">
-        连接钱包
-      </button>
-    </div>
-  </div>
-</nav>
-
-<!-- 页面内容顶部留白 -->
-<div style="height: 80px;"></div>  <div class="charts-container">
-    <h1>🔥 热门榜单</h1>
-    
-    <!-- 榜单类型 -->
-    <div class="chart-tabs">
-      <div class="chart-tab active" data-tab="all" onclick="switchTab('all')">总榜</div>
-      <div class="chart-tab" data-tab="electronic" onclick="switchTab('electronic')">电子</div>
-      <div class="chart-tab" data-tab="rock" onclick="switchTab('rock')">摇滚</div>
-      <div class="chart-tab" data-tab="pop" onclick="switchTab('pop')">流行</div>
-      <div class="chart-tab" data-tab="new" onclick="switchTab('new')">新晋</div>
-    </div>
-    
-    <!-- 时间筛选 -->
-    <div class="time-filter">
-      <button class="time-btn" data-period="week" onclick="setPeriod('week')">本周</button>
-      <button class="time-btn active" data-period="month" onclick="setPeriod('month')">本月</button>
-      <button class="time-btn" data-period="all" onclick="setPeriod('all')">总榜</button>
-    </div>
-    
-    <!-- 连接钱包提示 -->
-    <div class="connect-prompt" id="connectPrompt">
-      <div class="empty-state-icon">🔗</div>
-      <p>连接钱包查看热门榜单</p>
-      <button class="connect-btn" id="connectBtn">连接 MetaMask</button>
-    </div>
-    
-    <!-- 榜单内容 -->
-    <div id="chartContent" style="display: none;">
-      <div class="chart-header">
-        <div class="header-rank">排名</div>
-        <div class="header-info">音乐信息</div>
-        <div class="header-stats">数据统计</div>
-        <div class="header-score">热度分</div>
+  <!-- 主内容 -->
+  <main class="main-content">
+    <div class="container">
+      <!-- 页头 -->
+      <div class="page-header">
+        <h1 class="page-title">风云榜</h1>
+        <p class="page-subtitle">音之流转，众声所归</p>
       </div>
       
-      <div class="chart-list" id="chartList">
-        <!-- 动态生成 -->
+      <!-- 榜单类型 -->
+      <div class="chart-tabs">
+        <div class="chart-tab active" data-tab="all" onclick="switchTab('all')">总榜</div>
+        <div class="chart-tab" data-tab="electronic" onclick="switchTab('electronic')">电子</div>
+        <div class="chart-tab" data-tab="rock" onclick="switchTab('rock')">摇滚</div>
+        <div class="chart-tab" data-tab="pop" onclick="switchTab('pop')">流行</div>
+        <div class="chart-tab" data-tab="new" onclick="switchTab('new')">新晋</div>
+      </div>
+      
+      <!-- 时间筛选 -->
+      <div class="time-filter">
+        <button class="time-btn" data-period="week" onclick="setPeriod('week')">本周</button>
+        <button class="time-btn active" data-period="month" onclick="setPeriod('month')">本月</button>
+        <button class="time-btn" data-period="all" onclick="setPeriod('all')">总榜</button>
+      </div>
+      
+      <!-- 连接钱包提示 -->
+      <div class="connect-prompt" id="connectPrompt">
+        <div class="connect-prompt-icon">⛓</div>
+        <p>连接钱包，观风云之势</p>
+        <button class="connect-btn" onclick="connectWallet()">入链</button>
+      </div>
+      
+      <!-- 榜单内容 -->
+      <div id="chartContent" style="display: none;">
+        <div class="chart-header">
+          <div class="header-rank">序</div>
+          <div class="header-info">音境</div>
+          <div class="header-stats">流转</div>
+          <div class="header-score">热度</div>
+        </div>
+        
+        <div class="chart-list" id="chartList">
+          <!-- 动态生成 -->
+        </div>
       </div>
     </div>
-  </div>
+  </main>
+  
+  <!-- 底部 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">ECHO · 榜</div>
+        <div class="footer-links">
+          <a href="discover.html" class="footer-link">探</a>
+          <a href="music-market.html" class="footer-link">集</a>
+          <a href="charts.html" class="footer-link">榜</a>
+        </div>
+      </div>
+      <div class="footer-copyright">留声于链，归于创作者</div>
+    </div>
+  </footer>
   
   <script>
-    // ========== 合约配置 ==========
+    // 合约配置
     const CONTRACT_ADDRESSES = {
       echoAsset: '0x5f5AAe09BB85f561b21845729B79E840AB026148',
       echoFusion: '0x3AD441ECfC193fbe7f086b962d0bCfd2Bc2Bac0d'
     };
 
-    // ABI - EchoAsset
     const ECHO_ASSET_ABI = [
       "function getAssetInfo(uint256) view returns (tuple(string,string,string,string,uint256),tuple(address,address,address,address,uint256,uint256,uint256),address)",
       "function getCurrentTokenId() view returns (uint256)",
       "function ownerOf(uint256) view returns (address)"
     ];
 
-    // 全局状态
     let provider, signer, userAddress;
     let echoAssetContract;
     let currentTab = 'all';
     let currentPeriod = 'month';
     let allMusicData = [];
 
-    // ========== 热度计算 ==========
-    function calculateHotScore(music, period) {
-      let score = 0;
-      const now = Date.now() / 1000;
-      
-      // 基础数据权重
-      // 播放次数 (权重 1)
-      score += (music.playCount || 0) * 1;
-      
-      // 购买次数 (权重 10)
-      score += (music.purchaseCount || 0) * 10;
-      
-      // 收藏次数 (权重 5)
-      score += (music.favoriteCount || 0) * 5;
-      
-      // 时间衰减因子 (越新越热)
-      const createdAt = music.createdAt || (now - 86400 * 7); // 默认1周前
-      const age = now - createdAt;
-      const days = age / 86400;
-      
-      // 根据周期调整时间衰减
-      let timeDecay;
-      switch(period) {
-        case 'week':
-          // 本周榜：7天内线性衰减
-          timeDecay = Math.max(0.1, 1 - (days / 7));
-          break;
-        case 'month':
-          // 本月榜：30天后衰减到0.3
-          timeDecay = Math.max(0.3, 1 - (days / 30));
-          break;
-        case 'all':
-        default:
-          // 总榜：90天后衰减到0.5
-          timeDecay = Math.max(0.5, 1 - (days / 90));
-          break;
+    // 导航栏滚动效果
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('is-scrolled');
+      } else {
+        navbar.classList.remove('is-scrolled');
       }
-      
-      // 新晋榜额外加成
-      if (currentTab === 'new' && days <= 7) {
-        score *= 1.5;
-      }
-      
-      return score * timeDecay;
-    }
+    });
 
-    // ========== 连接钱包 ==========
+    // 连接钱包
     async function connectWallet() {
       if (!window.ethereum) {
         alert('请先安装 MetaMask');
@@ -564,91 +419,104 @@
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
         
-        // 初始化合约
+        document.getElementById('connectBtn').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+        
         echoAssetContract = new ethers.Contract(
           CONTRACT_ADDRESSES.echoAsset, 
           ECHO_ASSET_ABI, 
           provider
         );
         
-        // 隐藏连接提示，显示内容
         document.getElementById('connectPrompt').style.display = 'none';
         document.getElementById('chartContent').style.display = 'block';
         
-        // 加载榜单
         await loadCharts();
-        
       } catch (error) {
         console.error('连接失败:', error);
-        alert('连接失败: ' + error.message);
       }
     }
 
-    // ========== 加载榜单 ==========
+    // 热度计算
+    function calculateHotScore(music, period) {
+      let score = 0;
+      const now = Date.now() / 1000;
+      
+      score += (music.playCount || 0) * 1;
+      score += (music.purchaseCount || 0) * 10;
+      score += (music.favoriteCount || 0) * 5;
+      
+      const createdAt = music.createdAt || (now - 86400 * 7);
+      const age = now - createdAt;
+      const days = age / 86400;
+      
+      let timeDecay;
+      switch(period) {
+        case 'week':
+          timeDecay = Math.max(0.1, 1 - (days / 7));
+          break;
+        case 'month':
+          timeDecay = Math.max(0.3, 1 - (days / 30));
+          break;
+        case 'all':
+        default:
+          timeDecay = Math.max(0.5, 1 - (days / 90));
+          break;
+      }
+      
+      if (currentTab === 'new' && days <= 7) {
+        score *= 1.5;
+      }
+      
+      return score * timeDecay;
+    }
+
+    // 加载榜单
     async function loadCharts() {
       const container = document.getElementById('chartList');
-      container.innerHTML = '<div class="loading">⏳ 加载中...</div>';
+      container.innerHTML = '<div class="loading">载入中...</div>';
       
       try {
-        // 获取所有音乐数据
         const currentId = await echoAssetContract.getCurrentTokenId();
         const musicList = [];
         
         for (let i = 0; i < currentId; i++) {
           try {
             const info = await echoAssetContract.getAssetInfo(i);
-            
-            // 只处理音乐类型的资产
             const assetType = info[0][2]?.toLowerCase() || '';
+            
             if (assetType.includes('music') || assetType.includes('audio') || 
                 assetType.includes('electronic') || assetType.includes('rock') || 
                 assetType.includes('pop')) {
               
-              // 模拟数据（实际应从合约或后端获取）
               const music = {
                 tokenId: i,
-                name: info[0][0] || `音乐 #${i}`,
+                name: info[0][0] || `音境 #${i}`,
                 description: info[0][1] || '',
                 genre: extractGenre(assetType),
                 bpm: extractBpm(info[0][3]),
                 createdAt: Number(info[0][4]) || (Date.now()/1000 - Math.random()*86400*30),
-                // 模拟统计数据
                 playCount: Math.floor(Math.random() * 10000) + 100,
                 purchaseCount: Math.floor(Math.random() * 500) + 10,
                 favoriteCount: Math.floor(Math.random() * 2000) + 50,
-                artist: info[2] ? (info[2].slice(0, 6) + '...' + info[2].slice(-4)) : '未知艺术家'
+                artist: info[2] ? (info[2].slice(0, 6) + '...' + info[2].slice(-4)) : '未知创作者'
               };
               
-              // 计算热度分数
               music.hotScore = calculateHotScore(music, currentPeriod);
-              
               musicList.push(music);
             }
-          } catch (e) {
-            // 跳过无效资产
-          }
+          } catch (e) {}
         }
         
         allMusicData = musicList;
-        
-        // 过滤和排序
         const filteredList = filterAndSortMusic(musicList);
-        
-        // 渲染
         renderChartList(filteredList);
         
       } catch (error) {
         console.error('加载失败:', error);
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">⚠️</div>
-            <p>加载失败: ${error.message}</p>
-          </div>
-        `;
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠</div><p>加载失败</p></div>';
       }
     }
 
-    // 提取流派
     function extractGenre(assetType) {
       const type = assetType.toLowerCase();
       if (type.includes('electronic')) return 'electronic';
@@ -659,19 +527,15 @@
       return 'other';
     }
 
-    // 提取BPM
     function extractBpm(uri) {
-      // 从URI或描述中提取BPM
       const match = uri?.match(/(\d+)\s*bpm/i);
       return match ? parseInt(match[1]) : (Math.floor(Math.random() * 80) + 80);
     }
 
-    // ========== 过滤和排序 ==========
     function filterAndSortMusic(musicList) {
       let filtered = [...musicList];
       const now = Date.now() / 1000;
       
-      // 根据标签过滤
       switch(currentTab) {
         case 'electronic':
           filtered = filtered.filter(m => m.genre === 'electronic');
@@ -683,71 +547,43 @@
           filtered = filtered.filter(m => m.genre === 'pop');
           break;
         case 'new':
-          // 新晋：7天内发布的
           filtered = filtered.filter(m => (now - m.createdAt) <= 86400 * 7);
-          break;
-        case 'all':
-        default:
-          // 总榜：不过滤
           break;
       }
       
-      // 根据时间周期重新计算热度
       filtered.forEach(music => {
         music.hotScore = calculateHotScore(music, currentPeriod);
       });
       
-      // 按热度排序
       filtered.sort((a, b) => b.hotScore - a.hotScore);
-      
-      // 取前50
       return filtered.slice(0, 50);
     }
 
-    // ========== 渲染榜单 ==========
     function renderChartList(musicList) {
       const container = document.getElementById('chartList');
       
       if (musicList.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">🎵</div>
-            <p>暂无数据</p>
-          </div>
-        `;
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">♪</div><p>暂无音境</p></div>';
         return;
       }
       
-      // 流派图标映射
       const genreIcons = {
-        electronic: '🎹',
-        rock: '🎸',
-        pop: '🎤',
-        jazz: '🎷',
-        classical: '🎻',
-        other: '🎵'
+        electronic: '音', rock: '岩', pop: '流', jazz: '爵', classical: '典', other: '韵'
       };
       
-      // 流派名称映射
       const genreNames = {
-        electronic: '电子',
-        rock: '摇滚',
-        pop: '流行',
-        jazz: '爵士',
-        classical: '古典',
-        other: '其他'
+        electronic: '电子', rock: '摇滚', pop: '流行', jazz: '爵士', classical: '古典', other: '其他'
       };
       
       container.innerHTML = musicList.map((music, index) => {
         const rank = index + 1;
         const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
-        const scoreClass = music.hotScore > 1000 ? 'high' : music.hotScore > 500 ? 'medium' : 'low';
         
         return `
           <div class="chart-item">
             <div class="rank ${rankClass}">${rank}</div>
             <div class="music-info">
-              <div class="music-cover">${genreIcons[music.genre] || '🎵'}</div>
+              <div class="music-cover">${genreIcons[music.genre] || '♪'}</div>
               <div class="music-details">
                 <div class="music-title">${escapeHtml(music.name)}</div>
                 <div class="music-meta">
@@ -759,67 +595,46 @@
             </div>
             <div class="stats-info">
               <div class="stat-item">
-                <span>▶</span> <span class="stat-value">${formatNumber(music.playCount)}</span>
+                <span>播</span> <span class="stat-value">${formatNumber(music.playCount)}</span>
               </div>
               <div class="stat-item">
-                <span>💰</span> <span class="stat-value">${formatNumber(music.purchaseCount)}</span>
+                <span>购</span> <span class="stat-value">${formatNumber(music.purchaseCount)}</span>
               </div>
               <div class="stat-item">
-                <span>❤️</span> <span class="stat-value">${formatNumber(music.favoriteCount)}</span>
+                <span>藏</span> <span class="stat-value">${formatNumber(music.favoriteCount)}</span>
               </div>
             </div>
-            <div class="hot-score ${scoreClass}">🔥 ${Math.floor(music.hotScore)}</div>
+            <div class="hot-score">${Math.floor(music.hotScore)}</div>
           </div>
         `;
       }).join('');
     }
 
-    // ========== 切换榜单类型 ==========
     function switchTab(tab) {
       currentTab = tab;
-      
-      // 更新UI
       document.querySelectorAll('.chart-tab').forEach(el => {
         el.classList.remove('active');
-        if (el.dataset.tab === tab) {
-          el.classList.add('active');
-        }
+        if (el.dataset.tab === tab) el.classList.add('active');
       });
-      
-      // 重新过滤和渲染
       if (allMusicData.length > 0) {
-        const filtered = filterAndSortMusic(allMusicData);
-        renderChartList(filtered);
+        renderChartList(filterAndSortMusic(allMusicData));
       }
     }
 
-    // ========== 切换时间周期 ==========
     function setPeriod(period) {
       currentPeriod = period;
-      
-      // 更新UI
       document.querySelectorAll('.time-btn').forEach(el => {
         el.classList.remove('active');
-        if (el.dataset.period === period) {
-          el.classList.add('active');
-        }
+        if (el.dataset.period === period) el.classList.add('active');
       });
-      
-      // 重新计算热度并渲染
       if (allMusicData.length > 0) {
-        const filtered = filterAndSortMusic(allMusicData);
-        renderChartList(filtered);
+        renderChartList(filterAndSortMusic(allMusicData));
       }
     }
 
-    // ========== 工具函数 ==========
     function formatNumber(num) {
-      if (num >= 10000) {
-        return (num / 10000).toFixed(1) + 'w';
-      }
-      if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'k';
-      }
+      if (num >= 10000) return (num / 10000).toFixed(1) + '万';
+      if (num >= 1000) return (num / 1000).toFixed(1) + '千';
       return num.toString();
     }
 
@@ -829,38 +644,9 @@
       return div.innerHTML;
     }
 
-    // ========== 自动连接 ==========
     if (window.ethereum && window.ethereum.selectedAddress) {
       connectWallet();
     }
   </script>
 </body>
 </html>
-
-<script>
-// Theme and Language functions
-function toggleTheme() {
-  const html = document.documentElement;
-  const currentTheme = html.getAttribute('data-theme') || 'dark';
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('echo-theme', newTheme);
-}
-
-function changeLanguage(lang) {
-  localStorage.setItem('echo-locale', lang);
-  window.location.reload();
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-  // Theme
-  const savedTheme = localStorage.getItem('echo-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-  
-  // Language
-  const savedLang = localStorage.getItem('echo-locale') || 'zh';
-  const langSelect = document.getElementById('langSelect');
-  if (langSelect) langSelect.value = savedLang;
-});
-</script>

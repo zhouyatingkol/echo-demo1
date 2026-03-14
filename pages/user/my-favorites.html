@@ -3,318 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的收藏 - ECHO Music</title>
+    <title>心 - ECHO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&family=LXGW+WenKai:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/styles/xuanzhi-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="../../frontend/js/i18n.js" defer></script>
+    <script src="../../frontend/js/wallet-state.js" defer></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { padding-top: 64px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container { max-width: 1200px; margin: 0 auto; }
-        
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .nav-links {
-            display: flex;
-            gap: 24px;
-        }
-        .nav-links a {
-            color: #888;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        .nav-links a:hover { color: #00d4ff; }
-        .nav-links a.active { color: #00d4ff; }
-        .wallet-btn {
-            padding: 10px 20px;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-        }
-        .wallet-btn.connected {
-            background: rgba(0,255,0,0.2);
-            border: 1px solid #0f0;
+        body {
+            background: var(--bg-primary);
         }
         
-        /* Page Title */
+        /* 页面标题 */
+        .page-header {
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+        
         .page-title {
-            font-size: 28px;
-            margin-bottom: 8px;
+            font-family: var(--font-wenkai);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
         }
+        
         .page-subtitle {
-            color: #888;
-            margin-bottom: 30px;
+            font-size: 1rem;
+            color: var(--ink-light);
         }
         
         /* Tabs */
         .tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 12px;
+            gap: 12px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid rgba(122, 110, 95, 0.15);
+            padding-bottom: 16px;
         }
+        
         .tab {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.05);
-            border: none;
-            border-radius: 8px;
-            color: #888;
-            font-size: 14px;
+            padding: 10px 24px;
+            background: transparent;
+            border: 1px solid rgba(122, 110, 95, 0.2);
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            color: var(--ink-light);
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all var(--transition-fast);
         }
+        
         .tab:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+            border-color: var(--seal-red);
+            color: var(--seal-red);
         }
+        
         .tab.active {
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-            color: #fff;
+            background: var(--seal-red);
+            border-color: var(--seal-red);
+            color: white;
         }
         
         /* Stats Bar */
         .stats-bar {
             display: flex;
-            gap: 24px;
-            margin-bottom: 24px;
-            padding: 16px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 12px;
+            gap: 32px;
+            margin-bottom: 32px;
+            padding: 16px 24px;
+            background: var(--bg-card);
+            border: 1px solid rgba(122, 110, 95, 0.1);
         }
+        
         .stat-item {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+        
         .stat-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #00d4ff;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--seal-red);
+            font-family: var(--font-wenkai);
         }
+        
         .stat-label {
-            font-size: 12px;
-            color: #888;
+            font-size: 0.85rem;
+            color: var(--ink-light);
         }
         
         /* Create Playlist Button */
         .create-playlist-btn {
             padding: 12px 24px;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            background: var(--seal-red);
             border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
+            color: white;
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
             cursor: pointer;
             margin-bottom: 24px;
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: background var(--transition-fast);
         }
+        
         .create-playlist-btn:hover {
-            opacity: 0.9;
+            background: #802820;
         }
         
         /* Playlist Grid */
         .playlist-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
             margin-bottom: 40px;
         }
+        
         .playlist-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s;
+            background: var(--bg-card);
+            border: 1px solid rgba(122, 110, 95, 0.1);
+            padding: 20px;
             cursor: pointer;
+            transition: all var(--transition-normal);
         }
+        
         .playlist-card:hover {
-            border-color: rgba(0,212,255,0.3);
-            transform: translateY(-4px);
+            border-color: rgba(184, 155, 108, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transform: translateY(-2px);
         }
+        
         .playlist-cover {
             height: 140px;
-            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            background: var(--bg-secondary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 3rem;
             position: relative;
+            margin-bottom: 16px;
         }
+        
         .playlist-count {
             position: absolute;
             bottom: 12px;
             right: 12px;
             background: rgba(0,0,0,0.7);
             padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
+            font-size: 0.75rem;
+            color: var(--ink-light);
         }
-        .playlist-info {
-            padding: 16px;
-        }
+        
         .playlist-name {
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 500;
             margin-bottom: 8px;
+            color: var(--ink-deep);
         }
+        
         .playlist-meta {
-            font-size: 12px;
-            color: #888;
+            font-size: 0.8rem;
+            color: var(--ink-light);
         }
+        
         .playlist-actions {
             display: flex;
             gap: 8px;
             margin-top: 12px;
         }
+        
         .playlist-action-btn {
             padding: 6px 12px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 12px;
+            background: transparent;
+            border: 1px solid rgba(122, 110, 95, 0.2);
+            color: var(--ink-light);
+            font-family: var(--font-serif);
+            font-size: 0.75rem;
             cursor: pointer;
+            transition: all var(--transition-fast);
         }
+        
         .playlist-action-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: var(--bg-secondary);
+            color: var(--ink-deep);
         }
+        
         .playlist-action-btn.delete {
-            color: #ff6b6b;
+            color: var(--seal-red);
+            border-color: rgba(139, 69, 19, 0.3);
         }
+        
         .playlist-action-btn.delete:hover {
-            background: rgba(255,107,107,0.2);
+            background: rgba(139, 69, 19, 0.1);
         }
         
         /* Music Grid */
         .music-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
         }
+        
         .music-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s;
+            background: var(--bg-card);
+            border: 1px solid rgba(122, 110, 95, 0.1);
+            transition: all var(--transition-normal);
         }
+        
         .music-card:hover {
-            border-color: rgba(0,212,255,0.3);
-            transform: translateY(-4px);
+            border-color: rgba(184, 155, 108, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transform: translateY(-2px);
         }
+        
         .music-visual {
             height: 160px;
-            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            background: var(--bg-secondary);
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
         }
+        
         .waveform {
             display: flex;
             align-items: center;
             gap: 3px;
             height: 60px;
         }
+        
         .wave-bar {
             width: 4px;
-            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
+            background: var(--gold-primary);
             border-radius: 2px;
             animation: wave 1s ease-in-out infinite;
         }
+        
         @keyframes wave {
             0%, 100% { height: 20%; }
             50% { height: 100%; }
         }
+        
         .play-overlay {
             position: absolute;
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 1.25rem;
+            color: white;
             cursor: pointer;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity var(--transition-fast);
         }
+        
         .music-card:hover .play-overlay {
             opacity: 1;
         }
+        
         .music-info {
             padding: 16px;
         }
+        
         .music-title {
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 500;
             margin-bottom: 8px;
+            color: var(--ink-deep);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        
         .music-meta {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
+        
         .meta-tag {
-            font-size: 11px;
-            padding: 4px 8px;
-            background: rgba(0,212,255,0.1);
-            border-radius: 4px;
-            color: #00d4ff;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            background: rgba(139, 157, 195, 0.1);
+            color: var(--realm-sound);
         }
+        
         .music-stats {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(122, 110, 95, 0.1);
         }
+        
         .price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #0f0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gold-primary);
         }
+        
         .price-unit {
-            font-size: 12px;
-            color: #888;
+            font-size: 0.75rem;
+            color: var(--ink-light);
             font-weight: normal;
         }
+        
         .buy-btn {
             padding: 8px 16px;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            background: var(--seal-red);
             border: none;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 13px;
+            color: white;
+            font-family: var(--font-serif);
+            font-size: 0.8rem;
             cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        
+        .buy-btn:hover {
+            background: #802820;
         }
         
         /* Favorite Button */
@@ -325,19 +336,20 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.5);
             border: none;
-            color: #ff4757;
-            font-size: 18px;
+            color: var(--seal-red);
+            font-size: 1rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            transition: all var(--transition-fast);
             z-index: 10;
         }
+        
         .favorite-btn:hover {
-            background: rgba(255,71,87,0.3);
+            background: rgba(139, 69, 19, 0.3);
             transform: scale(1.1);
         }
         
@@ -345,30 +357,44 @@
         .empty-state {
             text-align: center;
             padding: 80px 20px;
-            color: #888;
+            background: var(--bg-secondary);
+            border: 1px dashed rgba(122, 110, 95, 0.2);
+            grid-column: 1 / -1;
         }
+        
         .empty-state .icon {
-            font-size: 64px;
+            font-size: 3rem;
             margin-bottom: 20px;
         }
+        
         .empty-state h3 {
-            font-size: 20px;
+            font-family: var(--font-wenkai);
+            font-size: 1.25rem;
             margin-bottom: 12px;
+            color: var(--ink-deep);
         }
+        
         .empty-state p {
-            font-size: 14px;
+            font-size: 0.9rem;
+            color: var(--ink-light);
             margin-bottom: 24px;
         }
+        
         .empty-state .btn {
             padding: 12px 24px;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            background: var(--seal-red);
             border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
+            color: white;
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            transition: background var(--transition-fast);
+        }
+        
+        .empty-state .btn:hover {
+            background: #802820;
         }
         
         /* Audio Player Fixed */
@@ -377,75 +403,98 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(10,10,26,0.95);
-            border-top: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-card);
+            border-top: 1px solid rgba(122, 110, 95, 0.15);
             padding: 16px 20px;
             display: none;
             align-items: center;
             gap: 16px;
+            z-index: 100;
         }
+        
         .player-fixed.active {
             display: flex;
         }
+        
         .player-info {
             flex: 0 0 200px;
         }
+        
         .player-title {
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 4px;
+            color: var(--ink-deep);
         }
+        
         .player-artist {
-            font-size: 12px;
-            color: #888;
+            font-size: 0.75rem;
+            color: var(--ink-light);
         }
+        
         .player-preview {
-            font-size: 11px;
-            color: #ffd700;
+            font-size: 0.7rem;
+            color: var(--gold-primary);
             margin-top: 4px;
         }
+        
         .player-controls {
             display: flex;
             align-items: center;
             gap: 16px;
         }
+        
         .control-btn {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #fff;
-            font-size: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(122, 110, 95, 0.2);
+            color: var(--ink-deep);
+            font-size: 1rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all var(--transition-fast);
         }
+        
+        .control-btn:hover {
+            background: var(--seal-red);
+            border-color: var(--seal-red);
+            color: white;
+        }
+        
         .control-btn.play {
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            background: var(--seal-red);
+            border-color: var(--seal-red);
+            color: white;
         }
+        
         .player-progress {
             flex: 1;
             display: flex;
             align-items: center;
             gap: 12px;
         }
+        
         .progress-bar {
             flex: 1;
             height: 4px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(122, 110, 95, 0.15);
             border-radius: 2px;
             cursor: pointer;
         }
+        
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            background: var(--gold-primary);
             border-radius: 2px;
             width: 0%;
         }
+        
         .time {
-            font-size: 12px;
-            color: #888;
+            font-size: 0.75rem;
+            color: var(--ink-light);
             min-width: 40px;
         }
         
@@ -457,141 +506,187 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
         }
+        
         .modal.active {
             display: flex;
         }
+        
         .modal-content {
-            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
-            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid rgba(122, 110, 95, 0.15);
             padding: 32px;
             max-width: 400px;
             width: 90%;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
         }
+        
         .modal-header {
-            font-size: 24px;
+            font-family: var(--font-wenkai);
+            font-size: 1.5rem;
             margin-bottom: 20px;
-            color: #0f0;
+            color: var(--seal-red);
         }
-        .modal-body { padding-top: 64px;
+        
+        .modal-body {
             margin-bottom: 24px;
         }
+        
         .modal-input {
             width: 100%;
             padding: 12px 16px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(122, 110, 95, 0.2);
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            color: var(--ink-deep);
             margin-bottom: 16px;
-        }
-        .modal-input:focus {
             outline: none;
-            border-color: #00d4ff;
         }
+        
+        .modal-input:focus {
+            border-color: var(--gold-primary);
+        }
+        
         .modal-buttons {
             display: flex;
             gap: 12px;
             justify-content: center;
         }
+        
         .modal-btn {
             padding: 10px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
             cursor: pointer;
+            transition: all var(--transition-fast);
         }
+        
         .modal-btn.primary {
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
-            color: #fff;
+            background: var(--seal-red);
+            color: white;
         }
+        
+        .modal-btn.primary:hover {
+            background: #802820;
+        }
+        
         .modal-btn.secondary {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+            background: transparent;
+            border: 1px solid rgba(122, 110, 95, 0.2);
+            color: var(--ink-light);
+        }
+        
+        .modal-btn.secondary:hover {
+            border-color: var(--seal-red);
+            color: var(--seal-red);
         }
         
         /* Playlist Detail View */
         .playlist-detail {
             display: none;
         }
+        
         .playlist-detail.active {
             display: block;
         }
+        
         .back-btn {
             padding: 8px 16px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
+            background: transparent;
+            border: 1px solid rgba(122, 110, 95, 0.2);
+            color: var(--ink-light);
+            font-family: var(--font-serif);
+            font-size: 0.85rem;
             cursor: pointer;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: all var(--transition-fast);
         }
+        
         .back-btn:hover {
-            background: rgba(255,255,255,0.2);
+            border-color: var(--seal-red);
+            color: var(--seal-red);
         }
+        
         .playlist-header {
             display: flex;
             gap: 24px;
             margin-bottom: 30px;
             padding: 24px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid rgba(122, 110, 95, 0.1);
         }
+        
         .playlist-header-cover {
             width: 160px;
             height: 160px;
-            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
-            border-radius: 12px;
+            background: var(--bg-secondary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 64px;
+            font-size: 4rem;
+            flex-shrink: 0;
         }
+        
         .playlist-header-info {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+        
         .playlist-header-name {
-            font-size: 28px;
-            font-weight: bold;
+            font-family: var(--font-wenkai);
+            font-size: 1.75rem;
+            font-weight: 400;
             margin-bottom: 12px;
+            color: var(--ink-deep);
         }
+        
         .playlist-header-meta {
-            color: #888;
-            font-size: 14px;
+            color: var(--ink-light);
+            font-size: 0.9rem;
             margin-bottom: 16px;
         }
+        
         .playlist-header-actions {
             display: flex;
             gap: 12px;
         }
+        
         .header-action-btn {
             padding: 10px 20px;
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            background: var(--seal-red);
             border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
+            color: white;
+            font-family: var(--font-serif);
+            font-size: 0.85rem;
             cursor: pointer;
+            transition: background var(--transition-fast);
         }
+        
+        .header-action-btn:hover {
+            background: #802820;
+        }
+        
         .header-action-btn.secondary {
-            background: rgba(255,255,255,0.1);
+            background: transparent;
+            border: 1px solid rgba(122, 110, 95, 0.2);
+            color: var(--ink-light);
         }
+        
         .header-action-btn.secondary:hover {
-            background: rgba(255,255,255,0.2);
+            border-color: var(--seal-red);
+            color: var(--seal-red);
+            background: transparent;
         }
         
         /* Music List (Vertical) */
@@ -600,158 +695,176 @@
             flex-direction: column;
             gap: 12px;
         }
+        
         .music-list-item {
             display: flex;
             align-items: center;
             gap: 16px;
             padding: 12px 16px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            transition: all 0.3s;
+            background: var(--bg-card);
+            border: 1px solid rgba(122, 110, 95, 0.1);
+            transition: all var(--transition-fast);
         }
+        
         .music-list-item:hover {
-            background: rgba(255,255,255,0.1);
+            border-color: rgba(184, 155, 108, 0.3);
         }
+        
         .music-list-number {
             width: 32px;
             text-align: center;
-            color: #888;
-            font-size: 14px;
+            color: var(--ink-light);
+            font-size: 0.9rem;
         }
+        
         .music-list-play {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #fff;
-            font-size: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(122, 110, 95, 0.2);
+            color: var(--ink-deep);
+            font-size: 1rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all var(--transition-fast);
         }
+        
         .music-list-play:hover {
-            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            background: var(--seal-red);
+            border-color: var(--seal-red);
+            color: white;
         }
+        
         .music-list-info {
             flex: 1;
         }
+        
         .music-list-title {
-            font-size: 15px;
+            font-size: 0.95rem;
             font-weight: 500;
             margin-bottom: 4px;
+            color: var(--ink-deep);
         }
+        
         .music-list-meta {
-            font-size: 12px;
-            color: #888;
+            font-size: 0.75rem;
+            color: var(--ink-light);
         }
+        
         .music-list-actions {
             display: flex;
             gap: 8px;
         }
+        
         .music-list-action {
             width: 32px;
             height: 32px;
             border-radius: 50%;
             background: transparent;
             border: none;
-            color: #888;
-            font-size: 14px;
+            color: var(--ink-light);
+            font-size: 0.9rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all var(--transition-fast);
         }
+        
         .music-list-action:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+            background: var(--bg-secondary);
+            color: var(--ink-deep);
         }
+        
         .music-list-action.remove:hover {
-            color: #ff6b6b;
+            color: var(--seal-red);
         }
     </style>
-  <script src="../../frontend/js/theme-switcher.js" defer></script>
-  <script src="../../frontend/js/i18n.js" defer></script>
-  <link rel="stylesheet" href="frontend/css/global.css"
-  <link rel="stylesheet" href="frontend/css/theme.css">
-  <link rel="stylesheet" href="frontend/css/mobile.css">
-  <script src="../../frontend/js/wallet-state.js" defer></script>
 </head>
-<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="../index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="../market/discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="../market/music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="../market/charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="../creator/mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">生成</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
-    <div class="container">
-        <div class="header">
-            <div class="logo">🎵 ECHO Music</div>
-            <div class="nav-links">
-                <a href="../creator/mint-music.html">上传音乐</a>
-                <a href="../market/music-market.html">音乐市场</a>
-                <a href="my-favorites.html" class="active">我的收藏</a>
-                <a href="my-assets.html">我的资产</a>
-            </div>
-            <button class="wallet-btn" id="connectBtn" id="connectBtn">连接钱包</button>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" id="navbar">
+        <a href="../index.html" class="navbar__brand">ECHO<span>·</span>心</a>
+        <div class="navbar__nav">
+            <a href="../market/discover.html" class="navbar__link">探</a>
+            <a href="../market/music-market.html" class="navbar__link">集</a>
+            <a href="../market/charts.html" class="navbar__link">榜</a>
+            <a href="../creator/mint-music.html" class="navbar__link">铸</a>
+            <a href="dashboard.html" class="navbar__link is-active">境</a>
         </div>
+        <button class="navbar__action" id="connectBtn" onclick="toggleWallet()">入链</button>
+    </nav>
 
-        <div id="mainView">
-            <h1 class="page-title">我的收藏</h1>
-            <p class="page-subtitle">管理您收藏的音乐和播放列表</p>
+    <!-- 主内容 -->
+    <main class="main-content">
+        <div class="container">
+            <div id="mainView">
+                <div class="page-header">
+                    <h1 class="page-title">我的心境</h1>
+                    <p class="page-subtitle">收藏所爱，自成一境</p>
+                </div>
 
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('favorites')" id="tab-favorites">❤️ 收藏音乐</button>
-                <button class="tab" onclick="switchTab('playlists')" id="tab-playlists">📋 播放列表</button>
-            </div>
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('favorites')" id="tab-favorites">收藏</button>
+                    <button class="tab" onclick="switchTab('playlists')" id="tab-playlists">列表</button>
+                </div>
 
-            <!-- Favorites View -->
-            <div id="favoritesView">
-                <div class="stats-bar">
-                    <div class="stat-item">
-                        <span class="stat-value" id="favCount">0</span>
-                        <span class="stat-label">首收藏</span>
+                <!-- Favorites View -->
+                <div id="favoritesView">
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <span class="stat-value" id="favCount">0</span>
+                            <span class="stat-label">首收藏</span>
+                        </div>
+                    </div>
+                    <div class="music-grid" id="favoritesGrid">
+                        <!-- 动态生成 -->
                     </div>
                 </div>
-                <div class="music-grid" id="favoritesGrid">
-                    <!-- 动态生成 -->
-                </div>
-            </div>
 
-            <!-- Playlists View -->
-            <div id="playlistsView" style="display: none;">
-                <button class="create-playlist-btn" onclick="showCreatePlaylistModal()">
-                    ➕ 创建播放列表
-                </button>
-                <div class="playlist-grid" id="playlistsGrid">
-                    <!-- 动态生成 -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Playlist Detail View -->
-        <div id="playlistDetailView" class="playlist-detail">
-            <button class="back-btn" onclick="backToMain()">← 返回</button>
-            <div class="playlist-header">
-                <div class="playlist-header-cover" id="detailCover">🎵</div>
-                <div class="playlist-header-info">
-                    <div class="playlist-header-name" id="detailName">--</div>
-                    <div class="playlist-header-meta" id="detailMeta">--</div>
-                    <div class="playlist-header-actions">
-                        <button class="header-action-btn" onclick="playPlaylist()">▶ 播放全部</button>
-                        <button class="header-action-btn secondary" onclick="showRenameModal()">重命名</button>
-                        <button class="header-action-btn secondary" onclick="deleteCurrentPlaylist()" style="color: #ff6b6b;">删除</button>
+                <!-- Playlists View -->
+                <div id="playlistsView" style="display: none;">
+                    <button class="create-playlist-btn" onclick="showCreatePlaylistModal()">
+                        创建列表
+                    </button>
+                    <div class="playlist-grid" id="playlistsGrid">
+                        <!-- 动态生成 -->
                     </div>
                 </div>
             </div>
-            <div class="music-list" id="playlistMusicList">
-                <!-- 动态生成 -->
+
+            <!-- Playlist Detail View -->
+            <div id="playlistDetailView" class="playlist-detail">
+                <button class="back-btn" onclick="backToMain()">← 返回</button>
+                <div class="playlist-header">
+                    <div class="playlist-header-cover" id="detailCover">♪</div>
+                    <div class="playlist-header-info">
+                        <div class="playlist-header-name" id="detailName">--</div>
+                        <div class="playlist-header-meta" id="detailMeta">--</div>
+                        <div class="playlist-header-actions">
+                            <button class="header-action-btn" onclick="playPlaylist()">播放</button>
+                            <button class="header-action-btn secondary" onclick="showRenameModal()">重命名</button>
+                            <button class="header-action-btn secondary" onclick="deleteCurrentPlaylist()">删除</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="music-list" id="playlistMusicList">
+                    <!-- 动态生成 -->
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- 固定播放器 -->
     <div class="player-fixed" id="fixedPlayer">
         <div class="player-info">
             <div class="player-title" id="playerTitle">--</div>
             <div class="player-artist" id="playerArtist">--</div>
-            <div class="player-preview" id="playerPreviewTag" style="display: none;">🔒 30秒预览模式</div>
+            <div class="player-preview" id="playerPreviewTag" style="display: none;">预览模式</div>
         </div>
         
         <div class="player-controls">
@@ -774,8 +887,8 @@
     <!-- Create Playlist Modal -->
     <div class="modal" id="createPlaylistModal">
         <div class="modal-content">
-            <div style="font-size: 20px; margin-bottom: 16px;">📋 创建播放列表</div>
-            <input type="text" class="modal-input" id="playlistNameInput" placeholder="输入播放列表名称..." maxlength="50">
+            <div class="modal-header">创建列表</div>
+            <input type="text" class="modal-input" id="playlistNameInput" placeholder="输入列表名称..." maxlength="50">
             <div class="modal-buttons">
                 <button class="modal-btn primary" onclick="createPlaylist()">创建</button>
                 <button class="modal-btn secondary" onclick="closeModal('createPlaylistModal')">取消</button>
@@ -786,7 +899,7 @@
     <!-- Rename Playlist Modal -->
     <div class="modal" id="renamePlaylistModal">
         <div class="modal-content">
-            <div style="font-size: 20px; margin-bottom: 16px;">✏️ 重命名播放列表</div>
+            <div class="modal-header">重命名</div>
             <input type="text" class="modal-input" id="renameInput" placeholder="输入新名称..." maxlength="50">
             <div class="modal-buttons">
                 <button class="modal-btn primary" onclick="renamePlaylist()">保存</button>
@@ -810,15 +923,12 @@
         let playlistQueue = [];
         let currentQueueIndex = 0;
         
-        // 音频元素
         const audio = document.getElementById('audioElement');
         
-        // 音频时间更新
         audio.addEventListener('timeupdate', function() {
             const current = this.currentTime;
             const duration = this.duration || 0;
             
-            // 30秒预览限制
             if (current >= 30) {
                 this.pause();
                 this.currentTime = 0;
@@ -837,7 +947,6 @@
             isPlaying = false;
             document.getElementById('playerPlayBtn').textContent = '▶';
             
-            // 播放队列中的下一首
             if (playlistQueue.length > 0 && currentQueueIndex < playlistQueue.length - 1) {
                 currentQueueIndex++;
                 playMusicFromQueue();
@@ -848,10 +957,10 @@
             document.getElementById('totalTime').textContent = formatTime(this.duration);
         });
         
-        // ========== 钱包连接 ==========
-        async function connectWallet() {
+        // 钱包连接
+        async function toggleWallet() {
             if (typeof window.ethereum === 'undefined') {
-                alert('请先安装 MetaMask 钱包！');
+                alert('请先安装 MetaMask');
                 return;
             }
             
@@ -864,17 +973,13 @@
                 signer = provider.getSigner();
                 contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, signer);
                 
-                document.getElementById('connectBtn').textContent = 
-                    userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
-                document.getElementById('connectBtn').classList.add('connected');
-                
+                document.getElementById('connectBtn').textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
                 loadAllMusic();
-            } catch (error) {
-                console.error('连接失败:', error);
+            } catch (e) {
+                console.error(e);
             }
         }
         
-        // ========== 数据加载 ==========
         async function loadAllMusic() {
             if (!contract) return;
             
@@ -906,7 +1011,6 @@
             }
         }
         
-        // ========== 收藏功能 ==========
         function getFavorites() {
             const data = localStorage.getItem('echoMusicData');
             if (!data) return [];
@@ -937,7 +1041,7 @@
                 favorites.splice(index, 1);
                 saveFavorites(favorites);
                 renderFavorites();
-                showToast('已从收藏中移除');
+                showToast('已移除');
             }
         }
         
@@ -948,11 +1052,11 @@
             
             if (favorites.length === 0) {
                 grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="icon">🤍</div>
+                    <div class="empty-state">
+                        <div class="icon">♡</div>
                         <h3>暂无收藏</h3>
-                        <p>去音乐市场发现喜欢的音乐吧</p>
-                        <a href="../market/music-market.html" class="btn">前往音乐市场</a>
+                        <p>去音乐市场发现喜欢的音乐</p>
+                        <a href="../market/music-market.html" class="btn">前往市场</a>
                     </div>
                 `;
                 return;
@@ -963,9 +1067,7 @@
             grid.innerHTML = favMusic.map(music => `
                 <div class="music-card">
                     <div class="music-visual">
-                        <button class="favorite-btn" onclick="removeFavorite(${music.tokenId})" title="取消收藏">
-                            ❤️
-                        </button>
+                        <button class="favorite-btn" onclick="removeFavorite(${music.tokenId})" title="取消收藏">♥</button>
                         <div class="waveform">
                             ${Array(20).fill(0).map(() => `
                                 <div class="wave-bar" style="height: ${Math.random() * 80 + 20}%; animation-delay: ${Math.random()}s"></div>
@@ -984,14 +1086,13 @@
                                 ${music.price}
                                 <span class="price-unit">MEER/次</span>
                             </div>
-                            <button class="buy-btn" onclick="buyLicense(${music.tokenId}, '${music.price}')">购买授权</button>
+                            <button class="buy-btn" onclick="buyLicense(${music.tokenId}, '${music.price}')">购买</button>
                         </div>
                     </div>
                 </div>
             `).join('');
         }
         
-        // ========== 播放列表功能 ==========
         function getPlaylists() {
             const data = localStorage.getItem('echoMusicData');
             if (!data) return [];
@@ -1021,9 +1122,9 @@
             
             if (playlists.length === 0) {
                 grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <div class="icon">📋</div>
-                        <h3>暂无播放列表</h3>
+                    <div class="empty-state">
+                        <div class="icon">☰</div>
+                        <h3>暂无列表</h3>
                         <p>创建您的第一个播放列表</p>
                     </div>
                 `;
@@ -1033,7 +1134,7 @@
             grid.innerHTML = playlists.map(playlist => `
                 <div class="playlist-card" onclick="openPlaylist(${playlist.id})">
                     <div class="playlist-cover">
-                        🎵
+                        ♪
                         <span class="playlist-count">${playlist.items.length} 首</span>
                     </div>
                     <div class="playlist-info">
@@ -1053,7 +1154,7 @@
         function createPlaylist() {
             const name = document.getElementById('playlistNameInput').value.trim();
             if (!name) {
-                showToast('请输入播放列表名称');
+                showToast('请输入列表名称');
                 return;
             }
             
@@ -1069,7 +1170,7 @@
             savePlaylists(playlists);
             closeModal('createPlaylistModal');
             renderPlaylists();
-            showToast('播放列表创建成功');
+            showToast('创建成功');
         }
         
         function openPlaylist(id) {
@@ -1083,7 +1184,7 @@
             document.getElementById('playlistDetailView').classList.add('active');
             
             document.getElementById('detailName').textContent = playlist.name;
-            document.getElementById('detailMeta').textContent = `${playlist.items.length} 首音乐 · 创建于 ${formatDate(playlist.id)}`;
+            document.getElementById('detailMeta').textContent = `${playlist.items.length} 首 · 创建于 ${formatDate(playlist.id)}`;
             
             renderPlaylistMusic(playlist);
         }
@@ -1094,10 +1195,10 @@
             if (playlist.items.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
-                        <div class="icon">🎵</div>
-                        <h3>播放列表为空</h3>
-                        <p>去音乐市场添加音乐到播放列表</p>
-                        <a href="../market/music-market.html" class="btn">前往音乐市场</a>
+                        <div class="icon">♪</div>
+                        <h3>列表为空</h3>
+                        <p>去音乐市场添加音乐</p>
+                        <a href="../market/music-market.html" class="btn">前往市场</a>
                     </div>
                 `;
                 return;
@@ -1118,7 +1219,7 @@
                         <div class="music-list-meta">${getGenreLabel(music.genre)} · Token #${music.tokenId}</div>
                     </div>
                     <div class="music-list-actions">
-                        <button class="music-list-action remove" onclick="removeFromPlaylist(${music.tokenId})" title="从播放列表移除">🗑️</button>
+                        <button class="music-list-action remove" onclick="removeFromPlaylist(${music.tokenId})" title="移除">🗑</button>
                     </div>
                 </div>
             `).join('');
@@ -1157,12 +1258,12 @@
                 playlist.items.splice(index, 1);
                 savePlaylists(playlists);
                 renderPlaylistMusic(playlist);
-                showToast('已从播放列表移除');
+                showToast('已移除');
             }
         }
         
         function deleteCurrentPlaylist() {
-            if (!confirm('确定要删除这个播放列表吗？')) return;
+            if (!confirm('确定要删除这个列表吗？')) return;
             
             const playlists = getPlaylists();
             const index = playlists.findIndex(p => p.id === currentPlaylistId);
@@ -1170,7 +1271,7 @@
                 playlists.splice(index, 1);
                 savePlaylists(playlists);
                 backToMain();
-                showToast('播放列表已删除');
+                showToast('已删除');
             }
         }
         
@@ -1187,7 +1288,7 @@
         function renamePlaylist() {
             const name = document.getElementById('renameInput').value.trim();
             if (!name) {
-                showToast('请输入播放列表名称');
+                showToast('请输入列表名称');
                 return;
             }
             
@@ -1202,7 +1303,6 @@
             }
         }
         
-        // ========== 播放器 ==========
         async function playMusic(tokenId) {
             const music = allMusic.find(m => m.tokenId === tokenId);
             if (!music) return;
@@ -1214,7 +1314,6 @@
             document.getElementById('playerPreviewTag').style.display = 'block';
             document.getElementById('fixedPlayer').classList.add('active');
             
-            // 加载音频
             let audioUrl = music.uri;
             if (audioUrl && audioUrl.startsWith('ipfs://')) {
                 audioUrl = audioUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
@@ -1273,7 +1372,6 @@
             audio.currentTime = Math.min(30, percent * audio.duration);
         }
         
-        // ========== Tab 切换 ==========
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
@@ -1289,7 +1387,6 @@
             }
         }
         
-        // ========== 通用函数 ==========
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
@@ -1298,16 +1395,15 @@
             const toast = document.createElement('div');
             toast.style.cssText = `
                 position: fixed;
-                top: 20px;
+                top: 80px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+                background: var(--seal-red);
                 color: #fff;
                 padding: 12px 24px;
-                border-radius: 8px;
-                font-size: 14px;
+                font-family: var(--font-serif);
+                font-size: 0.9rem;
                 z-index: 10000;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
                 animation: slideDown 0.3s ease;
             `;
             toast.textContent = message;
@@ -1345,7 +1441,6 @@
             return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`;
         }
         
-        // 添加动画样式
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideDown {
@@ -1359,7 +1454,6 @@
         `;
         document.head.appendChild(style);
         
-        // 回车键确认
         document.getElementById('playlistNameInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') createPlaylist();
         });
@@ -1367,9 +1461,8 @@
             if (e.key === 'Enter') renamePlaylist();
         });
         
-        // 初始化
         if (typeof window.ethereum !== 'undefined') {
-            connectWallet();
+            toggleWallet();
         }
     </script>
 </body>

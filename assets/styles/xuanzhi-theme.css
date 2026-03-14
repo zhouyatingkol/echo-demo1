@@ -1,0 +1,527 @@
+/**
+ * ECHO 宣纸主题 - 统一样式系统
+ * 东方美学 · 数字意境
+ */
+
+/* ==================== 基础变量 ==================== */
+:root {
+  /* 宣纸质感 */
+  --bg-primary: #F8F6F1;
+  --bg-secondary: #F2EFE8;
+  --bg-tertiary: #EBE7DD;
+  --bg-card: #FDFCFA;
+  
+  /* 四阶墨色 */
+  --ink-deep: #1A1A1A;
+  --ink-medium: #4A4A4A;
+  --ink-light: #7A6E5F;
+  --ink-faint: #B5B5B5;
+  
+  /* 宋金 */
+  --gold-primary: #B89B6C;
+  --gold-light: #D4C4A8;
+  --gold-faint: rgba(184, 155, 108, 0.15);
+  
+  /* 三域色 */
+  --realm-sound: #8B9DC3;
+  --realm-color: #C9A9A6;
+  --realm-text: #7A8B7C;
+  
+  /* 朱红 */
+  --seal-red: #A03020;
+  --seal-red-light: rgba(160, 48, 32, 0.1);
+  
+  /* 字体 */
+  --font-serif: 'Noto Serif SC', 'Source Han Serif CN', 'SimSun', serif;
+  --font-wenkai: 'LXGW WenKai', 'KaiTi', serif;
+  
+  /* 间距 */
+  --nav-height: 60px;
+  --page-padding: clamp(24px, 5vw, 80px);
+  --section-gap: 80px;
+  
+  /* 过渡 */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-slow: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== 基础重置 ==================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-serif);
+  background: var(--bg-primary);
+  color: var(--ink-deep);
+  min-height: 100vh;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 宣纸纹理 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==================== 导航栏 ==================== */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--page-padding);
+  background: transparent;
+  transition: background var(--transition-slow), 
+              box-shadow var(--transition-slow);
+}
+
+.navbar.is-scrolled {
+  background: rgba(253, 252, 250, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+}
+
+.navbar__brand {
+  font-family: var(--font-wenkai);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--ink-deep);
+  text-decoration: none;
+}
+
+.navbar__brand span {
+  color: var(--seal-red);
+}
+
+.navbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.navbar__link {
+  font-size: 0.9rem;
+  color: var(--ink-light);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  position: relative;
+}
+
+.navbar__link:hover {
+  color: var(--ink-deep);
+}
+
+.navbar__link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--gold-primary);
+  transition: width var(--transition-normal);
+}
+
+.navbar__link:hover::after {
+  width: 100%;
+}
+
+.navbar__link.is-active {
+  color: var(--ink-deep);
+}
+
+.navbar__link.is-active::after {
+  width: 100%;
+}
+
+.navbar__action {
+  padding: 8px 20px;
+  border: 1px solid var(--ink-faint);
+  background: transparent;
+  color: var(--ink-medium);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.navbar__action:hover {
+  border-color: var(--seal-red);
+  color: var(--seal-red);
+}
+
+/* ==================== 主内容区 ==================== */
+.main-content {
+  position: relative;
+  z-index: 1;
+  padding-top: var(--nav-height);
+  min-height: 100vh;
+}
+
+/* ==================== 标题系统 ==================== */
+.page-title {
+  font-family: var(--font-wenkai);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: 0.15em;
+}
+
+.page-subtitle {
+  font-size: 1rem;
+  color: var(--ink-light);
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.section-title {
+  font-family: var(--font-wenkai);
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title::before {
+  content: '';
+  width: 3px;
+  height: 20px;
+  background: var(--seal-red);
+}
+
+/* ==================== 卡片系统 ==================== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid rgba(122, 110, 95, 0.1);
+  padding: 24px;
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  border-color: rgba(184, 155, 108, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* ==================== 按钮系统 ==================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--seal-red);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #802820;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--ink-faint);
+  color: var(--ink-medium);
+}
+
+.btn-outline:hover {
+  border-color: var(--seal-red);
+  color: var(--seal-red);
+}
+
+.btn-gold {
+  background: var(--gold-primary);
+  color: white;
+}
+
+.btn-gold:hover {
+  background: #9a7f56;
+}
+
+/* ==================== 表单系统 ==================== */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid rgba(122, 110, 95, 0.2);
+  background: var(--bg-card);
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: var(--ink-deep);
+  transition: border-color var(--transition-fast);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--gold-primary);
+}
+
+.input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* ==================== 标签系统 ==================== */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  border: 1px solid transparent;
+}
+
+.tag-gold {
+  background: var(--gold-faint);
+  color: var(--gold-primary);
+  border-color: rgba(184, 155, 108, 0.3);
+}
+
+.tag-realm-sound {
+  background: rgba(139, 157, 195, 0.1);
+  color: var(--realm-sound);
+  border-color: rgba(139, 157, 195, 0.3);
+}
+
+.tag-realm-color {
+  background: rgba(201, 169, 166, 0.1);
+  color: var(--realm-color);
+  border-color: rgba(201, 169, 166, 0.3);
+}
+
+.tag-realm-text {
+  background: rgba(122, 139, 124, 0.1);
+  color: var(--realm-text);
+  border-color: rgba(122, 139, 124, 0.3);
+}
+
+/* ==================== 音频播放器 ==================== */
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-secondary);
+}
+
+.play-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--seal-red);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+}
+
+.progress-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(122, 110, 95, 0.2);
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gold-primary);
+  width: 30%;
+}
+
+.time {
+  font-size: 0.8rem;
+  color: var(--ink-light);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==================== 分页 ==================== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 48px;
+}
+
+.page-btn {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-light);
+  font-family: var(--font-serif);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.page-btn:hover {
+  border-color: var(--ink-faint);
+  color: var(--ink-deep);
+}
+
+.page-btn.is-active {
+  background: var(--seal-red);
+  color: white;
+  border-color: var(--seal-red);
+}
+
+/* ==================== 底部 ==================== */
+.footer {
+  padding: 60px var(--page-padding);
+  border-top: 1px solid rgba(122, 110, 95, 0.1);
+  margin-top: var(--section-gap);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.footer-brand {
+  font-family: var(--font-wenkai);
+  font-size: 1.25rem;
+  color: var(--ink-deep);
+}
+
+.footer-links {
+  display: flex;
+  gap: 48px;
+}
+
+.footer-link {
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.footer-link:hover {
+  color: var(--ink-deep);
+}
+
+.footer-copyright {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(122, 110, 95, 0.08);
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  :root {
+    --page-padding: 20px;
+    --section-gap: 48px;
+  }
+  
+  .navbar__nav {
+    display: none;
+  }
+  
+  .navbar__mobile-toggle {
+    display: flex;
+  }
+  
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* ==================== 工具类 ==================== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--page-padding);
+}
+
+.section {
+  padding: var(--section-gap) 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-gold {
+  color: var(--gold-primary);
+}
+
+.text-muted {
+  color: var(--ink-light);
+}
+
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mt-4 { margin-top: 32px; }
+
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
+
+.hidden {
+  display: none !important;
+}
