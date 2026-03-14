@@ -157,40 +157,74 @@
             text-align: center;
         }
         
-        /* 「共生」词组 */
+        /* 主文案 */
         .hero-title {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
+            gap: 2rem;
         }
         
-        .hero-word {
+        /* 主标语 */
+        .hero-slogan {
             font-family: var(--font-display);
-            font-size: clamp(4rem, 10vw, 6rem);
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
             font-weight: 300;
             color: var(--ink-deep);
-            letter-spacing: 0.35em;
-            line-height: 1.2;
-            position: relative;
+            letter-spacing: 0.25em;
+            line-height: 1.8;
             opacity: 0;
-            transform: translateY(30px);
-            filter: blur(10px);
-            animation: emerge 2s var(--ease-ink) forwards, 
-                       breathe 8s ease-in-out infinite;
-            animation-delay: 0.3s, 3s;
+            transform: translateY(20px);
+            filter: blur(4px);
+            animation: emerge 1.8s var(--ease-ink) forwards;
+            animation-delay: 0.3s;
         }
         
-        .hero-word::after {
+        /* 印章 - 共生 */
+        .hero-seal {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #C45C48;
+            background: rgba(196, 92, 72, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.8) rotate(-5deg);
+            animation: sealStamp 1.2s var(--ease-ink) 0.8s forwards;
+        }
+        
+        .hero-seal::before {
             content: '';
             position: absolute;
-            bottom: -0.3rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 3rem;
-            height: 0.5px;
-            background: var(--gold-primary);
-            opacity: 0.6;
+            inset: 4px;
+            border: 1px solid rgba(196, 92, 72, 0.4);
+        }
+        
+        .hero-seal-text {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #C45C48;
+            letter-spacing: 0.1em;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+        }
+        
+        @keyframes sealStamp {
+            0% { 
+                opacity: 0; 
+                transform: scale(0.8) rotate(-5deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05) rotate(2deg);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1) rotate(0deg);
+            }
         }
         
         @keyframes emerge {
@@ -219,27 +253,30 @@
             to { opacity: 1; }
         }
         
-        /* 副标题 */
+        /* 底部小字 */
         .hero-subtitle {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            gap: 0.6rem;
             opacity: 0;
             animation: fadeIn 1.5s ease 1.5s forwards;
+            max-width: 400px;
         }
         
         .subtitle-main {
             font-family: var(--font-serif);
-            font-size: 1rem;
-            color: var(--ink-medium);
-            letter-spacing: 0.35em;
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            font-weight: 300;
+            line-height: 2;
         }
         
         .subtitle-highlight {
             font-family: var(--font-serif);
-            font-size: 0.9rem;
-            color: var(--ink-light);
-            letter-spacing: 0.25em;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.1em;
             font-weight: 300;
         }
         
@@ -428,14 +465,22 @@
         
         /* 响应式 */
         @media (max-width: 768px) {
-            .hero-word {
-                font-size: clamp(3rem, 12vw, 4.5rem);
-                letter-spacing: 0.2em;
+            .hero-slogan {
+                font-size: clamp(1rem, 4vw, 1.3rem);
+                letter-spacing: 0.15em;
+            }
+            
+            .hero-seal {
+                width: 64px;
+                height: 64px;
+            }
+            
+            .hero-seal-text {
+                font-size: 1.4rem;
             }
             
             .subtitle-main {
-                font-size: 0.9rem;
-                letter-spacing: 0.2em;
+                font-size: 0.8rem;
             }
             
             .realm-section {
@@ -463,13 +508,16 @@
         
         <div class="hero-content">
             <div class="hero-title">
-                <span class="hero-word">共生</span>
+                <span class="hero-slogan">万物有灵，皆可生长</span>
+                <div class="hero-seal">
+                    <span class="hero-seal-text">共生</span>
+                </div>
                 <span class="hero-brand">ECHO</span>
             </div>
             
             <div class="hero-subtitle">
-                <span class="subtitle-main">万物有灵，皆可生长</span>
-                <span class="subtitle-highlight">人类与 Agent 的共同进化之地</span>
+                <span class="subtitle-main">创作即生命，流转即生长</span>
+                <span class="subtitle-highlight">无论创作者是谁，这里只认生长的痕迹</span>
             </div>
             
             <button class="hero-cta">
