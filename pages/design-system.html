@@ -182,12 +182,12 @@
             line-height: 1.8;
         }
         
-        /* 朱红印章 - 篆书风格 */
+        /* 朱红印章 - 手绘篆刻风格 */
         .hero-seal {
-            width: 40px;
-            height: 62px;
-            background: #B83E2F;
-            border: 2px solid #8B2820;
+            width: 36px;
+            height: 56px;
+            background: #A03020;
+            border: 2px solid #7A2018;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -196,46 +196,43 @@
             transform: scale(0.8) rotate(-3deg);
             animation: sealStamp 0.8s var(--ease-ink) 1.2s forwards;
             box-shadow: 
-                inset 0 0 12px rgba(0,0,0,0.15),
-                2px 2px 6px rgba(184, 62, 47, 0.25);
+                inset 0 0 15px rgba(0,0,0,0.2),
+                2px 2px 6px rgba(160, 48, 32, 0.3);
             overflow: hidden;
         }
         
-        /* 印章内边框 - 不规则感 */
+        /* 内边框 */
         .hero-seal::before {
             content: '';
             position: absolute;
             inset: 2px;
-            border: 1px solid rgba(255,255,255,0.25);
+            border: 1px solid rgba(255,255,255,0.2);
             pointer-events: none;
         }
         
-        /* 做旧雕刻纹理 */
+        /* 强烈做旧纹理 */
         .hero-seal::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.25'/%3E%3C/svg%3E");
-            opacity: 0.4;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
+            opacity: 0.5;
             mix-blend-mode: overlay;
         }
         
-        .hero-seal-text {
-            font-family: '方正清刻本悦宋', 'Source Han Serif SC', serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.95);
-            letter-spacing: 0.02em;
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            line-height: 1;
-            text-shadow: 
-                0 1px 1px rgba(0,0,0,0.2),
-                0 0 2px rgba(0,0,0,0.1);
+        /* 手绘 SVG 共生 */
+        .hero-seal-svg {
+            width: 24px;
+            height: 40px;
             position: relative;
             z-index: 1;
-            transform: scaleY(1.15) scaleX(0.95);
-            filter: contrast(1.1);
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+        }
+        
+        .hero-seal-svg path {
+            fill: rgba(255, 255, 255, 0.9);
+            stroke: rgba(255, 255, 255, 0.5);
+            stroke-width: 0.3;
         }
         
         @keyframes sealStamp {
@@ -497,12 +494,13 @@
             }
             
             .hero-seal {
-                width: 32px;
-                height: 50px;
+                width: 28px;
+                height: 44px;
             }
             
-            .hero-seal-text {
-                font-size: 0.9rem;
+            .hero-seal-svg {
+                width: 20px;
+                height: 32px;
             }
             
             .hero-slogan-wrapper {
@@ -537,7 +535,12 @@
                 <div class="hero-slogan-wrapper">
                     <span class="hero-slogan">万物有灵，皆可生长</span>
                     <div class="hero-seal">
-                        <span class="hero-seal-text">共生</span>
+                        <svg class="hero-seal-svg" viewBox="0 0 24 40">
+                            <!-- 共 - 篆书风格 -->
+                            <path d="M12 4 C11 4,10 5,10 6 C10 7,11 8,12 8 C13 8,14 7,14 6 C14 5,13 4,12 4 Z M8 10 C8 10,7 11,8 12 C9 13,15 13,16 12 C17 11,16 10,16 10 M6 15 C6 15,5 16,6 17 C8 18,16 18,18 17 C19 16,18 15,18 15 M10 19 C10 19,9 20,10 21 C10 22,10 28,10 29 C9 30,10 31,10 31 M14 19 C14 19,15 20,14 21 C14 22,14 28,14 29 C15 30,14 31,14 31"/>
+                            <!-- 生 - 篆书风格 -->
+                            <path d="M8 33 C8 33,7 34,8 35 C9 36,15 36,16 35 C17 34,16 33,16 33 M12 30 C12 30,11 31,12 32 C12 33,12 37,12 38 C11 39,12 39,12 39 M6 30 C6 30,5 31,6 32 C8 33,16 33,18 32 C19 31,18 30,18 30 M12 26 C12 26,11 27,12 28 C12 29,12 29,12 29"/>
+                        </svg>
                     </div>
                 </div>
                 <span class="hero-brand">ECHO</span>
