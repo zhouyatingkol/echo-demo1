@@ -3,117 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>西市 - ECHO</title>
-    <link rel="stylesheet" href="../../assets/styles/main.css">
+    <title>如是 - ECHO</title>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* ========================================
-           东方美学设计系统 - 市场页面
-           克制 · 留白 · 呼吸感
-        ======================================== */
-
-        /* 基础色彩系统 - 淡墨色系 */
+        /* ===== 色彩系统 ===== */
         :root {
-            --ink-900: #1a1a1a;
-            --ink-700: #3d3d3d;
-            --ink-500: #666666;
-            --ink-300: #999999;
-            --ink-200: #b8b8b8;
-            --ink-100: #e8e4e0;
-            --ink-50: #f5f3f0;
+            /* 宣纸底色 */
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F2EFE8;
+            --bg-tertiary: #EBE7DD;
             
-            /* 三域色彩 - 克制 */
-            --realm-cyan: #7ba3a8;      /* 青 - 创作域 */
-            --realm-pink: #c4a4a8;      /* 粉 - 社交域 */
-            --realm-green: #8fa68a;     /* 绿 - 交易域 */
+            /* 浓墨 */
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #7A6E5F;
+            --ink-faint: #B5B5B5;
             
-            /* 宣纸色系 */
-            --paper-bg: #faf8f5;
-            --paper-dark: #f0ebe3;
-            --paper-accent: #e8e0d5;
+            /* 宋金 */
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
             
-            /* 宋瓷色系 */
-            --celadon-light: #f5f7f4;
-            --celadon-mid: #e8ebe5;
-            --celadon-border: #d4d9cf;
+            /* 朱红 */
+            --vermilion: #A03020;
+            --vermilion-light: rgba(160, 48, 32, 0.4);
             
-            /* 过渡时间 */
-            --transition-slow: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            /* 三域色 */
+            --realm-sound: #8B9DC3;
+            --realm-color: #C9A9A6;
+            --realm-text: #7A8B7C;
+            
+            /* 字体 */
+            --font-display: 'LXGW WenKai', serif;
+            --font-serif: 'Noto Serif SC', serif;
+            
+            /* 缓动 */
+            --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);
             --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-fast: 0.2s ease;
+            --transition-slow: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 宣纸纹理背景 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
         body {
-            background-color: var(--paper-bg);
-            background-image: 
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            background-blend-mode: multiply;
-            background-size: 200px 200px;
-            color: var(--ink-700);
-            font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            color: var(--ink-deep);
             line-height: 1.8;
+            overflow-x: hidden;
         }
 
-        /* ========================================
-           Hero 区域 - 窗棂光晕
-        ======================================== */
+        /* ===== 导航栏 ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.8s ease,
+                        backdrop-filter 0.8s ease;
+        }
+        
+        .navbar.is-scrolled {
+            background: rgba(248, 246, 241, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+        }
+        
+        .navbar__brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .navbar__logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: var(--ink-deep);
+            letter-spacing: 0.3em;
+            text-decoration: none;
+            opacity: 0.85;
+            transition: opacity 0.4s ease;
+        }
+        
+        .navbar__brand:hover .navbar__logo {
+            opacity: 1;
+        }
+        
+        .navbar__nav {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .navbar__link {
+            position: relative;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--ink-light);
+            text-decoration: none;
+            letter-spacing: 0.2em;
+            padding: 0.5rem 0;
+            transition: color 0.4s ease;
+        }
+        
+        .navbar__link:hover,
+        .navbar__link.active {
+            color: var(--ink-deep);
+        }
+        
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: var(--gold-primary);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .navbar__link:hover::after,
+        .navbar__link.active::after {
+            width: 100%;
+        }
+        
+        .navbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .navbar__user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2px;
+            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            background: transparent;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        
+        .navbar__user:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+            background: rgba(184, 155, 108, 0.05);
+        }
+        
+        .navbar__user-placeholder {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(122, 110, 95, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar__user-placeholder svg {
+            width: 12px;
+            height: 12px;
+            stroke: var(--ink-light);
+        }
+
+        .navbar__menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            gap: 6px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .navbar__menu-line {
+            width: 24px;
+            height: 1px;
+            background: var(--ink-light);
+            transition: all 0.4s ease;
+            transform-origin: center;
+        }
+        
+        .navbar__mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(248, 246, 241, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .navbar__mobile-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        .navbar__mobile-menu .navbar__link {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: var(--ink-light);
+            padding: 1rem 0;
+            letter-spacing: 0.5em;
+        }
+        
+        .navbar__mobile-menu .navbar__link:hover {
+            color: var(--ink-deep);
+        }
+        
+        .navbar__mobile-menu .navbar__link::after {
+            display: none;
+        }
+
+        /* ===== Hero 区域 ===== */
         .marketplace-hero {
             position: relative;
-            padding: 80px 40px 60px;
+            padding: 120px 40px 60px;
             text-align: center;
             overflow: hidden;
             background: linear-gradient(180deg, 
-                rgba(232, 228, 224, 0.6) 0%, 
-                rgba(250, 248, 245, 0) 100%);
-        }
-
-        /* 窗棂光晕效果 */
-        .marketplace-hero::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 300px;
-            background: radial-gradient(ellipse at center,
-                rgba(232, 224, 213, 0.4) 0%,
-                rgba(232, 224, 213, 0.1) 40%,
-                transparent 70%);
-            pointer-events: none;
+                rgba(242, 239, 232, 0.6) 0%, 
+                rgba(248, 246, 241, 0) 100%);
         }
 
         .hero-title {
+            font-family: var(--font-display);
             font-size: 2.8rem;
-            font-weight: 300;
-            letter-spacing: 0.3em;
-            color: var(--ink-900);
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-title .sub {
-            font-size: 1rem;
-            display: block;
-            letter-spacing: 0.5em;
-            color: var(--ink-300);
-            margin-top: 10px;
             font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+            margin-bottom: 16px;
         }
 
         .hero-subtitle {
-            font-size: 1.1rem;
-            color: var(--ink-500);
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            color: var(--ink-light);
             letter-spacing: 0.15em;
             font-weight: 300;
-            position: relative;
-            z-index: 1;
         }
 
-        /* ========================================
-           筛选栏 - 竹简风格
-        ======================================== */
+        /* ===== 搜索和筛选栏 ===== */
         .search-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -125,7 +298,6 @@
             max-width: 1200px;
         }
 
-        /* 宣纸搜索框 */
         .search-box {
             position: relative;
             flex: 1;
@@ -136,24 +308,23 @@
         .search-box input {
             width: 100%;
             padding: 14px 20px 14px 48px;
-            background: var(--paper-bg);
-            border: 1px solid var(--paper-accent);
+            background: var(--bg-primary);
+            border: 0.5px solid var(--bg-tertiary);
             border-radius: 2px;
-            font-family: inherit;
+            font-family: var(--font-display);
             font-size: 0.95rem;
-            color: var(--ink-700);
+            color: var(--ink-deep);
             letter-spacing: 0.05em;
             transition: all var(--transition-medium);
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
         }
 
         .search-box input::placeholder {
-            color: var(--ink-300);
+            color: var(--ink-faint);
         }
 
         .search-box input:focus {
             outline: none;
-            border-color: var(--ink-200);
+            border-color: var(--gold-primary);
             background: #fff;
         }
 
@@ -162,11 +333,11 @@
             left: 18px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--ink-300);
+            color: var(--ink-faint);
             font-size: 0.9rem;
+            font-family: var(--font-display);
         }
 
-        /* 竹简风格下拉框 */
         .filter-group {
             display: flex;
             gap: 12px;
@@ -175,34 +346,31 @@
 
         .filter-select {
             padding: 12px 36px 12px 18px;
-            background: linear-gradient(180deg, var(--paper-dark) 0%, var(--paper-accent) 100%);
-            border: none;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--bg-tertiary);
             border-radius: 2px;
-            font-family: inherit;
+            font-family: var(--font-display);
             font-size: 0.9rem;
-            color: var(--ink-700);
-            letter-spacing: 0.08em;
+            color: var(--ink-medium);
+            letter-spacing: 0.1em;
             cursor: pointer;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 14px center;
-            box-shadow: 
-                0 1px 2px rgba(0,0,0,0.05),
-                inset 0 1px 0 rgba(255,255,255,0.5);
             transition: all var(--transition-medium);
         }
 
         .filter-select:hover {
-            background: linear-gradient(180deg, var(--paper-accent) 0%, #ddd8cf 100%);
+            border-color: var(--gold-primary);
         }
 
         .filter-select:focus {
             outline: none;
-            box-shadow: 0 0 0 2px rgba(123, 163, 168, 0.2);
+            border-color: var(--gold-primary);
         }
 
-        /* 宋金风格标签 */
+        /* ===== 极简筛选标签 ===== */
         .filter-tags {
             display: flex;
             gap: 8px;
@@ -212,28 +380,26 @@
         }
 
         .filter-tag {
-            padding: 6px 16px;
+            padding: 6px 20px;
             background: transparent;
-            border: 0.5px solid var(--ink-200);
+            border: 0.5px solid var(--bg-tertiary);
             border-radius: 1px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            color: var(--ink-500);
-            letter-spacing: 0.1em;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
             cursor: pointer;
             transition: all var(--transition-medium);
         }
 
         .filter-tag:hover,
         .filter-tag.active {
-            background: var(--ink-100);
-            color: var(--ink-700);
-            border-color: var(--ink-300);
+            background: var(--gold-primary);
+            color: #fff;
+            border-color: var(--gold-primary);
         }
 
-        /* ========================================
-           资产网格 - 宋瓷卡片
-        ======================================== */
+        /* ===== 资产网格 ===== */
         .asset-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -243,45 +409,23 @@
             margin: 0 auto;
         }
 
-        /* 宋瓷卡片 */
         .asset-card {
             position: relative;
-            background: linear-gradient(145deg, var(--celadon-light) 0%, var(--celadon-mid) 100%);
-            border: 0.5px solid var(--celadon-border);
-            border-radius: 3px;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
             padding: 24px;
             cursor: pointer;
             transition: all var(--transition-slow);
             overflow: hidden;
         }
 
-        /* 水波动效 - hover */
-        .asset-card::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, 
-                rgba(139, 166, 138, 0.08) 0%, 
-                transparent 70%);
-            transform: translate(-50%, -50%);
-            transition: all var(--transition-slow);
-            border-radius: 50%;
-        }
-
-        .asset-card:hover::before {
-            width: 300%;
-            height: 300%;
-        }
-
         .asset-card:hover {
-            border-color: var(--ink-200);
-            transform: translateY(-2px);
+            border-color: var(--gold-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(122, 110, 95, 0.08);
         }
 
-        /* 三域角标 */
         .realm-badge {
             position: absolute;
             top: 12px;
@@ -296,25 +440,21 @@
             transform: scale(1.2);
         }
 
-        .realm-badge.cyan { background: var(--realm-cyan); }
-        .realm-badge.pink { background: var(--realm-pink); }
-        .realm-badge.green { background: var(--realm-green); }
-        .realm-badge.multi {
-            background: linear-gradient(135deg, var(--realm-cyan) 33%, var(--realm-pink) 33% 66%, var(--realm-green) 66%);
-        }
+        .realm-badge.sound { background: var(--realm-sound); }
+        .realm-badge.color { background: var(--realm-color); }
+        .realm-badge.text { background: var(--realm-text); }
 
-        /* 卡片内容 */
         .asset-cover {
             width: 100%;
             aspect-ratio: 1;
-            background: var(--paper-dark);
+            background: var(--bg-tertiary);
             border-radius: 2px;
             margin-bottom: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
-            color: var(--ink-200);
+            color: var(--ink-faint);
             overflow: hidden;
         }
 
@@ -325,9 +465,10 @@
         }
 
         .asset-title {
+            font-family: var(--font-display);
             font-size: 1rem;
             font-weight: 400;
-            color: var(--ink-900);
+            color: var(--ink-deep);
             margin-bottom: 8px;
             letter-spacing: 0.05em;
             white-space: nowrap;
@@ -337,7 +478,7 @@
 
         .asset-creator {
             font-size: 0.85rem;
-            color: var(--ink-300);
+            color: var(--ink-light);
             margin-bottom: 16px;
             letter-spacing: 0.03em;
         }
@@ -347,30 +488,29 @@
             justify-content: space-between;
             align-items: center;
             padding-top: 12px;
-            border-top: 0.5px solid var(--celadon-border);
+            border-top: 0.5px solid var(--bg-tertiary);
         }
 
         .asset-price {
             font-size: 1rem;
-            color: var(--ink-700);
+            color: var(--vermilion);
             letter-spacing: 0.05em;
+            font-family: var(--font-display);
         }
 
         .asset-price .unit {
             font-size: 0.75rem;
-            color: var(--ink-300);
+            color: var(--ink-light);
             margin-left: 4px;
         }
 
         .asset-type {
             font-size: 0.75rem;
-            color: var(--ink-200);
+            color: var(--ink-faint);
             letter-spacing: 0.1em;
         }
 
-        /* ========================================
-           分页 - 极简淡墨
-        ======================================== */
+        /* ===== 分页 ===== */
         .pagination {
             display: flex;
             justify-content: center;
@@ -379,24 +519,23 @@
             padding: 60px 40px;
         }
 
-        /* 宋瓷按钮 */
         .btn-celadon {
             padding: 12px 28px;
-            background: linear-gradient(180deg, var(--celadon-light) 0%, var(--celadon-mid) 100%);
-            border: 0.5px solid var(--celadon-border);
+            background: transparent;
+            border: 0.5px solid var(--bg-tertiary);
             border-radius: 2px;
-            font-family: inherit;
+            font-family: var(--font-display);
             font-size: 0.9rem;
-            color: var(--ink-500);
+            color: var(--ink-medium);
             letter-spacing: 0.15em;
             cursor: pointer;
             transition: all var(--transition-medium);
         }
 
         .btn-celadon:hover:not(:disabled) {
-            background: linear-gradient(180deg, var(--celadon-mid) 0%, #dde2d8 100%);
-            color: var(--ink-700);
-            border-color: var(--ink-200);
+            background: var(--gold-primary);
+            color: #fff;
+            border-color: var(--gold-primary);
         }
 
         .btn-celadon:disabled {
@@ -404,7 +543,6 @@
             cursor: not-allowed;
         }
 
-        /* 淡墨分页数字 */
         .page-numbers {
             display: flex;
             gap: 8px;
@@ -415,200 +553,264 @@
             padding: 8px;
             background: transparent;
             border: none;
-            font-family: inherit;
+            font-family: var(--font-display);
             font-size: 0.9rem;
-            color: var(--ink-300);
+            color: var(--ink-faint);
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: all var(--transition-medium);
         }
 
         .page-number:hover {
-            color: var(--ink-500);
+            color: var(--ink-medium);
         }
 
         .page-number.active {
-            color: var(--ink-700);
-            border-bottom: 0.5px solid var(--ink-300);
+            color: var(--ink-deep);
+            border-bottom: 0.5px solid var(--gold-primary);
         }
 
         .page-ellipsis {
-            color: var(--ink-200);
+            color: var(--ink-faint);
             padding: 8px;
         }
 
-        /* ========================================
-           状态提示
-        ======================================== */
+        /* ===== 状态提示 - 东方文案 ===== */
         .loading-state,
         .error-state,
         .empty-state {
             text-align: center;
             padding: 80px 40px;
-            color: var(--ink-300);
+            color: var(--ink-light);
         }
 
         .loading-state::before {
-            content: '◠';
+            content: '墨';
             display: block;
+            font-family: var(--font-display);
             font-size: 2rem;
             margin-bottom: 20px;
-            animation: breathe 2s ease-in-out infinite;
+            animation: ink-flow 2s ease-in-out infinite;
+            color: var(--ink-faint);
         }
 
-        @keyframes breathe {
+        @keyframes ink-flow {
             0%, 100% { opacity: 0.3; }
             50% { opacity: 0.8; }
+        }
+
+        .loading-state p {
+            font-family: var(--font-display);
+            letter-spacing: 0.15em;
         }
 
         .error-state .error-icon {
             font-size: 2rem;
             display: block;
             margin-bottom: 16px;
+            color: var(--vermilion);
+        }
+
+        .error-state p {
+            font-family: var(--font-display);
+            letter-spacing: 0.1em;
         }
 
         .empty-state .empty-icon {
+            font-family: var(--font-display);
             font-size: 2rem;
             display: block;
             margin-bottom: 16px;
+            color: var(--ink-faint);
         }
 
-        /* ========================================
-           页脚
-        ======================================== */
+        .empty-state p {
+            font-family: var(--font-display);
+            letter-spacing: 0.1em;
+        }
+
+        /* ===== 页脚 ===== */
         .footer {
             text-align: center;
             padding: 60px 40px;
-            border-top: 0.5px solid var(--paper-accent);
-            color: var(--ink-300);
+            border-top: 0.5px solid var(--bg-tertiary);
+            color: var(--ink-faint);
             font-size: 0.85rem;
             letter-spacing: 0.1em;
         }
 
         .footer p {
             margin: 8px 0;
-        }
-
-        /* ========================================
-           导航栏适配
-        ======================================== */
-        .navbar {
-            background: rgba(250, 248, 245, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 0.5px solid var(--paper-accent);
-        }
-
-        .nav-brand .brand-text {
-            font-weight: 400;
-            letter-spacing: 0.1em;
-        }
-
-        .nav-links a {
-            color: var(--ink-500);
-            letter-spacing: 0.05em;
-            transition: color var(--transition-fast);
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: var(--ink-700);
+            font-family: var(--font-serif);
         }
 
         /* 隐藏状态 */
         .hidden {
             display: none !important;
         }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .navbar__nav {
+                display: none;
+            }
+            .navbar__actions {
+                display: none;
+            }
+            .navbar__menu-btn {
+                display: flex;
+            }
+            .navbar__brand {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                letter-spacing: 0.2em;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .filter-group {
+                justify-content: center;
+            }
+
+            .asset-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .navbar__mobile-menu {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar">
-        <div class="nav-brand">
-            <span class="logo">🌳</span>
-            <span class="brand-text">ECHO</span>
+    <!-- 东方美学导航栏 -->
+    <nav class="navbar" id="navbar" role="navigation" aria-label="主导航">
+        <a href="index.html" class="navbar__brand" aria-label="返回首页">
+            <span class="navbar__logo">ECHO</span>
+        </a>
+        
+        <div class="navbar__nav">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link active">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
         </div>
-        <div class="nav-links">
-            <a href="index.html">首页</a>
-            <a href="marketplace.html" class="active">市场</a>
-            <a href="market/license-shop.html">授权</a>
-            <a href="user/dashboard.html">我的</a>
+        
+        <div class="navbar__actions">
+            <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包">
+                <span class="navbar__user-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span>入链</span>
+            </button>
+            
+            <button class="navbar__user navbar__user--connected" id="userMenu" type="button" aria-label="打开用户菜单" style="display: none;">
+                <img src="" alt="" class="navbar__user-avatar" id="userAvatar">
+                <span id="userName">吾</span>
+            </button>
         </div>
-        <div class="wallet-section">
-            <button id="connectWallet" class="btn-celadon">连接钱包</button>
-            <span id="walletAddress" class="wallet-address hidden"></span>
+        
+        <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+        </button>
+        
+        <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+            <button class="navbar__user" id="mobileConnectWallet" type="button">
+                <span>入链</span>
+            </button>
         </div>
     </nav>
 
-    <!-- Hero 区域 - 西市 -->
+    <!-- Hero 区域 - 如是 -->
     <header class="marketplace-hero">
-        <h1 class="hero-title">
-            西市
-            <span class="sub">MARKETPLACE</span>
-        </h1>
-        <p class="hero-subtitle">流转即生长</p>
+        <h1 class="hero-title">如是</h1>
+        <p class="hero-subtitle">万物归处，各得其所</p>
     </header>
 
     <!-- 搜索和筛选栏 -->
     <section class="search-filter-bar">
         <div class="search-box">
-            <span class="search-icon">○</span>
-            <input type="text" id="searchInput" placeholder="寻觅音乐、创作者..." />
+            <span class="search-icon">寻</span>
+            <input type="text" id="searchInput" placeholder="寻觅..." />
         </div>
         
         <div class="filter-group">
             <select id="priceFilter" class="filter-select">
-                <option value="">价格</option>
-                <option value="0-50">0 - 50 MEER</option>
-                <option value="50-100">50 - 100 MEER</option>
-                <option value="100-500">100 - 500 MEER</option>
-                <option value="500+">500+ MEER</option>
+                <option value="">价</option>
+                <option value="0-50">0 - 50</option>
+                <option value="50-100">50 - 100</option>
+                <option value="100-500">100 - 500</option>
+                <option value="500+">500+</option>
             </select>
             
             <select id="sceneFilter" class="filter-select">
-                <option value="">场景</option>
-                <option value="personal">个人创作</option>
-                <option value="game">游戏配乐</option>
-                <option value="ai_training">AI训练</option>
-                <option value="commercial">商业广告</option>
+                <option value="">域</option>
+                <option value="sound">音</option>
+                <option value="color">色</option>
+                <option value="text">文</option>
             </select>
             
             <select id="sortFilter" class="filter-select">
-                <option value="newest">最新</option>
-                <option value="price_asc">价格 ↑</option>
-                <option value="price_desc">价格 ↓</option>
-                <option value="popular">热门</option>
+                <option value="newest">新</option>
+                <option value="hot">热</option>
+                <option value="value">值</option>
             </select>
         </div>
     </section>
 
-    <!-- 宋金标签 -->
+    <!-- 极简筛选标签 -->
     <section class="filter-tags">
-        <button class="filter-tag active">全部</button>
-        <button class="filter-tag">纯音乐</button>
-        <button class="filter-tag">人声作品</button>
-        <button class="filter-tag">游戏配乐</button>
-        <button class="filter-tag">影视配乐</button>
-        <button class="filter-tag">AI训练集</button>
+        <button class="filter-tag active">全</button>
+        <button class="filter-tag">新</button>
+        <button class="filter-tag">热</button>
+        <button class="filter-tag">值</button>
     </section>
 
     <!-- 主内容区 -->
     <main class="marketplace-container">
         <!-- 加载状态 -->
         <div id="loadingState" class="loading-state">
-            <p>正在加载...</p>
+            <p>尚待笔墨...</p>
         </div>
 
         <!-- 错误状态 -->
         <div id="errorState" class="error-state hidden">
-            <span class="error-icon">◈</span>
-            <p id="errorText">加载失败，请稍后重试</p>
-            <button class="btn-celadon" onclick="marketplace.loadAssets()">重新加载</button>
+            <span class="error-icon">×</span>
+            <p id="errorText">墨未研就，请再试</p>
+            <button class="btn-celadon" onclick="marketplace.loadAssets()">重试</button>
         </div>
 
         <!-- 空状态 -->
         <div id="emptyState" class="empty-state hidden">
-            <span class="empty-icon">○</span>
-            <p>暂无符合条件的资产</p>
-            <button class="btn-celadon" onclick="marketplace.clearFilters()">清除筛选</button>
+            <span class="empty-icon">空</span>
+            <p>未觅得踪迹</p>
+            <button class="btn-celadon" onclick="marketplace.clearFilters()">重寻</button>
         </div>
 
         <!-- 资产网格 -->
@@ -618,7 +820,7 @@
 
         <!-- 分页 -->
         <section id="pagination" class="pagination hidden">
-            <button id="prevPage" class="btn-celadon" disabled>← 上一页</button>
+            <button id="prevPage" class="btn-celadon" disabled>←</button>
             <div class="page-numbers">
                 <button class="page-number active">1</button>
                 <button class="page-number">2</button>
@@ -626,28 +828,43 @@
                 <span class="page-ellipsis">...</span>
                 <button class="page-number">12</button>
             </div>
-            <button id="nextPage" class="btn-celadon">下一页 →</button>
+            <button id="nextPage" class="btn-celadon">→</button>
         </section>
 
         <!-- 加载更多 -->
         <section id="loadMoreSection" class="pagination hidden">
-            <button id="loadMoreBtn" class="btn-celadon">加载更多</button>
+            <button id="loadMoreBtn" class="btn-celadon">载入更多</button>
         </section>
     </main>
 
     <!-- 页脚 -->
     <footer class="footer">
-        <p>ECHO Protocol · 保护创作者的数字权益</p>
-        <p>Powered by Qitmeer Network</p>
+        <p>随用而生，随流而长</p>
+        <p>ECHO Protocol</p>
     </footer>
 
-    <!-- 脚本 -->
-    <script src="../../scripts/contract-config.js"></script>
-    <script src="../../scripts/wallet.js"></script>
-    <script src="../../scripts/contract-manager-v3.js"></script>
-    <script src="../../scripts/marketplace.js"></script>
-    
+    <!-- 导航栏交互脚本 -->
     <script>
+        // 移动端菜单切换
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        menuBtn.addEventListener('click', () => {
+            const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+            menuBtn.setAttribute('aria-expanded', !isExpanded);
+            mobileMenu.classList.toggle('is-open');
+        });
+        
+        // 滚动时导航栏背景渐显
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('is-scrolled');
+            } else {
+                navbar.classList.remove('is-scrolled');
+            }
+        });
+
         // 标签切换
         document.querySelectorAll('.filter-tag').forEach(tag => {
             tag.addEventListener('click', function() {
@@ -656,5 +873,11 @@
             });
         });
     </script>
+
+    <!-- 保留原有脚本 -->
+    <script src="../../scripts/contract-config.js"></script>
+    <script src="../../scripts/wallet.js"></script>
+    <script src="../../scripts/contract-manager-v3.js"></script>
+    <script src="../../scripts/marketplace.js"></script>
 </body>
 </html>
