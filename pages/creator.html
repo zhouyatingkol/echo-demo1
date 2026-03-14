@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>铸 — ECHO</title>
+    <title>铸 - ECHO</title>
     <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,49 +11,49 @@
             --bg-primary: #F8F6F1;
             --bg-secondary: #F2EFE8;
             --bg-tertiary: #EBE7DD;
-            
+
             /* 四阶墨色 */
             --ink-deep: #1A1A1A;
             --ink-medium: #4A4A4A;
             --ink-light: #7A6E5F;
             --ink-faint: #B5B5B5;
-            
+
             /* 宋金 */
             --gold-primary: #B89B6C;
             --gold-light: #D4C4A8;
-            
+
             /* 三域 - 宋瓷高级感 */
             --realm-sound: #8B9DC3;
             --realm-color: #C9A9A6;
             --realm-text: #7A8B7C;
-            
+
             /* 朱红 */
             --seal-red: #A03020;
-            
+
             /* 字体 */
             --font-display: 'LXGW WenKai', cursive;
             --font-serif: 'Noto Serif SC', serif;
-            
+
             /* 时长 */
             --duration-slow: 1.2s;
             --duration-ambient: 12s;
-            
+
             /* 缓动 */
             --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);
             --ease-breath: cubic-bezier(0.45, 0, 0.55, 1);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         html {
             font-size: 16px;
             scroll-behavior: smooth;
         }
-        
+
         body {
             font-family: var(--font-serif);
             background: var(--bg-primary);
@@ -61,7 +61,7 @@
             line-height: 1.8;
             overflow-x: hidden;
         }
-        
+
         /* ===== 导航栏样式 ===== */
         .navbar {
             position: fixed;
@@ -79,21 +79,21 @@
                         box-shadow 0.8s ease,
                         backdrop-filter 0.8s ease;
         }
-        
+
         .navbar.is-scrolled {
             background: rgba(253, 252, 250, 0.92);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
         }
-        
+
         .navbar__brand {
             display: flex;
             align-items: center;
             text-decoration: none;
             flex-shrink: 0;
         }
-        
+
         .navbar__logo {
             font-family: var(--font-display);
             font-size: 1.25rem;
@@ -104,11 +104,11 @@
             opacity: 0.85;
             transition: opacity 0.4s ease;
         }
-        
+
         .navbar__brand:hover .navbar__logo {
             opacity: 1;
         }
-        
+
         .navbar__nav {
             display: flex;
             align-items: center;
@@ -116,7 +116,7 @@
             margin: 0 auto;
             padding: 0 2rem;
         }
-        
+
         .navbar__link {
             position: relative;
             font-family: var(--font-display);
@@ -128,11 +128,11 @@
             padding: 0.5rem 0;
             transition: color 0.4s ease;
         }
-        
+
         .navbar__link:hover {
             color: #3A3530;
         }
-        
+
         .navbar__link::after {
             content: '';
             position: absolute;
@@ -143,22 +143,22 @@
             background: var(--gold-primary);
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         .navbar__link:hover::after {
             width: 100%;
         }
-        
+
         .navbar__link.is-active {
             color: var(--ink-deep);
         }
-        
+
         .navbar__actions {
             display: flex;
             align-items: center;
             gap: 1.5rem;
             flex-shrink: 0;
         }
-        
+
         .navbar__user {
             text-decoration: none;
             display: flex;
@@ -175,13 +175,13 @@
             cursor: pointer;
             transition: all 0.4s ease;
         }
-        
+
         .navbar__user:hover {
             border-color: var(--gold-primary);
             color: #3A3530;
             background: rgba(201, 184, 150, 0.05);
         }
-        
+
         .navbar__user-placeholder {
             width: 20px;
             height: 20px;
@@ -191,13 +191,13 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .navbar__user-placeholder svg {
             width: 12px;
             height: 12px;
             stroke: #7A6E5F;
         }
-        
+
         .navbar__menu-btn {
             display: none;
             flex-direction: column;
@@ -211,7 +211,7 @@
             border: none;
             padding: 0;
         }
-        
+
         .navbar__menu-line {
             width: 24px;
             height: 1px;
@@ -219,7 +219,7 @@
             transition: all 0.4s ease;
             transform-origin: center;
         }
-        
+
         .navbar__mobile-menu {
             position: fixed;
             top: 60px;
@@ -239,13 +239,13 @@
             pointer-events: none;
             transition: opacity 0.8s ease, visibility 0.8s ease;
         }
-        
+
         .navbar__mobile-menu.is-open {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
         }
-        
+
         .navbar__mobile-menu .navbar__link {
             font-size: 1.5rem;
             font-weight: 300;
@@ -253,7 +253,7 @@
             padding: 1rem 0;
             letter-spacing: 0.5em;
         }
-        
+
         @media (max-width: 768px) {
             .navbar__nav {
                 display: none;
@@ -270,27 +270,27 @@
                 transform: translateX(-50%);
             }
         }
-        
+
         @media (min-width: 769px) {
             .navbar__mobile-menu {
                 display: none !important;
             }
         }
-        
+
         /* ===== 页面主容器 ===== */
         .creator-page {
             min-height: 100vh;
             padding-top: 80px;
             padding-bottom: 10vh;
         }
-        
+
         /* ===== Hero 区 ===== */
         .creator-hero {
             padding: 8vh 5vw 6vh;
             text-align: center;
             position: relative;
         }
-        
+
         .creator-hero::before {
             content: '';
             position: absolute;
@@ -302,7 +302,7 @@
             background: linear-gradient(to bottom, transparent, var(--gold-primary), transparent);
             opacity: 0.5;
         }
-        
+
         .creator-title {
             font-family: var(--font-display);
             font-size: clamp(3rem, 8vw, 5rem);
@@ -312,7 +312,7 @@
             margin-bottom: 1rem;
             margin-left: 0.3em;
         }
-        
+
         .creator-subtitle {
             font-family: var(--font-serif);
             font-size: 1rem;
@@ -320,7 +320,7 @@
             letter-spacing: 0.2em;
             font-weight: 300;
         }
-        
+
         /* ===== 步骤指示器 ===== */
         .step-indicator {
             display: flex;
@@ -330,13 +330,13 @@
             padding: 3rem 2rem;
             margin-bottom: 2rem;
         }
-        
+
         .step {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
-        
+
         .step-dot {
             width: 40px;
             height: 40px;
@@ -349,37 +349,37 @@
             letter-spacing: 0.1em;
             transition: all 0.6s ease;
         }
-        
+
         .step-dot--pending {
             background: var(--bg-tertiary);
             color: var(--ink-light);
             border: 0.5px solid rgba(122, 110, 95, 0.2);
         }
-        
+
         .step-dot--active {
             background: var(--ink-deep);
             color: var(--bg-primary);
         }
-        
+
         .step-dot--completed {
             background: var(--gold-primary);
             color: white;
         }
-        
+
         .step-line {
             width: 40px;
             height: 0.5px;
             background: var(--gold-primary);
             opacity: 0.4;
         }
-        
+
         /* ===== 表单容器 ===== */
         .creator-form {
             max-width: 720px;
             margin: 0 auto;
             padding: 0 2rem;
         }
-        
+
         .form-section {
             background: var(--bg-secondary);
             padding: 3rem;
@@ -387,15 +387,15 @@
             border-radius: 2px;
             border: 0.5px solid rgba(26, 26, 26, 0.06);
         }
-        
+
         .form-group {
             margin-bottom: 2.5rem;
         }
-        
+
         .form-group:last-child {
             margin-bottom: 0;
         }
-        
+
         .form-label {
             display: block;
             font-family: var(--font-display);
@@ -404,7 +404,7 @@
             letter-spacing: 0.2em;
             margin-bottom: 1rem;
         }
-        
+
         .form-hint {
             font-family: var(--font-serif);
             font-size: 0.75rem;
@@ -413,7 +413,7 @@
             margin-top: 0.5rem;
             opacity: 0.8;
         }
-        
+
         .form-input {
             width: 100%;
             padding: 1rem 1.2rem;
@@ -427,22 +427,22 @@
             outline: none;
             transition: all 0.4s ease;
         }
-        
+
         .form-input:focus {
             border-color: var(--gold-primary);
             box-shadow: 0 0 0 2px rgba(184, 155, 108, 0.1);
         }
-        
+
         .form-input::placeholder {
             color: var(--ink-faint);
         }
-        
+
         .form-textarea {
             min-height: 120px;
             resize: vertical;
             line-height: 1.8;
         }
-        
+
         /* ===== 上传区域 ===== */
         .upload-area {
             position: relative;
@@ -454,31 +454,31 @@
             transition: all 0.6s ease;
             background: var(--bg-primary);
         }
-        
+
         .upload-area:hover {
             border-color: var(--gold-primary);
             background: rgba(184, 155, 108, 0.02);
         }
-        
+
         .upload-area.is-dragover {
             border-color: var(--gold-primary);
             background: rgba(184, 155, 108, 0.05);
         }
-        
+
         .upload-icon {
             width: 48px;
             height: 48px;
             margin: 0 auto 1rem;
             opacity: 0.5;
         }
-        
+
         .upload-icon svg {
             width: 100%;
             height: 100%;
             stroke: var(--ink-light);
             stroke-width: 0.5;
         }
-        
+
         .upload-text {
             font-family: var(--font-display);
             font-size: 1rem;
@@ -486,14 +486,14 @@
             letter-spacing: 0.1em;
             margin-bottom: 0.5rem;
         }
-        
+
         .upload-hint {
             font-family: var(--font-serif);
             font-size: 0.75rem;
             color: var(--ink-faint);
             letter-spacing: 0.05em;
         }
-        
+
         .upload-input {
             position: absolute;
             top: 0;
@@ -503,7 +503,7 @@
             opacity: 0;
             cursor: pointer;
         }
-        
+
         .upload-preview {
             display: none;
             margin-top: 1.5rem;
@@ -512,18 +512,18 @@
             border-radius: 2px;
             border: 0.5px solid rgba(26, 26, 26, 0.1);
         }
-        
+
         .upload-preview.is-visible {
             display: block;
         }
-        
+
         .preview-item {
             display: flex;
             align-items: center;
             gap: 1rem;
             padding: 0.8rem;
         }
-        
+
         .preview-icon {
             width: 40px;
             height: 40px;
@@ -533,32 +533,32 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .preview-icon svg {
             width: 20px;
             height: 20px;
             stroke: var(--ink-light);
         }
-        
+
         .preview-info {
             flex: 1;
             text-align: left;
         }
-        
+
         .preview-name {
             font-family: var(--font-serif);
             font-size: 0.85rem;
             color: var(--ink-deep);
             letter-spacing: 0.02em;
         }
-        
+
         .preview-size {
             font-family: var(--font-serif);
             font-size: 0.7rem;
             color: var(--ink-faint);
             letter-spacing: 0.02em;
         }
-        
+
         .preview-remove {
             padding: 0.4rem 0.8rem;
             font-family: var(--font-display);
@@ -571,19 +571,19 @@
             transition: all 0.3s ease;
             letter-spacing: 0.1em;
         }
-        
+
         .preview-remove:hover {
             color: var(--seal-red);
             border-color: var(--seal-red);
         }
-        
+
         /* ===== 三域选择 ===== */
         .realm-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
         }
-        
+
         .realm-card {
             position: relative;
             padding: 2rem 1.5rem;
@@ -593,35 +593,35 @@
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             border: 2px solid transparent;
         }
-        
+
         .realm-card:hover {
             transform: translateY(-3px);
         }
-        
+
         .realm-card.is-selected {
             border-color: var(--ink-deep);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
-        
+
         .realm-card--sound {
             background: var(--realm-sound);
         }
-        
+
         .realm-card--color {
             background: var(--realm-color);
         }
-        
+
         .realm-card--text {
             background: var(--realm-text);
         }
-        
+
         .realm-icon {
             width: 32px;
             height: 32px;
             margin: 0 auto 1rem;
             opacity: 0.9;
         }
-        
+
         .realm-icon svg {
             width: 100%;
             height: 100%;
@@ -629,7 +629,7 @@
             stroke-width: 0.5;
             fill: none;
         }
-        
+
         .realm-name {
             font-family: var(--font-display);
             font-size: 1.1rem;
@@ -637,14 +637,14 @@
             letter-spacing: 0.15em;
             margin-bottom: 0.5rem;
         }
-        
+
         .realm-desc {
             font-family: var(--font-serif);
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.7);
             letter-spacing: 0.05em;
         }
-        
+
         .realm-check {
             position: absolute;
             top: 0.8rem;
@@ -660,44 +660,44 @@
             transform: scale(0);
             transition: all 0.3s ease;
         }
-        
+
         .realm-card.is-selected .realm-check {
             opacity: 1;
             transform: scale(1);
         }
-        
+
         .realm-check svg {
             width: 12px;
             height: 12px;
             stroke: white;
             stroke-width: 2;
         }
-        
+
         /* ===== 定价输入 ===== */
         .price-input-wrapper {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
-        
+
         .price-input {
             flex: 1;
             max-width: 200px;
         }
-        
+
         .price-unit {
             font-family: var(--font-display);
             font-size: 0.9rem;
             color: var(--ink-medium);
             letter-spacing: 0.1em;
         }
-        
+
         .price-options {
             display: flex;
             gap: 0.8rem;
             margin-top: 1rem;
         }
-        
+
         .price-option {
             padding: 0.6rem 1.2rem;
             font-family: var(--font-display);
@@ -710,98 +710,121 @@
             transition: all 0.4s ease;
             letter-spacing: 0.1em;
         }
-        
+
         .price-option:hover {
             border-color: var(--gold-primary);
             color: var(--ink-deep);
         }
-        
+
         .price-option.is-selected {
             background: var(--ink-deep);
             color: var(--bg-primary);
             border-color: var(--ink-deep);
         }
-        
+
         /* ===== 权益设置 ===== */
+        .rights-intro {
+            text-align: center;
+            font-family: var(--font-serif);
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            margin-bottom: 1.5rem;
+        }
+
         .rights-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
         }
-        
+
         .rights-item {
             display: flex;
             align-items: flex-start;
             gap: 0.8rem;
-            padding: 1rem;
+            padding: 1.2rem;
             background: var(--bg-primary);
             border-radius: 2px;
             border: 0.5px solid rgba(26, 26, 26, 0.06);
             cursor: pointer;
             transition: all 0.4s ease;
         }
-        
+
         .rights-item:hover {
             border-color: var(--gold-primary);
+            transform: translateY(-2px);
         }
-        
-        .rights-checkbox {
-            width: 18px;
-            height: 18px;
-            border: 1px solid rgba(26, 26, 26, 0.2);
-            border-radius: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+
+        .rights-item.is-checked {
+            border-color: var(--cinnabar);
+            background: rgba(160, 48, 32, 0.02);
+        }
+
+        .rights-icon {
+            font-size: 1.4rem;
+            color: var(--ink-light);
             flex-shrink: 0;
-            margin-top: 2px;
-            transition: all 0.3s ease;
+            transition: color 0.3s ease;
         }
-        
-        .rights-item.is-checked .rights-checkbox {
-            background: var(--ink-deep);
-            border-color: var(--ink-deep);
+
+        .rights-item.is-checked .rights-icon {
+            color: var(--cinnabar);
         }
-        
-        .rights-checkbox svg {
-            width: 12px;
-            height: 12px;
-            stroke: white;
-            stroke-width: 2;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .rights-item.is-checked .rights-checkbox svg {
-            opacity: 1;
-        }
-        
+
         .rights-content {
             flex: 1;
         }
-        
+
         .rights-title {
             font-family: var(--font-display);
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: var(--ink-deep);
-            letter-spacing: 0.1em;
-            margin-bottom: 0.3rem;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.4rem;
         }
-        
+
+        .rights-item.is-checked .rights-title {
+            color: var(--cinnabar);
+        }
+
         .rights-desc {
             font-family: var(--font-serif);
-            font-size: 0.7rem;
+            font-size: 0.75rem;
+            color: var(--ink-medium);
+            letter-spacing: 0.05em;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .rights-detail {
+            font-family: var(--font-sans);
+            font-size: 0.65rem;
             color: var(--ink-light);
             letter-spacing: 0.02em;
-            line-height: 1.6;
         }
-        
+
+        .rights-modes {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .mode-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.65rem;
+            color: var(--gold-primary);
+            border: 0.5px solid var(--gold-primary);
+            border-radius: 2px;
+            letter-spacing: 0.05em;
+        }
+
         /* ===== 提交按钮 ===== */
         .form-submit {
             text-align: center;
             padding: 3rem 0;
         }
-        
+
         .submit-btn {
             display: inline-flex;
             align-items: center;
@@ -820,7 +843,7 @@
             text-decoration: none;
             position: relative;
         }
-        
+
         .submit-btn::before {
             content: '';
             position: absolute;
@@ -828,29 +851,29 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.1), 
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
                 transparent);
             transition: left 1s ease;
         }
-        
+
         .submit-btn:hover::before {
             left: 100%;
         }
-        
+
         .submit-btn:hover {
             background: var(--seal-red);
             letter-spacing: 0.6em;
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(160, 48, 32, 0.2);
         }
-        
+
         .submit-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         /* ===== 印章装饰 ===== */
         .seal-decoration {
             position: fixed;
@@ -867,47 +890,47 @@
             pointer-events: none;
             z-index: 1;
         }
-        
+
         .seal-decoration span {
             font-family: var(--font-display);
             font-size: 1.5rem;
             color: var(--seal-red);
             letter-spacing: 0.1em;
         }
-        
+
         /* ===== 响应式 ===== */
         @media (max-width: 768px) {
             .creator-title {
                 font-size: clamp(2.5rem, 10vw, 4rem);
             }
-            
+
             .form-section {
                 padding: 2rem 1.5rem;
             }
-            
+
             .realm-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .rights-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .step-indicator {
                 flex-wrap: wrap;
                 gap: 0.5rem;
             }
-            
+
             .step-line {
                 width: 20px;
             }
-            
+
             .step-dot {
                 width: 32px;
                 height: 32px;
                 font-size: 0.8rem;
             }
-            
+
             .seal-decoration {
                 display: none;
             }
@@ -920,13 +943,13 @@
         <a href="index.html" class="navbar__brand" aria-label="返回首页">
             <span class="navbar__logo">ECHO</span>
         </a>
-        
+
         <div class="navbar__nav">
             <a href="index.html" class="navbar__link">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
             <a href="docs.html" class="navbar__link">典</a>
         </div>
-        
+
         <div class="navbar__actions">
             <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包">
                 <span class="navbar__user-placeholder">
@@ -938,13 +961,13 @@
                 <span>入链</span>
             </button>
         </div>
-        
+
         <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
             <span class="navbar__menu-line"></span>
             <span class="navbar__menu-line"></span>
             <span class="navbar__menu-line"></span>
         </button>
-        
+
         <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
             <a href="index.html" class="navbar__link">境</a>
             <a href="marketplace.html" class="navbar__link">集</a>
@@ -962,7 +985,7 @@
             <h1 class="creator-title">生</h1>
             <p class="creator-subtitle">生此 ECHO</p>
         </section>
-        
+
         <!-- 步骤指示器 -->
         <div class="step-indicator">
             <div class="step">
@@ -985,7 +1008,7 @@
                 <div class="step-dot step-dot--pending" data-step="5">生</div>
             </div>
         </div>
-        
+
         <!-- 表单 -->
         <form class="creator-form" id="creatorForm">
             <!-- 呈：上传 -->
@@ -1070,7 +1093,7 @@
                     </div>
                 </div>
             </section>
-            
+
             <!-- 述：描述 -->
             <section class="form-section" id="section-describe">
                 <div class="form-group">
@@ -1083,7 +1106,7 @@
                     <p class="form-hint">简练为上，百字为限</p>
                 </div>
             </section>
-            
+
             <!-- 值：定价 -->
             <section class="form-section" id="section-value">
                 <div class="form-group">
@@ -1101,60 +1124,54 @@
                     <p class="form-hint">设值则售，留空则藏</p>
                 </div>
             </section>
-            
+
             <!-- 权：权益 -->
             <section class="form-section" id="section-rights">
                 <div class="form-group">
                     <label class="form-label">权</label>
+                    <div class="rights-intro">四权分离，各得其所</div>
                     <div class="rights-grid">
-                        <div class="rights-item is-checked" data-right="ownership">
-                            <div class="rights-checkbox">
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                            </div>
+                        <div class="rights-item is-checked" data-right="usage">
+                            <div class="rights-icon">◈</div>
                             <div class="rights-content">
-                                <div class="rights-title">拥有权</div>
-                                <div class="rights-desc">藏家获得作品链上所有权</div>
-                            </div>
-                        </div>
-                        <div class="rights-item" data-right="display">
-                            <div class="rights-checkbox">
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                            </div>
-                            <div class="rights-content">
-                                <div class="rights-title">展示权</div>
-                                <div class="rights-desc">允许公开展示与分享</div>
+                                <div class="rights-title">用</div>
+                                <div class="rights-desc">特定场景、时限、次数内可用</div>
+                                <div class="rights-modes">
+                                    <span class="mode-tag">断</span>
+                                    <span class="mode-tag">次</span>
+                                    <span class="mode-tag">时</span>
+                                </div>
                             </div>
                         </div>
                         <div class="rights-item" data-right="derivative">
-                            <div class="rights-checkbox">
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                            </div>
+                            <div class="rights-icon">◇</div>
                             <div class="rights-content">
-                                <div class="rights-title">衍生权</div>
-                                <div class="rights-desc">允许创作衍生作品</div>
+                                <div class="rights-title">衍</div>
+                                <div class="rights-desc"> remix、翻唱、改编之权</div>
+                                <div class="rights-detail">多父资产混音，自动收益分配</div>
                             </div>
                         </div>
-                        <div class="rights-item" data-right="commercial">
-                            <div class="rights-checkbox">
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                            </div>
+                        <div class="rights-item" data-right="extension">
+                            <div class="rights-icon">◎</div>
                             <div class="rights-content">
-                                <div class="rights-title">商用权</div>
-                                <div class="rights-desc">允许商业使用与获利</div>
+                                <div class="rights-title">扩</div>
+                                <div class="rights-desc">跨平台、跨媒体、跨地域</div>
+                                <div class="rights-detail">自动扩展条款，七日通知期</div>
+                            </div>
+                        </div>
+                        <div class="rights-item" data-right="revenue">
+                            <div class="rights-icon">◉</div>
+                            <div class="rights-content">
+                                <div class="rights-title">益</div>
+                                <div class="rights-desc">资产收益之分配则</div>
+                                <div class="rights-detail">创作者分成，链上实时结算</div>
                             </div>
                         </div>
                     </div>
+                    <p class="form-hint">勾选则启，留空则禁</p>
                 </div>
             </section>
-            
+
             <!-- 提交 -->
             <div class="form-submit">
                 <button type="submit" class="submit-btn">
@@ -1163,7 +1180,7 @@
             </div>
         </form>
     </main>
-    
+
     <!-- 印章装饰 -->
     <div class="seal-decoration">
         <span>铸</span>
@@ -1179,21 +1196,21 @@
                 navbar.classList.remove('is-scrolled');
             }
         });
-        
+
         // 移动端菜单
         const menuBtn = document.getElementById('menuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
-        
+
         menuBtn.addEventListener('click', () => {
             const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
             menuBtn.setAttribute('aria-expanded', !isExpanded);
             mobileMenu.classList.toggle('is-open');
         });
-        
+
         // 三域选择
         const realmCards = document.querySelectorAll('.realm-card');
         let selectedRealm = null;
-        
+
         realmCards.forEach(card => {
             card.addEventListener('click', () => {
                 realmCards.forEach(c => c.classList.remove('is-selected'));
@@ -1202,7 +1219,7 @@
                 updateStepIndicator(1, true);
             });
         });
-        
+
         // 文件上传
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -1210,18 +1227,18 @@
         const previewName = document.getElementById('previewName');
         const previewSize = document.getElementById('previewSize');
         const removeFile = document.getElementById('removeFile');
-        
+
         uploadArea.addEventListener('click', () => fileInput.click());
-        
+
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('is-dragover');
         });
-        
+
         uploadArea.addEventListener('dragleave', () => {
             uploadArea.classList.remove('is-dragover');
         });
-        
+
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('is-dragover');
@@ -1230,26 +1247,26 @@
                 handleFile(files[0]);
             }
         });
-        
+
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 handleFile(e.target.files[0]);
             }
         });
-        
+
         function handleFile(file) {
             previewName.textContent = file.name;
             previewSize.textContent = formatFileSize(file.size);
             uploadPreview.classList.add('is-visible');
             updateStepIndicator(1, true);
         }
-        
+
         removeFile.addEventListener('click', (e) => {
             e.stopPropagation();
             fileInput.value = '';
             uploadPreview.classList.remove('is-visible');
         });
-        
+
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 B';
             const k = 1024;
@@ -1257,11 +1274,11 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
-        
+
         // 定价选项
         const priceOptions = document.querySelectorAll('.price-option');
         const priceInput = document.getElementById('workPrice');
-        
+
         priceOptions.forEach(option => {
             option.addEventListener('click', () => {
                 priceOptions.forEach(o => o.classList.remove('is-selected'));
@@ -1271,15 +1288,15 @@
                 updateStepIndicator(3, true);
             });
         });
-        
+
         priceInput.addEventListener('input', () => {
             priceOptions.forEach(o => o.classList.remove('is-selected'));
             updateStepIndicator(3, priceInput.value !== '');
         });
-        
+
         // 权益选择
         const rightsItems = document.querySelectorAll('.rights-item');
-        
+
         rightsItems.forEach(item => {
             item.addEventListener('click', () => {
                 item.classList.toggle('is-checked');
@@ -1287,24 +1304,24 @@
                 updateStepIndicator(4, hasChecked);
             });
         });
-        
+
         // 表单输入监听
         const workName = document.getElementById('workName');
         const workDesc = document.getElementById('workDesc');
-        
+
         workName.addEventListener('input', () => {
             updateStepIndicator(2, workName.value !== '' && workDesc.value !== '');
         });
-        
+
         workDesc.addEventListener('input', () => {
             updateStepIndicator(2, workName.value !== '' && workDesc.value !== '');
         });
-        
+
         // 步骤指示器更新
         function updateStepIndicator(step, isComplete) {
             const dots = document.querySelectorAll('.step-dot');
             const steps = ['呈', '述', '值', '权', '生'];
-            
+
             for (let i = 0; i < dots.length; i++) {
                 if (i < step) {
                     dots[i].classList.remove('step-dot--pending', 'step-dot--active');
@@ -1320,7 +1337,7 @@
                     dots[i].textContent = steps[i];
                 }
             }
-            
+
             // 检查是否可以提交
             const canSubmit = dots[3].classList.contains('step-dot--completed');
             const lastDot = dots[4];
@@ -1329,19 +1346,19 @@
                 lastDot.classList.add('step-dot--active');
             }
         }
-        
+
         // 表单提交
         const creatorForm = document.getElementById('creatorForm');
-        
+
         creatorForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
+
             // 更新最后一步
             const dots = document.querySelectorAll('.step-dot');
             dots[4].classList.remove('step-dot--active', 'step-dot--pending');
             dots[4].classList.add('step-dot--completed');
             dots[4].textContent = '✓';
-            
+
             // 显示成功提示（实际项目中会提交到服务器）
             setTimeout(() => {
                 alert('ECHO 已成，灵境化生');
