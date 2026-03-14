@@ -279,6 +279,91 @@
         .work-type {
             font-size: 0.8rem;
             color: #9e8b76;
+            padding: 0.2rem 0.6rem;
+            border-radius: 2px;
+            letter-spacing: 0.05em;
+        }
+        
+        .work-type.type-music {
+            background: rgba(201, 168, 108, 0.08);
+            color: #c9a86c;
+        }
+        
+        .work-type.type-art {
+            background: rgba(158, 139, 118, 0.1);
+            color: #9e8b76;
+        }
+        
+        .work-type.type-lit {
+            background: rgba(90, 82, 72, 0.08);
+            color: #5a5248;
+        }
+        
+        /* 三域按钮 */
+        .domain-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .domain-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 2.5rem;
+            background: transparent;
+            border: 0.5px solid rgba(26, 26, 26, 0.12);
+            text-decoration: none;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            min-width: 120px;
+        }
+        
+        .domain-btn:hover {
+            border-color: #c9a86c;
+            background: rgba(201, 168, 108, 0.03);
+            transform: translateY(-3px);
+        }
+        
+        .domain-icon {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2.2rem;
+            font-weight: 200;
+            color: #c9a86c;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.1em;
+            transition: all 0.4s ease;
+        }
+        
+        .domain-btn:hover .domain-icon {
+            transform: scale(1.1);
+            color: #b8955a;
+        }
+        
+        .domain-name {
+            font-size: 0.75rem;
+            color: #5a5248;
+            letter-spacing: 0.15em;
+            font-weight: 300;
+        }
+        
+        .dashboard-btn {
+            margin-top: 0;
+        }
+        
+        .domain-item {
+            transition: all 0.5s ease;
+        }
+        
+        .domain-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .domain-item:hover div:first-child {
+            color: #b8955a;
+            transform: scale(1.05);
+            transition: all 0.4s ease;
         }
         
         /* 状态标签 */
@@ -878,18 +963,59 @@
 
         <!-- 快捷操作 -->
         <section class="actions-section">
-            <a href="creator-upload.html" class="action-btn fade-up">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M12 5v14M5 12h14"/>
-                </svg>
-                生成新作品
-            </a>
-            <a href="creator-dashboard.html" class="action-btn fade-up">
+            <div class="domain-actions fade-up">
+                <a href="mint.html?type=music" class="domain-btn domain-music">
+                    <span class="domain-icon">音</span>
+                    <span class="domain-name">生成声音作品</span>
+                </a>
+                <a href="mint.html?type=art" class="domain-btn domain-art">
+                    <span class="domain-icon">色</span>
+                    <span class="domain-name">生成视觉作品</span>
+                </a>
+                <a href="mint.html?type=lit" class="domain-btn domain-lit">
+                    <span class="domain-icon">文</span>
+                    <span class="domain-name">生成文字作品</span>
+                </a>
+            </div>
+            <a href="creator-dashboard.html" class="action-btn dashboard-btn fade-up">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 3h18v18H3zM9 3v18M15 3v18M3 9h18M3 15h18"/>
                 </svg>
                 仪表盘
             </a>
+        </section>
+
+        <!-- 三域 -->
+        <section class="section-poetic" style="background: #f0ece3;">
+            <div class="section-label fade-up">Domains</div>
+            
+            <div style="display: flex; justify-content: center; gap: 6vw; text-align: center; flex-wrap: wrap; align-items: center;">
+                <div class="domain-item" style="padding: 2.5rem 2rem;">
+                    <div style="font-size: 2.8rem; font-family: 'Noto Serif SC', serif; font-weight: 200; color: #c9a86c; letter-spacing: 0.2em; margin-bottom: 1.2rem; line-height: 1;">音</div>
+                    <div style="width: 24px; height: 1px; background: linear-gradient(90deg, transparent, #c9a86c, transparent); margin: 0 auto 0.8rem;"></div>
+                    <div style="font-size: 0.75rem; color: #7a6e5f; letter-spacing: 0.2em; font-weight: 300;">音乐</div>
+                </div>
+                
+                <div style="width: 1px; height: 80px; background: linear-gradient(to bottom, transparent, rgba(201,168,108,0.3), transparent);"></div>
+                
+                <div class="domain-item" style="padding: 2.5rem 2rem;">
+                    <div style="font-size: 2.8rem; font-family: 'Noto Serif SC', serif; font-weight: 200; color: #c9a86c; letter-spacing: 0.2em; margin-bottom: 1.2rem; line-height: 1;">色</div>
+                    <div style="width: 24px; height: 1px; background: linear-gradient(90deg, transparent, #c9a86c, transparent); margin: 0 auto 0.8rem;"></div>
+                    <div style="font-size: 0.75rem; color: #7a6e5f; letter-spacing: 0.2em; font-weight: 300;">艺术</div>
+                </div>
+                
+                <div style="width: 1px; height: 80px; background: linear-gradient(to bottom, transparent, rgba(201,168,108,0.3), transparent);"></div>
+                
+                <div class="domain-item" style="padding: 2.5rem 2rem;">
+                    <div style="font-size: 2.8rem; font-family: 'Noto Serif SC', serif; font-weight: 200; color: #c9a86c; letter-spacing: 0.2em; margin-bottom: 1.2rem; line-height: 1;">文</div>
+                    <div style="width: 24px; height: 1px; background: linear-gradient(90deg, transparent, #c9a86c, transparent); margin: 0 auto 0.8rem;"></div>
+                    <div style="font-size: 0.75rem; color: #7a6e5f; letter-spacing: 0.2em; font-weight: 300;">文学</div>
+                </div>
+            </div>
+            
+            <p style="text-align: center; margin-top: 4rem; font-size: 0.9rem; color: #7a6e5f; letter-spacing: 0.25em; font-style: italic; font-weight: 300;">
+                三者共鸣，生长不息
+            </p>
         </section>
 
         <!-- 作品管理 -->
@@ -913,7 +1039,7 @@
                     <tbody>
                         <tr>
                             <td data-label="作品名称"><span class="work-name">夏日微风</span></td>
-                            <td data-label="类型"><span class="work-type">音乐</span></td>
+                            <td data-label="类型"><span class="work-type type-music">音 · 音乐</span></td>
                             <td data-label="状态"><span class="status-tag active">已上架</span></td>
                             <td data-label="价格"><span class="work-price">100 ECHO</span></td>
                             <td data-label="操作">
@@ -926,7 +1052,7 @@
                         </tr>
                         <tr>
                             <td data-label="作品名称"><span class="work-name">城市节拍</span></td>
-                            <td data-label="类型"><span class="work-type">音乐</span></td>
+                            <td data-label="类型"><span class="work-type type-music">音 · 音乐</span></td>
                             <td data-label="状态"><span class="status-tag active">已上架</span></td>
                             <td data-label="价格"><span class="work-price">150 ECHO</span></td>
                             <td data-label="操作">
@@ -939,7 +1065,7 @@
                         </tr>
                         <tr>
                             <td data-label="作品名称"><span class="work-name">山间晨雾</span></td>
-                            <td data-label="类型"><span class="work-type">影像</span></td>
+                            <td data-label="类型"><span class="work-type type-art">色 · 艺术</span></td>
                             <td data-label="状态"><span class="status-tag pending">审核中</span></td>
                             <td data-label="价格"><span class="work-price">—</span></td>
                             <td data-label="操作">
@@ -951,7 +1077,7 @@
                         </tr>
                         <tr>
                             <td data-label="作品名称"><span class="work-name">午夜蓝调</span></td>
-                            <td data-label="类型"><span class="work-type">音乐</span></td>
+                            <td data-label="类型"><span class="work-type type-music">音 · 音乐</span></td>
                             <td data-label="状态"><span class="status-tag inactive">已下架</span></td>
                             <td data-label="价格"><span class="work-price">—</span></td>
                             <td data-label="操作">
@@ -964,7 +1090,7 @@
                         </tr>
                         <tr>
                             <td data-label="作品名称"><span class="work-name">光影流动</span></td>
-                            <td data-label="类型"><span class="work-type">影像</span></td>
+                            <td data-label="类型"><span class="work-type type-art">色 · 艺术</span></td>
                             <td data-label="状态"><span class="status-tag active">已上架</span></td>
                             <td data-label="价格"><span class="work-price">200 ECHO</span></td>
                             <td data-label="操作">
