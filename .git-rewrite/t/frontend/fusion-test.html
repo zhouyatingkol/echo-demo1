@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO融合测试</title>
+    <script src="ethers.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding-top: 64px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 14px; }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-title { font-size: 18px; margin-bottom: 16px; color: #00d4ff; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            margin-bottom: 10px;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .seed-list {
+            display: grid;
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .seed-item {
+            background: rgba(0,0,0,0.3);
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .seed-item:hover { border-color: rgba(0,212,255,0.3); }
+        .seed-item.selected {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        .seed-icon { font-size: 24px; }
+        .seed-info { flex: 1; }
+        .seed-name { font-weight: bold; margin-bottom: 4px; }
+        .seed-meta { font-size: 12px; color: #888; }
+        .address-display {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: monospace;
+            word-break: break-all;
+            margin-bottom: 16px;
+        }
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .status.success { background: rgba(0,255,0,0.1); color: #0f0; }
+        .status.error { background: rgba(255,0,0,0.1); color: #f55; }
+        .status.pending { background: rgba(255,215,0,0.1); color: #ffd700; }
+        .hidden { display: none !important; }
+        .tree-preview {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+        .tree-icon { font-size: 80px; margin-bottom: 10px; }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+    </style>
+  <script src="js/wallet-state.js" defer></script>
+</head>
+<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">铸造</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
+    <div class="container">
+        <h1>🌳 ECHO 融合测试</h1>
+        <p class="subtitle">把种子融合成树</p>
+
+        <!-- 步骤1：连接钱包 -->
+        <div class="card" id="step1">
+            <div class="card-title">步骤 1：连接钱包</div>
+            <button class="btn" id="connectBtn">连接 MetaMask</button>
+            <div id="walletInfo" class="hidden">
+                <div class="address-display" id="walletAddress"></div>
+            </div>
+        </div>
+
+        <!-- 步骤2：选择种子 -->
+        <div class="card hidden" id="step2">
+            <div class="card-title">步骤 2：选择种子（2-10颗）</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <p style="text-align: center; color: #888; font-size: 14px; margin-bottom: 16px;">
+                已选择 <span id="selectedCount">0</span> / 10
+            </p>
+            <div class="seed-list" id="seedList">
+                <p style="color: #888; text-align: center;">加载中...</p>
+            </div>
+            
+            <button class="btn" id="nextToStep3" style="display: none; margin-bottom: 10px;">下一步 →</button>
+            <button class="btn btn-secondary" id="refreshSeedsBtn">🔄 刷新列表</button>
+        </div>
+
+        <!-- 步骤3：配置树 -->
+        <div class="card hidden" id="step3">
+            <div class="card-title">步骤 3：配置树</div>
+            
+            <div class="tree-preview">
+                <div class="tree-icon">🌳</div>
+                <p>培育新树</p>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; color: #888;">树的名称</label>
+                <input type="text" id="treeName" value="我的第一棵树" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff;">
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; color: #888;">描述</label>
+                <textarea id="treeDesc" rows="2" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff;">由数字种子融合而成</textarea>
+            </div>
+
+            <button class="btn" id="backToStep2">← 重新选择</button>
+        </div>
+
+        <!-- 步骤4：确认融合 -->
+        <div class="card hidden" id="step4">
+            <div class="card-title">步骤 4：确认融合</div>
+            
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; margin-bottom: 16px;">
+                <h3 style="margin-bottom: 12px; color: #00d4ff;">融合预览</h3>
+                <p><strong>树名：</strong><span id="previewName">--</span></p>
+                <p><strong>使用种子：</strong><span id="previewSeeds">--</span></p>
+                <p><strong>预估Gas：</strong>~0.02 MEER</p>
+            </div>
+
+            <button class="btn" id="fuseBtn">🔨 确认融合</button>
+            <button class="btn btn-secondary" id="backToStep3">← 修改配置</button>
+        </div>
+
+        <!-- 状态显示 -->
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // 合约配置
+        const ECHO_ASSET_CONTRACT = '0x5f5AAe09BB85f561b21845729B79E840AB026148';
+        const ECHO_FUSION_CONTRACT = '0x3AD441ECfC193fbe7f086b962d0bCfd2Bc2Bac0d';
+
+        // ABI
+        const ECHO_ASSET_ABI = [
+            "function getAssetInfo(uint256) view returns (tuple(string,string,string,string,uint256),tuple(address,address,address,address,uint256,uint256,uint256),address)",
+            "function ownerOf(uint256) view returns (address)",
+            "function getCurrentTokenId() view returns (uint256)"
+        ];
+
+        const ECHO_FUSION_ABI = [
+            "function fuseTree(uint256[],uint256[],string,string) returns (uint256)",
+            "function getCurrentTreeId() view returns (uint256)"
+        ];
+
+        let provider, signer, userAddress;
+        let echoAssetContract, echoFusionContract;
+        let selectedSeeds = [];
+
+        // DOM元素
+        const connectBtn = document.getElementById('connectBtn');
+        const walletInfo = document.getElementById('walletInfo');
+        const walletAddress = document.getElementById('walletAddress');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const seedList = document.getElementById('seedList');
+        const selectedCount = document.getElementById('selectedCount');
+        const progressFill = document.getElementById('progressFill');
+        const nextToStep3 = document.getElementById('nextToStep3');
+        const refreshSeedsBtn = document.getElementById('refreshSeedsBtn');
+        const treeName = document.getElementById('treeName');
+        const treeDesc = document.getElementById('treeDesc');
+        const fuseBtn = document.getElementById('fuseBtn');
+        const status = document.getElementById('status');
+
+        // 辅助函数
+        function showStatus(msg, type) {
+            status.innerHTML = msg ? `<div class="status ${type}">${msg}</div>` : '';
+        }
+
+        function showStep(stepNum) {
+            step1.classList.add('hidden');
+            step2.classList.add('hidden');
+            step3.classList.add('hidden');
+            step4.classList.add('hidden');
+            
+            document.getElementById('step' + stepNum).classList.remove('hidden');
+        }
+
+        // 连接钱包
+        connectBtn.addEventListener('click', async () => {
+            try {
+                showStatus('连接中...', 'pending');
+                
+                if (!window.ethereum) {
+                    showStatus('❌ 请安装 MetaMask', 'error');
+                    return;
+                }
+
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                // 初始化合约
+                echoAssetContract = new ethers.Contract(ECHO_ASSET_CONTRACT, ECHO_ASSET_ABI, signer);
+                echoFusionContract = new ethers.Contract(ECHO_FUSION_CONTRACT, ECHO_FUSION_ABI, signer);
+                
+                // 更新UI
+                walletAddress.textContent = userAddress;
+                walletInfo.classList.remove('hidden');
+                connectBtn.classList.add('hidden');
+                
+                showStatus('✅ 连接成功', 'success');
+                
+                // 加载种子
+                await loadSeeds();
+                showStep(2);
+                
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        });
+
+        // 加载种子列表
+        async function loadSeeds() {
+            seedList.innerHTML = '<p style="color: #888; text-align: center;">加载中...</p>';
+            
+            try {
+                const currentId = await echoAssetContract.getCurrentTokenId();
+                const seeds = [];
+                
+                for (let i = 0; i < currentId; i++) {
+                    try {
+                        const owner = await echoAssetContract.ownerOf(i);
+                        if (owner.toLowerCase() === userAddress.toLowerCase()) {
+                            const info = await echoAssetContract.getAssetInfo(i);
+                            seeds.push({
+                                id: i,
+                                name: info[0][0],
+                                type: info[0][2]
+                            });
+                        }
+                    } catch (e) {}
+                }
+                
+                renderSeeds(seeds);
+                
+            } catch (error) {
+                seedList.innerHTML = '<p style="color: #f55; text-align: center;">加载失败: ' + error.message + '</p>';
+            }
+        }
+
+        // 渲染种子列表
+        function renderSeeds(seeds) {
+            if (seeds.length === 0) {
+                seedList.innerHTML = '<p style="color: #888; text-align: center;">您还没有种子，请先铸造</p>';
+                return;
+            }
+            
+            if (seeds.length < 2) {
+                seedList.innerHTML = '<p style="color: #888; text-align: center;">至少需要2颗种子才能融合，您当前有 ' + seeds.length + ' 颗</p>';
+                return;
+            }
+            
+            seedList.innerHTML = seeds.map(seed => `
+                <div class="seed-item" data-id="${seed.id}" onclick="toggleSeed(${seed.id})">
+                    <div class="seed-icon">🌱</div>
+                    <div class="seed-info">
+                        <div class="seed-name">${seed.name}</div>
+                        <div class="seed-meta">Token #${seed.id} · ${seed.type}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 切换种子选择
+        window.toggleSeed = function(id) {
+            const index = selectedSeeds.indexOf(id);
+            const element = document.querySelector(`[data-id="${id}"]`);
+            
+            if (index > -1) {
+                selectedSeeds.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                if (selectedSeeds.length >= 10) {
+                    showStatus('最多选择10颗种子', 'error');
+                    return;
+                }
+                selectedSeeds.push(id);
+                element.classList.add('selected');
+            }
+            
+            updateProgress();
+            
+            // 如果选择了>=2颗，显示下一步按钮
+            if (selectedSeeds.length >= 2) {
+                nextToStep3.style.display = 'block';
+            } else {
+                nextToStep3.style.display = 'none';
+            }
+        };
+
+        // 更新进度条
+        function updateProgress() {
+            const count = selectedSeeds.length;
+            selectedCount.textContent = count;
+            progressFill.style.width = (count * 10) + '%';
+        }
+
+        // 刷新种子
+        refreshSeedsBtn.addEventListener('click', loadSeeds);
+
+        // 下一步按钮
+        nextToStep3.addEventListener('click', () => {
+            if (selectedSeeds.length >= 2) {
+                showStep(3);
+            } else {
+                showStatus('请至少选择2颗种子', 'error');
+            }
+        });
+
+        // 返回步骤2
+        document.getElementById('backToStep2').addEventListener('click', () => {
+            showStep(2);
+        });
+
+        // 进入步骤4
+        treeName.addEventListener('change', updatePreview);
+        treeDesc.addEventListener('change', updatePreview);
+
+        function updatePreview() {
+            if (selectedSeeds.length >= 2) {
+                showStep(4);
+                document.getElementById('previewName').textContent = treeName.value;
+                document.getElementById('previewSeeds').textContent = selectedSeeds.map(id => '#' + id).join(', ');
+            }
+        }
+
+        // 返回步骤3
+        document.getElementById('backToStep3').addEventListener('click', () => {
+            showStep(3);
+        });
+
+        // 执行融合
+        fuseBtn.addEventListener('click', async () => {
+            try {
+                showStatus('融合中...请确认MetaMask交易', 'pending');
+                fuseBtn.disabled = true;
+                
+                // 默认权重1:1
+                const weights = selectedSeeds.map(() => 1);
+                
+                const tx = await echoFusionContract.fuseTree(
+                    selectedSeeds,
+                    weights,
+                    treeName.value,
+                    treeDesc.value
+                );
+                
+                showStatus('交易已提交，等待确认...', 'pending');
+                
+                const receipt = await tx.wait();
+                
+                if (receipt.status === 1) {
+                    showStatus('🎉 融合成功！您创建了一棵树！', 'success');
+                    
+                    // 重置
+                    selectedSeeds = [];
+                    updateProgress();
+                    
+                    // 显示树的TokenId
+                    const treeId = await echoFusionContract.getCurrentTreeId();
+                    showStatus(`🎉 融合成功！树ID: ${treeId - 1}`, 'success');
+                } else {
+                    showStatus('❌ 交易失败', 'error');
+                }
+                
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            } finally {
+                fuseBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECHO Music - 私信</title>
+  <script src="./ethers.min.js"></script>
+  <script src="./js/messaging.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      color: #eee;
+    }
+    
+    /* 导航栏 */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+    }
+    
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    
+    .nav-logo {
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .nav-link {
+      padding: 8px 16px;
+      color: #888;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    
+    .nav-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-link.active {
+      color: #00d4ff;
+      background: rgba(0, 212, 255, 0.1);
+    }
+    
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .wallet-btn {
+      padding: 8px 20px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    
+    .wallet-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .wallet-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: rgba(0, 212, 255, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+    
+    .wallet-address {
+      font-family: monospace;
+      color: #00d4ff;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      padding-top: 84px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 40px;
+    }
+    
+    .page-header {
+      margin-bottom: 24px;
+    }
+    
+    .page-header h1 {
+      font-size: 28px;
+      background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* 消息统计卡片 */
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: rgba(26, 26, 46, 0.8);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+    
+    .stat-card .label {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #00d4ff;
+    }
+    
+    /* 消息容器 */
+    #messagingContainer {
+      background: rgba(26, 26, 46, 0.8);
+      border-radius: 16px;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      overflow: hidden;
+      min-height: 600px;
+    }
+    
+    /* 滚动条样式 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 212, 255, 0.3);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 212, 255, 0.5);
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .main-content {
+        padding-top: 72px;
+      }
+    }
+    
+    /* 登录提示 */
+    .login-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: 20px;
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .login-prompt .icon {
+      font-size: 64px;
+    }
+    
+    .login-prompt h2 {
+      color: #fff;
+      font-size: 24px;
+    }
+    
+    .login-prompt p {
+      color: #888;
+      max-width: 400px;
+    }
+    
+    /* 新消息提示 */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(26, 26, 46, 0.95);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      z-index: 9999;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    .toast-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+    }
+    
+    .toast-content {
+      flex: 1;
+    }
+    
+    .toast-title {
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    
+    .toast-message {
+      font-size: 14px;
+      color: #888;
+      max-width: 250px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+  <script src="js/theme-switcher.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+  <link rel="stylesheet" href="css/global.css"
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <script src="js/wallet-state.js" defer></script>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="./index.html" class="nav-logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 17l10 5 10-5"></path>
+          <path d="M2 12l10 5 10-5"></path>
+        </svg>
+        ECHO Music
+      </a>
+      
+      <div class="nav-links">
+        <a href="./index.html" class="nav-link">首页</a>
+        <a href="./discover.html" class="nav-link">发现</a>
+        <a href="./music-market.html" class="nav-link">市场</a>
+        <a href="./my-assets.html" class="nav-link">我的资产</a>
+        <a href="./messages.html" class="nav-link active">私信</a>
+      </div>
+      
+      <div class="nav-right">
+        <div id="walletSection">
+          <button class="wallet-btn" id="connectBtn">连接钱包</button>
+        </div>
+        <div id="walletInfo" class="wallet-info" style="display: none;">
+          <span class="wallet-address" id="walletAddress"></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1>💬 私信中心</h1>
+    </div>
+    
+    <!-- 统计卡片 -->
+    <div class="stats-cards" id="statsCards" style="display: none;">
+      <div class="stat-card">
+        <div class="label">总会话</div>
+        <div class="value" id="totalConversations">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">未读消息</div>
+        <div class="value" id="unreadCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">今日新消息</div>
+        <div class="value" id="todayMessages">0</div>
+      </div>
+    </div>
+    
+    <!-- 消息容器 -->
+    <div id="messagingContainer">
+      <div class="login-prompt" id="loginPrompt">
+        <div class="icon">🔐</div>
+        <h2>请先连接钱包</h2>
+        <p>连接您的 Web3 钱包以查看和发送私信。您的消息将安全存储在本地。</p>
+        <button class="wallet-btn" id="connectBtn">连接钱包</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 新消息 Toast -->
+  <div class="toast" id="messageToast">
+    <div class="toast-avatar" id="toastAvatar"></div>
+    <div class="toast-content">
+      <div class="toast-title" id="toastTitle">新消息</div>
+      <div class="toast-message" id="toastMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    // 全局变量
+    let provider, signer, userAddress;
+    let messagingSystem = null;
+    let messagingUI = null;
+
+    // 检查是否已连接
+    async function checkConnection() {
+      if (typeof window.ethereum === 'undefined') {
+        return;
+      }
+      
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          await connectWallet();
+        }
+      } catch (e) {
+        console.error('Check connection failed:', e);
+      }
+    }
+
+    // 连接钱包
+    async function connectWallet() {
+      if (typeof window.ethereum === 'undefined') {
+        alert('请先安装 MetaMask');
+        return;
+      }
+      
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+        
+        // 更新UI
+        document.getElementById('walletSection').style.display = 'none';
+        document.getElementById('walletInfo').style.display = 'flex';
+        document.getElementById('walletAddress').textContent = 
+          userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+        
+        // 隐藏登录提示，显示统计
+        document.getElementById('loginPrompt').style.display = 'none';
+        document.getElementById('statsCards').style.display = 'grid';
+        
+        // 初始化私信系统
+        initMessagingSystem();
+        
+      } catch (e) {
+        console.error('Connection failed:', e);
+        alert('连接失败: ' + e.message);
+      }
+    }
+
+    // 初始化私信系统
+    function initMessagingSystem() {
+      // 初始化消息系统
+      const { messaging, ui } = initMessaging(userAddress, 'messagingContainer');
+      messagingSystem = messaging;
+      messagingUI = ui;
+      
+      // 更新统计
+      updateStats();
+      
+      // 监听消息事件
+      messaging.onMessage((event, data) => {
+        if (event === 'messageReceived') {
+          showNewMessageToast(data.message, data.conversation);
+        }
+        updateStats();
+      });
+      
+      // 定期检查未读
+      setInterval(updateStats, 5000);
+    }
+
+    // 更新统计
+    function updateStats() {
+      if (!messagingSystem) return;
+      
+      const conversations = messagingSystem.getConversations();
+      const unreadCount = messagingSystem.getTotalUnreadCount();
+      
+      // 今日消息
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let todayCount = 0;
+      
+      conversations.forEach(conv => {
+        if (conv.lastTimestamp >= today.getTime()) {
+          todayCount++;
+        }
+      });
+      
+      document.getElementById('totalConversations').textContent = conversations.length;
+      document.getElementById('unreadCount').textContent = unreadCount;
+      document.getElementById('todayMessages').textContent = todayCount;
+    }
+
+    // 显示新消息提示
+    function showNewMessageToast(message, conversation) {
+      const otherAddress = messagingSystem.getOtherParticipant(conversation);
+      const toast = document.getElementById('messageToast');
+      
+      document.getElementById('toastAvatar').textContent = otherAddress.slice(2, 4).toUpperCase();
+      document.getElementById('toastTitle').textContent = messagingSystem.formatAddress(otherAddress);
+      document.getElementById('toastMessage').textContent = message.content;
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 5000);
+      
+      // 点击跳转
+      toast.onclick = () => {
+        toast.classList.remove('show');
+        messagingUI.openChat(otherAddress);
+      };
+    }
+
+    // 监听账户变化
+    if (typeof window.ethereum !== 'undefined') {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          // 断开连接
+          location.reload();
+        } else {
+          userAddress = accounts[0];
+          document.getElementById('walletAddress').textContent = 
+            userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+          
+          // 重新初始化
+          if (messagingSystem) {
+            messagingSystem.destroy();
+          }
+          initMessagingSystem();
+        }
+      });
+    }
+
+    // 页面加载时检查
+    document.addEventListener('DOMContentLoaded', checkConnection);
+  </script>
+</body>
+</html>

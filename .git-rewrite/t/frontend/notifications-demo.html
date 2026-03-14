@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知系统使用示例</title>
+    <link rel="stylesheet" href="css/notifications.css">
+    <style>
+        /* 基础样式 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .demo-content {
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .demo-btn {
+            padding: 12px 24px;
+            margin: 8px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        .demo-btn:hover { transform: translateY(-2px); }
+        .code-block {
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .code-block pre { color: #8892b0; font-size: 13px; }
+        .code-block code { color: #38bdf8; }
+    </style>
+  <script src="js/wallet-state.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <h1>🎵 Echo 音乐平台</h1>
+        <div id="notification-bell-container"></div>
+    </header>
+
+    <!-- 通知面板 -->
+    <div id="notification-panel">
+        <div id="notification-list-container"></div>
+    </div>
+
+    <main class="demo-content">
+        <h2>通知系统演示</h2>
+        <p>点击下方按钮模拟不同类型的通知</p>
+        
+        <div>
+            <button class="demo-btn" onclick="addRevenueNotification()">💰 收益到账</button>
+            <button class="demo-btn" onclick="addFollowerNotification()">👤 新粉丝</button>
+            <button class="demo-btn" onclick="addCommentNotification()">💬 新评论</button>
+            <button class="demo-btn" onclick="addReleaseNotification()">🎵 新作品</button>
+            <button class="demo-btn" onclick="markAllAsRead()">✓ 全部已读</button>
+        </div>
+
+        <div class="code-block">
+            <h3>集成示例代码</h3>
+            <pre>
+// 1. 引入通知系统
+&lt;script src="js/notifications.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="css/notifications.css"&gt;
+
+// 2. 初始化（在页面加载时）
+const userAddress = '0x...';
+const notifications = initNotificationSystem(userAddress);
+
+// 3. 渲染铃铛图标
+notifications.renderBell('notification-bell-container');
+
+// 4. 添加通知
+notifications.addNotification(
+  NOTIFICATION_TYPES.REVENUE,
+  '收益到账',
+  '夏日微风 获得 0.1 MEER 使用费',
+  { tokenId: 123, amount: '0.1' }
+);
+
+// 5. 请求桌面通知权限
+notifications.requestNotificationPermission();
+            </pre>
+        </div>
+    </main>
+
+    <script src="js/notifications.js"></script>
+    <script>
+        // 模拟用户地址
+        const userAddress = '0x' + Math.random().toString(16).substr(2, 40);
+        
+        // 初始化通知系统
+        const notifications = initNotificationSystem(userAddress);
+        
+        // 渲染铃铛
+        notifications.renderBell('notification-bell-container');
+        
+        // 请求桌面通知权限
+        notifications.requestNotificationPermission();
+
+        // 演示功能
+        function addRevenueNotification() {
+            const musicNames = ['夏日微风', '城市霓虹', '雨后彩虹', '星空漫步'];
+            const amounts = ['0.1', '0.5', '1.0', '0.05'];
+            const music = musicNames[Math.floor(Math.random() * musicNames.length)];
+            const amount = amounts[Math.floor(Math.random() * amounts.length)];
+            
+            notifications.addNotification(
+                NOTIFICATION_TYPES.REVENUE,
+                '收益到账',
+                `${music} 获得 ${amount} MEER 使用费`,
+                { tokenId: Math.floor(Math.random() * 1000), amount }
+            );
+            notifications.renderBell('notification-bell-container');
+        }
+
+        function addFollowerNotification() {
+            const names = ['音乐爱好者', 'NFT收藏家', 'Web3探索者', '艺术鉴赏家'];
+            const name = names[Math.floor(Math.random() * names.length)];
+            
+            notifications.addNotification(
+                NOTIFICATION_TYPES.NEW_FOLLOWER,
+                '新粉丝',
+                `${name} 开始关注你了`,
+                { followerId: Math.floor(Math.random() * 10000) }
+            );
+            notifications.renderBell('notification-bell-container');
+        }
+
+        function addCommentNotification() {
+            const songs = ['夏日微风', '城市霓虹', '雨后彩虹'];
+            const comments = ['太棒了！', '喜欢这个风格', '期待更多作品', '收藏了！'];
+            const song = songs[Math.floor(Math.random() * songs.length)];
+            const comment = comments[Math.floor(Math.random() * comments.length)];
+            
+            notifications.addNotification(
+                NOTIFICATION_TYPES.COMMENT,
+                '新评论',
+                `${song}: "${comment}"`,
+                { songId: Math.floor(Math.random() * 1000), comment }
+            );
+            notifications.renderBell('notification-bell-container');
+        }
+
+        function addReleaseNotification() {
+            const artists = ['DJ Spark', 'Luna Beats', 'Crypto Melody', 'Block Beat'];
+            const songs = ['夜曲', '数字梦境', '链上节拍', '元宇宙之歌'];
+            const artist = artists[Math.floor(Math.random() * artists.length)];
+            const song = songs[Math.floor(Math.random() * songs.length)];
+            
+            notifications.addNotification(
+                NOTIFICATION_TYPES.NEW_RELEASE,
+                '关注者新作品',
+                `${artist} 发布了新作品《${song}》`,
+                { artistId: Math.floor(Math.random() * 1000), songName: song }
+            );
+            notifications.renderBell('notification-bell-container');
+        }
+
+        function markAllAsRead() {
+            notifications.markAllAsRead();
+            notifications.renderBell('notification-bell-container');
+            notifications.renderNotificationList('notification-list-container');
+        }
+
+        // 点击页面其他地方关闭通知面板
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('notification-panel');
+            const bell = document.querySelector('.notification-bell');
+            if (panel && bell && !panel.contains(e.target) && !bell.contains(e.target)) {
+                panel.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容验证 - ECHO V2</title>
+    <script src="ethers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding-top: 64px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 14px; }
+        
+        .wallet-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .wallet-btn {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .wallet-btn.connected {
+            background: rgba(0,255,0,0.2);
+            border: 1px solid #0f0;
+        }
+        
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .panel-title { font-size: 18px; margin-bottom: 16px; color: #00d4ff; }
+        
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .tab.active {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .upload-area:hover { border-color: #00d4ff; }
+        #fileInput { display: none; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 6px; font-size: 13px; color: #aaa; }
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-full { width: 100%; }
+        
+        .result-box {
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .result-box.valid { background: rgba(0,255,0,0.1); border: 2px solid #0f0; }
+        .result-box.invalid { background: rgba(255,0,0,0.1); border: 2px solid #f55; }
+        
+        .hidden { display: none !important; }
+    </style>
+  <script src="js/theme-switcher.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+  <link rel="stylesheet" href="css/global.css"
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <script src="js/wallet-state.js" defer></script>
+</head>
+<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">铸造</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
+    <div class="container">
+        <h1>🔐 内容验证</h1>
+        <p class="subtitle">验证资产内容完整性，防篡改</p>
+
+        <div class="wallet-section">
+            <button class="wallet-btn" id="connectWalletBtn" id="connectBtn">🔌 连接钱包</button>
+        </div>
+
+        <div class="panel">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('file')">📁 文件验证</div>
+                <div class="tab" onclick="switchTab('hash')">🔢 哈希验证</div>
+            </div>
+
+            <div id="fileTab">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📤</div>
+                    <div>点击或拖拽上传文件</div>
+                    <input type="file" id="fileInput" onchange="handleFile(this.files[0])">
+                </div>
+                
+                <div id="fileInfo" class="hidden" style="margin-top: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">文件哈希</label>
+                        <input type="text" class="form-input" id="fileHash" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hashTab" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">输入哈希</label>
+                    <input type="text" class="form-input" id="inputHash" placeholder="0x...">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label class="form-label">Token ID</label>
+                <input type="text" class="form-input" id="tokenId" placeholder="输入资产 Token ID">
+            </div>
+
+            <button class="btn btn-full" onclick="verify()">🔍 验证</button>
+
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const V2_CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+        const V2_ABI = [
+            "function getAssetInfo(uint256 tokenId) view returns (tuple(string name, string description, string assetType, string uri, bytes32 contentHash, uint256 createdAt, uint256 lastUpdated), tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue), address creator, uint256 version)"
+        ];
+        
+        let provider, contract, userAddress;
+        let currentTab = 'file';
+        let calculatedHash = '';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('fileTab').classList.toggle('hidden', tab !== 'file');
+            document.getElementById('hashTab').classList.toggle('hidden', tab !== 'hash');
+        }
+
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('请先安装 MetaMask 钱包！');
+                return;
+            }
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, provider);
+                
+                document.getElementById('connectWalletBtn').textContent = 
+                    '已连接: ' + userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                document.getElementById('connectWalletBtn').classList.add('connected');
+            } catch (error) {
+                console.error('连接失败:', error);
+            }
+        }
+
+        async function handleFile(file) {
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const arrayBuffer = e.target.result;
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const hash = '0x' + sha3_256(uint8Array);
+                calculatedHash = hash;
+                
+                document.getElementById('fileHash').value = hash;
+                document.getElementById('fileInfo').classList.remove('hidden');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function verify() {
+            const tokenId = document.getElementById('tokenId').value;
+            if (!tokenId) {
+                showResult('请输入 Token ID', 'error');
+                return;
+            }
+            
+            try {
+                const readContract = contract || new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI,
+                    new ethers.providers.Web3Provider(window.ethereum));
+                
+                const [metadata] = await readContract.getAssetInfo(tokenId);
+                const onChainHash = metadata.contentHash;
+                
+                let localHash;
+                if (currentTab === 'file') {
+                    localHash = calculatedHash;
+                } else {
+                    localHash = document.getElementById('inputHash').value;
+                }
+                
+                if (!localHash) {
+                    showResult('请提供哈希值', 'error');
+                    return;
+                }
+                
+                const match = onChainHash.toLowerCase() === localHash.toLowerCase();
+                
+                if (match) {
+                    showResult('✅ 验证通过！内容未被篡改', 'valid');
+                } else {
+                    showResult('❌ 验证失败！内容不匹配', 'invalid');
+                }
+            } catch (error) {
+                showResult('验证错误: ' + error.message, 'error');
+            }
+        }
+
+        function showResult(msg, type) {
+            const resultEl = document.getElementById('result');
+            if (type === 'valid') {
+                resultEl.innerHTML = `<div class="result-box valid">${msg}</div>`;
+            } else if (type === 'invalid') {
+                resultEl.innerHTML = `<div class="result-box invalid">${msg}</div>`;
+            } else {
+                resultEl.innerHTML = `<div style="color: #f55; margin-top: 16px;">${msg}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

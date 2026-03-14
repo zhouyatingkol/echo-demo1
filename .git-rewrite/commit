@@ -1,0 +1,10 @@
+tree 7117083fbc794a758d2f89af738a9c3c9a5db636
+parent 974bbfa0fac7ee2ba870090592c299de779a6edd
+author ECHO Bot <echo@demo.local> 1773335126 +0800
+committer ECHO Bot <echo@demo.local> 1773335126 +0800
+
+fix: Add id=connectBtn to all wallet buttons for cross-page persistence
+
+- Replace onclick handlers with id-based button identification
+- wallet-state.js now finds and updates all buttons correctly
+- Fix discover.html, mint-music.html, license-shop.html

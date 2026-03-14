@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的树 - 收益管理</title>
+    <script src="ethers.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding-top: 64px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 14px; }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-title { font-size: 18px; margin-bottom: 16px; color: #00d4ff; }
+        .tree-display {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+        .tree-icon { font-size: 80px; margin-bottom: 10px; }
+        .tree-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+        .tree-desc { color: #888; font-size: 14px; }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .stat-item {
+            background: rgba(0,0,0,0.3);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            margin-bottom: 10px;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .input-group {
+            margin: 16px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #888;
+            font-size: 14px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+        }
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .status.success { background: rgba(0,255,0,0.1); color: #0f0; }
+        .status.error { background: rgba(255,0,0,0.1); color: #f55; }
+        .status.pending { background: rgba(255,215,0,0.1); color: #ffd700; }
+        .hidden { display: none !important; }
+        .seed-tag {
+            display: inline-block;
+            background: rgba(0,212,255,0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 4px;
+            border: 1px solid rgba(0,212,255,0.3);
+        }
+        .revenue-history {
+            margin-top: 20px;
+        }
+        .history-item {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+    </style>
+  <script src="js/theme-switcher.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+  <link rel="stylesheet" href="css/global.css"
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <script src="js/wallet-state.js" defer></script>
+</head>
+<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">铸造</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
+    <div class="container">
+        <h1>🌳 我的树</h1>
+        <p class="subtitle">查看和管理您的树收益</p>
+
+        <!-- 连接钱包 -->
+        <div class="card" id="connectCard">
+            <div class="card-title">连接钱包</div>
+            <button class="btn" id="connectBtn">连接 MetaMask</button>
+        </div>
+
+        <!-- 树的信息 -->
+        <div class="card hidden" id="treeCard">
+            <div class="tree-display">
+                <div class="tree-icon">🌳</div>
+                <div class="tree-name" id="treeName">--</div>
+                <div class="tree-desc" id="treeDesc">--</div>
+                <div style="margin-top: 15px;" id="seedTags"></div>
+            </div
+>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalRevenue">0</div>
+                    <div class="stat-label">累计收益 (MEER)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="pendingRevenue">0</div>
+                    <div class="stat-label">待领取 (MEER)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="seedCount">0</div>
+                    <div class="stat-label">种子数量</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="treeId">0</div>
+                    <div class="stat-label">树ID</div>
+                </div>
+            </div
+>
+        </div
+>
+
+        <!-- 分配收益 -->
+        <div class="card hidden" id="distributeCard">
+            <div class="card-title">💰 分配收益到树</div>
+            <p style="color: #888; font-size: 14px; margin-bottom: 16px;">
+                向树支付MEER，收益将按权重分配给种子所有者
+            </p>
+            
+            <div class="input-group">
+                <label>分配金额 (MEER)</label>
+                <input type="number" id="distributeAmount" value="0.01" step="0.001" min="0.001">
+            </div
+>
+            
+            <button class="btn" id="distributeBtn">💸 分配收益</button
+>
+        </div
+>
+
+        <!-- 领取收益 -->
+        <div class="card hidden" id="claimCard">
+            <div class="card-title">🎯 领取收益</div>
+            
+            <div id="claimInfo">
+                <p style="color: #888; text-align: center; padding: 20px;">
+                    暂无待领取收益
+                </p>
+            </div
+>
+            
+            <button class="btn" id="claimBtn" style="display: none;">
+                🎁 领取收益
+            </button
+>
+        </div
+>
+
+        <div id="status"></div>
+    </div
+>
+
+    <script>
+        const FUSION_CONTRACT = '0x3AD441ECfC193fbe7f086b962d0bCfd2Bc2Bac0d';
+        
+        const ABI = [
+            {
+                "inputs": [{"internalType": "uint256", "name": "treeId", "type": "uint256"}],
+                "name": "getTreeInfo",
+                "outputs": [
+                    {"internalType": "string", "name": "name", "type": "string"},
+                    {"internalType": "string", "name": "description", "type": "string"},
+                    {"internalType": "uint256[]", "name": "seedIds", "type": "uint256[]"},
+                    {"internalType": "uint256[]", "name": "weights", "type": "uint256[]"},
+                    {"internalType": "uint256", "name": "accumulatedRevenue", "type": "uint256"},
+                    {"internalType": "address", "name": "owner", "type": "address"}
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "treeId", "type": "uint256"}, {"internalType": "address", "name": "user", "type": "address"}],
+                "name": "getPendingRevenue",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "treeId", "type": "uint256"}],
+                "name": "distributeRevenue",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "treeId", "type": "uint256"}],
+                "name": "claimRevenue",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        let contract, userAddress;
+        const status = document.getElementById('status');
+
+        function showStatus(msg, type) {
+            status.innerHTML = msg ? `<div class="status ${type}">${msg}</div>` : '';
+        }
+
+        // 连接钱包
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            try {
+                showStatus('连接中...', 'pending');
+                
+                if (!window.ethereum) {
+                    showStatus('❌ 请安装 MetaMask', 'error');
+                    return;
+                }
+
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+                
+                contract = new ethers.Contract(FUSION_CONTRACT, ABI, signer);
+                
+                showStatus('✅ 连接成功', 'success');
+                
+                document.getElementById('connectCard').classList.add('hidden');
+                document.getElementById('treeCard').classList.remove('hidden');
+                document.getElementById('distributeCard').classList.remove('hidden');
+                document.getElementById('claimCard').classList.remove('hidden');
+                
+                // 加载树信息
+                await loadTreeInfo();
+                
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        });
+
+        // 加载树信息
+        async function loadTreeInfo() {
+            try {
+                // 查询树ID 0（您的第一棵树）
+                const info = await contract.getTreeInfo(0);
+                
+                document.getElementById('treeName').textContent = info.name;
+                document.getElementById('treeDesc').textContent = info.description;
+                document.getElementById('seedCount').textContent = info.seedIds.length;
+                document.getElementById('treeId').textContent = '0';
+                
+                // 显示种子标签
+                const seedTags = info.seedIds.map(id => `<span class="seed-tag">🌱 Token #${id}</span>`).join('');
+                document.getElementById('seedTags').innerHTML = seedTags;
+                
+                // 累计收益
+                const totalRevenue = ethers.utils.formatEther(info.accumulatedRevenue);
+                document.getElementById('totalRevenue').textContent = totalRevenue;
+                
+                // 待领取收益
+                const pending = await contract.getPendingRevenue(0, userAddress);
+                const pendingRevenue = ethers.utils.formatEther(pending);
+                document.getElementById('pendingRevenue').textContent = pendingRevenue;
+                
+                // 如果有待领取收益，显示领取按钮
+                if (parseFloat(pendingRevenue) > 0) {
+                    document.getElementById('claimInfo').innerHTML = `
+                        <p style="text-align: center; color: #00d4ff; font-size: 24px; font-weight: bold; padding: 20px;">
+                            ${pendingRevenue} MEER
+                        </p>
+                    `;
+                    document.getElementById('claimBtn').style.display = 'block';
+                }
+                
+            } catch (error) {
+                showStatus('加载树信息失败: ' + error.message, 'error');
+            }
+        }
+
+        // 分配收益
+        document.getElementById('distributeBtn').addEventListener('click', async () => {
+            try {
+                const amount = document.getElementById('distributeAmount').value;
+                if (!amount || parseFloat(amount) <= 0) {
+                    showStatus('❌ 请输入有效的金额', 'error');
+                    return;
+                }
+                
+                showStatus('分配收益中...', 'pending');
+                
+                const amountWei = ethers.utils.parseEther(amount);
+                const tx = await contract.distributeRevenue(0, { value: amountWei });
+                
+                showStatus('交易已提交，等待确认...', 'pending');
+                
+                const receipt = await tx.wait();
+                
+                if (receipt.status === 1) {
+                    showStatus('✅ 收益分配成功！', 'success');
+                    await loadTreeInfo(); // 刷新信息
+                } else {
+                    showStatus('❌ 交易失败', 'error');
+                }
+                
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        });
+
+        // 领取收益
+        document.getElementById('claimBtn').addEventListener('click', async () => {
+            try {
+                showStatus('领取收益中...', 'pending');
+                
+                const tx = await contract.claimRevenue(0);
+                
+                showStatus('交易已提交，等待确认...', 'pending');
+                
+                const receipt = await tx.wait();
+                
+                if (receipt.status === 1) {
+                    showStatus('✅ 收益领取成功！', 'success');
+                    await loadTreeInfo(); // 刷新信息
+                } else {
+                    showStatus('❌ 交易失败', 'error');
+                }
+                
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

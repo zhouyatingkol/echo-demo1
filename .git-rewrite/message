@@ -1,0 +1,6 @@
+fix: Unify navbar styling across all pages
+
+- Add global.css for consistent navigation bar
+- Standardize theme/lang/wallet button styles
+- Fix inconsistent spacing and colors
+- Mobile responsive improvements

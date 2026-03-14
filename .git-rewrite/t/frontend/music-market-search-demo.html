@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐资产交易市场</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .filter-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* 搜索框样式 */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .search-box button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .search-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        /* 高级筛选面板 */
+        .advanced-filters-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #00d4ff;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .advanced-filters-toggle:hover {
+            color: #7b2cbf;
+        }
+
+        .advanced-filters-toggle .arrow {
+            transition: transform 0.3s;
+        }
+
+        .advanced-filters-toggle.expanded .arrow {
+            transform: rotate(180deg);
+        }
+
+        .advanced-filters {
+            display: none;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .advanced-filters.expanded {
+            display: flex;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .filter-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .filter-group select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .bpm-range {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .bpm-range input[type="range"] {
+            flex: 1;
+        }
+
+        #bpmValue {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        /* 结果统计 */
+        .results-info {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        /* 音乐卡片网格 */
+        .music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .music-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .music-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .music-cover {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .music-info {
+            padding: 20px;
+        }
+
+        .music-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .music-creator {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .music-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .music-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .music-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .music-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+
+        .buy-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .buy-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .music-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .advanced-filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+  <script src="js/wallet-state.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎵 音乐资产交易市场</h1>
+            <p>发现、收藏、交易独特的音乐作品</p>
+        </header>
+
+        <div class="filter-section">
+            <!-- 全局搜索框 -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索音乐、创作者...">
+                <button onclick="performSearch()">搜索</button>
+            </div>
+
+            <!-- 高级筛选面板 -->
+            <div class="advanced-filters-toggle" onclick="toggleAdvancedFilters()">
+                <span class="arrow">▼</span>
+                <span>高级筛选</span>
+            </div>
+
+            <div class="advanced-filters" id="advancedFilters">
+                <!-- BPM 范围 -->
+                <div class="filter-group">
+                    <label>BPM: <span id="bpmValue">60-180</span></label>
+                    <div class="bpm-range">
+                        <input type="range" id="bpmMin" min="60" max="180" value="60" oninput="updateBpmDisplay()">
+                        <input type="range" id="bpmMax" min="60" max="180" value="180" oninput="updateBpmDisplay()">
+                    </div>
+                </div>
+
+                <!-- 时长 -->
+                <div class="filter-group">
+                    <label>时长</label>
+                    <select id="durationFilter" onchange="filterMusic()">
+                        <option value="all">全部</option>
+                        <option value="short">短 (&lt; 1分钟)</option>
+                        <option value="medium">中 (1-3分钟)</option>
+                        <option value="long">长 (&gt; 3分钟)</option>
+                    </select>
+                </div>
+
+                <!-- 排序 -->
+                <div class="filter-group">
+                    <label>排序</label>
+                    <select id="sortBy" onchange="filterMusic()">
+                        <option value="newest">最新</option>
+                        <option value="price-low">价格：低到高</option>
+                        <option value="price-high">价格：高到低</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果统计 -->
+        <div class="results-info" id="resultsInfo">共找到 <span id="resultCount">0</span> 首音乐</div>
+
+        <!-- 音乐列表 -->
+        <div class="music-grid" id="musicGrid">
+            <!-- 动态生成 -->
+        </div>
+
+        <!-- 空状态 -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="icon">🔍</div>
+            <h3>没有找到匹配的音乐</h3>
+            <p>尝试调整筛选条件或搜索关键词</p>
+        </div>
+    </div>
+
+    <script>
+        // 示例音乐数据
+        const musicList = [
+            { id: 1, name: "Neon Dreams", creator: "CyberArtist", price: "0.5", bpm: 128, duration: 185, date: "2024-03-10" },
+            { id: 2, name: "Midnight Jazz", creator: "BlueNote", price: "0.3", bpm: 90, duration: 240, date: "2024-03-09" },
+            { id: 3, name: "Electronic Pulse", creator: "SynthWave", price: "0.8", bpm: 140, duration: 195, date: "2024-03-08" },
+            { id: 4, name: "Peaceful Piano", creator: "MelodyMaker", price: "0.2", bpm: 72, duration: 180, date: "2024-03-07" },
+            { id: 5, name: "Hip Hop Beat", creator: "BeatMaster", price: "0.6", bpm: 95, duration: 150, date: "2024-03-06" },
+            { id: 6, name: "Rock Anthem", creator: "GuitarHero", price: "0.4", bpm: 135, duration: 210, date: "2024-03-05" },
+            { id: 7, name: "Lo-Fi Chill", creator: "ChillVibes", price: "0.25", bpm: 80, duration: 160, date: "2024-03-04" },
+            { id: 8, name: "Techno Rave", creator: "RaveKing", price: "0.9", bpm: 150, duration: 300, date: "2024-03-03" },
+            { id: 9, name: "Acoustic Love", creator: "SongBird", price: "0.35", bpm: 100, duration: 200, date: "2024-03-02" },
+            { id: 10, name: "Trap King", creator: "BeatKing", price: "0.7", bpm: 145, duration: 140, date: "2024-03-01" },
+            { id: 11, name: "Ambient Drone", creator: "SoundScaper", price: "0.15", bpm: 60, duration: 600, date: "2024-02-28" },
+            { id: 12, name: "Funk Groove", creator: "GrooveMaster", price: "0.55", bpm: 110, duration: 225, date: "2024-02-27" }
+        ];
+
+        // 切换高级筛选面板
+        function toggleAdvancedFilters() {
+            const panel = document.getElementById('advancedFilters');
+            const toggle = document.querySelector('.advanced-filters-toggle');
+            panel.classList.toggle('expanded');
+            toggle.classList.toggle('expanded');
+        }
+
+        // 更新 BPM 显示
+        function updateBpmDisplay() {
+            const min = parseInt(document.getElementById('bpmMin').value);
+            const max = parseInt(document.getElementById('bpmMax').value);
+            
+            // 确保最小值不大于最大值
+            if (min > max) {
+                document.getElementById('bpmMin').value = max;
+            }
+            
+            const displayMin = document.getElementById('bpmMin').value;
+            const displayMax = document.getElementById('bpmMax').value;
+            document.getElementById('bpmValue').textContent = `${displayMin}-${displayMax}`;
+            
+            filterMusic();
+        }
+
+        // 执行搜索
+        function performSearch() {
+            filterMusic();
+        }
+
+        // 筛选音乐
+        function filterMusic() {
+            let results = [...musicList];
+
+            // 搜索关键词
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (keyword) {
+                results = results.filter(m => 
+                    m.name.toLowerCase().includes(keyword) ||
+                    m.creator.toLowerCase().includes(keyword)
+                );
+            }
+
+            // BPM 筛选
+            const bpmMin = parseInt(document.getElementById('bpmMin').value);
+            const bpmMax = parseInt(document.getElementById('bpmMax').value);
+            results = results.filter(m => m.bpm >= bpmMin && m.bpm <= bpmMax);
+
+            // 时长筛选
+            const durationFilter = document.getElementById('durationFilter').value;
+            if (durationFilter !== 'all') {
+                results = results.filter(m => {
+                    const durationMin = m.duration / 60;
+                    switch (durationFilter) {
+                        case 'short': return durationMin < 1;
+                        case 'medium': return durationMin >= 1 && durationMin <= 3;
+                        case 'long': return durationMin > 3;
+                        default: return true;
+                    }
+                });
+            }
+
+            // 排序
+            const sortBy = document.getElementById('sortBy').value;
+            switch (sortBy) {
+                case 'newest':
+                    results.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'price-low':
+                    results.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+                    break;
+                case 'price-high':
+                    results.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+                    break;
+            }
+
+            renderResults(results);
+        }
+
+        // 渲染结果
+        function renderResults(results) {
+            const grid = document.getElementById('musicGrid');
+            const emptyState = document.getElementById('emptyState');
+            const resultCount = document.getElementById('resultCount');
+
+            resultCount.textContent = results.length;
+
+            if (results.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            grid.innerHTML = results.map(music => `
+                <div class="music-card">
+                    <div class="music-cover">🎵</div>
+                    <div class="music-info">
+                        <div class="music-name">${music.name}</div>
+                        <div class="music-creator">by ${music.creator}</div>
+                        <div class="music-meta">
+                            <span>🎼 ${music.bpm} BPM</span>
+                            <span>⏱️ ${formatDuration(music.duration)}</span>
+                        </div>
+                        <div class="music-footer">
+                            <div class="music-price">${music.price} ETH</div>
+                            <button class="buy-btn">购买</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 格式化时长
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // 初始化
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        // 页面加载时渲染
+        filterMusic();
+    </script>
+</body>
+</html>

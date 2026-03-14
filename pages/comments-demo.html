@@ -3,9 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ECHO Music - 评论系统演示</title>
-  <script src="./js/comments.js"></script>
+  <title>评 - ECHO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&family=LXGW+WenKai:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="../js/comments.js"></script>
   <style>
+    :root {
+      /* 宣纸质感 */
+      --bg-primary: #F8F6F1;
+      --bg-secondary: #F2EFE8;
+      --bg-tertiary: #EBE7DD;
+      
+      /* 四阶墨色 */
+      --ink-deep: #1A1A1A;
+      --ink-medium: #4A4A4A;
+      --ink-light: #7A6E5F;
+      --ink-faint: #B5B5B5;
+      
+      /* 宋金 */
+      --gold-primary: #B89B6C;
+      --gold-light: #D4C4A8;
+      
+      /* 朱红 */
+      --seal-red: #A03020;
+      
+      /* 字体 */
+      --font-serif: 'Noto Serif SC', 'Source Han Serif CN', serif;
+      --font-wenkai: 'LXGW WenKai', serif;
+    }
+    
     * {
       margin: 0;
       padding: 0;
@@ -13,41 +38,154 @@
     }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      font-family: var(--font-serif);
+      background: var(--bg-primary);
       min-height: 100vh;
-      color: #eee;
+      color: var(--ink-deep);
+      line-height: 1.8;
+    }
+    
+    /* 宣纸纹理 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    /* 导航栏 */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(24px, 5vw, 80px);
+      background: transparent;
+      transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.8s ease;
+    }
+    
+    .navbar.is-scrolled {
+      background: rgba(253, 252, 250, 0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+    }
+    
+    .navbar__brand {
+      font-family: var(--font-wenkai);
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      color: var(--ink-deep);
+      text-decoration: none;
+    }
+    
+    .navbar__brand span {
+      color: var(--seal-red);
+    }
+    
+    .navbar__nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(24px, 4vw, 48px);
+    }
+    
+    .navbar__nav a {
+      font-family: var(--font-serif);
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: var(--ink-light);
+      text-decoration: none;
+      transition: color 0.4s ease;
+    }
+    
+    .navbar__nav a:hover {
+      color: var(--ink-deep);
+    }
+    
+    .navbar__actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .navbar__btn {
+      font-family: var(--font-serif);
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      padding: 0.5rem 1.25rem;
+      border: 0.5px solid rgba(122, 110, 95, 0.2);
+      border-radius: 2px;
+      background: transparent;
+      color: var(--ink-light);
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+    
+    .navbar__btn:hover {
+      border-color: var(--gold-primary);
+      color: var(--ink-deep);
+    }
+    
+    .navbar__btn--primary {
+      background: var(--ink-deep);
+      color: var(--bg-primary);
+      border-color: var(--ink-deep);
+    }
+    
+    .navbar__btn--primary:hover {
+      background: var(--gold-primary);
+      border-color: var(--gold-primary);
     }
     
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 80px 20px 20px;
+      position: relative;
+      z-index: 1;
     }
     
     header {
       text-align: center;
-      padding: 40px 20px;
+      padding: 60px 20px 40px;
     }
     
     header h1 {
+      font-family: var(--font-wenkai);
       font-size: 2.5em;
-      background: linear-gradient(135deg, #00d4ff, #7b2cbf);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-weight: 300;
+      color: var(--ink-deep);
       margin-bottom: 10px;
+      letter-spacing: 0.15em;
     }
     
     header p {
-      color: #888;
+      color: var(--ink-light);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
     }
     
+    /* 音乐播放器 */
     .music-player {
-      background: rgba(26, 26, 46, 0.8);
-      border-radius: 16px;
+      background: var(--bg-secondary);
+      border-radius: 2px;
       padding: 30px;
       margin-bottom: 30px;
-      border: 1px solid rgba(0, 212, 255, 0.2);
+      border: 0.5px solid rgba(122, 110, 95, 0.1);
     }
     
     .music-info {
@@ -60,26 +198,32 @@
     .music-cover {
       width: 120px;
       height: 120px;
-      background: linear-gradient(135deg, #00d4ff, #7b2cbf);
-      border-radius: 12px;
+      background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+      border: 0.5px solid rgba(122, 110, 95, 0.15);
+      border-radius: 2px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 48px;
+      color: var(--ink-light);
     }
     
     .music-details h2 {
+      font-family: var(--font-serif);
       font-size: 24px;
+      font-weight: 500;
       margin-bottom: 8px;
+      color: var(--ink-deep);
     }
     
     .music-details .artist {
-      color: #00d4ff;
-      font-size: 20px;
+      color: var(--gold-primary);
+      font-size: 18px;
+      font-weight: 400;
     }
     
     .music-details .meta {
-      color: #888;
+      color: var(--ink-faint);
       font-size: 14px;
       margin-top: 8px;
     }
@@ -95,161 +239,269 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+      background: var(--ink-deep);
       border: none;
-      color: white;
+      color: var(--bg-primary);
       font-size: 24px;
       cursor: pointer;
-      transition: transform 0.3s;
+      transition: all 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .play-btn:hover {
-      transform: scale(1.1);
+      background: var(--gold-primary);
+      transform: scale(1.05);
     }
     
     .progress-bar {
       flex: 1;
-      height: 6px;
-      background: #333;
-      border-radius: 3px;
-      overflow: hidden;
+      height: 4px;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
     }
     
-    .progress {
-      width: 35%;
+    .progress-bar .progress {
       height: 100%;
-      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      width: 35%;
+      background: var(--gold-primary);
+      border-radius: 2px;
+      transition: width 0.3s ease;
     }
     
     .time {
-      color: #888;
       font-size: 14px;
+      color: var(--ink-light);
+      font-family: monospace;
     }
     
-    .wallet-section {
-      background: rgba(22, 33, 62, 0.8);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 30px;
+    /* 评论区 */
+    .comments-section {
+      background: var(--bg-secondary);
+      border-radius: 2px;
+      padding: 30px;
+      border: 0.5px solid rgba(122, 110, 95, 0.1);
+    }
+    
+    .comments-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 0.5px solid rgba(122, 110, 95, 0.1);
     }
     
-    .wallet-info {
+    .comments-header h3 {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--ink-deep);
+    }
+    
+    .comments-header span {
+      color: var(--ink-faint);
+      font-size: 0.85rem;
+    }
+    
+    .comment-form {
       display: flex;
-      align-items: center;
       gap: 15px;
+      margin-bottom: 30px;
     }
     
-    .wallet-status {
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      border: 0.5px solid rgba(122, 110, 95, 0.15);
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      color: var(--ink-light);
+      font-size: 18px;
+      flex-shrink: 0;
     }
     
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #ff4757;
+    .comment-input-wrapper {
+      flex: 1;
     }
     
-    .status-dot.connected {
-      background: #2ed573;
+    .comment-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-primary);
+      border: 0.5px solid rgba(122, 110, 95, 0.2);
+      border-radius: 2px;
+      color: var(--ink-deep);
+      font-family: var(--font-serif);
+      font-size: 15px;
+      resize: vertical;
+      min-height: 80px;
+      transition: border-color 0.4s ease;
     }
     
-    .connect-btn {
-      padding: 10px 20px;
-      background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+    .comment-input::placeholder {
+      color: var(--ink-faint);
+    }
+    
+    .comment-input:focus {
+      outline: none;
+      border-color: var(--gold-primary);
+    }
+    
+    .comment-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .btn {
+      padding: 8px 20px;
       border: none;
-      border-radius: 8px;
-      color: white;
+      border-radius: 2px;
+      font-family: var(--font-serif);
       font-size: 14px;
       cursor: pointer;
-      transition: opacity 0.3s;
+      transition: all 0.4s ease;
     }
     
-    .connect-btn:hover {
-      opacity: 0.9;
+    .btn-secondary {
+      background: transparent;
+      color: var(--ink-light);
+      border: 0.5px solid rgba(122, 110, 95, 0.2);
     }
     
-    .connect-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .btn-secondary:hover {
+      border-color: var(--ink-light);
+      color: var(--ink-deep);
     }
     
-    .token-selector {
+    .btn-primary {
+      background: var(--ink-deep);
+      color: var(--bg-primary);
+    }
+    
+    .btn-primary:hover {
+      background: var(--gold-primary);
+    }
+    
+    /* 评论列表 */
+    .comment-item {
+      display: flex;
+      gap: 15px;
+      padding: 20px 0;
+      border-bottom: 0.5px solid rgba(122, 110, 95, 0.1);
+    }
+    
+    .comment-item:last-child {
+      border-bottom: none;
+    }
+    
+    .comment-content {
+      flex: 1;
+    }
+    
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .comment-author {
+      font-weight: 500;
+      color: var(--ink-deep);
+    }
+    
+    .comment-time {
+      font-size: 12px;
+      color: var(--ink-faint);
+    }
+    
+    .comment-text {
+      color: var(--ink-medium);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    
+    .comment-footer {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .comment-action {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--ink-light);
+      cursor: pointer;
+      transition: color 0.4s ease;
     }
     
-    .token-selector select {
-      padding: 8px 15px;
-      background: #1a1a2e;
-      border: 1px solid #333;
-      border-radius: 6px;
-      color: #eee;
-      font-size: 14px;
+    .comment-action:hover {
+      color: var(--gold-primary);
     }
     
-    @media (max-width: 768px) {
-      .wallet-section {
-        flex-direction: column;
-        gap: 15px;
-      }
-      
-      .music-info {
-        flex-direction: column;
-        text-align: center;
-      }
+    /* 加载更多 */
+    .load-more {
+      text-align: center;
+      padding: 20px;
+      margin-top: 20px;
+      border-top: 0.5px solid rgba(122, 110, 95, 0.1);
+    }
+    
+    .load-more-btn {
+      background: transparent;
+      border: 0.5px solid rgba(122, 110, 95, 0.2);
+      color: var(--ink-light);
+      padding: 10px 30px;
+      border-radius: 2px;
+      font-family: var(--font-serif);
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+    
+    .load-more-btn:hover {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
     }
   </style>
-  <script src="../frontend/js/wallet-state.js" defer></script>
 </head>
 <body>
+  <!-- 导航栏 -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar__brand"><span>ECHO</span> · 评</a>
+    <div class="navbar__nav">
+      <a href="index.html">境</a>
+      <a href="marketplace.html">集</a>
+      <a href="creator.html">铸</a>
+      <a href="docs.html">典</a>
+    </div>
+    <div class="navbar__actions">
+      <button class="navbar__btn" id="connectWallet">入链</button>
+    </div>
+  </nav>
+
   <div class="container">
     <header>
-      <h1>🎵 ECHO Music</h1>
-      <p>去中心化音乐评论系统演示</p>
+      <h1>评 · 乐</h1>
+      <p>留墨于此，以声会友</p>
     </header>
     
-    <!-- 钱包连接区域 -->
-    <div class="wallet-section">
-      <div class="wallet-info">
-        <div class="wallet-status">
-          <span class="status-dot" id="status-dot"></span>
-          <span id="wallet-address">未连接钱包</span>
-        </div>
-      </div>
-      <div style="display: flex; align-items: center; gap: 20px;">
-        <div class="token-selector">
-          <label>选择 ECHO 音乐资产:</label>
-          <select id="token-select">
-            <option value="1">🎵 区块链之梦 #1</option>
-            <option value="2">🎸 去中心化旋律 #2</option>
-            <option value="3">🎹 智能合约协奏曲 #3</option>
-            <option value="4">🎺 加密货币爵士 #4</option>
-          </select>
-        </div>
-        <button class="connect-btn" id="connect-btn" onclick="connectWallet()">
-          连接钱包
-        </button>
-      </div>
-    </div>
-    
-    <!-- 音乐播放器 -->
     <div class="music-player">
       <div class="music-info">
         <div class="music-cover">🎵</div>
         <div class="music-details">
-          <h2 id="music-title">区块链之梦</h2>
-          <div class="artist" id="music-artist">Crypto Artist</div>
-          <div class="meta">
-            <span>Token ID: <span id="current-token">1</span></span> | 
-            <span>合约: ECHO Music</span>
-          </div>
+          <h2>春江花月夜</h2>
+          <div class="artist">古琴 · 匿名</div>
+          <div class="meta">发布于 2024年 · 中国传统音乐</div>
         </div>
       </div>
       
@@ -258,150 +510,100 @@
         <div class="progress-bar">
           <div class="progress"></div>
         </div>
-        <span class="time">1:45 / 4:20</span>
+        <span class="time">1:45 / 5:20</span>
       </div>
     </div>
     
-    <!-- 评论区 -->
-    <div id="comments-container"></div>
+    <div class="comments-section">
+      <div class="comments-header">
+        <h3>评注</h3>
+        <span>共 128 条</span>
+      </div>
+      
+      <div class="comment-form">
+        <div class="avatar">吾</div>
+        <div class="comment-input-wrapper">
+          <textarea class="comment-input" placeholder="留墨于此，分享您的感受..."></textarea>
+          <div class="comment-actions">
+            <button class="btn btn-secondary">取消</button>
+            <button class="btn btn-primary">呈评</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comments-list">
+        <div class="comment-item">
+          <div class="avatar">墨</div>
+          <div class="comment-content">
+            <div class="comment-header">
+              <span class="comment-author">墨韵</span>
+              <span class="comment-time">2小时前</span>
+            </div>
+            <p class="comment-text">琴音婉转，如流水潺潺，意境深远。此曲只应天上有，人间难得几回闻。</p>
+            <div class="comment-footer">
+              <span class="comment-action">👍 32</span>
+              <span class="comment-action">💬 回复</span>
+              <span class="comment-action">❤️ 收藏</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="comment-item">
+          <div class="avatar">音</div>
+          <div class="comment-content">
+            <div class="comment-header">
+              <span class="comment-author">音痴</span>
+              <span class="comment-time">5小时前</span>
+            </div>
+            <p class="comment-text">古琴的韵味在现代音乐中很难找到了，感谢创作者保留这份纯粹。</p>
+            <div class="comment-footer">
+              <span class="comment-action">👍 18</span>
+              <span class="comment-action">💬 回复</span>
+              <span class="comment-action">❤️ 收藏</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="comment-item">
+          <div class="avatar">山</div>
+          <div class="comment-content">
+            <div class="comment-header">
+              <span class="comment-author">山水客</span>
+              <span class="comment-time">1天前</span>
+            </div>
+            <p class="comment-text">听得入神，仿佛置身月下江畔，微风拂面，万籁俱寂。</p>
+            <div class="comment-footer">
+              <span class="comment-action">👍 45</span>
+              <span class="comment-action">💬 回复</span>
+              <span class="comment-action">❤️ 收藏</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="load-more">
+        <button class="load-more-btn">更多评注</button>
+      </div>
+    </div>
   </div>
-  
-  <!-- Ethers.js (用于钱包连接) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+
+  <!-- Wallet Manager -->
+  <script src="../js/wallet-manager.js"></script>
   
   <script>
-    // 音乐数据
-    const musicData = {
-      1: { title: '区块链之梦', artist: 'Crypto Artist', icon: '🎵' },
-      2: { title: '去中心化旋律', artist: 'Web3 Musician', icon: '🎸' },
-      3: { title: '智能合约协奏曲', artist: 'Solidity Composer', icon: '🎹' },
-      4: { title: '加密货币爵士', artist: 'DeFi Jazz Band', icon: '🎺' }
-    };
-    
-    // 全局变量
-    let commentSystem = null;
-    let commentUI = null;
-    let currentTokenId = 1;
-    let userAddress = '';
-    
-    // 注入评论样式
-    injectCommentStyles();
-    
-    // 初始化评论系统
-    function initCommentSystem() {
-      commentSystem = new CommentSystem({
-        userAddress: userAddress
-      });
-      
-      commentUI = new CommentUI(commentSystem, 'comments-container');
-      commentUI.setToken(currentTokenId);
-      
-      // 监听Token切换
-      document.getElementById('token-select').addEventListener('change', (e) => {
-        currentTokenId = parseInt(e.target.value);
-        updateMusicInfo(currentTokenId);
-        commentUI.setToken(currentTokenId);
-      });
-    }
-    
-    // 更新音乐信息
-    function updateMusicInfo(tokenId) {
-      const music = musicData[tokenId];
-      if (music) {
-        document.getElementById('music-title').textContent = music.title;
-        document.getElementById('music-artist').textContent = music.artist;
-        document.querySelector('.music-cover').textContent = music.icon;
-        document.getElementById('current-token').textContent = tokenId;
-      }
-    }
-    
-    // 连接钱包
-    async function connectWallet() {
-      const btn = document.getElementById('connect-btn');
-      
-      if (!window.ethereum) {
-        alert('请安装 MetaMask 或其他 Web3 钱包');
-        return;
-      }
-      
-      try {
-        btn.disabled = true;
-        btn.textContent = '连接中...';
-        
-        // 请求连接
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        // 获取地址
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        userAddress = await signer.getAddress();
-        
-        // 更新UI
-        updateWalletUI(userAddress);
-        
-        // 更新评论系统用户
-        if (commentSystem) {
-          commentSystem.setUser(userAddress);
-          commentUI.render();
-        }
-        
-        // 监听账户变化
-        window.ethereum.on('accountsChanged', (accounts) => {
-          if (accounts.length > 0) {
-            userAddress = accounts[0];
-            updateWalletUI(userAddress);
-            commentSystem.setUser(userAddress);
-          } else {
-            disconnectWallet();
-          }
-        });
-        
-      } catch (error) {
-        console.error('连接失败:', error);
-        alert('连接失败: ' + error.message);
-      } finally {
-        btn.disabled = false;
-        if (userAddress) {
-          btn.textContent = '断开连接';
-          btn.onclick = disconnectWallet;
-        } else {
-          btn.textContent = '连接钱包';
-        }
-      }
-    }
-    
-    // 断开钱包
-    function disconnectWallet() {
-      userAddress = '';
-      updateWalletUI('');
-      
-      if (commentSystem) {
-        commentSystem.setUser('');
-        commentUI.render();
-      }
-      
-      const btn = document.getElementById('connect-btn');
-      btn.textContent = '连接钱包';
-      btn.onclick = connectWallet;
-    }
-    
-    // 更新钱包UI
-    function updateWalletUI(address) {
-      const statusDot = document.getElementById('status-dot');
-      const walletAddress = document.getElementById('wallet-address');
-      
-      if (address) {
-        statusDot.classList.add('connected');
-        walletAddress.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+    // 导航栏滚动效果
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('is-scrolled');
       } else {
-        statusDot.classList.remove('connected');
-        walletAddress.textContent = '未连接钱包';
+        navbar.classList.remove('is-scrolled');
       }
-    }
+    });
     
-    // 页面加载时初始化
-    window.addEventListener('DOMContentLoaded', () => {
-      initCommentSystem();
+    // 播放按钮切换
+    document.querySelector('.play-btn').addEventListener('click', function() {
+      this.textContent = this.textContent === '▶' ? '❚❚' : '▶';
     });
   </script>
 </body>

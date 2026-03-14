@@ -1,0 +1,137 @@
+/**
+ * ECHO Music 移动端适配
+ * 响应式设计，触控优化
+ */
+
+/* 移动端导航 */
+@media (max-width: 768px) {
+  .navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    border-top: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    border-bottom: none;
+    z-index: 1000;
+  }
+  
+  .nav-container {
+    height: 60px;
+    padding: 0 10px;
+  }
+  
+  .nav-links {
+    display: none; /* 隐藏桌面导航 */
+  }
+  
+  .mobile-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    color: var(--text-secondary, #888);
+    text-decoration: none;
+    font-size: 12px;
+  }
+  
+  .mobile-nav-item.active {
+    color: var(--accent-primary, #00d4ff);
+  }
+  
+  .mobile-nav-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  
+  /* 主内容区增加底部padding */
+  .main-content {
+    padding-bottom: 80px;
+  }
+  
+  /* Hero 区域调整 */
+  .hero {
+    padding: 40px 20px;
+  }
+  
+  .hero-title {
+    font-size: 32px;
+  }
+  
+  .hero-subtitle {
+    font-size: 16px;
+  }
+  
+  /* 卡片网格单列 */
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* 按钮全宽 */
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .hero-btn {
+    width: 100%;
+  }
+}
+
+/* 平板适配 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 触控优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 增大触控区域 */
+  .nav-link,
+  .mobile-nav-item,
+  .hero-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 禁用 hover 效果 */
+  .card:hover,
+  .btn-primary:hover {
+    transform: none;
+  }
+}
+
+/* 小屏手机 */
+@media (max-width: 375px) {
+  .hero-title {
+    font-size: 28px;
+  }
+  
+  .mobile-nav-item {
+    font-size: 10px;
+  }
+  
+  .mobile-nav-icon {
+    font-size: 20px;
+  }
+}
+
+/* 横屏模式 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .navbar {
+    position: relative;
+  }
+  
+  .mobile-nav {
+    flex-direction: row;
+  }
+}

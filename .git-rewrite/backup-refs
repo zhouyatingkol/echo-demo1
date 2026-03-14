@@ -1,0 +1,8 @@
+28e278fd2f9ef0feb190e28d6adfd6fcec3e97a5 commit	refs/heads/master
+f9996fb88ce1dffcc64af0ee3eb897fe3064ff27 commit	refs/heads/v4-react
+571f30b9fef7d51a4cc519010046cf4c663c21bd commit	refs/original/refs/heads/master
+b88f51651b77cba06dd2915581bc3c34001e978a commit	refs/original/refs/heads/v4-react
+571f30b9fef7d51a4cc519010046cf4c663c21bd commit	refs/original/refs/remotes/origin/master
+b88f51651b77cba06dd2915581bc3c34001e978a commit	refs/original/refs/remotes/origin/v4-react
+28e278fd2f9ef0feb190e28d6adfd6fcec3e97a5 commit	refs/remotes/origin/master
+f9996fb88ce1dffcc64af0ee3eb897fe3064ff27 commit	refs/remotes/origin/v4-react

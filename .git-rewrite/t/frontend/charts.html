@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔥 热门榜单 - ECHO Music</title>
+  <script src="ethers.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { padding-top: 64px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    /* 暗色主题容器 */
+    .charts-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+      background: linear-gradient(90deg, #ff6b6b, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* 榜单类型标签 */
+    .chart-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .chart-tab {
+      padding: 12px 24px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+    
+    .chart-tab:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+    
+    .chart-tab.active {
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(0,212,255,0.3);
+    }
+    
+    /* 时间筛选 */
+    .time-filter {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+    
+    .time-btn {
+      padding: 8px 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .time-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: #ccc;
+    }
+    
+    .time-btn.active {
+      background: rgba(0,212,255,0.2);
+      border-color: #00d4ff;
+      color: #00d4ff;
+    }
+    
+    /* 榜单头部 */
+    .chart-header {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px 12px 0 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 14px;
+      color: #888;
+    }
+    
+    .header-rank { width: 60px; text-align: center; }
+    .header-info { flex: 1; }
+    .header-stats { width: 150px; text-align: center; }
+    .header-score { width: 120px; text-align: center; }
+    
+    /* 榜单列表 */
+    .chart-list {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+    
+    .chart-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s ease;
+    }
+    
+    .chart-item:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    
+    .chart-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* 排名样式 */
+    .rank {
+      width: 60px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      color: #00d4ff;
+    }
+    
+    .rank.top1 {
+      color: #ffd700;
+      font-size: 28px;
+      text-shadow: 0 0 10px rgba(255,215,0,0.5);
+    }
+    
+    .rank.top2 {
+      color: #c0c0c0;
+      font-size: 26px;
+    }
+    
+    .rank.top3 {
+      color: #cd7f32;
+      font-size: 24px;
+    }
+    
+    /* 音乐信息 */
+    .music-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .music-cover {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00d4ff20, #7b2cbf20);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .music-details {
+      flex: 1;
+    }
+    
+    .music-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    
+    .music-meta {
+      font-size: 13px;
+      color: #888;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .music-artist {
+      color: #00d4ff;
+    }
+    
+    .genre-tag {
+      background: rgba(123,44,191,0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    
+    /* 统计数据 */
+    .stats-info {
+      width: 150px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+    }
+    
+    .stat-item {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .stat-value {
+      color: #fff;
+      font-weight: 500;
+    }
+    
+    /* 热度分数 */
+    .hot-score {
+      width: 120px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .hot-score.high {
+      color: #ff4757;
+    }
+    
+    .hot-score.medium {
+      color: #ffa502;
+    }
+    
+    .hot-score.low {
+      color: #2ed573;
+    }
+    
+    /* 加载和空状态 */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    /* 连接钱包提示 */
+    .connect-prompt {
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      margin: 20px 0;
+    }
+    
+    .connect-btn {
+      margin-top: 20px;
+      padding: 14px 32px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+    
+    .connect-btn:hover {
+      opacity: 0.9;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .chart-header { display: none; }
+      .stats-info { display: none; }
+      .header-stats { display: none; }
+      .chart-tabs { gap: 8px; }
+      .chart-tab { padding: 10px 16px; font-size: 14px; }
+      .rank { width: 40px; font-size: 20px; }
+      .rank.top1 { font-size: 24px; }
+      .hot-score { width: 80px; font-size: 14px; }
+    }
+  </style>
+  <script src="js/theme-switcher.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+  <link rel="stylesheet" href="css/global.css"
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <script src="js/wallet-state.js" defer></script>
+</head>
+<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">铸造</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
+  <div class="charts-container">
+    <h1>🔥 热门榜单</h1>
+    
+    <!-- 榜单类型 -->
+    <div class="chart-tabs">
+      <div class="chart-tab active" data-tab="all" onclick="switchTab('all')">总榜</div>
+      <div class="chart-tab" data-tab="electronic" onclick="switchTab('electronic')">电子</div>
+      <div class="chart-tab" data-tab="rock" onclick="switchTab('rock')">摇滚</div>
+      <div class="chart-tab" data-tab="pop" onclick="switchTab('pop')">流行</div>
+      <div class="chart-tab" data-tab="new" onclick="switchTab('new')">新晋</div>
+    </div>
+    
+    <!-- 时间筛选 -->
+    <div class="time-filter">
+      <button class="time-btn" data-period="week" onclick="setPeriod('week')">本周</button>
+      <button class="time-btn active" data-period="month" onclick="setPeriod('month')">本月</button>
+      <button class="time-btn" data-period="all" onclick="setPeriod('all')">总榜</button>
+    </div>
+    
+    <!-- 连接钱包提示 -->
+    <div class="connect-prompt" id="connectPrompt">
+      <div class="empty-state-icon">🔗</div>
+      <p>连接钱包查看热门榜单</p>
+      <button class="connect-btn" id="connectBtn">连接 MetaMask</button>
+    </div>
+    
+    <!-- 榜单内容 -->
+    <div id="chartContent" style="display: none;">
+      <div class="chart-header">
+        <div class="header-rank">排名</div>
+        <div class="header-info">音乐信息</div>
+        <div class="header-stats">数据统计</div>
+        <div class="header-score">热度分</div>
+      </div>
+      
+      <div class="chart-list" id="chartList">
+        <!-- 动态生成 -->
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // ========== 合约配置 ==========
+    const CONTRACT_ADDRESSES = {
+      echoAsset: '0x5f5AAe09BB85f561b21845729B79E840AB026148',
+      echoFusion: '0x3AD441ECfC193fbe7f086b962d0bCfd2Bc2Bac0d'
+    };
+
+    // ABI - EchoAsset
+    const ECHO_ASSET_ABI = [
+      "function getAssetInfo(uint256) view returns (tuple(string,string,string,string,uint256),tuple(address,address,address,address,uint256,uint256,uint256),address)",
+      "function getCurrentTokenId() view returns (uint256)",
+      "function ownerOf(uint256) view returns (address)"
+    ];
+
+    // 全局状态
+    let provider, signer, userAddress;
+    let echoAssetContract;
+    let currentTab = 'all';
+    let currentPeriod = 'month';
+    let allMusicData = [];
+
+    // ========== 热度计算 ==========
+    function calculateHotScore(music, period) {
+      let score = 0;
+      const now = Date.now() / 1000;
+      
+      // 基础数据权重
+      // 播放次数 (权重 1)
+      score += (music.playCount || 0) * 1;
+      
+      // 购买次数 (权重 10)
+      score += (music.purchaseCount || 0) * 10;
+      
+      // 收藏次数 (权重 5)
+      score += (music.favoriteCount || 0) * 5;
+      
+      // 时间衰减因子 (越新越热)
+      const createdAt = music.createdAt || (now - 86400 * 7); // 默认1周前
+      const age = now - createdAt;
+      const days = age / 86400;
+      
+      // 根据周期调整时间衰减
+      let timeDecay;
+      switch(period) {
+        case 'week':
+          // 本周榜：7天内线性衰减
+          timeDecay = Math.max(0.1, 1 - (days / 7));
+          break;
+        case 'month':
+          // 本月榜：30天后衰减到0.3
+          timeDecay = Math.max(0.3, 1 - (days / 30));
+          break;
+        case 'all':
+        default:
+          // 总榜：90天后衰减到0.5
+          timeDecay = Math.max(0.5, 1 - (days / 90));
+          break;
+      }
+      
+      // 新晋榜额外加成
+      if (currentTab === 'new' && days <= 7) {
+        score *= 1.5;
+      }
+      
+      return score * timeDecay;
+    }
+
+    // ========== 连接钱包 ==========
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert('请先安装 MetaMask');
+        return;
+      }
+      
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+        
+        // 初始化合约
+        echoAssetContract = new ethers.Contract(
+          CONTRACT_ADDRESSES.echoAsset, 
+          ECHO_ASSET_ABI, 
+          provider
+        );
+        
+        // 隐藏连接提示，显示内容
+        document.getElementById('connectPrompt').style.display = 'none';
+        document.getElementById('chartContent').style.display = 'block';
+        
+        // 加载榜单
+        await loadCharts();
+        
+      } catch (error) {
+        console.error('连接失败:', error);
+        alert('连接失败: ' + error.message);
+      }
+    }
+
+    // ========== 加载榜单 ==========
+    async function loadCharts() {
+      const container = document.getElementById('chartList');
+      container.innerHTML = '<div class="loading">⏳ 加载中...</div>';
+      
+      try {
+        // 获取所有音乐数据
+        const currentId = await echoAssetContract.getCurrentTokenId();
+        const musicList = [];
+        
+        for (let i = 0; i < currentId; i++) {
+          try {
+            const info = await echoAssetContract.getAssetInfo(i);
+            
+            // 只处理音乐类型的资产
+            const assetType = info[0][2]?.toLowerCase() || '';
+            if (assetType.includes('music') || assetType.includes('audio') || 
+                assetType.includes('electronic') || assetType.includes('rock') || 
+                assetType.includes('pop')) {
+              
+              // 模拟数据（实际应从合约或后端获取）
+              const music = {
+                tokenId: i,
+                name: info[0][0] || `音乐 #${i}`,
+                description: info[0][1] || '',
+                genre: extractGenre(assetType),
+                bpm: extractBpm(info[0][3]),
+                createdAt: Number(info[0][4]) || (Date.now()/1000 - Math.random()*86400*30),
+                // 模拟统计数据
+                playCount: Math.floor(Math.random() * 10000) + 100,
+                purchaseCount: Math.floor(Math.random() * 500) + 10,
+                favoriteCount: Math.floor(Math.random() * 2000) + 50,
+                artist: info[2] ? (info[2].slice(0, 6) + '...' + info[2].slice(-4)) : '未知艺术家'
+              };
+              
+              // 计算热度分数
+              music.hotScore = calculateHotScore(music, currentPeriod);
+              
+              musicList.push(music);
+            }
+          } catch (e) {
+            // 跳过无效资产
+          }
+        }
+        
+        allMusicData = musicList;
+        
+        // 过滤和排序
+        const filteredList = filterAndSortMusic(musicList);
+        
+        // 渲染
+        renderChartList(filteredList);
+        
+      } catch (error) {
+        console.error('加载失败:', error);
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚠️</div>
+            <p>加载失败: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // 提取流派
+    function extractGenre(assetType) {
+      const type = assetType.toLowerCase();
+      if (type.includes('electronic')) return 'electronic';
+      if (type.includes('rock')) return 'rock';
+      if (type.includes('pop')) return 'pop';
+      if (type.includes('jazz')) return 'jazz';
+      if (type.includes('classical')) return 'classical';
+      return 'other';
+    }
+
+    // 提取BPM
+    function extractBpm(uri) {
+      // 从URI或描述中提取BPM
+      const match = uri?.match(/(\d+)\s*bpm/i);
+      return match ? parseInt(match[1]) : (Math.floor(Math.random() * 80) + 80);
+    }
+
+    // ========== 过滤和排序 ==========
+    function filterAndSortMusic(musicList) {
+      let filtered = [...musicList];
+      const now = Date.now() / 1000;
+      
+      // 根据标签过滤
+      switch(currentTab) {
+        case 'electronic':
+          filtered = filtered.filter(m => m.genre === 'electronic');
+          break;
+        case 'rock':
+          filtered = filtered.filter(m => m.genre === 'rock');
+          break;
+        case 'pop':
+          filtered = filtered.filter(m => m.genre === 'pop');
+          break;
+        case 'new':
+          // 新晋：7天内发布的
+          filtered = filtered.filter(m => (now - m.createdAt) <= 86400 * 7);
+          break;
+        case 'all':
+        default:
+          // 总榜：不过滤
+          break;
+      }
+      
+      // 根据时间周期重新计算热度
+      filtered.forEach(music => {
+        music.hotScore = calculateHotScore(music, currentPeriod);
+      });
+      
+      // 按热度排序
+      filtered.sort((a, b) => b.hotScore - a.hotScore);
+      
+      // 取前50
+      return filtered.slice(0, 50);
+    }
+
+    // ========== 渲染榜单 ==========
+    function renderChartList(musicList) {
+      const container = document.getElementById('chartList');
+      
+      if (musicList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎵</div>
+            <p>暂无数据</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // 流派图标映射
+      const genreIcons = {
+        electronic: '🎹',
+        rock: '🎸',
+        pop: '🎤',
+        jazz: '🎷',
+        classical: '🎻',
+        other: '🎵'
+      };
+      
+      // 流派名称映射
+      const genreNames = {
+        electronic: '电子',
+        rock: '摇滚',
+        pop: '流行',
+        jazz: '爵士',
+        classical: '古典',
+        other: '其他'
+      };
+      
+      container.innerHTML = musicList.map((music, index) => {
+        const rank = index + 1;
+        const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+        const scoreClass = music.hotScore > 1000 ? 'high' : music.hotScore > 500 ? 'medium' : 'low';
+        
+        return `
+          <div class="chart-item">
+            <div class="rank ${rankClass}">${rank}</div>
+            <div class="music-info">
+              <div class="music-cover">${genreIcons[music.genre] || '🎵'}</div>
+              <div class="music-details">
+                <div class="music-title">${escapeHtml(music.name)}</div>
+                <div class="music-meta">
+                  <span class="music-artist">${music.artist}</span>
+                  <span class="genre-tag">${genreNames[music.genre] || music.genre}</span>
+                  <span>${music.bpm} BPM</span>
+                </div>
+              </div>
+            </div>
+            <div class="stats-info">
+              <div class="stat-item">
+                <span>▶</span> <span class="stat-value">${formatNumber(music.playCount)}</span>
+              </div>
+              <div class="stat-item">
+                <span>💰</span> <span class="stat-value">${formatNumber(music.purchaseCount)}</span>
+              </div>
+              <div class="stat-item">
+                <span>❤️</span> <span class="stat-value">${formatNumber(music.favoriteCount)}</span>
+              </div>
+            </div>
+            <div class="hot-score ${scoreClass}">🔥 ${Math.floor(music.hotScore)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ========== 切换榜单类型 ==========
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      // 更新UI
+      document.querySelectorAll('.chart-tab').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.tab === tab) {
+          el.classList.add('active');
+        }
+      });
+      
+      // 重新过滤和渲染
+      if (allMusicData.length > 0) {
+        const filtered = filterAndSortMusic(allMusicData);
+        renderChartList(filtered);
+      }
+    }
+
+    // ========== 切换时间周期 ==========
+    function setPeriod(period) {
+      currentPeriod = period;
+      
+      // 更新UI
+      document.querySelectorAll('.time-btn').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.period === period) {
+          el.classList.add('active');
+        }
+      });
+      
+      // 重新计算热度并渲染
+      if (allMusicData.length > 0) {
+        const filtered = filterAndSortMusic(allMusicData);
+        renderChartList(filtered);
+      }
+    }
+
+    // ========== 工具函数 ==========
+    function formatNumber(num) {
+      if (num >= 10000) {
+        return (num / 10000).toFixed(1) + 'w';
+      }
+      if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'k';
+      }
+      return num.toString();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ========== 自动连接 ==========
+    if (window.ethereum && window.ethereum.selectedAddress) {
+      connectWallet();
+    }
+  </script>
+</body>
+</html>

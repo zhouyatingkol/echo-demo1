@@ -1,0 +1,17 @@
+{
+  "name": "echo-demo",
+  "version": "1.0.0",
+  "description": "ECHO Protocol Demo on Qitmeer Network",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network qitmeerTestnet",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^4.9.0",
+    "dotenv": "^17.3.1",
+    "hardhat": "^2.19.0"
+  }
+}

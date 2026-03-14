@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>铸造音乐资产 - ECHO Music</title>
+    <script src="ethers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding-top: 64px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 14px; }
+        
+        .wallet-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .wallet-btn {
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .wallet-btn.connected {
+            background: rgba(0,255,0,0.2);
+            border: 1px solid #0f0;
+        }
+        
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 0;
+        }
+        .step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            border: 2px solid transparent;
+            font-weight: bold;
+        }
+        .step.active .step-number {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-color: #00d4ff;
+        }
+        .step-label { font-size: 12px; color: #888; }
+        .step.active .step-label { color: #00d4ff; }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        
+        /* 音频上传区域 */
+        .audio-upload {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        .audio-upload:hover { border-color: #00d4ff; background: rgba(0,212,255,0.05); }
+        .audio-upload.has-file {
+            border-color: #0f0;
+            background: rgba(0,255,0,0.05);
+        }
+        .audio-icon { font-size: 48px; margin-bottom: 12px; }
+        #audioInput { display: none; }
+        
+        .audio-info {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .audio-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .audio-info-item:last-child { border-bottom: none; }
+        
+        /* 播放器 */
+        .audio-player {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .play-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            width: 0%;
+            transition: width 0.1s;
+        }
+        .time-display {
+            font-size: 12px;
+            color: #888;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        /* 音乐标签 */
+        .tag-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .tag-option {
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .tag-option:hover { border-color: rgba(0,212,255,0.3); }
+        .tag-option.selected {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        
+        .bpm-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .bpm-value {
+            width: 100px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .template-card {
+            background: rgba(0,0,0,0.2);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .template-card:hover { border-color: rgba(0,212,255,0.3); }
+        .template-card.selected {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        .template-icon { font-size: 24px; margin-bottom: 8px; }
+        .template-name { font-size: 12px; }
+        
+        .blueprint-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .blueprint-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid;
+        }
+        .blueprint-card.usage { border-color: #00d4ff; }
+        .blueprint-card.derivative { border-color: #7b2cbf; }
+        .blueprint-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .toggle-label { font-size: 13px; color: #aaa; }
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .toggle.active { background: #00d4ff; }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        .toggle.active::after { transform: translateX(20px); }
+        
+        .btn {
+            padding: 14px 28px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-full { width: 100%; }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .nav-buttons .btn { flex: 1; }
+        
+        .preview-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .preview-title { font-size: 16px; color: #00d4ff; margin-bottom: 12px; }
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .preview-label { color: #888; }
+        .preview-value { color: #fff; }
+        
+        .hidden { display: none !important; }
+        
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .status.success { background: rgba(0,255,0,0.1); color: #0f0; }
+        .status.error { background: rgba(255,0,0,0.1); color: #f55; }
+        .status.pending { background: rgba(255,215,0,0.1); color: #ffd700; }
+    </style>
+  <script src="js/theme-switcher.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+  <link rel="stylesheet" href="css/global.css"
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <script src="js/wallet-state.js" defer></script>
+</head>
+<body><nav class="main-nav" style="position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(10,10,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 1000;"><div style="max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; gap: 30px;"><a href="index.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎵 ECHO Music</a><div style="display: flex; gap: 8px; flex: 1;"><a href="discover.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">发现</a><a href="music-market.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">市场</a><a href="charts.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">榜单</a><a href="mint-music.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">铸造</a><a href="dashboard.html" style="padding: 8px 14px; color: #aaa; text-decoration: none; border-radius: 6px; font-size: 14px;">收益</a></div><div style="display: flex; align-items: center; gap: 12px;"><a href="my-favorites.html" style="padding: 8px; text-decoration: none; font-size: 18px;">❤️</a><button style="padding: 8px 20px; background: linear-gradient(90deg, #00d4ff, #7b2cbf); border: none; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;" id="connectBtn">连接钱包</button></div></div></nav>
+    <div class="container">
+        <h1>🎵 铸造音乐资产</h1>
+        <p class="subtitle">将您的音乐授权给 AI 训练，获得持续收益</p>
+
+        <div class="wallet-section">
+            <button class="wallet-btn" id="connectWalletBtn" id="connectBtn">🔌 连接钱包</button>
+        </div>
+
+        <div class="steps">
+            <div class="step active" id="step1Indicator">
+                <div class="step-number">1</div>
+                <div class="step-label">上传音乐</div>
+            </div>
+            <div class="step" id="step2Indicator">
+                <div class="step-number">2</div>
+                <div class="step-label">音乐信息</div>
+            </div>
+            <div class="step" id="step3Indicator">
+                <div class="step-number">3</div>
+                <div class="step-label">授权设置</div>
+            </div>
+            <div class="step" id="step4Indicator">
+                <div class="step-number">4</div>
+                <div class="step-label">确认铸造</div>
+            </div>
+        </div>
+
+        <!-- 步骤1: 上传音乐 -->
+        <div class="card" id="step1">
+            <div class="card-title">🎼 步骤 1: 上传音乐文件</div>
+            
+            <div class="audio-upload" id="audioUpload" onclick="document.getElementById('audioInput').click()">
+                <div class="audio-icon">🎵</div>
+                <div>点击上传音频文件</div>
+                <div style="color: #888; font-size: 12px; margin-top: 8px;">支持 MP3, WAV, FLAC 格式，最大 50MB</div>
+                <input type="file" id="audioInput" accept=".mp3,.wav,.flac,audio/mpeg,audio/wav" onchange="handleAudioUpload(this.files[0])">
+            </div>
+            
+            <div id="audioInfo" class="hidden">
+                <div class="audio-info">
+                    <div class="audio-info-item">
+                        <span>文件名</span>
+                        <span id="audioFileName">--</span>
+                    </div>
+                    <div class="audio-info-item">
+                        <span>格式</span>
+                        <span id="audioFormat">--</span>
+                    </div>
+                    <div class="audio-info-item">
+                        <span>时长</span>
+                        <span id="audioDuration">--</span>
+                    </div>
+                    <div class="audio-info-item">
+                        <span>文件大小</span>
+                        <span id="audioSize">--</span>
+                    </div>
+                </div>
+                
+                <div class="audio-player">
+                    <div class="player-controls">
+                        <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+                    </div>
+                    <audio id="audioPlayer" preload="metadata"></audio>
+                </div>
+            </div>
+            
+            <button class="btn btn-full" style="margin-top: 20px;" onclick="goToStep(2)">下一步：填写音乐信息 →</button>
+        </div>
+
+        <!-- 步骤2: 音乐信息 -->
+        <div class="card hidden" id="step2">
+            <div class="card-title">📝 步骤 2: 音乐信息</div>
+            
+            <div class="form-group">
+                <label class="form-label">音乐名称 *</label>
+                <input type="text" class="form-input" id="musicName" placeholder="例如：夏日微风">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">描述</label>
+                <textarea class="form-textarea" id="musicDesc" placeholder="描述您的音乐风格、适用场景..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">风格 *</label>
+                <div class="tag-grid" id="genreTags">
+                    <div class="tag-option" data-value="electronic">电子</div>
+                    <div class="tag-option" data-value="rock">摇滚</div>
+                    <div class="tag-option" data-value="classical">古典</div>
+                    <div class="tag-option" data-value="jazz">爵士</div>
+                    <div class="tag-option" data-value="pop">流行</div>
+                    <div class="tag-option" data-value="ambient">氛围</div>
+                    <div class="tag-option" data-value="hiphop">嘻哈</div>
+                    <div class="tag-option" data-value="folk">民谣</div>
+                    <div class="tag-option" data-value="other">其他</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">情绪 *</label>
+                <div class="tag-grid" id="moodTags">
+                    <div class="tag-option" data-value="happy">欢快</div>
+                    <div class="tag-option" data-value="sad">悲伤</div>
+                    <div class="tag-option" data-value="energetic">激昂</div>
+                    <div class="tag-option" data-value="calm">平静</div>
+                    <div class="tag-option" data-value="mysterious">神秘</div>
+                    <div class="tag-option" data-value="romantic">浪漫</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">BPM（每分钟节拍数）</label>
+                <div class="bpm-input">
+                    <input type="range" class="form-input" id="bpmSlider" min="60" max="180" value="120" 
+                           oninput="document.getElementById('bpmValue').textContent = this.value">
+                    <div class="bpm-value" id="bpmValue">120</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">调性</label>
+                <select class="form-select" id="keySignature">
+                    <option value="">未知/不适用</option>
+                    <option value="C">C大调</option>
+                    <option value="Cm">C小调</option>
+                    <option value="G">G大调</option>
+                    <option value="Gm">G小调</option>
+                    <option value="D">D大调</option>
+                    <option value="Dm">D小调</option>
+                    <option value="A">A大调</option>
+                    <option value="Am">A小调</option>
+                    <option value="E">E大调</option>
+                    <option value="Em">E小调</option>
+                    <option value="F">F大调</option>
+                    <option value="Fm">F小调</option>
+                </select>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="goToStep(1)">← 上一步</button>
+                <button class="btn" onclick="goToStep(3)">下一步：授权设置 →</button>
+            </div>
+        </div>
+
+        <!-- 步骤3: 授权设置 -->
+        <div class="card hidden" id="step3">
+            <div class="card-title">⚖️ 步骤 3: 授权设置</div>
+            
+            <p style="color: #888; font-size: 13px; margin-bottom: 16px;">设置 AI 公司使用您音乐的条款和价格</p>
+            
+            <div class="blueprint-grid">
+                <div class="blueprint-card usage">
+                    <div class="blueprint-header">🔑 使用权配置</div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">允许 AI 训练使用</span>
+                        <div class="toggle active" id="allowAI"></div>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">允许商业使用</span>
+                        <div class="toggle active" id="allowCommercial"></div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label class="form-label">每次使用价格 (MEER)</label>
+                        <input type="number" class="form-input" id="usagePrice" value="0.1" step="0.01" min="0.01">
+                        <small style="color: #666;">建议：0.1-1 MEER/次</small>
+                    </div>
+                </div>
+                
+                <div class="blueprint-card derivative">
+                    <div class="blueprint-header">🌱 衍生权配置</div>
+                    
+                    <div class="toggle-group">
+                        <span class="toggle-label">允许创作衍生作品</span>
+                        <div class="toggle" id="allowDerivative"></div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label class="form-label">衍生授权费 (MEER)</label>
+                        <input type="number" class="form-input" id="derivativePrice" value="1" step="0.1" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">您收益分成 (%)</label>
+                        <input type="number" class="form-input" id="revenueShare" value="80" min="0" max="100">
+                        <small style="color: #666;">平台抽成 20%</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="goToStep(2)">← 上一步</button>
+                <button class="btn" onclick="goToStep(4)">下一步：确认铸造 →</button>
+            </div>
+        </div>
+
+        <!-- 步骤4: 确认铸造 -->
+        <div class="card hidden" id="step4">
+            <div class="card-title">🔨 步骤 4: 确认铸造</div>
+            
+            <div class="preview-panel">
+                <div class="preview-title">铸造预览</div>
+                
+                <div class="preview-item">
+                    <span class="preview-label">音乐名称</span>
+                    <span class="preview-value" id="previewName">--</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">风格</span>
+                    <span class="preview-value" id="previewGenre">--</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">时长</span>
+                    <span class="preview-value" id="previewDuration">--</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">使用价格</span>
+                    <span class="preview-value" id="previewPrice">-- MEER/次</span>
+                </div>
+                <div class="preview-item">
+                    <span class="preview-label">预估Gas费</span>
+                    <span class="preview-value">~0.05 MEER</span>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="goToStep(3)">← 上一步</button>
+                <button class="btn" id="mintBtn" onclick="mintMusic()">🚀 确认铸造</button>
+            </div>
+            
+            <div id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        const V2_CONTRACT_ADDRESS = '0x319148d9b9265D75858c508E445d65B649036f75';
+        const V2_ABI = [
+            "function mintECHO(string name, string description, string assetType, string uri, bytes32 contentHash, tuple(tuple(address owner, uint256 fee, bool commercialUse, bool modificationAllowed, string[] allowedScopes, string[] restrictedScopes, uint256 maxUsers, uint256 licenseDuration) usage, tuple(address owner, uint256 fee, bool allowDerivatives, uint256 revenueShare, string[] allowedTypes) derivative, tuple(address owner, uint256 fee, bool allowExtensions, string[] allowedExtensions) extension, tuple(address owner, uint256 sharePercentage, bool autoDistribute) revenue) blueprint) returns (uint256)"
+        ];
+        
+        let provider, signer, contract, userAddress;
+        let isConnected = false;
+        let currentStep = 1;
+        let audioFile = null;
+        let audioHash = '';
+        let selectedGenre = '';
+        let selectedMood = '';
+        
+        // 初始化标签选择
+        document.querySelectorAll('#genreTags .tag-option').forEach(tag => {
+            tag.addEventListener('click', () => {
+                document.querySelectorAll('#genreTags .tag-option').forEach(t => t.classList.remove('selected'));
+                tag.classList.add('selected');
+                selectedGenre = tag.dataset.value;
+            });
+        });
+        
+        document.querySelectorAll('#moodTags .tag-option').forEach(tag => {
+            tag.addEventListener('click', () => {
+                document.querySelectorAll('#moodTags .tag-option').forEach(t => t.classList.remove('selected'));
+                tag.classList.add('selected');
+                selectedMood = tag.dataset.value;
+            });
+        });
+        
+        // 开关切换
+        document.querySelectorAll('.toggle').forEach(toggle => {
+            toggle.addEventListener('click', () => toggle.classList.toggle('active'));
+        });
+        
+        // 连接钱包
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                showStatus('请先安装 MetaMask 钱包！', 'error');
+                return;
+            }
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length === 0) return;
+                
+                userAddress = accounts[0];
+                isConnected = true;
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                contract = new ethers.Contract(V2_CONTRACT_ADDRESS, V2_ABI, signer);
+                
+                document.getElementById('connectWalletBtn').textContent = 
+                    '已连接: ' + userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                document.getElementById('connectWalletBtn').classList.add('connected');
+                
+                showStatus('✅ 钱包已连接', 'success');
+            } catch (error) {
+                showStatus('连接失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 处理音频上传
+        async function handleAudioUpload(file) {
+            if (!file) return;
+            
+            audioFile = file;
+            
+            // 显示文件信息
+            document.getElementById('audioFileName').textContent = file.name;
+            document.getElementById('audioFormat').textContent = file.type || file.name.split('.').pop().toUpperCase();
+            document.getElementById('audioSize').textContent = formatFileSize(file.size);
+            
+            // 计算文件哈希（简化版）
+            const arrayBuffer = await file.arrayBuffer();
+            const hash = '0x' + sha3_256(new Uint8Array(arrayBuffer));
+            audioHash = hash;
+            
+            // 加载音频获取时长
+            const audio = document.getElementById('audioPlayer');
+            audio.src = URL.createObjectURL(file);
+            
+            audio.onloadedmetadata = () => {
+                const duration = formatTime(audio.duration);
+                document.getElementById('audioDuration').textContent = duration;
+                document.getElementById('audioUpload').classList.add('has-file');
+                document.getElementById('audioInfo').classList.remove('hidden');
+            };
+        }
+        
+        // 播放控制
+        function togglePlay() {
+            const audio = document.getElementById('audioPlayer');
+            const btn = document.getElementById('playBtn');
+            
+            if (audio.paused) {
+                audio.play();
+                btn.textContent = '⏸';
+            } else {
+                audio.pause();
+                btn.textContent = '▶';
+            }
+        }
+        
+        // 更新进度条
+        document.getElementById('audioPlayer').addEventListener('timeupdate', function() {
+            const progress = (this.currentTime / this.duration) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('timeDisplay').textContent = 
+                formatTime(this.currentTime) + ' / ' + formatTime(this.duration);
+        });
+        
+        document.getElementById('audioPlayer').addEventListener('ended', function() {
+            document.getElementById('playBtn').textContent = '▶';
+        });
+        
+        // 上传到IPFS（使用 Pinata）
+        async function uploadToIPFS(file, metadata) {
+            // 注意：实际使用时需要配置 Pinata API Key
+            // 这里使用模拟上传，实际应调用 Pinata API
+            
+            showStatus('正在上传音频到 IPFS...', 'pending');
+            
+            // 模拟上传延迟
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // 生成模拟IPFS hash
+            const audioHash = 'Qm' + Math.random().toString(36).substring(2, 15);
+            const metadataHash = 'Qm' + Math.random().toString(36).substring(2, 15);
+            
+            return {
+                audioUrl: `ipfs://${audioHash}`,
+                metadataUrl: `ipfs://${metadataHash}`
+            };
+        }
+        
+        // 实际IPFS上传（需要配置API密钥）
+        async function uploadToIPFSReal(file, metadata) {
+            const PINATA_API_KEY = localStorage.getItem('pinata_api_key') || '';
+            const PINATA_SECRET_KEY = localStorage.getItem('pinata_secret_key') || '';
+            
+            if (!PINATA_API_KEY) {
+                console.warn('未配置 Pinata API，使用模拟上传');
+                return uploadToIPFS(file, metadata);
+            }
+            
+            try {
+                // 1. 上传音频文件
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const audioRes = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+                    method: 'POST',
+                    headers: {
+                        'pinata_api_key': PINATA_API_KEY,
+                        'pinata_secret_api_key': PINATA_SECRET_KEY
+                    },
+                    body: formData
+                });
+                
+                const audioData = await audioRes.json();
+                const audioUrl = `ipfs://${audioData.IpfsHash}`;
+                
+                // 2. 上传元数据
+                const metadataWithAudio = {
+                    ...metadata,
+                    audioUrl: audioUrl,
+                    animation_url: audioUrl
+                };
+                
+                const metadataRes = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'pinata_api_key': PINATA_API_KEY,
+                        'pinata_secret_api_key': PINATA_SECRET_KEY
+                    },
+                    body: JSON.stringify({
+                        pinataContent: metadataWithAudio,
+                        pinataMetadata: { name: metadata.name }
+                    })
+                });
+                
+                const metadataData = await metadataRes.json();
+                
+                return {
+                    audioUrl: audioUrl,
+                    metadataUrl: `ipfs://${metadataData.IpfsHash}`
+                };
+            } catch (error) {
+                console.error('IPFS上传失败:', error);
+                throw error;
+            }
+        }
+        
+        // 显示IPFS配置弹窗
+        function showIPFSConfig() {
+            const apiKey = prompt('请输入 Pinata API Key（可选）:', localStorage.getItem('pinata_api_key') || '');
+            if (apiKey !== null) {
+                localStorage.setItem('pinata_api_key', apiKey);
+            }
+            
+            const secretKey = prompt('请输入 Pinata Secret Key（可选）:', localStorage.getItem('pinata_secret_key') || '');
+            if (secretKey !== null) {
+                localStorage.setItem('pinata_secret_key', secretKey);
+            }
+        }
+        
+        // 步骤导航
+        function goToStep(step) {
+            // 验证
+            if (step === 2 && !audioFile) {
+                showStatus('请先上传音频文件', 'error');
+                return;
+            }
+            if (step === 3) {
+                if (!document.getElementById('musicName').value) {
+                    showStatus('请填写音乐名称', 'error');
+                    return;
+                }
+                if (!selectedGenre) {
+                    showStatus('请选择风格', 'error');
+                    return;
+                }
+                if (!selectedMood) {
+                    showStatus('请选择情绪', 'error');
+                    return;
+                }
+            }
+            if (step === 4) {
+                updatePreview();
+            }
+            
+            // 隐藏所有步骤
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('step' + i).classList.add('hidden');
+                document.getElementById('step' + i + 'Indicator').classList.remove('active');
+            }
+            
+            // 显示目标步骤
+            document.getElementById('step' + step).classList.remove('hidden');
+            for (let i = 1; i <= step; i++) {
+                document.getElementById('step' + i + 'Indicator').classList.add('active');
+            }
+            
+            currentStep = step;
+        }
+        
+        // 更新预览
+        function updatePreview() {
+            document.getElementById('previewName').textContent = document.getElementById('musicName').value;
+            document.getElementById('previewGenre').textContent = 
+                document.querySelector('#genreTags .tag-option.selected')?.textContent || '--';
+            document.getElementById('previewDuration').textContent = 
+                document.getElementById('audioDuration').textContent;
+            document.getElementById('previewPrice').textContent = 
+                document.getElementById('usagePrice').value + ' MEER/次';
+        }
+        
+        // 铸造音乐资产
+        async function mintMusic() {
+            if (!isConnected) {
+                showStatus('请先连接钱包', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('铸造中...请确认交易', 'pending');
+                
+                const name = document.getElementById('musicName').value;
+                const description = document.getElementById('musicDesc').value;
+                const bpm = document.getElementById('bpmSlider').value;
+                const key = document.getElementById('keySignature').value;
+                
+                // 构建元数据
+                const metadata = {
+                    name,
+                    description,
+                    genre: selectedGenre,
+                    mood: selectedMood,
+                    bpm: parseInt(bpm),
+                    key: key,
+                    duration: document.getElementById('audioDuration').textContent,
+                    createdAt: new Date().toISOString()
+                };
+                
+                const uri = 'data:application/json;base64,' + utf8ToBase64(JSON.stringify(metadata));
+                
+                // 构建蓝图
+                const usagePrice = ethers.utils.parseEther(document.getElementById('usagePrice').value);
+                const derivativePrice = ethers.utils.parseEther(document.getElementById('derivativePrice').value);
+                const revenueShare = parseInt(document.getElementById('revenueShare').value) * 100;
+                
+                const blueprint = {
+                    usage: {
+                        owner: userAddress,
+                        fee: usagePrice,
+                        commercialUse: document.getElementById('allowCommercial').classList.contains('active'),
+                        modificationAllowed: false,
+                        allowedScopes: ['AI_training'],
+                        restrictedScopes: [],
+                        maxUsers: 0,
+                        licenseDuration: 0
+                    },
+                    derivative: {
+                        owner: userAddress,
+                        fee: derivativePrice,
+                        allowDerivatives: document.getElementById('allowDerivative').classList.contains('active'),
+                        revenueShare: revenueShare,
+                        allowedTypes: ['remix', 'sample']
+                    },
+                    extension: {
+                        owner: userAddress,
+                        fee: 0,
+                        allowExtensions: false,
+                        allowedExtensions: []
+                    },
+                    revenue: {
+                        owner: userAddress,
+                        sharePercentage: 10000,
+                        autoDistribute: true
+                    }
+                };
+                
+                const tx = await contract.mintECHO(
+                    name, 
+                    description, 
+                    'music_' + selectedGenre, 
+                    uri, 
+                    audioHash, 
+                    blueprint
+                );
+                
+                showStatus('交易已提交，等待确认...', 'pending');
+                
+                const receipt = await tx.wait();
+                
+                showStatus('✅ 音乐资产铸造成功！', 'success');
+                
+                // 3秒后重置
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+                
+            } catch (error) {
+                showStatus('铸造失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 工具函数
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+        
+        // Unicode 安全的 base64 编码
+        function utf8ToBase64(str) {
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+        }
+        
+        // 简单的 SHA3-256 实现 - 使用 ethers.js keccak256
+        function sha3_256(data) {
+            // 使用 ethers.js 的 keccak256
+            return ethers.utils.keccak256(data).slice(2); // 去掉 '0x' 前缀
+        }
+        
+        function showStatus(msg, type) {
+            const statusEl = document.getElementById('status');
+            if (statusEl) {
+                statusEl.innerHTML = msg ? `<div class="status ${type}">${msg}</div>` : '';
+            }
+        }
+    </script>
+</body>
+</html>

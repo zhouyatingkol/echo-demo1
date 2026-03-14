@@ -3,325 +3,534 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHO Protocol V4 - 演示版</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#667eea',
-                        'primary-dark': '#764ba2',
-                        'bg-primary': '#0a0a0a',
-                        'bg-secondary': '#1a1a2e',
-                        'bg-card': '#16162a',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                }
+    <title>试 · ECHO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&family=LXGW+WenKai:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 宣纸质感 */
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F2EFE8;
+            --bg-tertiary: #EBE7DD;
+            --bg-card: #FDFCFA;
+            
+            /* 四阶墨色 */
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #7A6E5F;
+            --ink-faint: #B5B5B5;
+            
+            /* 宋金 */
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
+            
+            /* 三域 - 宋瓷高级感 */
+            --realm-sound: #8B9DC3;
+            --realm-color: #C9A9A6;
+            --realm-text: #7A8B7C;
+            
+            /* 朱红 */
+            --seal-red: #A03020;
+            
+            /* 字体 */
+            --font-serif: 'Noto Serif SC', 'Source Han Serif CN', serif;
+            --font-wenkai: 'LXGW WenKai', serif;
+            
+            /* 过渡 */
+            --transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            color: var(--ink-deep);
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+        
+        /* 宣纸纹理 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.8s ease,
+                        backdrop-filter 0.8s ease;
+        }
+        
+        .navbar.is-scrolled {
+            background: rgba(253, 252, 250, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+        }
+        
+        .navbar__brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .navbar__brand span:first-child {
+            font-size: 1.5rem;
+        }
+        
+        .navbar__brand span:last-child {
+            font-family: var(--font-wenkai);
+            font-size: 1.25rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: var(--ink-deep);
+        }
+        
+        .navbar__nav {
+            display: flex;
+            align-items: center;
+            gap: clamp(24px, 4vw, 48px);
+        }
+        
+        .navbar__nav a {
+            font-size: 0.875rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: var(--ink-light);
+            text-decoration: none;
+            transition: color 0.4s ease;
+        }
+        
+        .navbar__nav a:hover {
+            color: var(--ink-deep);
+        }
+        
+        .navbar__btn {
+            font-family: var(--font-serif);
+            font-size: 0.875rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            padding: 0.5rem 1.25rem;
+            border: 0.5px solid rgba(122, 110, 95, 0.2);
+            border-radius: 2px;
+            background: var(--ink-deep);
+            color: var(--bg-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .navbar__btn:hover {
+            background: var(--gold-primary);
+            border-color: var(--gold-primary);
+        }
+        
+        /* 主内容 */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            padding-top: 60px;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 8vh 10vw 6vh;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-family: var(--font-wenkai);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            color: var(--ink-deep);
+            margin-bottom: 1rem;
+            letter-spacing: 0.1em;
+        }
+        
+        .hero h1 span {
+            color: var(--gold-primary);
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--ink-light);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            letter-spacing: 0.02em;
+        }
+        
+        /* 搜索框 */
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            padding-right: 100px;
+            background: var(--bg-card);
+            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            border-radius: 2px;
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            color: var(--ink-deep);
+            transition: border-color 0.4s ease;
+        }
+        
+        .search-box input::placeholder {
+            color: var(--ink-faint);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+        }
+        
+        .search-box button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.6rem 1.25rem;
+            background: var(--ink-deep);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 2px;
+            font-family: var(--font-serif);
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .search-box button:hover {
+            background: var(--gold-primary);
+        }
+        
+        /* 统计 */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-family: var(--font-wenkai);
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--gold-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--ink-light);
+            letter-spacing: 0.05em;
+        }
+        
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .navbar__nav {
+                display: none;
             }
         }
-    </script>
-    <style>
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        
+        /* 功能展示 */
+        .features {
+            padding: 6vh 10vw;
+            background: var(--bg-secondary);
         }
-        .glass {
-            background: rgba(22, 22, 42, 0.8);
-            backdrop-filter: blur(10px);
+        
+        .features-title {
+            font-family: var(--font-wenkai);
+            font-size: 1.5rem;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.15em;
         }
-        .card-hover {
-            transition: all 0.3s ease;
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
         }
-        .card-hover:hover {
+        
+        .feature-card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 2px;
+            border: 0.5px solid rgba(122, 110, 95, 0.1);
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            border-color: var(--gold-primary);
             transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--ink-deep);
+        }
+        
+        .feature-desc {
+            font-size: 0.875rem;
+            color: var(--ink-light);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 三域展示 */
+        .realms {
+            padding: 6vh 10vw;
+        }
+        
+        .realms-title {
+            font-family: var(--font-wenkai);
+            font-size: 1.5rem;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.15em;
+        }
+        
+        .realms-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .realm-card {
+            background: var(--bg-card);
+            padding: 2.5rem 2rem;
+            border-radius: 2px;
+            border: 0.5px solid rgba(122, 110, 95, 0.1);
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .realm-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .realm-card--sound:hover {
+            border-color: var(--realm-sound);
+        }
+        
+        .realm-card--color:hover {
+            border-color: var(--realm-color);
+        }
+        
+        .realm-card--text:hover {
+            border-color: var(--realm-text);
+        }
+        
+        .realm-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .realm-name {
+            font-family: var(--font-wenkai);
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+        
+        .realm-card--sound .realm-name {
+            color: var(--realm-sound);
+        }
+        
+        .realm-card--color .realm-name {
+            color: var(--realm-color);
+        }
+        
+        .realm-card--text .realm-name {
+            color: var(--realm-text);
+        }
+        
+        .realm-desc {
+            font-size: 0.875rem;
+            color: var(--ink-light);
+        }
+        
+        @media (max-width: 768px) {
+            .realms-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body class="bg-bg-primary text-white min-h-screen">
+<body>
     <!-- 导航栏 -->
-    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-2">
-                    <span class="text-2xl">🌳</span>
-                    <span class="text-xl font-bold gradient-text">ECHO Protocol</span>
-                </div>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-white/70 hover:text-white transition">发现</a>
-                    <a href="#marketplace" class="text-white/70 hover:text-white transition">市场</a>
-                    <a href="#" class="text-white/70 hover:text-white transition">榜单</a>
-                    <a href="#creator" class="text-white/70 hover:text-white transition">创作</a>
-                </div>
-                <button class="bg-gradient-to-r from-primary to-primary-dark px-6 py-2 rounded-lg font-medium hover:opacity-90 transition">
-                    连接钱包
-                </button>
-            </div>
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="navbar__brand">
+            <span>🎋</span>
+            <span>ECHO · 试</span>
+        </a>
+        
+        <div class="navbar__nav">
+            <a href="index.html">境</a>
+            <a href="marketplace.html">集</a>
+            <a href="creator.html">铸</a>
+            <a href="docs.html">典</a>
         </div>
+        
+        <button class="navbar__btn" id="connectWallet">入链</button>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="pt-32 pb-20 px-4">
-        <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-5xl md:text-7xl font-bold mb-6">
-                发现音乐的
-                <span class="gradient-text">未来</span>
-            </h1>
-            <p class="text-xl text-white/60 mb-10 max-w-2xl mx-auto">
-                去中心化音乐授权平台，保护创作者权益，释放音乐价值
-            </p>
+    <!-- 主内容 -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>由此而入，皆可<span>生长</span></h1>
+            <p>去中心化数字确权平台，创作者真正拥有作品</p>
             
-            <!-- 搜索框 -->
-            <div class="max-w-2xl mx-auto mb-12">
-                <div class="relative">
-                    <input type="text" 
-                           placeholder="搜索音乐、创作者..." 
-                           class="w-full bg-bg-secondary border border-white/10 rounded-xl px-6 py-4 pl-14 text-white placeholder-white/40 focus:outline-none focus:border-primary">
-                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 text-xl">🔍</span>
-                    <button class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary px-6 py-2 rounded-lg font-medium hover:bg-primary/80 transition">
-                        搜索
-                    </button>
+            <div class="search-box">
+                <input type="text" placeholder="寻...">
+                <button>寻</button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value">1,234</div>
+                    <div class="stat-label">作品</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5,678</div>
+                    <div class="stat-label">藏家</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">创作者</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">12.5K</div>
+                    <div class="stat-label">交易</div>
                 </div>
             </div>
+        </section>
 
-            <!-- 统计 -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-                <div class="text-center">
-                    <div class="text-4xl font-bold gradient-text mb-2">1,234</div>
-                    <div class="text-white/50">音乐作品</div>
+        <!-- 功能展示 -->
+        <section class="features">
+            <h2 class="features-title">何以不同</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3 class="feature-title">链上确权</h3>
+                    <p class="feature-desc">每一份作品都有独一无二的链上身份，永久存证，无法篡改</p>
                 </div>
-                <div class="text-center">
-                    <div class="text-4xl font-bold gradient-text mb-2">5,678</div>
-                    <div class="text-white/50">License</div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">即时收益</h3>
+                    <p class="feature-desc">智能合约自动分配版税，创作者实时获得收益</p>
                 </div>
-                <div class="text-center">
-                    <div class="text-4xl font-bold gradient-text mb-2">987</div>
-                    <div class="text-white/50">创作者</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl font-bold gradient-text mb-2">45.6K</div>
-                    <div class="text-white/50">交易量</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 热门音乐 -->
-    <section id="marketplace" class="py-20 px-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex items-center justify-between mb-10">
-                <h2 class="text-3xl font-bold">🔥 热门音乐</h2>
-                <a href="#" class="text-primary hover:text-primary/80 flex items-center gap-2">
-                    查看全部 <span>→</span>
-                </a>
-            </div>
-
-            <!-- 筛选器 -->
-            <div class="flex flex-wrap gap-4 mb-8">
-                <select class="bg-bg-secondary border border-white/10 rounded-lg px-4 py-2 text-white">
-                    <option>全部类型</option>
-                    <option>电子音乐</option>
-                    <option>流行音乐</option>
-                    <option>古典音乐</option>
-                </select>
-                <select class="bg-bg-secondary border border-white/10 rounded-lg px-4 py-2 text-white">
-                    <option>价格范围</option>
-                    <option>0 - 50 MEER</option>
-                    <option>50 - 100 MEER</option>
-                    <option>100+ MEER</option>
-                </select>
-                <select class="bg-bg-secondary border border-white/10 rounded-lg px-4 py-2 text-white">
-                    <option>最新上架</option>
-                    <option>价格: 低到高</option>
-                    <option>价格: 高到低</option>
-                    <option>最受欢迎</option>
-                </select>
-            </div>
-
-            <!-- 音乐网格 -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Card 1 -->
-                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
-                    <div class="aspect-square bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center text-6xl">
-                        🎵
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-lg mb-1">夏日微风</h3>
-                        <p class="text-white/50 text-sm mb-3">👤 音乐创作者</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs bg-primary/20 text-primary px-2 py-1 rounded">电子</span>
-                            <span class="font-bold gradient-text">💎 100</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
-                    <div class="aspect-square bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-6xl">
-                        🎸
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-lg mb-1">摇滚之夜</h3>
-                        <p class="text-white/50 text-sm mb-3">👤 RockStar</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs bg-pink-500/20 text-pink-400 px-2 py-1 rounded">摇滚</span>
-                            <span class="font-bold gradient-text">💎 250</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
-                    <div class="aspect-square bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-6xl">
-                        🎹
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-lg mb-1">钢琴协奏曲</h3>
-                        <p class="text-white/50 text-sm mb-3">👤 古典大师</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">古典</span>
-                            <span class="font-bold gradient-text">💎 500</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
-                    <div class="aspect-square bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center text-6xl">
-                        🎤
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-lg mb-1">城市节拍</h3>
-                        <p class="text-white/50 text-sm mb-3">👤 嘻哈达人</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">嘻哈</span>
-                            <span class="font-bold gradient-text">💎 150</span>
-                        </div>
-                    </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="feature-title">全球流通</h3>
+                    <p class="feature-desc">跨越地域限制，作品可在全球范围内自由交易</p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- 创作者中心 CTA -->
-    <section id="creator" class="py-20 px-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="bg-gradient-to-r from-primary/10 to-primary-dark/10 rounded-3xl p-12 text-center border border-primary/20">
-                <h2 class="text-4xl font-bold mb-4">🎨 创作者中心</h2>
-                <p class="text-xl text-white/60 mb-8 max-w-2xl mx-auto">
-                    上传你的音乐作品，通过 License ECHO 获得收益，
-                    让你的创作被更多人发现和使用
-                </p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button class="bg-gradient-to-r from-primary to-primary-dark px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition">
-                        开始创作
-                    </button>
-                    <button class="border border-white/20 px-8 py-3 rounded-xl font-semibold hover:bg-white/5 transition">
-                        了解更多
-                    </button>
+        <!-- 三域展示 -->
+        <section class="realms">
+            <h2 class="realms-title">三域</h2>
+            
+            <div class="realms-grid">
+                <div class="realm-card realm-card--sound">
+                    <div class="realm-icon">🎵</div>
+                    <h3 class="realm-name">音</h3>
+                    <p class="realm-desc">音乐、音效、声景</p>
+                </div>
+                
+                <div class="realm-card realm-card--color">
+                    <div class="realm-icon">🎨</div>
+                    <h3 class="realm-name">色</h3>
+                    <p class="realm-desc">图像、影像、视觉</p>
+                </div>
+                
+                <div class="realm-card realm-card--text">
+                    <div class="realm-icon">✍️</div>
+                    <h3 class="realm-name">文</h3>
+                    <p class="realm-desc">文字、思想、叙事</p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- 最新上架 -->
-    <section class="py-20 px-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex items-center justify-between mb-10">
-                <h2 class="text-3xl font-bold">⚡ 最新上架</h2>
-                <a href="#" class="text-primary hover:text-primary/80 flex items-center gap-2">
-                    查看全部 <span>→</span>
-                </a>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Cards (similar to above) -->
-                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
-                    <div class="aspect-square bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center text-6xl">
-                        🎺
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-lg mb-1">爵士时光</h3>
-                        <p class="text-white/50 text-sm mb-3">👤 JazzMaster</p>
-                        <span class="font-bold gradient-text">💎 180</span>
-                    </div>
-                </div>
-
-                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
-                    <div class="aspect-square bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-6xl">
-                        🎻
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-lg mb-1">弦乐四重奏</h3>
-                        <p class="text-white/50 text-sm mb-3">👤 交响乐团</p>
-                        <span class="font-bold gradient-text">💎 350</span>
-                    </div>
-                </div>
-
-                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
-                    <div class="aspect-square bg-gradient-to-br from-teal-500/20 to-cyan-500/20 flex items-center justify-center text-6xl">
-                        🥁
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-lg mb-1">鼓点节奏</h3>
-                        <p class="text-white/50 text-sm mb-3">👤 BeatMaker</p>
-                        <span class="font-bold gradient-text">💎 80</span>
-                    </div>
-                </div>
-
-                <div class="bg-bg-card rounded-2xl overflow-hidden card-hover cursor-pointer">
-                    <div class="aspect-square bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center text-6xl">
-                        🎼
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-lg mb-1">梦幻旋律</h3>
-                        <p class="text-white/50 text-sm mb-3">👤 Dreamer</p>
-                        <span class="font-bold gradient-text">💎 200</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="border-t border-white/10 py-12 px-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex items-center space-x-2">
-                    <span class="text-2xl">🌳</span>
-                    <span class="text-xl font-bold gradient-text">ECHO Protocol</span>
-                </div>
-                <p class="text-white/50">保护创作者的数字权益 - Powered by Qitmeer</p>
-                <div class="flex items-center space-x-6">
-                    <a href="#" class="text-white/50 hover:text-white transition">文档</a>
-                    <a href="#" class="text-white/50 hover:text-white transition">GitHub</a>
-                    <a href="#" class="text-white/50 hover:text-white transition">Twitter</a>
-                </div>
-            </div>
-            <div class="text-center mt-8 text-white/30 text-sm">
-                © 2026 ECHO Protocol. All rights reserved.
-            </div>
-        </div>
-    </footer>
-
+    <!-- Wallet Manager -->
+    <script src="../js/wallet-manager.js"></script>
+    
     <script>
-        // 简单的交互效果
-        document.querySelectorAll('.card-hover').forEach(card => {
-            card.addEventListener('click', () => {
-                alert('点击了音乐卡片！在实际版本中，这将跳转到资产详情页');
-            });
-        });
-
-        // 连接钱包按钮
-        document.querySelector('button').addEventListener('click', (e) => {
-            if (e.target.textContent.includes('连接钱包')) {
-                alert('在实际版本中，这将唤起 MetaMask 连接');
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('is-scrolled');
+            } else {
+                navbar.classList.remove('is-scrolled');
             }
         });
     </script>
