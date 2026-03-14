@@ -1443,7 +1443,7 @@
     <main class="creator-page">
         <!-- Hero 区 -->
         <section class="creator-hero">
-            <h1 class="creator-title">生</h1>
+            <h1 class="creator-title">铸</h1>
             <p class="creator-subtitle">生此一物，归于你</p>
         </section>
 
@@ -1466,7 +1466,7 @@
             </div>
             <div class="step-line"></div>
             <div class="step">
-                <div class="step-dot step-dot--pending" data-step="5">生</div>
+                <div class="step-dot step-dot--pending" data-step="5">成</div>
             </div>
         </div>
 
@@ -1559,11 +1559,11 @@
             <section class="form-section" id="section-describe">
                 <div class="form-group">
                     <label class="form-label" for="workName">名</label>
-                    <input type="text" class="form-input" id="workName" placeholder="赋之以名" required>
+                    <input type="text" class="form-input" id="workName" placeholder="命名于此" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="workDesc">述</label>
-                    <textarea class="form-input form-textarea" id="workDesc" placeholder="述其灵韵，传其心境" required></textarea>
+                    <textarea class="form-input form-textarea" id="workDesc" placeholder="述其由来" required></textarea>
                     <p class="form-hint">简练为上，百字为限</p>
                 </div>
             </section>
@@ -1895,7 +1895,7 @@
         // 步骤指示器更新
         function updateStepIndicator(step, isComplete) {
             const dots = document.querySelectorAll('.step-dot');
-            const steps = ['呈', '述', '值', '权', '生'];
+            const steps = ['呈', '述', '值', '权', '成'];
 
             for (let i = 0; i < dots.length; i++) {
                 if (i < step) {
