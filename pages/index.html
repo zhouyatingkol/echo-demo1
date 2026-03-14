@@ -383,11 +383,10 @@
             justify-content: center;
             gap: 1rem;
             flex-wrap: wrap;
-            opacity: 0;
-            transform: translateY(20px);
-            filter: blur(4px);
-            animation: emerge 1.8s var(--ease-ink) forwards;
-            animation-delay: 0.3s;
+            /* 移除动画，直接显示 */
+            opacity: 1;
+            transform: none;
+            filter: none;
         }
         
         .hero-slogan {
@@ -406,9 +405,9 @@
             background-color: #A03020;
             border-radius: 2px;
             position: relative;
-            opacity: 0;
-            transform: scale(0.8) rotate(-2deg);
-            animation: sealStamp 0.8s var(--ease-ink) 1.2s forwards;
+            /* 直接显示 */
+            opacity: 1;
+            transform: none;
             /* 简化的古朴效果 */
             box-shadow: 
                 inset 0 0 15px rgba(0,0,0,0.15),
