@@ -26,6 +26,8 @@
                         'gold-soft': '#d4b896',
                         'clay': '#9e8b76',
                         'stone': '#5a5248',
+                        'ru-sky': '#a8c4c9',
+                        'ru-mist': '#c4b9b0',
                     }
                 }
             }
@@ -515,6 +517,44 @@
             transition: all 0.4s ease;
         }
         
+        /* 宋代纹样装饰 */
+        .song-pattern {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0z' fill='none' stroke='%231a1a1a' stroke-width='0.5'/%3E%3C/svg%3E");
+        }
+        
+        /* 回纹分隔线 */
+        .huiwen-divider {
+            width: 120px;
+            height: 12px;
+            margin: 3rem auto;
+            background-image: url("data:image/svg+xml,%3Csvg width='24' height='12' viewBox='0 0 24 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h6v6H0zM6 6h6v6H6zM12 0h6v6h-6zM18 6h6v6h-6z' fill='%23b8944f' fill-opacity='0.3'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            opacity: 0.6;
+        }
+        
+        /* 水波纹页脚装饰 */
+        .wave-footer {
+            position: relative;
+            padding-top: 8vh;
+        }
+        
+        .wave-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 Q25 0, 50 10 T100 10' fill='none' stroke='%23b8944f' stroke-width='0.5' stroke-opacity='0.15'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            opacity: 0.5;
+        }
+        
         @media (max-width: 768px) {
             .side-mark { display: none; }
             .section-poetic { padding: 12vh 6vw; }
@@ -527,6 +567,7 @@
 </head>
 <body>
     <div class="paper-texture"></div>
+    <div class="song-pattern"></div>
     <div class="glow-soft"></div>
     <div class="side-mark">ECHO</div>
 
@@ -585,6 +626,8 @@
                 <p>不是拥有，而是相伴。不是结束，而是开始。</p>
             </div>
         </div>
+        
+        <div class="huiwen-divider"></div>
     </section>
 
     <!-- 生长 -->
@@ -718,7 +761,7 @@
     </section>
 
     <!-- 页脚 -->
-    <footer class="footer">
+    <footer class="footer wave-footer">
         <div class="footer-logo">ECHO</div>
         
         <div class="footer-links">
