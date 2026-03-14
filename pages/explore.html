@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三域 | ECHO</title>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 宣纸质感 */
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F2EFE8;
+            --bg-tertiary: #EBE7DD;
+            
+            /* 四阶墨色 */
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #7A6E5F;
+            --ink-faint: #B5B5B5;
+            
+            /* 宋金 */
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
+            
+            /* 三域 - 宋瓷高级感 */
+            --realm-sound: #8B9DC3;
+            --realm-color: #C9A9A6;
+            --realm-text: #7A8B7C;
+            
+            /* 字体 */
+            --font-display: 'LXGW WenKai', cursive;
+            --font-serif: 'Noto Serif SC', serif;
+            
+            /* 时长 */
+            --duration-slow: 1.2s;
+            --duration-ambient: 12s;
+            
+            /* 缓动 */
+            --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);
+            --ease-breath: cubic-bezier(0.45, 0, 0.55, 1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-display);
+            background: var(--bg-primary);
+            color: var(--ink-deep);
+            line-height: 1.8;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* ===== 导航栏 ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.8s ease,
+                        backdrop-filter 0.8s ease;
+        }
+        
+        .navbar.is-scrolled {
+            background: rgba(248, 246, 241, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+        }
+        
+        .navbar__brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .navbar__logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: var(--ink-deep);
+            letter-spacing: 0.3em;
+            text-decoration: none;
+            opacity: 0.85;
+            transition: opacity 0.4s ease;
+        }
+        
+        .navbar__brand:hover .navbar__logo {
+            opacity: 1;
+        }
+        
+        .navbar__nav {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .navbar__link {
+            position: relative;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--ink-light);
+            text-decoration: none;
+            letter-spacing: 0.2em;
+            padding: 0.5rem 0;
+            transition: color 0.4s ease;
+        }
+        
+        .navbar__link:hover,
+        .navbar__link[aria-current="page"] {
+            color: var(--ink-deep);
+        }
+        
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: var(--gold-primary);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .navbar__link:hover::after,
+        .navbar__link[aria-current="page"]::after {
+            width: 100%;
+        }
+        
+        .navbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .navbar__user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2px;
+            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            background: transparent;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        
+        .navbar__user:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+            background: rgba(184, 155, 108, 0.05);
+        }
+        
+        .navbar__user-placeholder {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(122, 110, 95, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .navbar__user-placeholder svg {
+            width: 12px;
+            height: 12px;
+            stroke: var(--ink-light);
+        }
+        
+        .navbar__menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            gap: 6px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .navbar__menu-line {
+            width: 24px;
+            height: 1px;
+            background: var(--ink-light);
+            transition: all 0.4s ease;
+            transform-origin: center;
+        }
+        
+        .navbar__mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(248, 246, 241, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .navbar__mobile-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        .navbar__mobile-menu .navbar__link {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #5A5045;
+            padding: 1rem 0;
+            letter-spacing: 0.5em;
+        }
+        
+        .navbar__mobile-menu .navbar__link:hover {
+            color: var(--ink-deep);
+        }
+        
+        .navbar__mobile-menu .navbar__link::after {
+            display: none;
+        }
+        
+        /* 宣纸纹理 */
+        .paper-texture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+        }
+        
+        /* 窗棂光晕 */
+        .window-glow {
+            position: fixed;
+            top: -25%;
+            right: -15%;
+            width: 80vw;
+            height: 80vw;
+            background: radial-gradient(ellipse at center, rgba(184, 148, 79, 0.15) 0%, rgba(201, 168, 108, 0.08) 30%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: glowPulse 12s ease-in-out infinite;
+        }
+        
+        .window-glow::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: -30%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(ellipse at center, rgba(139, 157, 195, 0.08) 0%, transparent 60%);
+            animation: glowPulse 15s ease-in-out infinite reverse;
+        }
+        
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        /* 左侧垂直水印 */
+        .side-mark {
+            position: fixed;
+            left: 5vw;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            letter-spacing: 0.8em;
+            color: rgba(26, 26, 26, 0.12);
+            z-index: 0;
+            pointer-events: none;
+            font-weight: 300;
+        }
+        
+        /* Hero 区域 */
+        .hero-explore {
+            min-height: 55vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+            padding-top: 12vh;
+        }
+        
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 400;
+            letter-spacing: 0.35em;
+            line-height: 1.6;
+            color: var(--ink-deep);
+            text-align: center;
+            opacity: 0;
+            animation: charFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
+        
+        .hero-subtitle {
+            margin-top: 3rem;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            color: var(--ink-light);
+            letter-spacing: 0.3em;
+            font-weight: 400;
+            line-height: 2.2;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 1.5s ease 0.8s forwards;
+        }
+        
+        .hero-subtitle span {
+            display: block;
+        }
+        
+        @keyframes charFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeIn { to { opacity: 1; } }
+        
+        /* 分隔装饰 */
+        .divider-gold {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+            margin: 2.5rem auto;
+            opacity: 0;
+            animation: fadeIn 1s ease 1.2s forwards;
+        }
+        
+        /* 三域卡片区域 */
+        .domains-section {
+            padding: 8vh 5vw 12vh;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .domains-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3vw;
+        }
+        
+        /* 三域卡片基础样式 - 应用三域色 */
+        .domain-card {
+            position: relative;
+            aspect-ratio: 3/4;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        /* 音域 - 青瓷色 */
+        .domain-card.sound {
+            background: var(--realm-sound);
+        }
+        
+        /* 色域 - 粉瓷色 */
+        .domain-card.color {
+            background: var(--realm-color);
+        }
+        
+        /* 文域 - 蟹壳青 */
+        .domain-card.text {
+            background: var(--realm-text);
+        }
+        
+        .domain-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* 卡片内容 */
+        .domain-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.6s ease;
+        }
+        
+        .domain-card:hover .domain-icon {
+            transform: scale(1.1);
+        }
+        
+        .domain-char {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.95);
+            position: relative;
+            z-index: 2;
+            transition: all 0.6s ease;
+        }
+        
+        .domain-card:hover .domain-char {
+            transform: scale(1.05);
+            letter-spacing: 0.25em;
+        }
+        
+        /* 三域文案 */
+        .domain-quote {
+            margin-top: 1rem;
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 0.2em;
+            font-weight: 400;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .domain-divider {
+            width: 20px;
+            height: 0.5px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 1rem auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 新作区域 */
+        .works-section {
+            padding: 10vh 5vw;
+            background: var(--bg-secondary);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+        
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.4rem, 3vw, 1.8rem);
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            color: var(--ink-deep);
+        }
+        
+        /* 宋瓷质感卡片网格 */
+        .works-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+        
+        /* 宋瓷质感卡片 */
+        .work-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(247,244,237,0.2) 100%);
+            border: 0.5px solid rgba(26, 26, 26, 0.06);
+            border-radius: 3px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        
+        /* 宋瓷开片纹理 */
+        .work-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(45deg, transparent 48%, rgba(26,26,26,0.02) 49%, rgba(26,26,26,0.02) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(26,26,26,0.015) 49%, rgba(26,26,26,0.015) 51%, transparent 52%);
+            background-size: 30px 30px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        
+        .work-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* 宋瓷光泽 */
+        .work-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg) translateY(-100%);
+            transition: transform 0.8s ease;
+            pointer-events: none;
+        }
+        
+        .work-card:hover::after {
+            transform: rotate(45deg) translateY(100%);
+        }
+        
+        .work-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(184, 155, 108, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.03);
+        }
+        
+        .work-image {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, rgba(139, 157, 195, 0.1) 0%, rgba(201, 169, 166, 0.08) 50%, rgba(122, 139, 124, 0.1) 100%);
+            border-radius: 2px;
+            margin-bottom: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .work-image::after {
+            content: attr(data-initial);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: rgba(26, 26, 26, 0.15);
+            letter-spacing: 0.1em;
+        }
+        
+        .work-name {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: var(--ink-deep);
+            margin-bottom: 0.4rem;
+            transition: color 0.4s ease;
+        }
+        
+        .work-card:hover .work-name {
+            color: var(--gold-primary);
+        }
+        
+        .work-meta {
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            color: var(--ink-light);
+            letter-spacing: 0.08em;
+            font-weight: 400;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .work-price {
+            color: var(--gold-primary);
+            font-style: italic;
+        }
+        
+        /* 滚动渐入动画 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 页脚 */
+        .footer {
+            padding: 8vh 5vw;
+            border-top: 0.5px solid rgba(26, 26, 26, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            background: var(--bg-primary);
+        }
+        
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            letter-spacing: 0.5em;
+            font-weight: 400;
+        }
+        
+        .footer-links a {
+            margin-left: 3rem;
+            text-decoration: none;
+            color: var(--ink-light);
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            transition: all 0.6s ease;
+            position: relative;
+            font-weight: 400;
+        }
+        
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: var(--gold-primary);
+            transition: width 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--ink-deep);
+            letter-spacing: 0.2em;
+        }
+        
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .works-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .side-mark { display: none; }
+            .hero-subtitle span { display: inline; }
+            .domains-container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+            .domain-card {
+                aspect-ratio: 16/9;
+                flex-direction: row;
+                gap: 2rem;
+                padding: 2rem;
+            }
+            .domain-icon {
+                margin-bottom: 0;
+                width: 48px;
+                height: 48px;
+            }
+            .domain-info {
+                text-align: left;
+            }
+            .works-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            .footer {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+            .footer-links a {
+                margin: 0 1rem;
+            }
+            .navbar__nav {
+                display: none;
+            }
+            .navbar__actions {
+                display: none;
+            }
+            .navbar__menu-btn {
+                display: flex;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .works-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景元素 -->
+    <div class="paper-texture"></div>
+    <div class="window-glow"></div>
+    <div class="side-mark">三域</div>
+
+    <!-- 东方美学导航栏 -->
+    <nav class="navbar" id="navbar" role="navigation" aria-label="主导航">
+        <a href="index.html" class="navbar__brand" aria-label="返回首页">
+            <span class="navbar__logo">ECHO</span>
+        </a>
+        
+        <div class="navbar__nav">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+        </div>
+        
+        <div class="navbar__actions">
+            <button class="navbar__user" id="connectWallet" type="button" aria-label="连接钱包">
+                <span class="navbar__user-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span>入链</span>
+            </button>
+        </div>
+        
+        <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+        </button>
+        
+        <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+            <button class="navbar__user" id="mobileConnectWallet" type="button">
+                <span>入链</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="hero-explore">
+        <h1 class="hero-title">三域</h1>
+        <div class="divider-gold"></div>
+        <p class="hero-subtitle">
+            <span>声之所至，心之所向。</span>
+            <span>一笔一世界。字里行间，自有山河。</span>
+        </p>
+    </section>
+
+    <!-- 三域入口卡片 -->
+    <section class="domains-section">
+        <div class="domains-container">
+            <!-- 音域 -->
+            <div class="domain-card sound fade-up" onclick="location.href='market/music.html'">
+                <svg class="domain-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+                    <path d="M20 24c0-4 4-6 4-6v28s-4-2-4-6 4-6 4-6" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                    <path d="M36 20v24" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" stroke-linecap="round"/>
+                    <circle cx="36" cy="38" r="4" stroke="rgba(255,255,255,0.9)" stroke-width="1" fill="none"/>
+                    <path d="M46 16v32" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" stroke-linecap="round"/>
+                    <path d="M46 28c-3 0-6 2-6 4s3 4 6 4" stroke="rgba(255,255,255,0.9)" stroke-width="1" stroke-linecap="round" fill="none"/>
+                </svg>
+                <div class="domain-info">
+                    <div class="domain-char">音</div>
+                    <div class="domain-divider"></div>
+                    <div class="domain-quote">声至心随</div>
+                </div>
+            </div>
+
+            <!-- 色域 -->
+            <div class="domain-card color fade-up" onclick="location.href='market/art.html'">
+                <svg class="domain-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+                    <ellipse cx="32" cy="24" rx="6" ry="8" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" fill="none"/>
+                    <path d="M26 30v12c0 3 2.5 6 6 6s6-3 6-6V30" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                    <path d="M32 36c-2 0-4 1.5-4 3.5S30 42 32 42s4-1 4-2.5" stroke="rgba(255,255,255,0.9)" stroke-width="0.8" stroke-linecap="round" fill="none"/>
+                    <path d="M18 20c2-4 6.5-8 14-8s12 4 14 8" stroke="rgba(255,255,255,0.4)" stroke-width="0.5" fill="none"/>
+                    <path d="M20 44c3 3 7 5 12 5s9-2 12-5" stroke="rgba(255,255,255,0.4)" stroke-width="0.5" fill="none"/>
+                </svg>
+                <div class="domain-info">
+                    <div class="domain-char">色</div>
+                    <div class="domain-divider"></div>
+                    <div class="domain-quote">一色天地</div>
+                </div>
+            </div>
+
+            <!-- 文域 -->
+            <div class="domain-card text fade-up" onclick="location.href='market/literature.html'">
+                <svg class="domain-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
+                    <rect x="14" y="10" width="36" height="44" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" fill="none"/>
+                    <line x1="20" y1="10" x2="20" y2="54" stroke="rgba(255,255,255,0.9)" stroke-width="0.8"/>
+                    <line x1="14" y1="18" x2="50" y2="18" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>
+                    <line x1="26" y1="26" x2="44" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="0.8"/>
+                    <line x1="26" y1="34" x2="44" y2="34" stroke="rgba(255,255,255,0.9)" stroke-width="0.8"/>
+                    <line x1="26" y1="42" x2="38" y2="42" stroke="rgba(255,255,255,0.9)" stroke-width="0.8"/>
+                    <circle cx="22" cy="30" r="1.5" fill="rgba(255,255,255,0.9)"/>
+                    <circle cx="22" cy="38" r="1.5" fill="rgba(255,255,255,0.9)"/>
+                </svg>
+                <div class="domain-info">
+                    <div class="domain-char">文</div>
+                    <div class="domain-divider"></div>
+                    <div class="domain-quote">字间山河</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 新作区域 -->
+    <section class="works-section">
+        <div class="section-header fade-up">
+            <h2 class="section-title">新作</h2>
+        </div>
+
+        <div class="works-grid">
+            <!-- 作品卡片 1 -->
+            <div class="work-card fade-up">
+                <div class="work-image" data-initial="音"></div>
+                <div class="work-name">山间清风</div>
+                <div class="work-meta">
+                    <span>音乐 · 古琴</span>
+                    <span class="work-price">120 ECHO</span>
+                </div>
+            </div>
+
+            <!-- 作品卡片 2 -->
+            <div class="work-card fade-up">
+                <div class="work-image" data-initial="色" style="background: linear-gradient(135deg, rgba(201, 169, 166, 0.12) 0%, rgba(139, 157, 195, 0.08) 100%);"></div>
+                <div class="work-name">水墨江南</div>
+                <div class="work-meta">
+                    <span>绘画 · 数字</span>
+                    <span class="work-price">280 ECHO</span>
+                </div>
+            </div>
+
+            <!-- 作品卡片 3 -->
+            <div class="work-card fade-up">
+                <div class="work-image" data-initial="文" style="background: linear-gradient(135deg, rgba(122, 139, 124, 0.1) 0%, rgba(201, 169, 166, 0.08) 100%);"></div>
+                <div class="work-name">雨后</div>
+                <div class="work-meta">
+                    <span>文学 · 散文</span>
+                    <span class="work-price">80 ECHO</span>
+                </div>
+            </div>
+
+            <!-- 作品卡片 4 -->
+            <div class="work-card fade-up">
+                <div class="work-image" data-initial="音" style="background: linear-gradient(135deg, rgba(139, 157, 195, 0.15) 0%, rgba(122, 139, 124, 0.08) 100%);"></div>
+                <div class="work-name">星夜漫步</div>
+                <div class="work-meta">
+                    <span>音乐 · 电子</span>
+                    <span class="work-price">150 ECHO</span>
+                </div>
+            </div>
+
+            <!-- 作品卡片 5 -->
+            <div class="work-card fade-up">
+                <div class="work-image" data-initial="色" style="background: linear-gradient(135deg, rgba(122, 139, 124, 0.12) 0%, rgba(201, 169, 166, 0.1) 100%);"></div>
+                <div class="work-name">竹林深处</div>
+                <div class="work-meta">
+                    <span>绘画 · 摄影</span>
+                    <span class="work-price">200 ECHO</span>
+                </div>
+            </div>
+
+            <!-- 作品卡片 6 -->
+            <div class="work-card fade-up">
+                <div class="work-image" data-initial="文" style="background: linear-gradient(135deg, rgba(184, 155, 108, 0.08) 0%, rgba(139, 157, 195, 0.08) 100%);"></div>
+                <div class="work-name">旧时光</div>
+                <div class="work-meta">
+                    <span>文学 · 诗歌</span>
+                    <span class="work-price">60 ECHO</span>
+                </div>
+            </div>
+
+            <!-- 作品卡片 7 -->
+            <div class="work-card fade-up">
+                <div class="work-image" data-initial="音" style="background: linear-gradient(135deg, rgba(201, 169, 166, 0.1) 0%, rgba(184, 155, 108, 0.06) 100%);"></div>
+                <div class="work-name">晨曦序曲</div>
+                <div class="work-meta">
+                    <span>音乐 · 钢琴</span>
+                    <span class="work-price">180 ECHO</span>
+                </div>
+            </div>
+
+            <!-- 作品卡片 8 -->
+            <div class="work-card fade-up">
+                <div class="work-image" data-initial="色" style="background: linear-gradient(135deg, rgba(139, 157, 195, 0.12) 0%, rgba(122, 139, 124, 0.1) 100%);"></div>
+                <div class="work-name">青瓷忆</div>
+                <div class="work-meta">
+                    <span>绘画 · 水墨</span>
+                    <span class="work-price">320 ECHO</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-logo">ECHO</div>
+        <div class="footer-links">
+            <a href="docs.html">典</a>
+            <a href="index.html">境</a>
+        </div>
+    </footer>
+
+    <script>
+        // 移动端菜单切换
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        menuBtn.addEventListener('click', () => {
+            const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+            menuBtn.setAttribute('aria-expanded', !isExpanded);
+            mobileMenu.classList.toggle('is-open');
+        });
+        
+        // 滚动时导航栏背景渐显
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('is-scrolled');
+            } else {
+                navbar.classList.remove('is-scrolled');
+            }
+        });
+
+        // 滚动渐入动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 100);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-up').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
