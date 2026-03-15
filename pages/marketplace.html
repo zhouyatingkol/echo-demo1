@@ -304,7 +304,7 @@
             font-weight: 400;
             letter-spacing: 0.5em;
             color: var(--ink-deep);
-            margin-bottom: 16px;
+            margin-bottom: 1.2rem;
             position: relative;
             z-index: 2;
         }
@@ -314,8 +314,8 @@
             font-size: 1.1rem;
             color: var(--ink-medium);
             letter-spacing: 0.2em;
-            margin-top: 2.5rem;
-            margin-bottom: 40px;
+            margin-top: 0;
+            margin-bottom: 3rem;
             position: relative;
             z-index: 2;
         }
@@ -380,42 +380,7 @@
             letter-spacing: 0.15em;
         }
 
-        .search-box-wrapper {
-            max-width: 600px;
-            margin: 0 auto 32px;
-        }
-
-        .search-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-            border-bottom: 0.5px solid var(--gold-light);
-            padding: 12px 0;
-        }
-
-        .search-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 1rem;
-            color: var(--ink-deep);
-            letter-spacing: 0.1em;
-            padding-left: 32px;
-            outline: none;
-        }
-
-        .search-input::placeholder {
-            color: var(--ink-faint);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0;
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            color: var(--ink-faint);
-            font-size: 1.1rem;
-        }
+        /* 搜索框样式已移至下方统一定义 */
 
         /* 已删除遴选方案、墨字、巷门样式 */
             border-color: var(--gold-primary);
@@ -447,6 +412,39 @@
         .search-box {
             flex: 1;
             position: relative;
+            display: flex;
+            align-items: center;
+            border-bottom: 0.5px solid rgba(166, 139, 91, 0.15);
+            padding: 12px 0;
+            transition: border-color 0.4s ease;
+        }
+
+        .search-box:focus-within {
+            border-bottom-color: var(--gold-light);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 1rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.1em;
+            padding-left: 32px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--ink-faint);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            color: var(--ink-faint);
+            font-size: 1.1rem;
         }
 
         .random-btn {
@@ -522,7 +520,7 @@
         .daily-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 32px;
+            gap: 40px;
             max-width: 720px;
             margin: 0 auto;
         }
@@ -590,8 +588,22 @@
         /* ===== 境界高亮字（朱红印章感） ===== */
         .realm-highlight {
             color: #B85C4F;
-            font-weight: 500;
-            letter-spacing: 0.05em;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            position: relative;
+            display: inline-block;
+        }
+
+        .realm-highlight::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #B85C4F, transparent);
+            opacity: 0.5;
         }
 
         /* ===== 境界分隔线（更淡更克制） ===== */
@@ -656,7 +668,7 @@
         .daily-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
+            gap: 40px;
             max-width: 720px;
             margin: 0 auto;
         }
@@ -887,27 +899,30 @@
             cursor: pointer;
             transition: all 0.4s ease;
             background: var(--bg-secondary);
-            border: 0.5px solid var(--gold-light);
+            border: 0.5px solid rgba(166, 139, 91, 0.2);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
             position: relative;
+        }
+
+        .realm-category:hover {
+            border-color: var(--gold-light);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            transform: translateY(-4px);
         }
 
         .realm-category.sound:hover {
             border-color: var(--realm-sound);
-            box-shadow: 0 0 30px rgba(139, 157, 195, 0.15);
+            box-shadow: 0 8px 32px rgba(139, 157, 195, 0.12);
         }
 
         .realm-category.color:hover {
             border-color: var(--realm-color);
-            box-shadow: 0 0 30px rgba(201, 169, 166, 0.15);
+            box-shadow: 0 8px 32px rgba(201, 169, 166, 0.12);
         }
 
         .realm-category.text:hover {
             border-color: var(--realm-text);
-            box-shadow: 0 0 30px rgba(122, 139, 124, 0.15);
-        }
-
-        .realm-category:hover {
-            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(122, 139, 124, 0.12);
         }
 
         .realm-category .enter-hint {
@@ -1547,10 +1562,22 @@
             box-shadow: 0 4px 12px rgba(160, 48, 32, 0.3);
             transition: all 0.4s ease;
             z-index: 1000;
+            animation: fabBreathe 4s ease-in-out infinite;
         }
         .fab-create:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(160, 48, 32, 0.4);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(160, 48, 32, 0.4);
+            animation: none;
+        }
+        @keyframes fabBreathe {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 4px 12px rgba(160, 48, 32, 0.3);
+            }
+            50% { 
+                transform: scale(1.03); 
+                box-shadow: 0 6px 16px rgba(160, 48, 32, 0.35);
+            }
         }
         @media (max-width: 768px) {
             .fab-create {
