@@ -494,8 +494,6 @@
 
         .realm-category {
             aspect-ratio: 1;
-            background: var(--bg-secondary);
-            border: 0.5px solid var(--gold-light);
             border-radius: 2px;
             display: flex;
             flex-direction: column;
@@ -505,50 +503,41 @@
             transition: all 0.4s ease;
         }
 
-        .realm-category.sound:hover {
-            background: rgba(139, 157, 195, 0.08);
-            border-color: var(--realm-sound);
+        .realm-category.sound {
+            background: var(--realm-sound);
         }
 
-        .realm-category.color:hover {
-            background: rgba(201, 169, 166, 0.08);
-            border-color: var(--realm-color);
+        .realm-category.color {
+            background: var(--realm-color);
         }
 
+        .realm-category.text {
+            background: var(--realm-text);
+        }
+
+        .realm-category.sound:hover,
+        .realm-category.color:hover,
         .realm-category.text:hover {
-            background: rgba(122, 139, 124, 0.08);
-            border-color: var(--realm-text);
+            transform: translateY(-4px);
+            filter: brightness(1.05);
         }
 
         .realm-category .icon {
             font-size: 3rem;
             margin-bottom: 16px;
-            color: var(--ink-light);
-            transition: color 0.4s ease;
-        }
-
-        .realm-category.sound:hover .icon {
-            color: var(--realm-sound);
-        }
-
-        .realm-category.color:hover .icon {
-            color: var(--realm-color);
-        }
-
-        .realm-category.text:hover .icon {
-            color: var(--realm-text);
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .realm-category .name {
             font-family: var(--font-display), 'LXGW WenKai', cursive;
             font-size: 1.5rem;
             letter-spacing: 0.2em;
-            color: var(--ink-deep);
+            color: rgba(255, 255, 255, 0.95);
         }
 
         .realm-category .desc {
             font-size: 0.85rem;
-            color: var(--ink-light);
+            color: rgba(255, 255, 255, 0.8);
             margin-top: 8px;
         }
 
