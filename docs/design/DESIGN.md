@@ -112,5 +112,64 @@ work-detail.html (作品详情)
     ├─ ECHO → index.html
     ├─ 返回名录 → market.html
     └─ 购买 → (待连接钱包)
+
+---
+
+## 📋 更新记录
+
+### v1.0-stable (2026-03-15)
+**导航栏与 Hero 区域统一规范**
+
+本次更新统一了「境」「集」「铸」「典」四页面的导航栏和 Hero 区域样式：
+
+#### 1. 全页纹理背景
+新增 `.page-texture` 固定背景层，消除导航栏与 Hero 之间的色差问题：
+```css
+.page-texture {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,..."); /* 宣纸纹理 */
+}
+```
+
+#### 2. 导航栏规范
+- 高度：`60px`
+- 背景：默认 `transparent`，滚动后 `rgba(248, 246, 241, 0.92)`
+- 链接字间距：`0.3em`
+- z-index：`1000`
+
+#### 3. Hero 区域规范
+```css
+.hero {
+    padding: 140px 10vw 6vh;  /* 140px = 导航栏60px + 呼吸空间80px */
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+```
+
+#### 4. 标题规范
+- 主标题：`font-size: 2.8rem`, `letter-spacing: 0.3em`, `margin-bottom: 16px`
+- 副标题：`font-size: 0.95rem`, `letter-spacing: 0.5em`, `margin-top: 2.5rem`
+
+#### 5. HTML 基准
+```css
+html {
+    font-size: 20px;
+    scroll-behavior: smooth;
+}
+```
+
+#### 相关文件
+- `docs/DESIGN_GUIDE_v1.0.md` - 详细规范文档
+- Git 标签：`v1.0-stable`
+
+**⚠️ 重要**：后续页面开发请遵循此规范，确保四页面视觉一致性。
 ```
 
