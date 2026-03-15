@@ -143,34 +143,40 @@
 
 ---
 
-## 4. 颜色变量
+## 4. 颜色变量（v1.1 侘寂调色）
 
 ```css
 :root {
-    /* 宣纸质感 */
-    --bg-primary: #F8F6F1;
-    --bg-secondary: #F2EFE8;
-    --bg-tertiary: #EBE7DD;
+    /* 宣纸质感 - 陈年宣纸 */
+    --bg-primary: #F5F2EA;      /* 陈年宣纸，比纯白更温暖 */
+    --bg-secondary: #EDE9DE;
+    --bg-tertiary: #E5E1D4;
 
-    /* 四阶墨色 */
-    --ink-deep: #1A1A1A;
-    --ink-medium: #4A4A4A;
-    --ink-light: #7A6E5F;
-    --ink-faint: #B5B5B5;
+    /* 四阶墨色 - 茶色系 */
+    --ink-deep: #2A2825;        /* 茶色墨，非纯黑更温润 */
+    --ink-medium: #4A4742;
+    --ink-light: #7A756D;
+    --ink-faint: #B5B0A8;
 
-    /* 宋金 */
-    --gold-primary: #B89B6C;
-    --gold-light: #D4C4A8;
+    /* 宋金 - 氧化铜绿 */
+    --gold-primary: #A68B5B;    /* 氧化铜绿，古旧沉郁 */
+    --gold-light: #C9B896;
 
-    /* 朱红 */
-    --vermilion: #A03020;
-    --seal-red: #A03020;
+    /* 朱红 - 干朱砂 */
+    --vermilion: #8B2820;       /* 干朱砂，比鲜红更深沉 */
+    --seal-red: #8B2820;
 
     /* 字体 */
     --font-display: 'LXGW WenKai', cursive;
     --font-serif: 'Noto Serif SC', serif;
 }
 ```
+
+**颜色变更说明（v1.1）**：
+- `--bg-primary`: #F8F6F1 → **#F5F2EA** (冷白→陈年宣纸)
+- `--ink-deep`: #1A1A1A → **#2A2825** (纯黑→茶色墨)
+- `--gold-primary`: #B89B6C → **#A68B5B** (新金→氧化铜绿)
+- `--vermilion`: #A03020 → **#8B2820** (鲜红→干朱砂)
 
 ---
 

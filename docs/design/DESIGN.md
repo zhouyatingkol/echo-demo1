@@ -180,33 +180,43 @@ work-detail.html (作品详情)
 }
 ```
 
-#### 6. 颜色变量规范
-确保所有页面使用统一的颜色变量名：
+#### 6. 颜色变量规范（v1.1 侘寂调色）
+
+所有页面统一使用以下颜色变量：
 
 ```css
 :root {
-    /* 宣纸质感 */
-    --bg-primary: #F8F6F1;
-    --bg-secondary: #F2EFE8;
-    --bg-tertiary: #EBE7DD;
+    /* 宣纸质感 - 侘寂调色 */
+    --bg-primary: #F5F2EA;      /* 陈年宣纸 */
+    --bg-secondary: #EDE9DE;
+    --bg-tertiary: #E5E1D4;
 
-    /* 四阶墨色 */
-    --ink-deep: #1A1A1A;
-    --ink-medium: #4A4A4A;
-    --ink-light: #7A6E5F;
-    --ink-faint: #B5B5B5;
+    /* 四阶墨色 - 茶色系 */
+    --ink-deep: #2A2825;        /* 茶色墨 */
+    --ink-medium: #4A4742;
+    --ink-light: #7A756D;
+    --ink-faint: #B5B0A8;
 
-    /* 宋金 */
-    --gold-primary: #B89B6C;
-    --gold-light: #D4C4A8;
+    /* 宋金 - 氧化铜绿 */
+    --gold-primary: #A68B5B;    /* 氧化铜绿 */
+    --gold-light: #C9B896;
 
-    /* 朱红 - 两种命名都要定义 */
-    --vermilion: #A03020;
-    --seal-red: #A03020;
+    /* 朱红 - 干朱砂 */
+    --vermilion: #8B2820;       /* 干朱砂 */
+    --seal-red: #8B2820;
 }
 ```
 
+**颜色意象**：
+- `#F5F2EA` - 陈年宣纸：比纯白更温暖，有岁月沉淀感
+- `#2A2825` - 茶色墨：非纯黑，更温润柔和
+- `#A68B5B` - 氧化铜绿：古旧金器氧化的颜色，沉郁内敛
+- `#8B2820` - 干朱砂：比鲜红色更深沉，如古画上的印泥
+
 **⚠️ 注意**：`--vermilion` 和 `--seal-red` 必须同时定义，确保兼容性。
+
+**历史变更**：
+- v1.1 (2026-03-15): 全面调整为侘寂调色，从冷白调整为暖黄，墨色从纯黑调整为茶色
 
 #### 7. HTML 基准
 ```css
