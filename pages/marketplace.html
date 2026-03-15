@@ -615,6 +615,226 @@
             color: var(--vermilion);
         }
 
+        /* ===== 浏览模式切换 ===== */
+        .view-mode-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 48px;
+        }
+
+        .view-mode-btn {
+            padding: 10px 24px;
+            border: 0.5px solid var(--gold-light);
+            background: transparent;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-mode-btn:first-child {
+            border-radius: 2px 0 0 2px;
+        }
+
+        .view-mode-btn:last-child {
+            border-radius: 0 2px 2px 0;
+        }
+
+        .view-mode-btn:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+        }
+
+        .view-mode-btn.active {
+            background: var(--ink-deep);
+            border-color: var(--ink-deep);
+            color: var(--bg-primary);
+        }
+
+        .mode-icon {
+            font-size: 1rem;
+        }
+
+        /* ===== 方案E：长街漫游 ===== */
+        .street-section-title {
+            font-size: 0.8rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.3em;
+            margin-bottom: 32px;
+            padding-left: 16px;
+            border-left: 2px solid var(--gold-light);
+        }
+
+        .street-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .street-grid .asset-card:nth-child(4n+1) {
+            margin-top: 0;
+        }
+
+        .street-grid .asset-card:nth-child(4n+2) {
+            margin-top: 20px;
+        }
+
+        .street-grid .asset-card:nth-child(4n+3) {
+            margin-top: 40px;
+        }
+
+        .street-grid .asset-card:nth-child(4n+4) {
+            margin-top: 10px;
+        }
+
+        .street-load-more {
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .street-load-btn {
+            padding: 14px 40px;
+            border: 0.5px solid var(--gold-light);
+            background: transparent;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .street-load-btn:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+        }
+
+        /* ===== 方案H：无主之境 ===== */
+        .view-mode-daily {
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            padding: 40px;
+            border-radius: 2px;
+        }
+
+        .daily-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .daily-date {
+            font-size: 0.8rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+        }
+
+        .daily-quote {
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            margin-bottom: 24px;
+        }
+
+        .daily-refresh-btn {
+            padding: 10px 24px;
+            border: none;
+            background: var(--ink-deep);
+            color: var(--bg-primary);
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .daily-refresh-btn:hover {
+            background: var(--ink-medium);
+            transform: scale(1.02);
+        }
+
+        .daily-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .daily-card {
+            background: var(--bg-primary);
+            border: 0.5px solid var(--gold-light);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .daily-card:hover {
+            border-color: var(--gold-primary);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        .daily-card-realm {
+            font-size: 0.7rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.2em;
+            margin-bottom: 12px;
+        }
+
+        .daily-card-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .daily-card-icon.sound { background: #8B9DC3; }
+        .daily-card-icon.color { background: #C9A9A6; }
+        .daily-card-icon.text { background: #7A8B7C; }
+
+        .daily-card-name {
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            margin-bottom: 6px;
+            color: var(--ink-deep);
+        }
+
+        .daily-card-desc {
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .daily-card-price {
+            font-size: 0.85rem;
+            color: var(--ink-medium);
+            letter-spacing: 0.1em;
+        }
+
+        .daily-footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.1em;
+        }
+
         /* 保留 realm-header 样式用于寻和观 */
         .realm-header {
             text-align: center;
@@ -1145,8 +1365,44 @@
             </div>
         </div>
 
-        <div class="asset-grid" id="yuGrid">
-            <!-- 卡片由 JS 生成 -->
+        <!-- 浏览模式切换 -->
+        <div class="view-mode-toggle">
+            <button class="view-mode-btn active" data-mode="street" onclick="switchViewMode('street')">
+                <span class="mode-icon">≡</span>
+                <span class="mode-name">长街</span>
+            </button>
+            <button class="view-mode-btn" data-mode="daily" onclick="switchViewMode('daily')">
+                <span class="mode-icon">◈</span>
+                <span class="mode-name">今日</span>
+            </button>
+        </div>
+
+        <!-- 方案E：长街漫游 -->
+        <div class="view-mode-street" id="viewStreet">
+            <div class="street-section-title">今日摊位</div>
+            <div class="asset-grid street-grid" id="streetGrid">
+                <!-- 卡片由 JS 生成 -->
+            </div>
+            <div class="street-load-more">
+                <button class="street-load-btn" onclick="loadMoreStalls()">继续浏览</button>
+            </div>
+        </div>
+
+        <!-- 方案H：无主之境 -->
+        <div class="view-mode-daily" id="viewDaily" style="display: none;">
+            <div class="daily-header">
+                <div class="daily-date" id="dailyDate">乙巳年 六月初八</div>
+                <div class="daily-quote">每次刷新，皆是新缘</div>
+                <button class="daily-refresh-btn" onclick="refreshDaily()">
+                    <span>↻</span> 再逛逛
+                </button>
+            </div>
+            <div class="daily-grid" id="dailyGrid">
+                <!-- 卡片由 JS 生成 -->
+            </div>
+            <div class="daily-footer">
+                <span>每日辰时更新 · 过时不候</span>
+            </div>
         </div>
     </section>
 
@@ -1273,23 +1529,48 @@
             });
         });
 
-        // 生成遇境卡片
-        function generateYuCards() {
-            const grid = document.getElementById('yuGrid');
+        // 浏览模式切换
+        function switchViewMode(mode) {
+            const streetContainer = document.getElementById('viewStreet');
+            const dailyContainer = document.getElementById('viewDaily');
+            const btns = document.querySelectorAll('.view-mode-btn');
+            
+            btns.forEach(btn => {
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            if (mode === 'street') {
+                streetContainer.style.display = 'block';
+                dailyContainer.style.display = 'none';
+            } else {
+                streetContainer.style.display = 'none';
+                dailyContainer.style.display = 'block';
+            }
+        }
+
+        // 生成长街卡片
+        function generateStreetCards() {
+            const grid = document.getElementById('streetGrid');
             const realms = ['音', '色', '文'];
             const realmClasses = ['sound', 'color', 'text'];
-            const titles = ['夏日微风', '晨光初现', '山水之间', '月夜清音', '墨染流年', '云淡风轻'];
+            const titles = ['夏日微风', '晨光初现', '山水之间', '月夜清音', '墨染流年', '云淡风轻', '琴心剑魄', '竹影清风'];
+            const chars = ['夏', '晨', '山', '月', '墨', '淡', '琴', '竹'];
 
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 8; i++) {
                 const realm = realms[i % 3];
                 const realmClass = realmClasses[i % 3];
                 const title = titles[i];
+                const char = chars[i];
                 const price = (Math.random() * 1000 + 100).toFixed(0);
 
                 const card = document.createElement('div');
                 card.className = 'asset-card';
                 card.innerHTML = `
-                    <div class="asset-image">${realm}</div>
+                    <div class="asset-image">${char}</div>
                     <div class="asset-info">
                         <div class="asset-title">${title}</div>
                         <div class="asset-meta">
@@ -1301,6 +1582,89 @@
                 grid.appendChild(card);
             }
         }
+
+        // 生成今日市集卡片
+        function generateDailyCards() {
+            const grid = document.getElementById('dailyGrid');
+            const items = [
+                { realm: '声之境', realmClass: 'sound', icon: '♪', name: '夏日微风', desc: '轻抚耳畔，如沐春风', price: 581 },
+                { realm: '色之境', realmClass: 'color', icon: '◆', name: '晨光初现', desc: '霞光万丈，晨曦初露', price: 164 },
+                { realm: '文之境', realmClass: 'text', icon: '✦', name: '山水之间', desc: '笔墨山水，意境悠远', price: 1079 },
+                { realm: '文之境', realmClass: 'text', icon: '◈', name: '墨染流年', desc: '岁月如水，墨染春秋', price: 308 },
+                { realm: '色之境', realmClass: 'color', icon: '◇', name: '云淡风轻', desc: '云卷云舒，悠然自得', price: 708 },
+                { realm: '声之境', realmClass: 'sound', icon: '♫', name: '月夜清音', desc: '月华如水，清音绕梁', price: 188 }
+            ];
+
+            grid.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'daily-card';
+                card.innerHTML = `
+                    <div class="daily-card-realm">${item.realm}</div>
+                    <div class="daily-card-icon ${item.realmClass}">${item.icon}</div>
+                    <div class="daily-card-name">${item.name}</div>
+                    <div class="daily-card-desc">${item.desc}</div>
+                    <div class="daily-card-price">${item.price} ECHO</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 加载更多摊位
+        function loadMoreStalls() {
+            const grid = document.getElementById('streetGrid');
+            const realms = ['音', '色', '文'];
+            const realmClasses = ['sound', 'color', 'text'];
+            const titles = ['清风徐来', '烟雨江南', '松间明月', '流水高山'];
+            const chars = ['清', '烟', '松', '流'];
+
+            for (let i = 0; i < 4; i++) {
+                const realm = realms[i % 3];
+                const realmClass = realmClasses[i % 3];
+                const title = titles[i];
+                const char = chars[i];
+                const price = (Math.random() * 1000 + 100).toFixed(0);
+
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.style.opacity = '0';
+                card.innerHTML = `
+                    <div class="asset-image">${char}</div>
+                    <div class="asset-info">
+                        <div class="asset-title">${title}</div>
+                        <div class="asset-meta">
+                            <span class="realm-tag ${realmClass}">${realm}</span>
+                            <span>${price} ECHO</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+                
+                // 淡入动画
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.6s ease';
+                    card.style.opacity = '1';
+                }, i * 100);
+            }
+        }
+
+        // 刷新今日市集
+        function refreshDaily() {
+            const grid = document.getElementById('dailyGrid');
+            grid.style.opacity = '0';
+            
+            setTimeout(() => {
+                generateDailyCards();
+                grid.style.transition = 'opacity 0.4s ease';
+                grid.style.opacity = '1';
+            }, 200);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            generateStreetCards();
+            generateDailyCards();
+        });
 
         // 生成风云图气泡
         function generateChartData(type) {
@@ -1447,7 +1811,8 @@
         document.head.appendChild(style);
 
         // 初始化
-        generateYuCards();
+        generateStreetCards();
+        generateDailyCards();
         generateChartData('sound');
     </script>
 </main>
