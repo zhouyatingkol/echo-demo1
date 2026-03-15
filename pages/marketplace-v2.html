@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集 - ECHO</title>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ===== 色彩系统 ===== */
+        :root {
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F2EFE8;
+            --bg-tertiary: #E8E4DB;
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #7A6E5F;
+            --ink-faint: #B5B5B5;
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
+            --vermilion: #A03020;
+            --font-display: 'LXGW WenKai', cursive;
+            --font-serif: 'Noto Serif SC', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            color: var(--ink-deep);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* ===== 导航栏 ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+            transition: background 0.8s ease;
+        }
+        
+        .navbar.is-scrolled {
+            background: rgba(248, 246, 241, 0.92);
+            backdrop-filter: blur(12px);
+        }
+        
+        .navbar__brand {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--ink-deep);
+            text-decoration: none;
+        }
+        
+        .navbar__nav {
+            display: flex;
+            gap: 48px;
+        }
+        
+        .navbar__nav a {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            color: var(--ink-light);
+            text-decoration: none;
+            letter-spacing: 0.2em;
+            position: relative;
+            transition: color 0.4s ease;
+        }
+        
+        .navbar__nav a:hover,
+        .navbar__nav a.active {
+            color: var(--vermilion);
+        }
+        
+        .navbar__nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--vermilion);
+        }
+        
+        .navbar__user {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            background: transparent;
+            border: 1px solid var(--gold-light);
+            padding: 8px 20px;
+            cursor: pointer;
+            letter-spacing: 0.1em;
+            transition: all 0.4s ease;
+        }
+        
+        .navbar__user:hover {
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+        }
+
+        /* ===== Hero 区域 ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 160px 40px;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 300;
+            letter-spacing: 0.4em;
+            color: var(--ink-deep);
+            margin-bottom: 24px;
+        }
+        
+        .hero-subtitle {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+        }
+
+        /* ===== 吾作按钮（浮动） ===== */
+        .fab-create {
+            position: fixed;
+            right: 40px;
+            bottom: 40px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--vermilion);
+            color: var(--bg-primary);
+            border: none;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fab-create:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(160, 48, 32, 0.3);
+        }
+
+        /* ===== 境界分隔 ===== */
+        .realm-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+            margin: 0 auto;
+            max-width: 200px;
+        }
+
+        /* ===== 第一境：遇 ===== */
+        .realm-yu {
+            padding: 120px 40px;
+        }
+        
+        .realm-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .realm-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+            margin-bottom: 16px;
+        }
+        
+        .realm-quote {
+            font-family: var(--font-serif);
+            font-size: 0.95rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
+
+        /* 搜索框 */
+        .search-box {
+            max-width: 500px;
+            margin: 0 auto 80px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 24px 16px 48px;
+            border: none;
+            border-bottom: 1px solid var(--gold-light);
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.1em;
+            outline: none;
+            transition: border-color 0.4s ease;
+        }
+        
+        .search-input:focus {
+            border-color: var(--vermilion);
+        }
+        
+        .search-input::placeholder {
+            color: var(--ink-faint);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: var(--font-display);
+            color: var(--ink-faint);
+        }
+
+        /* 卡片网格 */
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .asset-card {
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        
+        .asset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(122, 110, 95, 0.1);
+        }
+        
+        .asset-image {
+            aspect-ratio: 4/3;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 3rem;
+            color: var(--ink-faint);
+        }
+        
+        .asset-info {
+            padding: 24px;
+        }
+        
+        .asset-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            color: var(--ink-deep);
+            margin-bottom: 8px;
+        }
+        
+        .asset-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--ink-light);
+        }
+
+        /* ===== 第二境：寻 ===== */
+        .realm-xun {
+            padding: 120px 40px;
+        }
+        
+        .realm-categories {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .realm-category {
+            aspect-ratio: 1;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--gold-light);
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        
+        .realm-category:hover {
+            background: var(--bg-primary);
+            border-color: var(--vermilion);
+        }
+        
+        .realm-category .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: var(--ink-light);
+        }
+        
+        .realm-category:hover .icon {
+            color: var(--vermilion);
+        }
+        
+        .realm-category .name {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            letter-spacing: 0.2em;
+            color: var(--ink-deep);
+        }
+        
+        .realm-category .desc {
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            margin-top: 8px;
+        }
+
+        /* ===== 第三境：观 ===== */
+        .realm-guan {
+            padding: 120px 40px;
+            min-height: 100vh;
+        }
+        
+        .chart-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-bottom: 60px;
+        }
+        
+        .chart-tab {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            color: var(--ink-light);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.2em;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.4s ease;
+        }
+        
+        .chart-tab:hover,
+        .chart-tab.active {
+            color: var(--vermilion);
+        }
+        
+        .chart-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--vermilion);
+        }
+
+        /* 榜单表格 */
+        .chart-table {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .chart-header {
+            display: grid;
+            grid-template-columns: 60px 1fr 100px 100px;
+            gap: 24px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gold-light);
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
+        
+        .chart-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 100px 100px;
+            gap: 24px;
+            padding: 20px 24px;
+            border-bottom: 0.5px solid rgba(180, 164, 140, 0.3);
+            transition: background 0.3s ease;
+        }
+        
+        .chart-row:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .chart-rank {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--ink-light);
+        }
+        
+        .chart-rank.top3 {
+            color: var(--vermilion);
+        }
+        
+        .chart-name {
+            font-family: var(--font-display);
+            color: var(--ink-deep);
+        }
+        
+        .chart-volume,
+        .chart-heat {
+            color: var(--ink-light);
+            font-size: 0.9rem;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .realm-categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .asset-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-header,
+            .chart-row {
+                grid-template-columns: 40px 1fr 80px;
+            }
+            
+            .chart-heat {
+                display: none;
+            }
+            
+            .navbar__nav {
+                gap: 24px;
+            }
+            
+            .fab-create {
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="navbar__brand">ECHO</a>
+        <div class="navbar__nav">
+            <a href="index.html">境</a>
+            <a href="marketplace-v2.html" class="active">集</a>
+            <a href="docs.html">典</a>
+        </div>
+        <button class="navbar__user" id="walletConnect">入链</button>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1 class="hero-title">集</h1>
+        <p class="hero-subtitle">随缘而聚，各得其所</p>
+    </section>
+
+    <!-- 第一境：遇 -->
+    <section class="realm-yu">
+        <div class="realm-divider"></div>
+        
+        <div class="realm-header">
+            <h2 class="realm-title">遇</h2>
+            <p class="realm-quote">此间万物，皆可遇</p>
+        </div>
+        
+        <div class="search-box">
+            <span class="search-icon">寻</span>
+            <input type="text" class="search-input" placeholder="寻觅..." />
+        </div>
+        
+        <div class="asset-grid" id="yuGrid">
+            <!-- 卡片由 JS 生成 -->
+        </div>
+    </section>
+
+    <!-- 第二境：寻 -->
+    <section class="realm-xun">
+        <div class="realm-divider"></div>
+        
+        <div class="realm-header">
+            <h2 class="realm-title">寻</h2>
+            <p class="realm-quote">三域之境，各有所藏</p>
+        </div>
+        
+        <div class="realm-categories">
+            <div class="realm-category" onclick="enterRealm('sound')">
+                <div class="icon">♪</div>
+                <div class="name">音</div>
+                <div class="desc">声之境</div>
+            </div>
+            <div class="realm-category" onclick="enterRealm('color')">
+                <div class="icon">◈</div>
+                <div class="name">色</div>
+                <div class="desc">色之境</div>
+            </div>
+            <div class="realm-category" onclick="enterRealm('text')">
+                <div class="icon">✦</div>
+                <div class="name">文</div>
+                <div class="desc">文之境</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第三境：观 -->
+    <section class="realm-guan">
+        <div class="realm-divider"></div>
+        
+        <div class="realm-header">
+            <h2 class="realm-title">观</h2>
+            <p class="realm-quote">声至名归，于此显</p>
+        </div>
+        
+        <div class="chart-tabs">
+            <button class="chart-tab active" onclick="switchChart('sound')">音观</button>
+            <button class="chart-tab" onclick="switchChart('color')">色观</button>
+            <button class="chart-tab" onclick="switchChart('text')">文观</button>
+        </div>
+        
+        <div class="chart-table" id="chartTable">
+            <div class="chart-header">
+                <span>序</span>
+                <span>音境</span>
+                <span>流转</span>
+                <span>热度</span>
+            </div>
+            <!-- 榜单内容由 JS 生成 -->
+        </div>
+    </section>
+
+    <!-- 吾作按钮 -->
+    <a href="creator.html" class="fab-create">铸</a>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('is-scrolled');
+            } else {
+                navbar.classList.remove('is-scrolled');
+            }
+        });
+
+        // 生成遇境卡片
+        function generateYuCards() {
+            const grid = document.getElementById('yuGrid');
+            const realms = ['音', '色', '文'];
+            const titles = ['夏日微风', '晨光初现', '山水之间', '月夜清音', '墨染流年', '云淡风轻'];
+            
+            for (let i = 0; i < 6; i++) {
+                const realm = realms[i % 3];
+                const title = titles[i];
+                const price = (Math.random() * 1000 + 100).toFixed(0);
+                
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.innerHTML = `
+                    <div class="asset-image">${realm}</div>
+                    <div class="asset-info">
+                        <div class="asset-title">${title}</div>
+                        <div class="asset-meta">
+                            <span>${realm}</span>
+                            <span>${price} ECHO</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        // 生成榜单数据
+        function generateChartData(type) {
+            const table = document.getElementById('chartTable');
+            const realmNames = { sound: '音境', color: '色境', text: '文境' };
+            const realmName = realmNames[type];
+            
+            // 清空现有行（保留表头）
+            const existingRows = table.querySelectorAll('.chart-row');
+            existingRows.forEach(row => row.remove());
+            
+            // 更新表头
+            const header = table.querySelector('.chart-header');
+            header.innerHTML = `
+                <span>序</span>
+                <span>${realmName}</span>
+                <span>流转</span>
+                <span>热度</span>
+            `;
+            
+            // 生成榜单数据
+            const names = {
+                sound: ['清风徐来', '月下独酌', '高山流水', '渔舟唱晚', '梅花三弄'],
+                color: ['春日暖阳', '秋水共长天', '暮色苍茫', '云卷云舒', '星河璀璨'],
+                text: ['静夜思', '春江花月夜', '声声慢', '水调歌头', '雨霖铃']
+            };
+            
+            const typeNames = names[type] || names.sound;
+            
+            for (let i = 0; i < 5; i++) {
+                const row = document.createElement('div');
+                row.className = 'chart-row';
+                if (i < 3) row.querySelector('.chart-rank')?.classList.add('top3');
+                
+                const volume = (Math.random() * 50 + 10).toFixed(1);
+                const heat = Math.floor(Math.random() * 5000 + 1000);
+                
+                row.innerHTML = `
+                    <div class="chart-rank ${i < 3 ? 'top3' : ''}">${i + 1}</div>
+                    <div class="chart-name">${typeNames[i]}</div>
+                    <div class="chart-volume">${volume}K</div>
+                    <div class="chart-heat">${heat}</div>
+                `;
+                table.appendChild(row);
+            }
+        }
+
+        // 进入域
+        function enterRealm(realm) {
+            console.log('进入' + realm + '之境');
+            // 可跳转到对应域的浏览页面
+        }
+
+        // 切换榜单
+        function switchChart(type) {
+            document.querySelectorAll('.chart-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            generateChartData(type);
+        }
+
+        // 初始化
+        generateYuCards();
+        generateChartData('sound');
+    </script>
+</body>
+</html>
