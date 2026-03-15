@@ -470,91 +470,95 @@
 
         /* ===== 方案H：无主之境（定稿） ===== */
         .view-mode-daily {
-            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            padding: 40px;
-            border-radius: 2px;
-            margin-top: 20px;
+            padding: 60px 40px;
         }
 
         .daily-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 48px;
         }
 
         .daily-date {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--ink-faint);
-            letter-spacing: 0.15em;
-            margin-bottom: 12px;
+            letter-spacing: 0.2em;
+            margin-bottom: 16px;
         }
 
         .daily-quote {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: var(--ink-light);
-            letter-spacing: 0.15em;
-            margin-bottom: 24px;
+            letter-spacing: 0.2em;
+            margin-bottom: 32px;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
         }
 
         .daily-refresh-btn {
-            padding: 10px 24px;
-            border: none;
-            background: var(--ink-deep);
-            color: var(--bg-primary);
+            padding: 12px 32px;
+            border: 0.5px solid var(--gold-light);
+            background: transparent;
+            color: var(--ink-light);
             font-family: var(--font-display), 'LXGW WenKai', cursive;
             font-size: 0.85rem;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.2em;
             cursor: pointer;
             border-radius: 2px;
             transition: all 0.4s ease;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .daily-refresh-btn:hover {
-            background: var(--ink-medium);
-            transform: scale(1.02);
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+            background: rgba(166, 139, 91, 0.05);
+        }
+
+        .daily-refresh-btn span {
+            font-size: 1rem;
         }
 
         .daily-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            max-width: 900px;
+            gap: 32px;
+            max-width: 960px;
             margin: 0 auto;
         }
 
         .daily-card {
-            background: var(--bg-primary);
-            border: 0.5px solid var(--gold-light);
-            padding: 24px;
+            background: var(--bg-secondary);
+            border: 0.5px solid transparent;
+            padding: 32px 24px;
             text-align: center;
             cursor: pointer;
             transition: all 0.4s ease;
         }
 
         .daily-card:hover {
-            border-color: var(--gold-primary);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border-color: var(--gold-light);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
 
         .daily-card-realm {
             font-size: 0.7rem;
             color: var(--ink-faint);
-            letter-spacing: 0.2em;
-            margin-bottom: 12px;
+            letter-spacing: 0.25em;
+            margin-bottom: 16px;
         }
 
         .daily-card-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 16px;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: white;
+            opacity: 0.85;
         }
 
         .daily-card-icon.sound { background: #8B9DC3; }
@@ -562,10 +566,33 @@
         .daily-card-icon.text { background: #7A8B7C; }
 
         .daily-card-name {
-            font-size: 1rem;
+            font-size: 1.1rem;
             letter-spacing: 0.15em;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--ink-deep);
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+        }
+
+        .daily-card-desc {
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .daily-card-price {
+            font-size: 0.85rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.1em;
+        }
+
+        .daily-footer {
+            text-align: center;
+            margin-top: 48px;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.15em;
         }
 
         .daily-card-desc {
@@ -1163,16 +1190,16 @@
         <div class="view-mode-daily" id="viewDaily">
             <div class="daily-header">
                 <div class="daily-date" id="dailyDate">乙巳年 六月初八</div>
-                <div class="daily-quote">每次刷新，皆是新缘</div>
+                <div class="daily-quote">今日有缘，随缘而遇</div>
                 <button class="daily-refresh-btn" onclick="refreshDaily()">
-                    <span>↻</span> 再逛逛
+                    <span>⟳</span> 再逛逛
                 </button>
             </div>
             <div class="daily-grid" id="dailyGrid">
                 <!-- 卡片由 JS 生成 -->
             </div>
             <div class="daily-footer">
-                <span>每日辰时更新 · 过时不候</span>
+                <span>每日辰时更新 · 一期一会</span>
             </div>
         </div>
     </section>
