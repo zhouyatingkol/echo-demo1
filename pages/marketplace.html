@@ -365,7 +365,7 @@
 
         /* ===== 第一境：遇 ===== */
         .realm-yu {
-            padding: 100px 40px 8vh;
+            padding: 80px 40px 10vh;
         }
 
         .yu-header {
@@ -587,33 +587,20 @@
             letter-spacing: 0.1em;
         }
 
-        /* ===== 境界高亮字 ===== */
+        /* ===== 境界高亮字（朱红印章感） ===== */
         .realm-highlight {
-            color: var(--ink-deep);
+            color: #B85C4F;
             font-weight: 500;
-            position: relative;
+            letter-spacing: 0.05em;
         }
 
-        .realm-highlight::after {
-            content: '';
-            position: absolute;
-            bottom: 2px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
-            opacity: 0.6;
-        }
-
-        /* ===== 境界分隔线 ===== */
+        /* ===== 境界分隔线（更淡更克制） ===== */
         .realm-separator {
             height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
-            margin: 80px 40px;
-        }
-
-        .realm-separator-light {
-            opacity: 0.4;
+            background: linear-gradient(90deg, transparent 0%, var(--gold-light) 20%, var(--gold-light) 80%, transparent 100%);
+            margin: 100px auto;
+            max-width: 200px;
+            opacity: 0.5;
         }
 
         /* ===== 页脚布局 ===== */
@@ -1213,7 +1200,7 @@
         <div class="realm-divider"></div>
         
         <div class="realm-header">
-            <p class="realm-quote"><span class="realm-highlight">遇</span>境：不期而<span class="realm-highlight">遇</span>，不约而同</p>
+            <p class="realm-quote">不期而<span class="realm-highlight">遇</span>，不约而同</p>
         </div>
 
         <!-- 方案H：无主之境（定稿） -->
@@ -1242,7 +1229,7 @@
         <div class="realm-divider"></div>
 
         <div class="realm-header">
-            <p class="realm-quote"><span class="realm-highlight">寻</span>境：<span class="realm-highlight">寻</span>声入色，由色入文</p>
+            <p class="realm-quote"><span class="realm-highlight">寻</span>声入色，由色入文</p>
         </div>
 
         <div class="realm-categories">
@@ -1272,7 +1259,7 @@
         <div class="realm-divider"></div>
 
         <div class="realm-header">
-            <p class="realm-quote"><span class="realm-highlight">观</span>境：<span class="realm-highlight">观</span>声动色，文以载道</p>
+            <p class="realm-quote"><span class="realm-highlight">观</span>声动色，文以载道</p>
         </div>
 
         <div class="chart-tabs">
