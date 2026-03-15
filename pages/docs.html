@@ -361,7 +361,6 @@
         .docs-container {
             display: flex;
             min-height: 100vh;
-            padding-top: 80px;
         }
 
         /* ========== 宣纸纹理背景 ========== */
@@ -380,7 +379,8 @@
 
         /* ========== Hero 区 ========== */
         .docs-header {
-            padding: 10vh 10vw 6vh;
+            padding: calc(10vh + 80px) 10vw 6vh;
+            margin-top: -80px;
             text-align: center;
             position: relative;
             z-index: 1;
