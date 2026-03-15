@@ -1498,15 +1498,10 @@
         document.head.appendChild(style);
 
         // 初始化
-        generateStreetCards();
         generateDailyCards();
         
-        // 延迟初始化风云图，确保DOM已加载
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                generateChartData('sound');
-            }, 100);
-        });
+        // 初始化风云图
+        generateChartData('sound');
     </script>
 
     <!-- 全局浮动铸造按钮 -->
