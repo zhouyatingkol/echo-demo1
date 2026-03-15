@@ -302,7 +302,7 @@
             font-family: var(--font-display);
             font-size: 2.8rem;
             font-weight: 400;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.5em;
             color: var(--ink-deep);
             margin-bottom: 16px;
             position: relative;
@@ -521,9 +521,9 @@
 
         .daily-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 32px;
-            max-width: 960px;
+            max-width: 720px;
             margin: 0 auto;
         }
 
@@ -1168,7 +1168,7 @@
     <!-- Hero -->
     <section class="hero">
         <h1 class="hero-title">集</h1>
-        <p class="hero-subtitle">万物并育，各归其位</p>
+        <p class="hero-subtitle">万物静观，皆自得</p>
     </section>
 
     <!-- 第一境：遇 -->
@@ -1178,19 +1178,12 @@
         <div class="yu-header">
             <span class="yu-quote">不期而遇，不约而同</span>
         </div>
-        
-        <div class="search-box-wrapper">
-            <div class="search-box">
-                <span class="search-icon">寻</span>
-                <input type="text" class="search-input" placeholder="寻觅藏品..." />
-            </div>
-        </div>
 
         <!-- 方案H：无主之境（定稿） -->
         <div class="view-mode-daily" id="viewDaily">
             <div class="daily-header">
                 <div class="daily-date" id="dailyDate">乙巳年 六月初八</div>
-                <div class="daily-quote">今日有缘，随缘而遇</div>
+                <div class="daily-quote">今日有缘，随缘随喜</div>
                 <button class="daily-refresh-btn" onclick="refreshDaily()">
                     <span>⟳</span> 再逛逛
                 </button>
@@ -1292,8 +1285,8 @@
         function generateDailyCards() {
             const grid = document.getElementById('dailyGrid');
             const items = [
-                { realm: '声之境', realmClass: 'sound', icon: '♪', name: '夏日微风', desc: '轻抚耳畔，如沐春风', price: 581 },
-                { realm: '色之境', realmClass: 'color', icon: '◆', name: '晨光初现', desc: '霞光万丈，晨曦初露', price: 164 },
+                { realm: '声之境', realmClass: 'sound', icon: '♪', name: '夏日微风', desc: '微风轻拂，如沐春霖', price: 581 },
+                { realm: '色之境', realmClass: 'color', icon: '◆', name: '晨光初现', desc: '霞光初绽，晨曦微露', price: 164 },
                 { realm: '文之境', realmClass: 'text', icon: '✦', name: '山水之间', desc: '笔墨山水，意境悠远', price: 1079 },
                 { realm: '文之境', realmClass: 'text', icon: '◈', name: '墨染流年', desc: '岁月如水，墨染春秋', price: 308 },
                 { realm: '色之境', realmClass: 'color', icon: '◇', name: '云淡风轻', desc: '云卷云舒，悠然自得', price: 708 },
