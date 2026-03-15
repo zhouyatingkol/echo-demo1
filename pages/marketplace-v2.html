@@ -18,8 +18,21 @@
             --gold-primary: #B89B6C;
             --gold-light: #D4C4A8;
             --vermilion: #A03020;
+            --vermilion-light: rgba(160, 48, 32, 0.4);
+            
+            /* 三域色 */
+            --realm-sound: #8B9DC3;
+            --realm-color: #C9A9A6;
+            --realm-text: #7A8B7C;
+            
+            /* 字体 */
             --font-display: 'LXGW WenKai', cursive;
             --font-serif: 'Noto Serif SC', serif;
+            
+            /* 缓动 */
+            --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);
+            --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -139,15 +152,14 @@
             position: fixed;
             right: 40px;
             bottom: 40px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--vermilion);
-            color: var(--bg-primary);
-            border: none;
+            padding: 12px 32px;
+            border-radius: 2px;
+            border: 0.5px solid var(--vermilion);
+            background: transparent;
+            color: var(--vermilion);
             font-family: var(--font-display);
-            font-size: 1rem;
-            letter-spacing: 0.1em;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
             cursor: pointer;
             z-index: 999;
             transition: all 0.4s ease;
@@ -158,8 +170,8 @@
         }
         
         .fab-create:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 20px rgba(160, 48, 32, 0.3);
+            background: var(--vermilion);
+            color: var(--bg-primary);
         }
 
         /* ===== 境界分隔 ===== */
@@ -553,8 +565,9 @@
     </section>
 
     <!-- 吾作按钮 -->
-    <a href="creator.html" class="fab-create">铸</a>
+    <a href="creator.html" class="fab-create">吾作</a>
 
+    <script src="../scripts/wallet.js"></script>
     <script>
         // 导航栏滚动效果
         window.addEventListener('scroll', () => {
