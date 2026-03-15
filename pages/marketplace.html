@@ -898,10 +898,37 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.4s ease;
-            background: var(--bg-secondary);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, #E8E4D8 50%, var(--bg-secondary) 100%);
             border: 0.5px solid rgba(166, 139, 91, 0.2);
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.5),
+                0 2px 12px rgba(0, 0, 0, 0.03);
             position: relative;
+            overflow: hidden;
+        }
+
+        .realm-category::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .realm-category.sound:hover::before {
+            background: radial-gradient(circle at center, var(--realm-sound) 0%, transparent 70%);
+            opacity: 0.08;
+        }
+
+        .realm-category.color:hover::before {
+            background: radial-gradient(circle at center, var(--realm-color) 0%, transparent 70%);
+            opacity: 0.08;
+        }
+
+        .realm-category.text:hover::before {
+            background: radial-gradient(circle at center, var(--realm-text) 0%, transparent 70%);
+            opacity: 0.08;
         }
 
         .realm-category:hover {
@@ -940,10 +967,13 @@
         }
 
         .realm-category .icon {
-            font-size: 2.5rem;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 2.2rem;
+            font-weight: 400;
             margin-bottom: 16px;
             color: var(--ink-light);
             transition: color 0.4s ease;
+            letter-spacing: 0.1em;
         }
 
         .realm-category.sound:hover .icon {
@@ -1214,7 +1244,7 @@
     <!-- Hero -->
     <section class="hero">
         <h1 class="hero-title">集</h1>
-        <p class="hero-subtitle">万物静观，皆自得</p>
+        <p class="hero-subtitle">万籁归藏，自得其所</p>
     </section>
 
     <!-- 第一境：遇 -->
@@ -1222,7 +1252,7 @@
         <div class="realm-divider"></div>
         
         <div class="realm-header">
-            <p class="realm-quote">不期而<span class="realm-highlight">遇</span>，不约而同</p>
+            <p class="realm-quote">不期而<span class="realm-highlight">遇</span>，不谋而合</p>
         </div>
 
         <!-- 方案H：无主之境（定稿） -->
@@ -1236,7 +1266,7 @@
             </div>
             <div class="daily-footer">
                 <button class="daily-refresh-btn" onclick="refreshDaily()">
-                    <span>⟳</span> 再逛逛
+                    <span>⟳</span> 随喜
                 </button>
                 <span class="daily-update-hint">每日辰时更新 · 一期一会</span>
             </div>
@@ -1251,27 +1281,27 @@
         <div class="realm-divider"></div>
 
         <div class="realm-header">
-            <p class="realm-quote"><span class="realm-highlight">寻</span>声入色，由色入文</p>
+            <p class="realm-quote"><span class="realm-highlight">寻</span>声觅色，因色遇文</p>
         </div>
 
         <div class="realm-categories">
             <div class="realm-category sound" onclick="enterRealm('sound')" style="position: relative;">
-                <div class="icon">♪</div>
+                <div class="icon">律</div>
                 <div class="name">音</div>
-                <div class="desc">声之境</div>
-                <div class="enter-hint">进入此境 →</div>
+                <div class="desc">律境</div>
+                <div class="enter-hint">循声入境 →</div>
             </div>
             <div class="realm-category color" onclick="enterRealm('color')" style="position: relative;">
-                <div class="icon">◈</div>
+                <div class="icon">彩</div>
                 <div class="name">色</div>
-                <div class="desc">色之境</div>
-                <div class="enter-hint">进入此境 →</div>
+                <div class="desc">彩境</div>
+                <div class="enter-hint">觅色入境 →</div>
             </div>
             <div class="realm-category text" onclick="enterRealm('text')" style="position: relative;">
-                <div class="icon">✦</div>
+                <div class="icon">章</div>
                 <div class="name">文</div>
-                <div class="desc">文之境</div>
-                <div class="enter-hint">进入此境 →</div>
+                <div class="desc">章境</div>
+                <div class="enter-hint">遇文入境 →</div>
             </div>
         </div>
     </section>
@@ -1284,13 +1314,13 @@
         <div class="realm-divider"></div>
 
         <div class="realm-header">
-            <p class="realm-quote"><span class="realm-highlight">观</span>声动色，文以载道</p>
+            <p class="realm-quote">声动而色起，文成而道显</p>
         </div>
 
         <div class="chart-tabs">
-            <button class="chart-tab active" onclick="switchChart('sound')">音观</button>
-            <button class="chart-tab" onclick="switchChart('color')">色观</button>
-            <button class="chart-tab" onclick="switchChart('text')">文观</button>
+            <button class="chart-tab active" onclick="switchChart('sound')">律观</button>
+            <button class="chart-tab" onclick="switchChart('color')">彩观</button>
+            <button class="chart-tab" onclick="switchChart('text')">章观</button>
             <button class="chart-tab" onclick="switchChart('all')">总观</button>
         </div>
 
@@ -1388,9 +1418,9 @@
             
             // 三域配置 - 固定三角形布局
             const realms = {
-                sound: { name: '音境', color: '#8B9DC3' },
-                color: { name: '色境', color: '#C9A9A6' },
-                text: { name: '文境', color: '#7A8B7C' }
+                sound: { name: '律境', color: '#8B9DC3' },
+                color: { name: '彩境', color: '#C9A9A6' },
+                text: { name: '章境', color: '#7A8B7C' }
             };
             
             // 固定位置 - 品字形布局
