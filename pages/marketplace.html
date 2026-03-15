@@ -969,14 +969,18 @@
         .realm-category .icon {
             width: 48px;
             height: 48px;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
             color: var(--ink-light);
             transition: color 0.4s ease, transform 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .realm-category .icon svg {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
         .realm-category.sound:hover .icon {
@@ -1011,6 +1015,13 @@
             color: var(--ink-light);
             letter-spacing: 0.1em;
         }
+
+        .realm-category .enter-hint {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.1em;
             opacity: 0;
             transform: translateY(10px);
             transition: all 0.3s ease;
@@ -1021,22 +1032,11 @@
             transform: translateY(0);
         }
 
-        .realm-category:hover .icon,
         .realm-category:hover .name,
         .realm-category:hover .desc {
             transform: translateY(-8px);
             transition: transform 0.3s ease;
         }
-
-        .realm-category .icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            color: var(--ink-medium);
-            transition: color 0.4s ease;
-        }
-
-        .realm-category .name {
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
             font-size: 1.5rem;
             letter-spacing: 0.2em;
             color: var(--ink-deep);
