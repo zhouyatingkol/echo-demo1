@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO - 东方美学设计系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 宣纸质感 */
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F2EFE8;
+            --bg-tertiary: #EBE7DD;
+            
+            /* 四阶墨色 */
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #7A6E5F;
+            --ink-faint: #B5B5B5;
+            
+            /* 宋金 */
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
+            
+            /* 三域 */
+            --realm-sound: #8B9DC3;
+            --realm-color: #C9A9A6;
+            --realm-text: #7A8B7C;
+            
+            /* 字体 */
+            --font-display: 'LXGW WenKai', cursive;
+            --font-serif: 'Noto Serif SC', serif;
+            
+            /* 时长 */
+            --duration-slow: 1.2s;
+            --duration-ambient: 12s;
+            
+            /* 缓动 */
+            --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);
+            --ease-breath: cubic-bezier(0.45, 0, 0.55, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+        }
+        
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            color: var(--ink-deep);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        
+        /* ===== HERO 区 ===== */
+        .hero {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 5vh 5vw;
+        }
+        
+        /* 宣纸纹理 */
+        .hero-texture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+        }
+        
+        /* 窗棂光晕 */
+        .hero-light {
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(ellipse at center, 
+                rgba(232, 228, 220, 0.6) 0%, 
+                transparent 70%);
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 1;
+            animation: lightBreath var(--duration-ambient) ease-in-out infinite;
+        }
+        
+        .hero-light--primary {
+            top: -20%;
+            right: -10%;
+        }
+        
+        .hero-light--secondary {
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(ellipse at center, 
+                rgba(212, 196, 168, 0.3) 0%, 
+                transparent 60%);
+            top: auto;
+            right: auto;
+            bottom: -10%;
+            left: -5%;
+            animation-delay: -6s;
+        }
+        
+        @keyframes lightBreath {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        /* 宋瓷开片装饰 */
+        .hero-crackle {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 0.5px solid var(--gold-primary);
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .hero-crackle--tr {
+            top: 10%;
+            right: 10%;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .hero-crackle--bl {
+            bottom: 10%;
+            left: 10%;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        /* 主内容 */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            text-align: center;
+        }
+        
+        /* 「动」字 */
+        .hero-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .hero-char {
+            font-family: var(--font-display);
+            font-size: clamp(5rem, 12vw, 8rem);
+            font-weight: 300;
+            color: var(--ink-deep);
+            letter-spacing: 0.28em;
+            line-height: 1;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            filter: blur(10px);
+            animation: emerge 2s var(--ease-ink) forwards, 
+                       breathe 8s ease-in-out infinite;
+            animation-delay: 0.3s, 3s;
+        }
+        
+        .hero-char::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2rem;
+            height: 0.5px;
+            background: var(--gold-primary);
+            opacity: 0.6;
+        }
+        
+        @keyframes emerge {
+            0% { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.005); }
+        }
+        
+        /* ECHO 品牌 */
+        .hero-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 400;
+            color: var(--ink-medium);
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 1.5s ease 1s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        /* 副标题 */
+        .hero-subtitle {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            opacity: 0;
+            animation: fadeIn 1.5s ease 1.5s forwards;
+        }
+        
+        .subtitle-main {
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            color: var(--ink-medium);
+            letter-spacing: 0.4em;
+        }
+        
+        .subtitle-highlight {
+            font-family: var(--font-serif);
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.3em;
+            font-weight: 300;
+            position: relative;
+            padding: 0.5rem 2rem;
+        }
+        
+        .subtitle-highlight::before,
+        .subtitle-highlight::after {
+            content: '—';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold-primary);
+            opacity: 0.4;
+            font-weight: 300;
+        }
+        
+        .subtitle-highlight::before { left: 0; }
+        .subtitle-highlight::after { right: 0; }
+        
+        /* 宋瓷按钮 */
+        .hero-cta {
+            margin-top: 1rem;
+            position: relative;
+            padding: 1.2rem 4rem;
+            font-family: var(--font-serif);
+            font-size: 0.85rem;
+            letter-spacing: 0.5em;
+            color: var(--ink-deep);
+            background: transparent;
+            border: 0.5px solid rgba(26, 26, 26, 0.08);
+            border-radius: 1px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            opacity: 0;
+            animation: fadeInUp 1.5s cubic-bezier(0.23, 1, 0.32, 1) 2s forwards;
+        }
+        
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(184, 155, 108, 0.1), 
+                transparent);
+            transition: left 1.5s ease;
+        }
+        
+        .hero-cta:hover::before {
+            left: 100%;
+        }
+        
+        .hero-cta:hover {
+            border-color: var(--gold-light);
+            letter-spacing: 0.6em;
+            color: var(--ink-deep);
+        }
+        
+        .hero-cta span {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* ===== 设计系统展示 ===== */
+        .showcase {
+            padding: 15vh 10vw;
+            background: var(--bg-secondary);
+        }
+        
+        .showcase-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        /* 色彩展示 */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 5rem;
+        }
+        
+        .color-item {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1rem;
+            border-radius: 2px;
+        }
+        
+        .color-item span {
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .color-item span:first-child {
+            font-size: 0.65rem;
+            opacity: 0.6;
+            margin-bottom: 0.3rem;
+        }
+        
+        /* 三域图标 */
+        .realm-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            margin: 5rem 0;
+        }
+        
+        .realm-card {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--bg-primary);
+            border-radius: 2px;
+            transition: transform 0.8s var(--ease-ink);
+        }
+        
+        .realm-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .realm-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .realm-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .realm-name {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            letter-spacing: 0.2em;
+        }
+        
+        .realm-desc {
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            line-height: 2;
+            letter-spacing: 0.05em;
+        }
+        
+        /* 文案展示 */
+        .copy-section {
+            margin-top: 5rem;
+        }
+        
+        .copy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+        
+        .copy-item {
+            padding: 2rem;
+            background: var(--bg-primary);
+            border-radius: 2px;
+        }
+        
+        .copy-label {
+            font-size: 0.7rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        
+        .copy-normal {
+            font-size: 0.9rem;
+            color: var(--ink-faint);
+            text-decoration: line-through;
+            opacity: 0.6;
+            margin-bottom: 0.5rem;
+        }
+        
+        .copy-poetic {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.05em;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero-char {
+                font-size: clamp(4rem, 15vw, 6rem);
+                letter-spacing: 0.15em;
+            }
+            
+            .realm-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .copy-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .color-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HERO 区 -->
+    <section class="hero">
+        <div class="hero-texture"></div>
+        <div class="hero-light hero-light--primary"></div>
+        <div class="hero-light hero-light--secondary"></div>
+        <div class="hero-crackle hero-crackle--tr"></div>
+        <div class="hero-crackle hero-crackle--bl"></div>
+        
+        <div class="hero-content">
+            <div class="hero-title">
+                <span class="hero-char">动</span>
+                <span class="hero-brand">ECHO</span>
+            </div>
+            
+            <div class="hero-subtitle">
+                <span class="subtitle-main">声音、色彩、文字</span>
+                <span class="subtitle-highlight">在流转中生长</span>
+            </div>
+            
+            <button class="hero-cta">
+                <span>进入</span>
+            </button>
+        </div>
+    </section>
+    
+    <!-- 设计系统展示 -->
+    <section class="showcase">
+        <h2 class="showcase-title">色彩系统</h2>
+        
+        <div class="color-grid">
+            <div class="color-item" style="background: #F8F6F1; border: 1px solid #e0ddd5;">
+                <span style="color: #999;">宣纸底色</span>
+                <span style="color: #666;">#F8F6F1</span>
+            </div>
+            <div class="color-item" style="background: #1A1A1A;">
+                <span>浓墨</span>
+                <span>#1A1A1A</span>
+            </div>
+            <div class="color-item" style="background: #B89B6C;">
+                <span>宋金</span>
+                <span>#B89B6C</span>
+            </div>
+            <div class="color-item" style="background: #8B9DC3;">
+                <span>青瓷</span>
+                <span>#8B9DC3</span>
+            </div>
+            <div class="color-item" style="background: #C9A9A6;">
+                <span>粉瓷</span>
+                <span>#C9A9A6</span>
+            </div>
+            <div class="color-item" style="background: #7A8B7C;">
+                <span>墨绿</span>
+                <span>#7A8B7C</span>
+            </div>
+        </div>
+        
+        <h2 class="showcase-title">三域</h2>
+        
+        <div class="realm-section">
+            <div class="realm-card">
+                <div class="realm-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#8B9DC3" stroke-width="0.5">
+                        <path d="M12 4v16M8 8c-2 2-2 6 0 8M16 6c3 3 3 9 0 12"/>
+                    </svg>
+                </div>
+                <h3 class="realm-name" style="color: #8B9DC3;">音</h3>
+                <p class="realm-desc">声之所至，心之所向<br>每一音符，都是时间的纹路</p>
+            </div>
+            
+            <div class="realm-card">
+                <div class="realm-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#C9A9A6" stroke-width="0.5">
+                        <circle cx="12" cy="12" r="8" opacity="0.3"/>
+                        <circle cx="12" cy="12" r="5" opacity="0.6"/>
+                        <circle cx="12" cy="12" r="2" fill="#C9A9A6" opacity="0.9"/>
+                    </svg>
+                </div>
+                <h3 class="realm-name" style="color: #C9A9A6;">色</h3>
+                <p class="realm-desc">一笔一世界，一色一乾坤<br>视觉的诗，无需翻译</p>
+            </div>
+            
+            <div class="realm-card">
+                <div class="realm-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#7A8B7C" stroke-width="0.5">
+                        <line x1="6" y1="4" x2="6" y2="20"/>
+                        <line x1="12" y1="4" x2="12" y2="20"/>
+                        <line x1="18" y1="4" x2="18" y2="20"/>
+                    </svg>
+                </div>
+                <h3 class="realm-name" style="color: #7A8B7C;">文</h3>
+                <p class="realm-desc">字里行间，自有山河<br>每一段文字，都是灵魂的拓印</p>
+            </div>
+        </div>
+        
+        <div class="copy-section">
+            <h2 class="showcase-title">仪式化文案</h2>
+            
+            <div class="copy-grid">
+                <div class="copy-item">
+                    <div class="copy-label">上传作品</div>
+                    <div class="copy-normal">上传、提交</div>
+                    <div class="copy-poetic">播种</div>
+                </div>
+                
+                <div class="copy-item">
+                    <div class="copy-label">购买授权</div>
+                    <div class="copy-normal">购买、下单</div>
+                    <div class="copy-poetic">结缘</div>
+                </div>
+                
+                <div class="copy-item">
+                    <div class="copy-label">收益到账</div>
+                    <div class="copy-normal">收益、到账</div>
+                    <div class="copy-poetic">果实成熟</div>
+                </div>
+                
+                <div class="copy-item">
+                    <div class="copy-label">确认操作</div>
+                    <div class="copy-normal">确定、确认</div>
+                    <div class="copy-poetic">如是</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

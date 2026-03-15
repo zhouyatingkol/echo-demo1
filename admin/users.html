@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户管理 - ECHO Music Admin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --primary: #00d4ff;
+      --secondary: #7b2cbf;
+      --success: #00d9a3;
+      --warning: #ffc107;
+      --danger: #ff4757;
+      --bg-dark: #0a0a0a;
+      --bg-card: #1a1a2e;
+      --bg-hover: #252542;
+      --text-primary: #fff;
+      --text-secondary: #8892b0;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    .sidebar {
+      width: 260px;
+      background: rgba(26, 26, 46, 0.95);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .sidebar-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      -webkit-text-fill-color: initial;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+    
+    .nav-section {
+      margin-bottom: 24px;
+    }
+    
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      margin-bottom: 4px;
+    }
+    
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(0, 212, 255, 0.15), rgba(123, 44, 191, 0.15));
+      color: var(--primary);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+    
+    .nav-item-icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+    
+    .nav-badge {
+      margin-left: auto;
+      padding: 2px 8px;
+      background: var(--danger);
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .admin-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-hover);
+      border-radius: 12px;
+    }
+    
+    .admin-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    
+    .admin-info {
+      flex: 1;
+    }
+    
+    .admin-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .admin-role {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .logout-btn {
+      padding: 8px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+    
+    .logout-btn:hover {
+      color: var(--danger);
+    }
+    
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 24px 32px;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .page-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: #fff;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* 筛选栏 */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+    
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .search-box {
+      position: relative;
+    }
+    
+    .search-input {
+      width: 280px;
+      padding: 10px 16px 10px 40px;
+      background: rgba(10, 10, 26, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    
+    .filter-select {
+      padding: 10px 16px;
+      background: rgba(10, 10, 26, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    /* 用户表格 */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      background: rgba(10, 10, 26, 0.5);
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .data-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px;
+    }
+    
+    .data-table tr:hover {
+      background: var(--bg-hover);
+    }
+    
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    
+    .user-details h4 {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .user-details span {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    
+    .status-badge.active {
+      background: rgba(0, 217, 163, 0.15);
+      color: var(--success);
+    }
+    
+    .status-badge.active::before {
+      background: var(--success);
+    }
+    
+    .status-badge.banned {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--danger);
+    }
+    
+    .status-badge.banned::before {
+      background: var(--danger);
+    }
+    
+    .status-badge.pending {
+      background: rgba(255, 193, 7, 0.15);
+      color: var(--warning);
+    }
+    
+    .status-badge.pending::before {
+      background: var(--warning);
+    }
+    
+    .user-role {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .user-role.creator {
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--primary);
+    }
+    
+    .user-role.buyer {
+      background: rgba(123, 44, 191, 0.15);
+      color: #a855f7;
+    }
+    
+    .user-role.both {
+      background: rgba(0, 217, 163, 0.15);
+      color: var(--success);
+    }
+    
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+    
+    .action-btn.view {
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--primary);
+    }
+    
+    .action-btn.view:hover {
+      background: rgba(0, 212, 255, 0.25);
+    }
+    
+    .action-btn.ban {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--danger);
+    }
+    
+    .action-btn.ban:hover {
+      background: rgba(255, 71, 87, 0.25);
+    }
+    
+    .action-btn.unban {
+      background: rgba(0, 217, 163, 0.15);
+      color: var(--success);
+    }
+    
+    .action-btn.unban:hover {
+      background: rgba(0, 217, 163, 0.25);
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-color);
+      background: rgba(10, 10, 26, 0.3);
+    }
+    
+    .pagination-info {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .pagination-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .page-btn {
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .page-btn.active {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-color: transparent;
+      color: #fff;
+    }
+    
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      width: 90%;
+      max-width: 560px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      animation: modalIn 0.3s ease;
+    }
+    
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    
+    .modal-close:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .modal-body {
+      padding: 24px;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .user-profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    
+    .user-profile-info h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .user-profile-info p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .info-item {
+      padding: 16px;
+      background: rgba(10, 10, 26, 0.5);
+      border-radius: 12px;
+    }
+    
+    .info-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      background: rgba(10, 10, 26, 0.3);
+    }
+    
+    @media (max-width: 1024px) {
+      .main-content {
+        margin-left: 0;
+        padding: 16px;
+      }
+      
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .filter-bar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+      }
+      
+      .filter-group {
+        flex-direction: column;
+      }
+      
+      .search-input {
+        width: 100%;
+      }
+      
+      .data-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">🎵</div>
+          <span>ECHO Admin</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">主菜单</div>
+          <a href="dashboard.html" class="nav-item">
+            <span class="nav-item-icon">📊</span>
+            <span>数据概览</span>
+          </a>
+          <a href="users.html" class="nav-item active">
+            <span class="nav-item-icon">👥</span>
+            <span>用户管理</span>
+          </a>
+          <a href="moderation.html" class="nav-item">
+            <span class="nav-item-icon">🛡️</span>
+            <span>内容审核</span>
+            <span class="nav-badge">12</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">系统</div>
+          <a href="settings.html" class="nav-item">
+            <span class="nav-item-icon">⚙️</span>
+            <span>系统设置</span>
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="admin-user">
+          <div class="admin-avatar">👤</div>
+          <div class="admin-info">
+            <div class="admin-name">超级管理员</div>
+            <div class="admin-role">admin@echo.com</div>
+          </div>
+          <button class="logout-btn" id="logoutBtn" title="退出登录">🚪</button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- 主内容 -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">用户管理</h1>
+        <div class="page-actions">
+          <button class="btn btn-secondary">📥 导出数据</button>
+          <button class="btn btn-primary">➕ 添加用户</button>
+        </div>
+      </div>
+      
+      <!-- 筛选栏 -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="搜索用户名、邮箱或钱包地址">
+          </div>
+        </div>
+        
+        <div class="filter-group">
+          <select class="filter-select">
+            <option value="">所有状态</option>
+            <option value="active">正常</option>
+            <option value="banned">已封禁</option>
+            <option value="pending">待审核</option>
+          </select>
+          
+          <select class="filter-select">
+            <option value="">所有角色</option>
+            <option value="creator">创作者</option>
+            <option value="buyer">买家</option>
+            <option value="both">双重身份</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- 用户表格 -->
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>用户</th>
+              <th>角色</th>
+              <th>状态</th>
+              <th>注册时间</th>
+              <th>作品数</th>
+              <th>交易量</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">🎵</div>
+                  <div class="user-details">
+                    <h4>music_creator_99</h4>
+                    <span>0x7a8b...3c4d</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="user-role creator">创作者</span></td>
+              <td><span class="status-badge active">正常</span></td>
+              <td>2024-03-10</td>
+              <td>12</td>
+              <td>156</td>
+              <td>
+                <div class="action-btns">
+                  <button class="action-btn view" onclick="showUserDetail('music_creator_99')">查看</button>
+                  <button class="action-btn ban">封禁</button>
+                </div>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">🎧</div>
+                  <div class="user-details">
+                    <h4>dj_beats</h4>
+                    <span>0x9c1d...5e6f</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="user-role both">双重身份</span></td>
+              <td><span class="status-badge active">正常</span></td>
+              <td>2024-02-28</td>
+              <td>8</td>
+              <td>342</td>
+              <td>
+                <div class="action-btns">
+                  <button class="action-btn view" onclick="showUserDetail('dj_beats')">查看</button>
+                  <button class="action-btn ban">封禁</button>
+                </div>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">🎹</div>
+                  <div class="user-details">
+                    <h4>piano_master</h4>
+                    <span>0x2e3f...7a8b</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="user-role creator">创作者</span></td>
+              <td><span class="status-badge banned">已封禁</span></td>
+              <td>2024-01-15</td>
+              <td>45</td>
+              <td>0</td>
+              <td>
+                <div class="action-btns">
+                  <button class="action-btn view" onclick="showUserDetail('piano_master')">查看</button>
+                  <button class="action-btn unban">解封</button>
+                </div>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">🎸</div>
+                  <div class="user-details">
+                    <h4>guitar_hero</h4>
+                    <span>0x4a5b...9c0d</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="user-role buyer">买家</span></td>
+              <td><span class="status-badge active">正常</span></td>
+              <td>2024-03-05</td>
+              <td>0</td>
+              <td>23</td>
+              <td>
+                <div class="action-btns">
+                  <button class="action-btn view" onclick="showUserDetail('guitar_hero')">查看</button>
+                  <button class="action-btn ban">封禁</button>
+                </div>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">🥁</div>
+                  <div class="user-details">
+                    <h4>drum_lover</h4>
+                    <span>0x6b7c...1d2e</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="user-role pending">待审核</span></td>
+              <td><span class="status-badge pending">待审核</span></td>
+              <td>2024-03-12</td>
+              <td>0</td>
+              <td>0</td>
+              <td>
+                <div class="action-btns">
+                  <button class="action-btn view" onclick="showUserDetail('drum_lover')">查看</button>
+                  <button class="action-btn ban">封禁</button>
+                </div>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">🎺</div>
+                  <div class="user-details">
+                    <h4>jazz_cat</h4>
+                    <span>0x8d9e...3f4a</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="user-role creator">创作者</span></td>
+              <td><span class="status-badge active">正常</span></td>
+              <td>2023-12-20</td>
+              <td>28</td>
+              <td>89</td>
+              <td>
+                <div class="action-btns">
+                  <button class="action-btn view" onclick="showUserDetail('jazz_cat')">查看</button>
+                  <button class="action-btn ban">封禁</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- 分页 -->
+        <div class="pagination">
+          <div class="pagination-info">显示 1-6 共 2,458 条</div>
+          <div class="pagination-actions">
+            <button class="page-btn" disabled>上一页</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span style="color: var(--text-secondary); padding: 8px;">...        </span>
+            <button class="page-btn">410</button>
+            <button class="page-btn">下一页</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- 用户详情 Modal -->
+  <div class="modal" id="userModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">用户详情</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="user-profile">
+          <div class="user-profile-avatar" id="modalAvatar">🎵</div>
+          <div class="user-profile-info">
+            <h3 id="modalUsername">music_creator_99</h3>
+            <p id="modalWallet">0x7a8b...3c4d</p>
+          </div>
+        </div>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">角色</div>
+            <div class="info-value" id="modalRole">创作者</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">状态</div>
+            <div class="info-value" id="modalStatus">正常</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">注册时间</div>
+            <div class="info-value" id="modalRegDate">2024-03-10</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">最后登录</div>
+            <div class="info-value">2024-03-12 14:30</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">作品数量</div>
+            <div class="info-value" id="modalWorks">12</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">交易次数</div>
+            <div class="info-value" id="modalTx">156</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">总收入</div>
+            <div class="info-value">¥12,450</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">总支出</div>
+            <div class="info-value">¥3,280</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+        <button class="btn btn-primary">查看完整资料</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 检查登录状态
+    if (!localStorage.getItem('adminToken') && !sessionStorage.getItem('adminToken')) {
+      window.location.href = 'login.html';
+    }
+    
+    // 退出登录
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('adminToken');
+      sessionStorage.removeItem('adminToken');
+      window.location.href = 'login.html';
+    });
+    
+    // 用户数据
+    const userData = {
+      'music_creator_99': {
+        avatar: '🎵',
+        role: '创作者',
+        status: '正常',
+        regDate: '2024-03-10',
+        works: 12,
+        tx: 156
+      },
+      'dj_beats': {
+        avatar: '🎧',
+        role: '双重身份',
+        status: '正常',
+        regDate: '2024-02-28',
+        works: 8,
+        tx: 342
+      },
+      'piano_master': {
+        avatar: '🎹',
+        role: '创作者',
+        status: '已封禁',
+        regDate: '2024-01-15',
+        works: 45,
+        tx: 0
+      },
+      'guitar_hero': {
+        avatar: '🎸',
+        role: '买家',
+        status: '正常',
+        regDate: '2024-03-05',
+        works: 0,
+        tx: 23
+      },
+      'drum_lover': {
+        avatar: '🥁',
+        role: '待审核',
+        status: '待审核',
+        regDate: '2024-03-12',
+        works: 0,
+        tx: 0
+      },
+      'jazz_cat': {
+        avatar: '🎺',
+        role: '创作者',
+        status: '正常',
+        regDate: '2023-12-20',
+        works: 28,
+        tx: 89
+      }
+    };
+    
+    // 显示用户详情
+    function showUserDetail(username) {
+      const user = userData[username];
+      if (user) {
+        document.getElementById('modalAvatar').textContent = user.avatar;
+        document.getElementById('modalUsername').textContent = username;
+        document.getElementById('modalRole').textContent = user.role;
+        document.getElementById('modalStatus').textContent = user.status;
+        document.getElementById('modalRegDate').textContent = user.regDate;
+        document.getElementById('modalWorks').textContent = user.works;
+        document.getElementById('modalTx').textContent = user.tx;
+        document.getElementById('userModal').classList.add('show');
+      }
+    }
+    
+    // 关闭 Modal
+    function closeModal() {
+      document.getElementById('userModal').classList.remove('show');
+    }
+    
+    // 点击 Modal 外部关闭
+    document.getElementById('userModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('userModal')) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

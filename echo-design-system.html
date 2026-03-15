@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO - 图标与组件系统设计</title>
+    <style>
+        /* ========================================
+           ECHO Design System - 极简东方主义
+           ======================================== */
+        
+        :root {
+            /* 色彩系统 - 宋瓷色调 */
+            --echo-white: #FAFAFA;
+            --echo-cream: #F5F3EF;
+            --echo-stone: #E8E4DE;
+            --echo-ink-light: #9A9590;
+            --echo-ink: #4A4540;
+            --echo-ink-deep: #2A2520;
+            --echo-shadow: rgba(74, 69, 64, 0.06);
+            --echo-shadow-hover: rgba(74, 69, 64, 0.1);
+            
+            /* 三域色彩 */
+            --echo-sound: #8B9DC3;    /* 音 - 青瓷 */
+            --echo-color: #C9A9A6;    /* 色 - 粉瓷 */
+            --echo-text: #7A8B7C;     /* 文 - 墨绿 */
+            
+            /* 尺寸系统 */
+            --radius: 1px;
+            --stroke-thin: 0.5px;
+            --stroke-normal: 1px;
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", sans-serif;
+            background: var(--echo-cream);
+            color: var(--echo-ink-deep);
+            line-height: 1.6;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            margin-bottom: 8px;
+            color: var(--echo-ink-deep);
+        }
+
+        .subtitle {
+            color: var(--echo-ink-light);
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            margin-bottom: 48px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            margin: 48px 0 24px;
+            padding-bottom: 12px;
+            border-bottom: var(--stroke-thin) solid var(--echo-stone);
+            color: var(--echo-ink);
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--echo-ink-light);
+            margin: 32px 0 16px;
+            letter-spacing: 0.1em;
+        }
+
+        /* ========================================
+           1. 图标系统
+           ======================================== */
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: var(--echo-white);
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px var(--echo-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .icon-item:hover {
+            box-shadow: 0 2px 8px var(--echo-shadow-hover);
+            transform: translateY(-1px);
+        }
+
+        .icon-item span {
+            font-size: 12px;
+            color: var(--echo-ink-light);
+        }
+
+        /* 图标基础样式 */
+        .icon {
+            width: 24px;
+            height: 24px;
+            stroke: var(--echo-ink);
+            stroke-width: var(--stroke-normal);
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .icon-domain {
+            stroke-width: var(--stroke-thin);
+        }
+
+        .icon-sound { stroke: var(--echo-sound); }
+        .icon-art { stroke: var(--echo-color); }
+        .icon-lit { stroke: var(--echo-text); }
+
+        /* ========================================
+           2. 按钮系统
+           ======================================== */
+        
+        .btn-section {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        /* 主要按钮 - 宋瓷质感 */
+        .btn-primary {
+            position: relative;
+            padding: 14px 32px;
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            color: var(--echo-white);
+            background: linear-gradient(135deg, var(--echo-ink) 0%, var(--echo-ink-deep) 100%);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                0 2px 4px var(--echo-shadow);
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255,255,255,0.3), 
+                transparent);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.15),
+                0 4px 12px rgba(42, 37, 32, 0.15);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 次要按钮 */
+        .btn-secondary {
+            padding: 13px 30px;
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            color: var(--echo-ink);
+            background: var(--echo-white);
+            border: var(--stroke-thin) solid var(--echo-stone);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--echo-ink-light);
+            background: var(--echo-cream);
+        }
+
+        /* 幽灵按钮 */
+        .btn-ghost {
+            padding: 13px 30px;
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            color: var(--echo-ink-light);
+            background: transparent;
+            border: var(--stroke-thin) solid transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ghost:hover {
+            color: var(--echo-ink);
+            border-color: var(--echo-stone);
+            background: var(--echo-white);
+        }
+
+        /* ========================================
+           3. 卡片组件
+           ======================================== */
+        
+        .card-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        /* 作品卡片 */
+        .work-card {
+            background: var(--echo-white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 1px 4px var(--echo-shadow);
+            transition: all 0.4s ease;
+        }
+
+        .work-card:hover {
+            box-shadow: 0 4px 16px var(--echo-shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .work-card-image {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, var(--echo-stone) 0%, var(--echo-cream) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .work-card-content {
+            padding: 20px;
+        }
+
+        .work-card-domain {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: var(--echo-ink-light);
+            margin-bottom: 12px;
+        }
+
+        .work-card-title {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--echo-ink-deep);
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        .work-card-author {
+            font-size: 13px;
+            color: var(--echo-ink-light);
+        }
+
+        /* 创作者卡片 */
+        .creator-card {
+            background: var(--echo-white);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: 0 1px 4px var(--echo-shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .creator-card:hover {
+            box-shadow: 0 4px 12px var(--echo-shadow-hover);
+        }
+
+        .creator-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--echo-stone), var(--echo-cream));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--echo-ink-light);
+        }
+
+        .creator-info {
+            flex: 1;
+        }
+
+        .creator-name {
+            font-size: 15px;
+            color: var(--echo-ink-deep);
+            margin-bottom: 4px;
+        }
+
+        .creator-domain {
+            font-size: 12px;
+            color: var(--echo-ink-light);
+        }
+
+        .creator-follow {
+            padding: 8px 20px;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            color: var(--echo-ink);
+            background: transparent;
+            border: var(--stroke-thin) solid var(--echo-stone);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .creator-follow:hover {
+            background: var(--echo-ink-deep);
+            color: var(--echo-white);
+            border-color: var(--echo-ink-deep);
+        }
+
+        /* 数据统计卡片 */
+        .stat-card {
+            background: var(--echo-white);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: 0 1px 4px var(--echo-shadow);
+        }
+
+        .stat-card-label {
+            font-size: 12px;
+            color: var(--echo-ink-light);
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .stat-card-value {
+            font-size: 32px;
+            font-weight: 300;
+            color: var(--echo-ink-deep);
+            letter-spacing: 0.05em;
+        }
+
+        .stat-card-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--echo-text);
+            margin-top: 8px;
+        }
+
+        /* ========================================
+           4. 输入控件
+           ======================================== */
+        
+        .input-section {
+            max-width: 400px;
+        }
+
+        /* 文本输入框 - 宣纸质感 */
+        .input-field {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .input-field label {
+            display: block;
+            font-size: 12px;
+            color: var(--echo-ink-light);
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .input-field input,
+        .input-field textarea {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 14px;
+            color: var(--echo-ink-deep);
+            background: var(--echo-white);
+            border: var(--stroke-thin) solid var(--echo-stone);
+            border-radius: var(--radius);
+            outline: none;
+            transition: all 0.3s ease;
+            
+            /* 宣纸质感 */
+            background-image: 
+                linear-gradient(90deg, rgba(250,250,250,0.9) 0%, rgba(248,246,242,0.95) 100%);
+            box-shadow: 
+                inset 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .input-field input:focus,
+        .input-field textarea:focus {
+            border-color: var(--echo-ink-light);
+            box-shadow: 
+                inset 0 1px 2px rgba(0,0,0,0.02),
+                0 2px 8px var(--echo-shadow);
+        }
+
+        .input-field input::placeholder,
+        .input-field textarea::placeholder {
+            color: var(--echo-ink-light);
+            opacity: 0.6;
+        }
+
+        /* 选择器 */
+        .select-field {
+            position: relative;
+        }
+
+        .select-field select {
+            width: 100%;
+            padding: 14px 40px 14px 16px;
+            font-size: 14px;
+            color: var(--echo-ink-deep);
+            background: var(--echo-white);
+            border: var(--stroke-thin) solid var(--echo-stone);
+            border-radius: var(--radius);
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            transition: all 0.3s ease;
+        }
+
+        .select-field::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-right: var(--stroke-normal) solid var(--echo-ink-light);
+            border-bottom: var(--stroke-normal) solid var(--echo-ink-light);
+            transform: translateY(-70%) rotate(45deg);
+            pointer-events: none;
+        }
+
+        /* 滑块 */
+        .slider-field {
+            margin-bottom: 24px;
+        }
+
+        .slider-field label {
+            display: block;
+            font-size: 12px;
+            color: var(--echo-ink-light);
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 2px;
+            background: var(--echo-stone);
+            border-radius: 1px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--echo-white);
+            border: var(--stroke-normal) solid var(--echo-ink-light);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px var(--echo-shadow);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            border-color: var(--echo-ink);
+            transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--echo-white);
+            border: var(--stroke-normal) solid var(--echo-ink-light);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* 开关 */
+        .toggle-field {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .toggle-field span {
+            font-size: 14px;
+            color: var(--echo-ink);
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--echo-stone);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--echo-white);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px var(--echo-shadow);
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background: var(--echo-ink-light);
+        }
+
+        .toggle input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* ========================================
+           代码展示区域
+           ======================================== */
+        
+        .code-section {
+            margin-top: 64px;
+            padding-top: 32px;
+            border-top: var(--stroke-thin) solid var(--echo-stone);
+        }
+
+        .code-block {
+            background: var(--echo-ink-deep);
+            border-radius: var(--radius);
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+        }
+
+        .code-block code {
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            color: var(--echo-cream);
+        }
+
+        .code-block .comment { color: var(--echo-ink-light); }
+        .code-block .tag { color: #A8C5E2; }
+        .code-block .attr { color: #C9A9A6; }
+        .code-block .value { color: #B5C9A8; }
+        .code-block .selector { color: #D4B5A8; }
+        .code-block .property { color: #A8C5E2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ECHO</h1>
+        <p class="subtitle">数字版权协议 · 图标与组件系统设计</p>
+
+        <!-- ========================================
+             1. 图标系统
+             ======================================== -->
+        
+        <h2>一、图标系统</h2>
+        
+        <h3>三域图标</h3>
+        <div class="icon-grid">
+            <!-- 音 -->
+            <div class="icon-item">
+                <svg class="icon icon-domain icon-sound" viewBox="0 0 24 24">
+                    <!-- 声波的不对称扩散 -->
+                    <path d="M12 6v12"/>
+                    <path d="M8 9v6"/>
+                    <path d="M16 9v6"/>
+                    <path d="M4 11v2"/>
+                    <path d="M20 11v2"/>
+                </svg>
+                <span>音 · 音乐</span>
+            </div>
+            
+            <!-- 色 -->
+            <div class="icon-item">
+                <svg class="icon icon-domain icon-art" viewBox="0 0 24 24">
+                    <!-- 水墨晕染的抽象 -->
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 3c-4 0-7 4-7 9s3 9 7 9" opacity="0.6"/>
+                    <path d="M12 21c4 0 7-4 7-9s-3-9-7-9" opacity="0.3"/>
+                </svg>
+                <span>色 · 艺术</span>
+            </div>
+            
+            <!-- 文 -->
+            <div class="icon-item">
+                <svg class="icon icon-domain icon-lit" viewBox="0 0 24 24">
+                    <!-- 竹简的意象 -->
+                    <path d="M6 4h12v16H6z" opacity="0.2"/>
+                    <path d="M8 4v16"/>
+                    <path d="M12 4v16"/>
+                    <path d="M16 4v16"/>
+                    <path d="M6 8h12"/>
+                    <path d="M6 16h12"/>
+                </svg>
+                <span>文 · 文学</span>
+            </div>
+        </div>
+
+        <h3>导航图标</h3>
+        <div class="icon-grid">
+            <!-- 市场 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <!-- 门框的意象 -->
+                    <path d="M3 6h18v14H3z" opacity="0.1"/>
+                    <path d="M3 20V6l9-3 9 3v14"/>
+                    <path d="M9 20V10"/>
+                    <path d="M15 20V10"/>
+                    <path d="M3 10h18" opacity="0.3"/>
+                </svg>
+                <span>市场</span>
+            </div>
+            
+            <!-- 创作 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <!-- 毛笔笔触 -->
+                    <path d="M12 20h9"/>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+                <span>创作</span>
+            </div>
+            
+            <!-- 文档 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <!-- 卷轴 -->
+                    <path d="M7 4h10v16H7z" opacity="0.1"/>
+                    <path d="M7 4v16"/>
+                    <path d="M17 4v16"/>
+                    <path d="M7 8h10"/>
+                    <path d="M7 12h7"/>
+                    <path d="M7 16h5"/>
+                </svg>
+                <span>文档</span>
+            </div>
+            
+            <!-- 用户 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <!-- 留白人像 -->
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+                <span>用户</span>
+            </div>
+        </div>
+
+        <h3>操作图标</h3>
+        <div class="icon-grid">
+            <!-- 上传 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 15V3"/>
+                    <path d="M7 8l5-5 5 5"/>
+                    <path d="M3 15v6h18v-6"/>
+                </svg>
+                <span>上传</span>
+            </div>
+            
+            <!-- 购买 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M6 6h15l-1.5 9h-12z"/>
+                    <circle cx="9" cy="20" r="1.5"/>
+                    <circle cx="18" cy="20" r="1.5"/>
+                    <path d="M6 6L5 3H2"/>
+                </svg>
+                <span>购买</span>
+            </div>
+            
+            <!-- 分享 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="18" cy="6" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="18" r="3"/>
+                    <path d="M15.5 7.5L8.5 10.5"/>
+                    <path d="M15.5 16.5L8.5 13.5"/>
+                </svg>
+                <span>分享</span>
+            </div>
+            
+            <!-- 收藏 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <!-- 书签 -->
+                    <path d="M6 4h12v16l-6-4-6 4z"/>
+                </svg>
+                <span>收藏</span>
+            </div>
+        </div>
+
+        <h3>状态图标</h3>
+        <div class="icon-grid">
+            <!-- 加载 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <!-- 旋转的留白圆环 -->
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.3"/>
+                    <path d="M12 2a10 10 0 0 0-10 10"/>
+                    <path d="M2 12h2"/>
+                    <path d="M20 12h2"/>
+                </svg>
+                <span>加载</span>
+            </div>
+            
+            <!-- 成功 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" opacity="0.1"/>
+                    <path d="M8 12l2.5 2.5L16 9"/>
+                </svg>
+                <span>成功</span>
+            </div>
+            
+            <!-- 错误 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9" opacity="0.1"/>
+                    <path d="M9 9l6 6"/>
+                    <path d="M15 9l-6 6"/>
+                </svg>
+                <span>错误</span>
+            </div>
+            
+            <!-- 空状态 -->
+            <div class="icon-item">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <!-- 空集符号 -->
+                    <ellipse cx="12" cy="12" rx="8" ry="5"/>
+                    <path d="M8 8l8 8" opacity="0.3"/>
+                </svg>
+                <span>空状态</span>
+            </div>
+        </div>
+
+        <!-- ========================================
+             2. 按钮系统
+             ======================================== -->
+        
+        <h2>二、按钮系统</h2>
+        
+        <div class="btn-section">
+            <button class="btn-primary">主要按钮</button>
+            <button class="btn-secondary">次要按钮</button>
+            <button class="btn-ghost">幽灵按钮</button>
+            <button class="btn-primary" disabled>禁用状态</button>
+        </div>
+
+        <!-- ========================================
+             3. 卡片组件
+             ======================================== -->
+        
+        <h2>三、卡片组件</h2>
+        
+        <div class="card-section">
+            <!-- 作品卡片 -->
+            <div class="work-card">
+                <div class="work-card-image">
+                    <svg class="icon icon-sound" viewBox="0 0 24 24" style="width: 48px; height: 48px; opacity: 0.5;">
+                        <path d="M12 6v12"/>
+                        <path d="M8 9v6"/>
+                        <path d="M16 9v6"/>
+                        <path d="M4 11v2"/>
+                        <path d="M20 11v2"/>
+                    </svg>
+                </div>
+                <div class="work-card-content">
+                    <div class="work-card-domain">
+                        <svg class="icon icon-domain icon-sound" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+                            <path d="M12 6v12"/>
+                            <path d="M8 9v6"/>
+                        </svg>
+                        音域作品
+                    </div>
+                    <h4 class="work-card-title">秋日私语</h4>
+                    <p class="work-card-author">创作者 · 林清音</p>
+                </div>
+            </div>
+
+            <!-- 创作者卡片 -->
+            <div class="creator-card">
+                <div class="creator-avatar">林</div>
+                <div class="creator-info">
+                    <div class="creator-name">林清音</div>
+                    <div class="creator-domain">音域 · 12件作品</div>
+                </div>
+                <button class="creator-follow">关注</button>
+            </div>
+
+            <!-- 数据统计卡片 -->
+            <div class="stat-card">
+                <div class="stat-card-label">总交易量</div>
+                <div class="stat-card-value">2,847</div>
+                <div class="stat-card-trend">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 14l5-5 5 5"/>
+                    </svg>
+                    +12.5% 本月
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             4. 输入控件
+             ======================================== -->
+        
+        <h2>四、输入控件</h2>
+        
+        <div class="input-section">
+            <!-- 文本输入 -->
+            <div class="input-field">
+                <label>作品名称</label>
+                <input type="text" placeholder="请输入作品名称...">
+            </div>
+
+            <div class="input-field">
+                <label>作品描述</label>
+                <textarea rows="3" placeholder="请输入作品描述..."></textarea>
+            </div>
+
+            <!-- 选择器 -->
+            <div class="input-field select-field">
+                <label>作品类型</label>
+                <select>
+                    <option>选择类型...</option>
+                    <option>音乐作品</option>
+                    <option>艺术创作</option>
+                    <option>文学作品</option>
+                </select>
+            </div>
+
+            <!-- 滑块 -->
+            <div class="slider-field">
+                <label>版税比例</label>
+                <input type="range" class="slider" min="0" max="100" value="30">
+            </div>
+
+            <!-- 开关 -->
+            <div class="toggle-field">
+                <span>开启二次创作授权</span>
+                <label class="toggle">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="toggle-field">
+                <span>公开作品信息</span>
+                <label class="toggle">
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- ========================================
+             SVG 代码展示
+             ======================================== -->
+        
+        <div class="code-section">
+            <h2>SVG 代码参考</h2>
+            
+            <h3>三域图标</h3>
+            <div class="code-block">
+                <code>
+<span class="comment">&lt;!-- 音 · 音乐 - 声波不对称扩散 --&gt;</span><br>
+<span class="tag">&lt;svg</span> <span class="attr">viewBox</span>=<span class="value">"0 0 24 24"</span> <span class="attr">class</span>=<span class="value">"icon icon-sound"</span><span class="tag">&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M12 6v12"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M8 9v6"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M16 9v6"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M4 11v2"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M20 11v2"</span><span class="tag">/&gt;</span><br>
+<span class="tag">&lt;/svg&gt;</span><br><br>
+
+<span class="comment">&lt;!-- 色 · 艺术 - 水墨晕染意象 --&gt;</span><br>
+<span class="tag">&lt;svg</span> <span class="attr">viewBox</span>=<span class="value">"0 0 24 24"</span> <span class="attr">class</span>=<span class="value">"icon icon-art"</span><span class="tag">&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;circle</span> <span class="attr">cx</span>=<span class="value">"12"</span> <span class="attr">cy</span>=<span class="value">"12"</span> <span class="attr">r</span>=<span class="value">"3"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M12 3c-4 0-7 4-7 9s3 9 7 9"</span> <span class="attr">opacity</span>=<span class="value">"0.6"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M12 21c4 0 7-4 7-9s-3-9-7-9"</span> <span class="attr">opacity</span>=<span class="value">"0.3"</span><span class="tag">/&gt;</span><br>
+<span class="tag">&lt;/svg&gt;</span><br><br>
+
+<span class="comment">&lt;!-- 文 · 文学 - 竹简意象 --&gt;</span><br>
+<span class="tag">&lt;svg</span> <span class="attr">viewBox</span>=<span class="value">"0 0 24 24"</span> <span class="attr">class</span>=<span class="value">"icon icon-lit"</span><span class="tag">&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M6 4h12v16H6z"</span> <span class="attr">opacity</span>=<span class="value">"0.2"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M8 4v16"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M12 4v16"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M16 4v16"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M6 8h12"</span><span class="tag">/&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;path</span> <span class="attr">d</span>=<span class="value">"M6 16h12"</span><span class="tag">/&gt;</span><br>
+<span class="tag">&lt;/svg&gt;</span>
+                </code>
+            </div>
+
+            <h3>CSS 变量系统</h3>
+            <div class="code-block">
+                <code>
+<span class="selector">:root</span> {<br>
+&nbsp;&nbsp;<span class="comment">/* 宋瓷色调 */</span><br>
+&nbsp;&nbsp;<span class="property">--echo-white</span>: <span class="value">#FAFAFA</span>;<br>
+&nbsp;&nbsp;<span class="property">--echo-cream</span>: <span class="value">#F5F3EF</span>;<br>
+&nbsp;&nbsp;<span class="property">--echo-stone</span>: <span class="value">#E8E4DE</span>;<br>
+&nbsp;&nbsp;<span class="property">--echo-ink-light</span>: <span class="value">#9A9590</span>;<br>
+&nbsp;&nbsp;<span class="property">--echo-ink</span>: <span class="value">#4A4540</span>;<br>
+&nbsp;&nbsp;<span class="property">--echo-ink-deep</span>: <span class="value">#2A2520</span>;<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment">/* 三域色彩 */</span><br>
+&nbsp;&nbsp;<span class="property">--echo-sound</span>: <span class="value">#8B9DC3</span>;&nbsp;&nbsp;<span class="comment">/* 青瓷 */</span><br>
+&nbsp;&nbsp;<span class="property">--echo-color</span>: <span class="value">#C9A9A6</span>;&nbsp;&nbsp;<span class="comment">/* 粉瓷 */</span><br>
+&nbsp;&nbsp;<span class="property">--echo-text</span>: <span class="value">#7A8B7C</span>;&nbsp;&nbsp;&nbsp;<span class="comment">/* 墨绿 */</span><br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment">/* 尺寸系统 */</span><br>
+&nbsp;&nbsp;<span class="property">--radius</span>: <span class="value">1px</span>;<br>
+&nbsp;&nbsp;<span class="property">--stroke-thin</span>: <span class="value">0.5px</span>;<br>
+&nbsp;&nbsp;<span class="property">--stroke-normal</span>: <span class="value">1px</span>;<br>
+}
+                </code>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

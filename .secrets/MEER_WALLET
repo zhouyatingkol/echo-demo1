@@ -1,0 +1,13 @@
+# ECHO 雨娃钱包 - MEER 主网
+# 生成时间: 2026-03-15
+# 用途: MEER 网络测试与部署
+# ⚠️ 绝不要分享此文件内容
+
+ADDRESS=0xD9B32068A1B316A5D26Ae50DADD7527F3a1fa3C2
+PRIVATE_KEY=0xa43e536d937410bb5fb69383f124c266ae3a5be3f0cacd07ecf31d6aea08d164
+MNEMONIC="little cover help garage enable enhance outdoor top unhappy truly heart bar"
+
+# 网络配置
+NETWORK=MEER
+CHAIN_ID=813
+RPC_URL=https://evm-dataseed1.meerscan.io

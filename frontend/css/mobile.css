@@ -1,0 +1,332 @@
+/**
+ * Mobile Adaptation Styles
+ * 移动端适配样式
+ */
+
+/* ===== Mobile Bottom Navigation ===== */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(20, 20, 35, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  z-index: 1000;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 11px;
+  transition: all 0.3s ease;
+  min-width: 60px;
+}
+
+.mobile-nav-item .icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+  transition: transform 0.3s ease;
+}
+
+.mobile-nav-item .label {
+  font-weight: 500;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item.active {
+  color: #8B5CF6;
+}
+
+.mobile-nav-item:hover .icon,
+.mobile-nav-item.active .icon {
+  transform: translateY(-2px);
+}
+
+.mobile-nav-item.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+  border-radius: 12px;
+}
+
+/* ===== Responsive Layout ===== */
+@media (max-width: 768px) {
+  /* Hide desktop navigation */
+  .nav-links {
+    display: none !important;
+  }
+  
+  /* Show mobile navigation */
+  .mobile-nav {
+    display: flex;
+  }
+  
+  /* Music grid single column */
+  .music-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+    padding: 0 16px 100px;
+  }
+  
+  /* Adjust main content padding for mobile nav */
+  main, .main-content, .container {
+    padding-bottom: 80px !important;
+  }
+  
+  /* Header adjustments */
+  header, .header {
+    padding: 12px 16px;
+  }
+  
+  /* Wallet button adjustments */
+  .wallet-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  
+  /* Hero section adjustments */
+  .hero, .hero-section {
+    padding: 40px 16px;
+    text-align: center;
+  }
+  
+  .hero h1, .hero-section h1 {
+    font-size: 28px;
+    line-height: 1.3;
+  }
+  
+  .hero p, .hero-section p {
+    font-size: 16px;
+  }
+  
+  /* Card adjustments */
+  .music-card, .nft-card {
+    margin: 0;
+  }
+  
+  .music-card img, .nft-card img {
+    height: 200px;
+  }
+  
+  /* Form adjustments */
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  input, textarea, select {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 14px;
+  }
+  
+  /* Button full width on mobile */
+  .btn-primary, .btn-secondary, .btn-mint {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+  }
+  
+  /* Footer adjustments */
+  footer, .footer {
+    padding-bottom: 100px;
+  }
+  
+  /* Modal adjustments */
+  .modal-content {
+    margin: 10% auto;
+    width: 90%;
+    max-width: none;
+  }
+  
+  /* Toast notifications */
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 90px;
+    transform: none;
+  }
+  
+  /* Pull to refresh indicator */
+  .pull-refresh {
+    position: absolute;
+    top: -60px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    transition: transform 0.3s ease;
+  }
+  
+  .pull-refresh.visible {
+    transform: translateY(60px);
+  }
+  
+  .pull-refresh-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-top-color: #8B5CF6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+  }
+  
+  /* Player bar for mobile */
+  .player-bar {
+    bottom: 70px;
+    left: 8px;
+    right: 8px;
+    border-radius: 12px;
+  }
+  
+  /* Swipe indicator */
+  .swipe-indicator {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 80px;
+    background: rgba(139, 92, 246, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 999;
+  }
+  
+  .swipe-indicator.left {
+    left: 0;
+    border-radius: 0 8px 8px 0;
+  }
+  
+  .swipe-indicator.right {
+    right: 0;
+    border-radius: 8px 0 0 8px;
+  }
+  
+  .swipe-indicator.visible {
+    opacity: 1;
+  }
+}
+
+/* ===== Extra Small Devices ===== */
+@media (max-width: 375px) {
+  .mobile-nav-item {
+    padding: 6px 8px;
+    font-size: 10px;
+    min-width: 50px;
+  }
+  
+  .mobile-nav-item .icon {
+    font-size: 20px;
+  }
+  
+  .hero h1, .hero-section h1 {
+    font-size: 24px;
+  }
+}
+
+/* ===== Safe Area Support (Notch Devices) ===== */
+@supports (padding-top: env(safe-area-inset-top)) {
+  @media (max-width: 768px) {
+    header, .header {
+      padding-top: calc(12px + env(safe-area-inset-top));
+    }
+    
+    .mobile-nav {
+      padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    }
+    
+    main, .main-content {
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+}
+
+/* ===== Touch Device Optimizations ===== */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-nav-item:active {
+    transform: scale(0.95);
+  }
+  
+  .btn-primary:active,
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+  
+  /* Remove hover effects on touch devices */
+  .music-card:hover,
+  .nft-card:hover {
+    transform: none;
+  }
+}
+
+/* ===== Landscape Mode on Mobile ===== */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-nav {
+    display: none;
+  }
+  
+  .nav-links {
+    display: flex !important;
+  }
+  
+  main, .main-content {
+    padding-bottom: 20px !important;
+  }
+}
+
+/* ===== Animation Keyframes ===== */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Slide up animation for player */
+.player-fullscreen {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Slide down animation for refresh */
+.refresh-complete {
+  animation: slideDown 0.3s ease-out;
+}

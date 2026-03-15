@@ -1,0 +1,581 @@
+/**
+ * ============================================
+ * ECHO Design System - Typography CSS
+ * 字体与文案系统样式表
+ * Version: 1.0.0
+ * ============================================
+ */
+
+/* ============================================
+   1. 字体引入
+   ============================================ */
+
+/* Google Fonts 统一加载 */
+@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================
+   2. CSS 变量（设计令牌）
+   ============================================ */
+:root {
+  /* -------- 字体族 -------- */
+  --font-display: 'LXGW WenKai', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', cursive;
+  --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif;
+  --font-sans: 'Noto Sans SC', 'Source Han Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-en-display: 'Playfair Display', 'Libre Baskerville', Georgia, serif;
+  --font-en-body: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-en-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  
+  /* 组合字体栈 */
+  --font-title: var(--font-display), var(--font-en-display);
+  --font-body: var(--font-serif), var(--font-en-body);
+  --font-ui: var(--font-sans), var(--font-en-ui);
+  
+  /* -------- 字号阶梯 -------- */
+  --text-xs: 0.75rem;      /* 12px - 标签、时间戳 */
+  --text-sm: 0.875rem;     /* 14px - 辅助说明 */
+  --text-base: 1rem;       /* 16px - 正文 */
+  --text-lg: 1.125rem;     /* 18px - 大正文 */
+  --text-xl: 1.25rem;      /* 20px - 小标题 */
+  --text-2xl: 1.5rem;      /* 24px - 章节标题 */
+  --text-3xl: 1.875rem;    /* 30px - 卡片标题 */
+  --text-4xl: 2.25rem;     /* 36px - 页面标题 */
+  --text-5xl: 3rem;        /* 48px - Hero 标题 */
+  --text-hero: clamp(2.25rem, 5vw, 4rem);  /* 36px - 64px 响应式 */
+  
+  /* -------- 行高 -------- */
+  --leading-tight: 1.2;    /* 大标题 */
+  --leading-snug: 1.4;     /* 章节标题 */
+  --leading-normal: 1.6;   /* 短文本 */
+  --leading-relaxed: 1.8;  /* 正文 */
+  --leading-loose: 2.0;    /* 长文阅读 */
+  --leading-poetic: 2.5;   /* 诗意排版 */
+  
+  /* -------- 字间距 -------- */
+  --tracking-tight: -0.02em;   /* 英文标题 */
+  --tracking-normal: 0;        /* 默认 */
+  --tracking-wide: 0.02em;     /* 中文正文 */
+  --tracking-wider: 0.05em;    /* 中文标题 */
+  --tracking-poetic: 0.1em;    /* 诗意大标题 */
+  
+  /* -------- 段间距 -------- */
+  --paragraph-gap-sm: 1em;
+  --paragraph-gap-md: 1.5em;
+  --paragraph-gap-lg: 2em;
+  --paragraph-gap-poetic: 2.5em;
+}
+
+/* ============================================
+   3. 基础样式
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: #1a1a1a;
+  background-color: #fafafa;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   4. 标题系统
+   ============================================ */
+
+/* 基础标题 */
+.echo-title {
+  font-family: var(--font-title);
+  font-weight: 400;
+  line-height: var(--leading-tight);
+  color: inherit;
+}
+
+/* Hero 标题 */
+.echo-title--hero {
+  font-size: var(--text-hero);
+  font-weight: 300;
+  letter-spacing: var(--tracking-poetic);
+  line-height: var(--leading-tight);
+}
+
+/* 页面标题 */
+.echo-title--page {
+  font-size: var(--text-4xl);
+  font-weight: 400;
+  letter-spacing: var(--tracking-wider);
+}
+
+/* 章节标题 */
+.echo-title--section {
+  font-size: var(--text-2xl);
+  font-weight: 400;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* 卡片标题 */
+.echo-title--card {
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* 小标题 */
+.echo-title--small {
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+/* ============================================
+   5. 正文系统
+   ============================================ */
+
+/* 基础正文 */
+.echo-body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+}
+
+/* 大正文 */
+.echo-body--large {
+  font-size: var(--text-lg);
+  line-height: var(--leading-loose);
+}
+
+/* 诗意正文（带缩进） */
+.echo-body--poetic {
+  font-size: var(--text-lg);
+  line-height: var(--leading-poetic);
+  text-indent: 2em;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* 段落 */
+.echo-paragraph {
+  margin-bottom: var(--paragraph-gap-md);
+  text-indent: 2em;
+}
+
+.echo-paragraph--modern {
+  margin-bottom: var(--paragraph-gap-md);
+  text-indent: 0;
+}
+
+.echo-paragraph--poetic {
+  margin-bottom: var(--paragraph-gap-poetic);
+  text-indent: 2em;
+  line-height: var(--leading-poetic);
+}
+
+/* ============================================
+   6. UI 文案系统
+   ============================================ */
+
+/* 基础 UI 字体 */
+.echo-ui {
+  font-family: var(--font-ui);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* 标签 */
+.echo-ui--label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* 按钮 */
+.echo-ui--button {
+  font-size: var(--text-base);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+/* 导航 */
+.echo-ui--nav {
+  font-size: var(--text-base);
+  font-weight: 400;
+  letter-spacing: var(--tracking-wider);
+}
+
+/* 辅助文字 */
+.echo-ui--helper {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: #666;
+}
+
+/* ============================================
+   7. 辅助文字
+   ============================================ */
+
+/* 说明文字 */
+.echo-caption {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: #666;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* 时间戳 */
+.echo-caption--time {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wider);
+  color: #888;
+}
+
+/* 代码 */
+.echo-code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background-color: #f5f5f5;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+/* ============================================
+   8. 特殊样式
+   ============================================ */
+
+/* 诗意文字 */
+.echo-poetic {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: var(--tracking-poetic);
+  line-height: var(--leading-poetic);
+}
+
+/* 引用 */
+.echo-quote {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-style: italic;
+  padding-left: 1.5em;
+  border-left: 2px solid #ccc;
+  margin: 1.5em 0;
+  color: #444;
+}
+
+/* 俳句样式 */
+.echo-haiku {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 300;
+  letter-spacing: var(--tracking-poetic);
+  line-height: 2;
+  text-align: center;
+  margin: 2em 0;
+}
+
+/* 分隔符 */
+.echo-divider {
+  text-align: center;
+  margin: 2em 0;
+  color: #999;
+  letter-spacing: 1em;
+}
+
+.echo-divider::before {
+  content: '· · ·';
+}
+
+/* ============================================
+   9. 三域专属样式
+   ============================================ */
+
+/* 音域 - 流动感 */
+.echo-realm--sound {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+}
+
+.echo-realm--sound .echo-title {
+  font-weight: 300;
+}
+
+/* 色域 - 视觉张力 */
+.echo-realm--color {
+  font-family: var(--font-display);
+}
+
+.echo-realm--color .echo-title {
+  font-weight: 500;
+}
+
+/* 文域 - 书卷气 */
+.echo-realm--word {
+  font-family: var(--font-serif);
+}
+
+.echo-realm--word .echo-body {
+  line-height: var(--leading-loose);
+  text-indent: 2em;
+}
+
+/* ============================================
+   10. 状态文案
+   ============================================ */
+
+/* 空状态 */
+.echo-empty {
+  text-align: center;
+  padding: 3em 1em;
+}
+
+.echo-empty__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  color: #666;
+  margin-bottom: 0.5em;
+}
+
+.echo-empty__desc {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: #999;
+}
+
+/* 错误页面 */
+.echo-error {
+  text-align: center;
+  padding: 4em 1em;
+}
+
+.echo-error__code {
+  font-family: var(--font-mono);
+  font-size: var(--text-5xl);
+  font-weight: 300;
+  color: #ccc;
+  margin-bottom: 0.3em;
+}
+
+.echo-error__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 400;
+  margin-bottom: 0.5em;
+}
+
+.echo-error__desc {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: #666;
+  max-width: 400px;
+  margin: 0 auto 1.5em;
+}
+
+/* 加载状态 */
+.echo-loading {
+  text-align: center;
+  padding: 2em;
+}
+
+.echo-loading__text {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: #999;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* ============================================
+   11. 工具类
+   ============================================ */
+
+/* 字重 */
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+/* 字间距 */
+.tracking-tight { letter-spacing: var(--tracking-tight); }
+.tracking-normal { letter-spacing: var(--tracking-normal); }
+.tracking-wide { letter-spacing: var(--tracking-wide); }
+.tracking-wider { letter-spacing: var(--tracking-wider); }
+.tracking-poetic { letter-spacing: var(--tracking-poetic); }
+
+/* 行高 */
+.leading-tight { line-height: var(--leading-tight); }
+.leading-snug { line-height: var(--leading-snug); }
+.leading-normal { line-height: var(--leading-normal); }
+.leading-relaxed { line-height: var(--leading-relaxed); }
+.leading-loose { line-height: var(--leading-loose); }
+.leading-poetic { line-height: var(--leading-poetic); }
+
+/* 对齐 */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+/* 颜色 */
+.text-primary { color: #1a1a1a; }
+.text-secondary { color: #666; }
+.text-tertiary { color: #999; }
+.text-muted { color: #ccc; }
+
+/* ============================================
+   12. 响应式调整
+   ============================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --text-hero: clamp(1.875rem, 8vw, 2.5rem);
+  }
+  
+  html {
+    font-size: 15px;
+  }
+  
+  body {
+    line-height: 1.75;
+  }
+  
+  .echo-title--hero {
+    letter-spacing: 0.05em;
+  }
+  
+  .echo-poetic,
+  .echo-haiku {
+    letter-spacing: 0.05em;
+  }
+  
+  .echo-paragraph,
+  .echo-paragraph--modern,
+  .echo-paragraph--poetic {
+    text-indent: 1.5em;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .echo-ui--button {
+    letter-spacing: 0.05em;
+  }
+}
+
+/* ============================================
+   13. 深色模式
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+  
+  body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+  }
+  
+  .text-primary { color: #e0e0e0; }
+  .text-secondary { color: #aaa; }
+  .text-tertiary { color: #777; }
+  .text-muted { color: #555; }
+  
+  .echo-caption {
+    color: #888;
+  }
+  
+  .echo-code {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+  }
+  
+  .echo-quote {
+    border-left-color: #555;
+    color: #bbb;
+  }
+  
+  .echo-error__code {
+    color: #444;
+  }
+}
+
+/* ============================================
+   14. 打印样式
+   ============================================ */
+
+@media print {
+  body {
+    font-family: var(--font-serif);
+    font-size: 12pt;
+    line-height: 1.5;
+    background: white;
+    color: black;
+  }
+  
+  .echo-title {
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  
+  .echo-title--hero {
+    font-size: 24pt;
+  }
+  
+  .echo-ui--button,
+  .echo-ui--nav {
+    font-family: Arial, sans-serif;
+  }
+}
+
+/* ============================================
+   15. 动画（可选）
+   ============================================ */
+
+/* 文字淡入 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.echo-animate--fadeInUp {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* 逐字显示效果 */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.echo-animate--typing {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 2s steps(20, end);
+}
+
+/* 呼吸效果（用于加载） */
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.echo-animate--breathe {
+  animation: breathe 2s ease-in-out infinite;
+}

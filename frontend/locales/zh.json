@@ -1,0 +1,79 @@
+{
+  "app": {
+    "name": "Echo",
+    "tagline": "智能语音助手",
+    "description": "您的个人AI助手，随时为您服务"
+  },
+  "nav": {
+    "home": "首页",
+    "chat": "聊天",
+    "history": "历史记录",
+    "settings": "设置",
+    "about": "关于"
+  },
+  "chat": {
+    "placeholder": "输入消息...",
+    "send": "发送",
+    "thinking": "思考中...",
+    "clear": "清空对话",
+    "copy": "复制",
+    "copied": "已复制",
+    "retry": "重试",
+    "delete": "删除"
+  },
+  "settings": {
+    "title": "设置",
+    "appearance": "外观",
+    "language": "语言",
+    "theme": {
+      "title": "主题",
+      "light": "浅色",
+      "dark": "深色",
+      "auto": "跟随系统"
+    },
+    "notifications": "通知",
+    "sound": "声音",
+    "save": "保存",
+    "cancel": "取消"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "retry": "重试",
+    "close": "关闭",
+    "back": "返回",
+    "next": "下一步",
+    "done": "完成",
+    "search": "搜索",
+    "filter": "筛选",
+    "sort": "排序",
+    "confirm": "确认",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "save": "保存",
+    "create": "创建",
+    "add": "添加",
+    "remove": "移除"
+  },
+  "errors": {
+    "network": "网络连接失败，请检查网络设置",
+    "timeout": "请求超时，请稍后重试",
+    "server": "服务器错误，请稍后重试",
+    "notFound": "未找到请求的内容",
+    "unauthorized": "请先登录",
+    "forbidden": "无权访问",
+    "unknown": "未知错误"
+  },
+  "welcome": {
+    "title": "欢迎使用 Echo",
+    "subtitle": "开始您的智能对话之旅",
+    "startChat": "开始聊天",
+    "features": {
+      "title": "功能特性",
+      "smart": "智能理解",
+      "fast": "快速响应",
+      "secure": "安全可靠"
+    }
+  }
+}

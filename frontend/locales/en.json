@@ -1,0 +1,79 @@
+{
+  "app": {
+    "name": "Echo",
+    "tagline": "Intelligent Voice Assistant",
+    "description": "Your personal AI assistant, always at your service"
+  },
+  "nav": {
+    "home": "Home",
+    "chat": "Chat",
+    "history": "History",
+    "settings": "Settings",
+    "about": "About"
+  },
+  "chat": {
+    "placeholder": "Type a message...",
+    "send": "Send",
+    "thinking": "Thinking...",
+    "clear": "Clear conversation",
+    "copy": "Copy",
+    "copied": "Copied",
+    "retry": "Retry",
+    "delete": "Delete"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "language": "Language",
+    "theme": {
+      "title": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "System Default"
+    },
+    "notifications": "Notifications",
+    "sound": "Sound",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "create": "Create",
+    "add": "Add",
+    "remove": "Remove"
+  },
+  "errors": {
+    "network": "Network connection failed, please check your network settings",
+    "timeout": "Request timed out, please try again later",
+    "server": "Server error, please try again later",
+    "notFound": "Requested content not found",
+    "unauthorized": "Please log in first",
+    "forbidden": "Access forbidden",
+    "unknown": "Unknown error"
+  },
+  "welcome": {
+    "title": "Welcome to Echo",
+    "subtitle": "Start your intelligent conversation journey",
+    "startChat": "Start Chatting",
+    "features": {
+      "title": "Features",
+      "smart": "Smart Understanding",
+      "fast": "Fast Response",
+      "secure": "Secure & Reliable"
+    }
+  }
+}

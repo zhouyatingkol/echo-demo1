@@ -1,0 +1,425 @@
+/**
+ * TransactionList 组件样式
+ */
+
+/* 容器 */
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  background: var(--card-bg, #ffffff);
+  border-radius: 12px 12px 0 0;
+}
+
+.transaction-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tx-count {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* 筛选器 */
+.transaction-filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  background: var(--input-bg, #ffffff);
+  color: var(--text-primary, #111827);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-select:hover {
+  border-color: var(--primary-color, #3b82f6);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 导出按钮 */
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-color, #3b82f6);
+  background: transparent;
+  border: 1px solid var(--primary-color, #3b82f6);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-export:hover:not(:disabled) {
+  background: var(--primary-color, #3b82f6);
+  color: white;
+}
+
+.btn-export:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-export svg {
+  flex-shrink: 0;
+}
+
+/* 表格容器 */
+.transaction-table-wrapper {
+  overflow-x: auto;
+  border-radius: 0 0 12px 12px;
+}
+
+/* 表格 */
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-bg, #ffffff);
+}
+
+.transaction-table thead {
+  background: var(--table-header-bg, #f9fafb);
+}
+
+.transaction-table th {
+  padding: 14px 20px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  white-space: nowrap;
+}
+
+.transaction-table th:last-child {
+  text-align: right;
+}
+
+.transaction-table td {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-primary, #111827);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  white-space: nowrap;
+}
+
+.transaction-table tr:last-child td {
+  border-bottom: none;
+}
+
+.transaction-table tbody tr:hover {
+  background: var(--hover-bg, #f9fafb);
+}
+
+/* 交易行 */
+.transaction-row {
+  transition: background 0.15s ease;
+}
+
+/* 时间列 */
+.tx-time {
+  color: var(--text-secondary, #6b7280);
+  font-size: 13px;
+}
+
+/* 类型徽章 */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.type-usage {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.type-derivative {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+/* 音乐/Token列 */
+.tx-music {
+  font-weight: 500;
+}
+
+.token-id {
+  color: var(--text-secondary, #6b7280);
+  font-family: monospace;
+  font-size: 13px;
+}
+
+/* 金额列 */
+.tx-amount {
+  font-weight: 600;
+  font-family: 'SF Mono', Monaco, monospace;
+}
+
+.amount-positive {
+  color: #10b981;
+}
+
+/* 哈希链接 */
+.tx-hash {
+  text-align: right;
+}
+
+.hash-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary, #6b7280);
+  text-decoration: none;
+  font-family: monospace;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.hash-link:hover {
+  color: var(--primary-color, #3b82f6);
+}
+
+.hash-link svg {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hash-link:hover svg {
+  opacity: 1;
+}
+
+/* 加载状态 */
+.transaction-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: var(--card-bg, #ffffff);
+  border-radius: 0 0 12px 12px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color, #e5e7eb);
+  border-top-color: var(--primary-color, #3b82f6);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.transaction-loading p {
+  margin-top: 16px;
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+}
+
+/* 空状态 */
+.transaction-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: var(--card-bg, #ffffff);
+  border-radius: 0 0 12px 12px;
+  text-align: center;
+}
+
+.transaction-empty svg {
+  color: var(--text-muted, #d1d5db);
+  margin-bottom: 16px;
+}
+
+.transaction-empty p {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+}
+
+.transaction-empty span {
+  font-size: 14px;
+  color: var(--text-muted, #9ca3af);
+}
+
+/* 空状态（表格内） */
+.empty-row .empty-cell {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-inline svg {
+  color: var(--text-muted, #d1d5db);
+}
+
+.empty-inline p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* 错误状态 */
+.transaction-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: var(--card-bg, #ffffff);
+  border-radius: 0 0 12px 12px;
+  text-align: center;
+}
+
+.transaction-error svg {
+  color: #ef4444;
+  margin-bottom: 16px;
+}
+
+.transaction-error p {
+  margin: 0 0 20px;
+  font-size: 16px;
+  color: var(--text-secondary, #6b7280);
+}
+
+.btn-retry {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background: var(--primary-color, #3b82f6);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-retry:hover {
+  background: var(--primary-hover, #2563eb);
+}
+
+/* Toast提示 */
+.tx-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  padding: 12px 24px;
+  background: #1f2937;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.tx-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .transaction-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .transaction-filters {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .filter-select,
+  .btn-export {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  .transaction-table th,
+  .transaction-table td {
+    padding: 12px 16px;
+  }
+  
+  .tx-hash {
+    display: none;
+  }
+  
+  .transaction-table th:last-child,
+  .transaction-table td:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .transaction-table th:nth-child(3),
+  .transaction-table td:nth-child(3) {
+    display: none;
+  }
+  
+  .type-badge {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+}
+
+/* 暗黑模式适配 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --card-bg: #1f2937;
+    --border-color: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --table-header-bg: #111827;
+    --hover-bg: #374151;
+    --input-bg: #111827;
+  }
+}
