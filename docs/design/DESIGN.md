@@ -158,12 +158,78 @@ work-detail.html (作品详情)
 - 主标题：`font-size: 2.8rem`, `letter-spacing: 0.3em`, `margin-bottom: 16px`
 - 副标题：`font-size: 0.95rem`, `letter-spacing: 0.5em`, `margin-top: 2.5rem`
 
-#### 5. HTML 基准
+#### 5. 导航栏交互规范
+- 当前页面（active）不显示下划线
+- hover 时显示金色下划线（`width: 100%`）
+- 下划线动画：`transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1)`
+
+```css
+.navbar__link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0.5px;
+    background: var(--gold-primary);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar__link:hover::after {
+    width: 100%;
+}
+```
+
+#### 6. 颜色变量规范
+确保所有页面使用统一的颜色变量名：
+
+```css
+:root {
+    /* 宣纸质感 */
+    --bg-primary: #F8F6F1;
+    --bg-secondary: #F2EFE8;
+    --bg-tertiary: #EBE7DD;
+
+    /* 四阶墨色 */
+    --ink-deep: #1A1A1A;
+    --ink-medium: #4A4A4A;
+    --ink-light: #7A6E5F;
+    --ink-faint: #B5B5B5;
+
+    /* 宋金 */
+    --gold-primary: #B89B6C;
+    --gold-light: #D4C4A8;
+
+    /* 朱红 - 两种命名都要定义 */
+    --vermilion: #A03020;
+    --seal-red: #A03020;
+}
+```
+
+**⚠️ 注意**：`--vermilion` 和 `--seal-red` 必须同时定义，确保兼容性。
+
+#### 7. HTML 基准
 ```css
 html {
     font-size: 20px;
     scroll-behavior: smooth;
 }
+```
+
+#### 8. 页面结构规范
+```html
+<body>
+    <!-- 全页纹理背景 -->
+    <div class="page-texture"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar">...</nav>
+    
+    <!-- 主内容区 -->
+    <main>
+        <section class="hero">...</section>
+    </main>
+</body>
 ```
 
 #### 相关文件
