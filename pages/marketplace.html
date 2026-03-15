@@ -369,23 +369,73 @@
         }
 
         .yu-header {
-            max-width: 800px;
-            margin: 0 auto 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
+            text-align: center;
+            margin-bottom: 40px;
         }
 
         .yu-quote {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--ink-light);
+            letter-spacing: 0.15em;
+        }
+
+        .search-box-wrapper {
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border-bottom: 0.5px solid var(--gold-light);
+            padding: 12px 0;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 1rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.1em;
+            padding-left: 32px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--ink-faint);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            color: var(--ink-faint);
+            font-size: 1.1rem;
+        }
+
+        /* 筛选标签 */
+        .yu-filters {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .yu-filter-label {
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.85rem;
+            color: var(--ink-faint);
             letter-spacing: 0.1em;
         }
 
-        .yu-filter {
-            padding: 8px 16px;
+        .yu-filter-tag {
+            padding: 6px 16px;
             border: 0.5px solid var(--gold-light);
             background: transparent;
             font-family: var(--font-serif), 'Noto Serif SC', serif;
@@ -393,63 +443,14 @@
             color: var(--ink-light);
             letter-spacing: 0.1em;
             cursor: pointer;
-            outline: none;
-            transition: border-color 0.4s ease;
+            transition: all 0.4s ease;
         }
 
-        .yu-filter:hover {
+        .yu-filter-tag:hover,
+        .yu-filter-tag.active {
             border-color: var(--gold-primary);
+            color: var(--ink-deep);
         }
-
-        /* 方案 C：遇章节 - 简洁标记 */
-        .yu-header-compact {
-            max-width: 800px;
-            margin: 0 auto 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-        }
-
-        .yu-quote {
-            font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.9rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.15em;
-        }
-
-        .yu-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .yu-create-btn {
-            padding: 6px 16px;
-            background: var(--vermilion);
-            color: var(--bg-primary);
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 0.8rem;
-            letter-spacing: 0.2em;
-            text-decoration: none;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .yu-create-btn:hover {
-            background: #8B2419;
-        }
-
-        .yu-filter {
-            padding: 6px 12px;
-            border: 0.5px solid var(--gold-light);
-            background: transparent;
-            font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.8rem;
-            color: var(--ink-light);
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            outline: none;
             transition: border-color 0.4s ease;
         }
 
@@ -548,12 +549,12 @@
             color: var(--ink-faint);
         }
 
-        /* 卡片网格 */
+        /* 卡片网格 - 3列规整 */
         .asset-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 32px;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -567,16 +568,8 @@
         }
 
         .asset-card:hover {
-            transform: rotate(0deg) translateY(-4px);
+            transform: translateY(-4px);
             border: 0.5px solid var(--gold-primary);
-        }
-
-        .asset-card:nth-child(odd) {
-            transform: rotate(-1deg);
-        }
-
-        .asset-card:nth-child(even) {
-            transform: rotate(1deg);
         }
 
         .asset-image {
@@ -643,7 +636,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 32px;
-            max-width: 1000px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -656,32 +649,76 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.4s ease;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--gold-light);
+            position: relative;
         }
 
-        .realm-category.sound {
-            background-color: var(--realm-sound);
+        .realm-category.sound:hover {
+            border-color: var(--realm-sound);
+            box-shadow: 0 0 30px rgba(139, 157, 195, 0.15);
         }
 
-        .realm-category.color {
-            background-color: var(--realm-color);
+        .realm-category.color:hover {
+            border-color: var(--realm-color);
+            box-shadow: 0 0 30px rgba(201, 169, 166, 0.15);
         }
 
-        .realm-category.text {
-            background-color: var(--realm-text);
-        }
-
-        .realm-category.sound:hover,
-        .realm-category.color:hover,
         .realm-category.text:hover {
+            border-color: var(--realm-text);
+            box-shadow: 0 0 30px rgba(122, 139, 124, 0.15);
+        }
+
+        .realm-category:hover {
             transform: translateY(-4px);
-            filter: brightness(1.05);
         }
 
         .realm-category .enter-hint {
             position: absolute;
             bottom: 20px;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.1em;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .realm-category:hover .enter-hint {
+            opacity: 1;
+        }
+
+        .realm-category .icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            color: var(--ink-light);
+            transition: color 0.4s ease;
+        }
+
+        .realm-category.sound:hover .icon {
+            color: var(--realm-sound);
+        }
+
+        .realm-category.color:hover .icon {
+            color: var(--realm-color);
+        }
+
+        .realm-category.text:hover .icon {
+            color: var(--realm-text);
+        }
+
+        .realm-category .name {
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 0.2em;
+            color: var(--ink-deep);
+            margin-bottom: 8px;
+        }
+
+        .realm-category .desc {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
             opacity: 0;
             transform: translateY(10px);
             transition: all 0.3s ease;
@@ -746,7 +783,7 @@
 
         .chart-tab:hover,
         .chart-tab.active {
-            color: var(--vermilion);
+            color: var(--ink-deep);
         }
 
         .chart-tab.active::after {
@@ -755,19 +792,20 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 1px;
-            background: var(--vermilion);
+            height: 0.5px;
+            background: var(--gold-primary);
         }
 
-        /* 风云图 - SVG 气泡图 */
+        /* 风云图 - 水墨气泡 */
         .cloud-chart {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto 40px;
             position: relative;
             height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: radial-gradient(ellipse at center, rgba(42, 40, 37, 0.02) 0%, transparent 70%);
         }
 
         .cloud-chart svg {
@@ -921,29 +959,27 @@
     </section>
 
     <!-- 第一境：遇 -->
-    <section class="realm-yu" style="padding-top: 60px;">
-        <div class="realm-divider" style="margin-bottom: 32px;"></div>
+    <section class="realm-yu">
+        <div class="realm-divider"></div>
         
-        <div class="yu-header-compact">
-            <span class="yu-quote">随缘而遇，不期而会</span>
-            <div class="yu-actions">
-                <a href="creator.html" class="yu-create-btn">吾作</a>
-                <select class="yu-filter">
-                    <option value="">价 ▼</option>
-                    <option value="0-50">0 - 50</option>
-                    <option value="50-100">50 - 100</option>
-                    <option value="100-500">100 - 500</option>
-                    <option value="500+">500+</option>
-                </select>
-            </div>
+        <div class="yu-header">
+            <span class="yu-quote">不期而遇，不约而同</span>
         </div>
         
         <div class="search-box-wrapper">
             <div class="search-box">
                 <span class="search-icon">寻</span>
-                <input type="text" class="search-input" placeholder="寻觅..." />
+                <input type="text" class="search-input" placeholder="寻觅藏品..." />
             </div>
-            <button class="random-btn" onclick="randomAsset()">随机</button>
+        </div>
+
+        <div class="yu-filters">
+            <span class="yu-filter-label">筛选：</span>
+            <button class="yu-filter-tag active">全部</button>
+            <button class="yu-filter-tag">音</button>
+            <button class="yu-filter-tag">色</button>
+            <button class="yu-filter-tag">文</button>
+            <button class="yu-filter-tag">我的</button>
         </div>
 
         <div class="asset-grid" id="yuGrid">
@@ -957,7 +993,7 @@
 
         <div class="realm-header">
             <h2 class="realm-title">寻</h2>
-            <p class="realm-quote">按域而寻，各入其门</p>
+            <p class="realm-quote">循声入色，由色入文</p>
         </div>
 
         <div class="realm-categories">
@@ -988,7 +1024,7 @@
 
         <div class="realm-header">
             <h2 class="realm-title">观</h2>
-            <p class="realm-quote">声至名归，于此显</p>
+            <p class="realm-quote">声动色起，文以载道</p>
         </div>
 
         <div class="chart-tabs">
