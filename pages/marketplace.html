@@ -311,9 +311,9 @@
 
         .hero-subtitle {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.9rem;
-            color: var(--ink-light);
-            letter-spacing: 0.15em;
+            font-size: 1.1rem;
+            color: var(--ink-medium);
+            letter-spacing: 0.2em;
             margin-top: 2.5rem;
             margin-bottom: 40px;
             position: relative;
@@ -529,7 +529,7 @@
 
         .daily-card {
             background: var(--bg-secondary);
-            border: 0.5px solid transparent;
+            border: 0.5px solid rgba(166, 139, 91, 0.3);
             padding: 32px 24px;
             text-align: center;
             cursor: pointer;
@@ -608,7 +608,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 24px;
             margin-top: 32px;
         }
 
@@ -976,21 +976,28 @@
         .realm-category .icon {
             font-size: 3rem;
             margin-bottom: 16px;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--ink-medium);
+            transition: color 0.4s ease;
         }
 
         .realm-category .name {
             font-family: var(--font-display), 'LXGW WenKai', cursive;
             font-size: 1.5rem;
             letter-spacing: 0.2em;
-            color: rgba(255, 255, 255, 0.95);
+            color: var(--ink-deep);
         }
 
         .realm-category .desc {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
             margin-top: 8px;
         }
+
+        /* 悬停时图标变色 */
+        .realm-category.sound:hover .icon { color: var(--realm-sound); }
+        .realm-category.color:hover .icon { color: var(--realm-color); }
+        .realm-category.text:hover .icon { color: var(--realm-text); }
 
         /* ===== 第三境：观 ===== */
         .realm-guan {
@@ -1364,11 +1371,18 @@
             // 清空现有气泡
             svg.innerHTML = '';
             
-            // 三域配置
+            // 三域配置 - 固定三角形布局
             const realms = {
-                sound: { name: '音境', color: '#8B9DC3', cx: 150, cy: 200 },
-                color: { name: '色境', color: '#C9A9A6', cx: 300, cy: 150 },
-                text: { name: '文境', color: '#7A8B7C', cx: 450, cy: 200 }
+                sound: { name: '音境', color: '#8B9DC3' },
+                color: { name: '色境', color: '#C9A9A6' },
+                text: { name: '文境', color: '#7A8B7C' }
+            };
+            
+            // 固定位置 - 品字形布局
+            const positions = {
+                sound: { cx: 180, cy: 200 },
+                color: { cx: 320, cy: 200 },
+                text: { cx: 250, cy: 280 }
             };
             
             // 生成随机热度数据
@@ -1377,29 +1391,24 @@
                 heatData[key] = Math.floor(Math.random() * 3000 + 2000);
             });
             
-            // 如果是总观，显示所有三域
-            const realmsToShow = type === 'all' ? Object.keys(realms) : [type];
+            // 显示所有三域 - "众星捧月"效果
+            const allRealms = Object.keys(realms);
             
-            realmsToShow.forEach((realmKey, index) => {
+            // 先渲染非选中领域（作为背景星）
+            const backgroundRealms = allRealms.filter(key => key !== type && type !== 'all');
+            const focusRealms = type === 'all' ? allRealms : [type];
+            
+            // 渲染函数
+            const renderRealm = (realmKey, isFocus) => {
                 const realm = realms[realmKey];
                 const heat = heatData[realmKey];
                 const volume = (Math.random() * 50 + 20).toFixed(1);
+                const pos = positions[realmKey];
                 
-                // 根据热度计算圆圈大小 (60-120)
-                const radius = 60 + (heat / 5000) * 60;
-                
-                // 总观模式下调整位置
-                let cx = realm.cx;
-                let cy = realm.cy;
-                if (type === 'all') {
-                    const positions = [
-                        { cx: 150, cy: 200 },
-                        { cx: 300, cy: 200 },
-                        { cx: 450, cy: 200 }
-                    ];
-                    cx = positions[index].cx;
-                    cy = positions[index].cy;
-                }
+                // 焦点领域正常显示，背景领域缩小淡化
+                const scale = isFocus ? 1 : 0.6;
+                const opacity = isFocus ? 0.9 : 0.35;
+                const radius = (60 + (heat / 5000) * 60) * scale;
                 
                 // 创建气泡组
                 const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -1408,34 +1417,38 @@
                 g.setAttribute('data-name', realm.name);
                 g.setAttribute('data-volume', volume);
                 g.setAttribute('data-heat', heat);
+                g.style.cursor = 'pointer';
                 
                 // 创建圆圈
                 const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', cx);
-                circle.setAttribute('cy', cy);
+                circle.setAttribute('cx', pos.cx);
+                circle.setAttribute('cy', pos.cy);
                 circle.setAttribute('r', radius);
                 circle.setAttribute('fill', realm.color);
-                circle.setAttribute('opacity', '0.9');
+                circle.setAttribute('opacity', opacity);
+                circle.style.transition = 'all 0.4s ease';
                 
-                // 创建文字
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', cx);
-                text.setAttribute('y', cy - 5);
-                text.setAttribute('text-anchor', 'middle');
-                text.setAttribute('class', 'cloud-bubble-text');
-                text.textContent = realm.name.charAt(0);
-                
-                // 创建热度文字
-                const heatText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                heatText.setAttribute('x', cx);
-                heatText.setAttribute('y', cy + 20);
-                heatText.setAttribute('text-anchor', 'middle');
-                heatText.setAttribute('class', 'cloud-bubble-heat');
-                heatText.textContent = heat.toLocaleString();
+                // 创建文字 - 仅焦点领域显示
+                if (isFocus) {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', pos.cx);
+                    text.setAttribute('y', pos.cy - 5);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('class', 'cloud-bubble-text');
+                    text.textContent = realm.name.charAt(0);
+                    
+                    const heatText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    heatText.setAttribute('x', pos.cx);
+                    heatText.setAttribute('y', pos.cy + 20);
+                    heatText.setAttribute('text-anchor', 'middle');
+                    heatText.setAttribute('class', 'cloud-bubble-heat');
+                    heatText.textContent = heat.toLocaleString();
+                    
+                    g.appendChild(text);
+                    g.appendChild(heatText);
+                }
                 
                 g.appendChild(circle);
-                g.appendChild(text);
-                g.appendChild(heatText);
                 
                 // 添加悬浮事件
                 g.addEventListener('mouseenter', (e) => {
@@ -1444,13 +1457,17 @@
                     tooltipHeat.textContent = `热度: ${heat.toLocaleString()}`;
                     
                     const rect = svg.getBoundingClientRect();
-                    tooltip.style.left = (cx + rect.left - 90) + 'px';
-                    tooltip.style.top = (cy + rect.top - radius - 80) + 'px';
+                    tooltip.style.left = (pos.cx + rect.left - 90) + 'px';
+                    tooltip.style.top = (pos.cy + rect.top - radius - 80) + 'px';
                     tooltip.classList.add('visible');
+                    
+                    // 悬浮时轻微放大
+                    circle.setAttribute('r', radius * 1.1);
                 });
                 
                 g.addEventListener('mouseleave', () => {
                     tooltip.classList.remove('visible');
+                    circle.setAttribute('r', radius);
                 });
                 
                 g.addEventListener('click', () => {
@@ -1458,7 +1475,12 @@
                 });
                 
                 svg.appendChild(g);
-            });
+            };
+            
+            // 先渲染背景领域（在底层）
+            backgroundRealms.forEach(key => renderRealm(key, false));
+            // 再渲染焦点领域（在顶层）
+            focusRealms.forEach(key => renderRealm(key, true));
         }
 
         // 进入域
