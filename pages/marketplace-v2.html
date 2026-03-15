@@ -494,6 +494,7 @@
 
         .realm-category {
             aspect-ratio: 1;
+            background: var(--bg-secondary);
             border: 0.5px solid var(--gold-light);
             border-radius: 2px;
             display: flex;
@@ -504,30 +505,18 @@
             transition: all 0.4s ease;
         }
 
-        .realm-category.sound {
-            background: rgba(139, 157, 195, 0.12);
-        }
-
-        .realm-category.color {
-            background: rgba(201, 169, 166, 0.12);
-        }
-
-        .realm-category.text {
-            background: rgba(122, 139, 124, 0.12);
-        }
-
         .realm-category.sound:hover {
-            background: rgba(139, 157, 195, 0.2);
+            background: rgba(139, 157, 195, 0.08);
             border-color: var(--realm-sound);
         }
 
         .realm-category.color:hover {
-            background: rgba(201, 169, 166, 0.2);
+            background: rgba(201, 169, 166, 0.08);
             border-color: var(--realm-color);
         }
 
         .realm-category.text:hover {
-            background: rgba(122, 139, 124, 0.2);
+            background: rgba(122, 139, 124, 0.08);
             border-color: var(--realm-text);
         }
 
