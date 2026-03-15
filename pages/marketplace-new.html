@@ -1,0 +1,2291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集 - ECHO</title>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/mobile-optimizations.css">
+    <style>
+        /* ===== 色彩系统 ===== */
+        :root {
+            /* 宣纸底色 */
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F2EFE8;
+            --bg-tertiary: #EBE7DD;
+            
+            /* 浓墨 */
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #7A6E5F;
+            --ink-faint: #B5B5B5;
+            
+            /* 宋金 */
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
+            
+            /* 朱红 */
+            --vermilion: #A03020;
+            --vermilion-light: rgba(160, 48, 32, 0.4);
+            
+            /* 三域色 */
+            --realm-sound: #8B9DC3;
+            --realm-color: #C9A9A6;
+            --realm-text: #7A8B7C;
+            
+            /* 字体 */
+            --font-display: 'LXGW WenKai', cursive;
+            --font-serif: 'Noto Serif SC', serif;
+            
+            /* 缓动 */
+            --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);
+            --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 20px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            color: var(--ink-deep);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* ===== 导航栏 ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
+            background: transparent;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.8s ease,
+                        backdrop-filter 0.8s ease;
+        }
+        
+        .navbar.is-scrolled {
+            background: rgba(248, 246, 241, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
+        }
+        
+        .navbar__brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .navbar__logo {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: var(--ink-deep);
+            letter-spacing: 0.3em;
+            text-decoration: none;
+            opacity: 0.85;
+            transition: opacity 0.4s ease;
+        }
+        
+        .navbar__brand:hover .navbar__logo {
+            opacity: 1;
+        }
+        
+        .navbar__nav {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .navbar__link {
+            position: relative;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--ink-light);
+            text-decoration: none;
+            letter-spacing: 0.3em;
+            padding: 0.5rem 0;
+            transition: color 0.4s ease;
+        }
+        
+        .navbar__link:hover,
+        .navbar__link.active {
+            color: var(--ink-deep);
+        }
+        
+        .navbar__link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.5px;
+            background: var(--gold-primary);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .navbar__link:hover::after,
+        .navbar__link.active::after {
+            width: 100%;
+        }
+        
+        .navbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .navbar__user {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2px;
+            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            background: transparent;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        
+        .navbar__user:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+            background: rgba(184, 155, 108, 0.05);
+        }
+        
+        .navbar__user.connected {
+            position: relative;
+        }
+        
+        .navbar__user.connected::after {
+            content: attr(data-address);
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            padding: 0.5rem 0.75rem;
+            background: var(--ink-deep);
+            color: white;
+            font-size: 0.7rem;
+            font-family: monospace;
+            letter-spacing: 0;
+            border-radius: 2px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .navbar__user.connected:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .navbar__menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            gap: 6px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .navbar__menu-line {
+            width: 24px;
+            height: 1px;
+            background: var(--ink-light);
+            transition: all 0.4s ease;
+            transform-origin: center;
+        }
+        
+        .navbar__mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(248, 246, 241, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .navbar__mobile-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        .navbar__mobile-menu .navbar__link {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: var(--ink-light);
+            padding: 1rem 0;
+            letter-spacing: 0.5em;
+        }
+        
+        .navbar__mobile-menu .navbar__link:hover {
+            color: var(--ink-deep);
+        }
+        
+        .navbar__mobile-menu .navbar__link::after {
+            display: none;
+        }
+
+        /* ===== Hero 区域 ===== */
+        .marketplace-hero {
+            position: relative;
+            padding: 140px 40px 80px;
+            text-align: center;
+            overflow: hidden;
+            background: linear-gradient(180deg, 
+                rgba(242, 239, 232, 0.6) 0%, 
+                rgba(248, 246, 241, 0) 100%);
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+            margin-bottom: 16px;
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            font-weight: 300;
+        }
+
+        .hero-create-link {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 8px 24px;
+            font-family: var(--font-serif);
+            font-size: 0.85rem;
+            color: #A03020;
+            border: 0.5px solid rgba(160, 48, 32, 0.4);
+            border-radius: 2px;
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            transition: all 0.4s ease;
+        }
+
+        .hero-create-link:hover {
+            background: #A03020;
+            color: #F8F6F1;
+        }
+
+        /* ===== Tab 导航 ===== */
+        .market-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            padding: 0 40px 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .market-tabs-with-create {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 40px 40px;
+        }
+
+        .tabs-left {
+            display: flex;
+            gap: 12px;
+        }
+
+        .create-btn {
+            padding: 8px 24px;
+            border: 0.5px solid var(--vermilion);
+            color: var(--vermilion);
+            background: transparent;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-decoration: none;
+            transition: all 0.4s ease;
+        }
+
+        .create-btn:hover {
+            background: var(--vermilion);
+            color: var(--bg-primary);
+        }
+
+        .tab-btn {
+            padding: 12px 48px;
+            background: transparent;
+            border: 0.5px solid var(--gold-light);
+            border-radius: 2px;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.3em;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+            background: rgba(184, 155, 108, 0.05);
+        }
+
+        .tab-btn.active {
+            background: var(--vermilion);
+            border-color: var(--vermilion);
+            color: var(--bg-primary);
+        }
+
+        /* ===== Tab 内容区 ===== */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 缘 Tab - 原有市场内容 ===== */
+        .yuan-content {
+            background: var(--bg-primary);
+        }
+
+        /* ===== 探 Tab - 探索功能 ===== */
+        .tan-content {
+            background: var(--bg-primary);
+        }
+
+        .explore-search-bar {
+            max-width: 600px;
+            margin: 0 auto 48px;
+            display: flex;
+            gap: 12px;
+            padding: 0 40px;
+        }
+
+        .explore-search-input {
+            flex: 1;
+            padding: 14px 20px 14px 48px;
+            background: var(--bg-primary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.05em;
+            transition: all var(--transition-medium);
+        }
+
+        .explore-search-input:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: #fff;
+        }
+
+        .explore-search-input::placeholder {
+            color: var(--ink-faint);
+        }
+
+        .explore-search-btn {
+            padding: 14px 28px;
+            background: var(--vermilion);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 2px;
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+        }
+
+        .explore-search-btn:hover {
+            background: #802820;
+        }
+
+        /* 分类浏览 */
+        .realm-categories {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 48px;
+            padding: 0 40px;
+            flex-wrap: wrap;
+        }
+
+        .realm-category {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 32px 48px;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+        }
+
+        .realm-category:hover {
+            border-color: var(--gold-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(122, 110, 95, 0.08);
+        }
+
+        .realm-icon {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            border-radius: 50%;
+            transition: all var(--transition-medium);
+        }
+
+        .realm-category.sound .realm-icon {
+            background: rgba(139, 157, 195, 0.15);
+            color: var(--realm-sound);
+        }
+
+        .realm-category.color .realm-icon {
+            background: rgba(201, 169, 166, 0.15);
+            color: var(--realm-color);
+        }
+
+        .realm-category.text .realm-icon {
+            background: rgba(122, 139, 124, 0.15);
+            color: var(--realm-text);
+        }
+
+        .realm-name {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            color: var(--ink-deep);
+        }
+
+        /* 探索区块 */
+        .explore-section {
+            margin-bottom: 64px;
+            padding: 0 40px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .explore-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .explore-section-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.1em;
+        }
+
+        .explore-section-title::before {
+            content: '';
+            width: 3px;
+            height: 18px;
+            background: var(--vermilion);
+        }
+
+        .explore-refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 0.5px solid var(--ink-faint);
+            border-radius: 2px;
+            color: var(--ink-light);
+            font-family: var(--font-serif);
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .explore-refresh-btn:hover {
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+        }
+
+        /* ===== 榜 Tab - 榜单功能 ===== */
+        .bang-content {
+            background: var(--bg-primary);
+        }
+
+        .chart-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 32px;
+            padding: 0 40px;
+        }
+
+        .chart-tabs-inner {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .chart-tab-btn {
+            padding: 10px 24px;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .chart-tab-btn:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+        }
+
+        .chart-tab-btn.active {
+            background: var(--vermilion);
+            border-color: var(--vermilion);
+            color: var(--bg-primary);
+        }
+
+        .time-filter {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .time-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            font-family: var(--font-serif);
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .time-btn:hover {
+            border-color: var(--gold-primary);
+            color: var(--ink-deep);
+        }
+
+        .time-btn.active {
+            background: rgba(184, 155, 108, 0.15);
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+        }
+
+        /* 榜单列表 */
+        .chart-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-bottom: none;
+            border-radius: 2px 2px 0 0;
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
+
+        .header-rank { width: 60px; text-align: center; }
+        .header-info { flex: 1; }
+        .header-stats { width: 150px; text-align: center; }
+        .header-score { width: 100px; text-align: center; }
+
+        .chart-list {
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 0 0 2px 2px;
+            overflow: hidden;
+        }
+
+        .chart-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 0.5px solid var(--bg-tertiary);
+            transition: background var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .chart-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .chart-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            width: 60px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--ink-medium);
+            font-family: var(--font-display);
+        }
+
+        .rank.top1 {
+            color: var(--gold-primary);
+            font-size: 1.5rem;
+        }
+
+        .rank.top2 {
+            color: var(--ink-medium);
+            font-size: 1.4rem;
+        }
+
+        .rank.top3 {
+            color: #A67C52;
+            font-size: 1.3rem;
+        }
+
+        .chart-music-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .chart-music-cover {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--ink-light);
+            border-radius: 2px;
+        }
+
+        .chart-music-details {
+            flex: 1;
+        }
+
+        .chart-music-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--ink-deep);
+            letter-spacing: 0.05em;
+        }
+
+        .chart-music-meta {
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chart-music-artist {
+            color: var(--gold-primary);
+        }
+
+        .genre-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            background: rgba(184, 155, 108, 0.15);
+            color: var(--gold-primary);
+            border: 0.5px solid rgba(184, 155, 108, 0.3);
+            border-radius: 1px;
+        }
+
+        .stats-info {
+            width: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            color: var(--ink-deep);
+            font-weight: 500;
+        }
+
+        .hot-score {
+            width: 100px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--vermilion);
+            font-family: var(--font-display);
+        }
+
+        /* 连接钱包提示 */
+        .connect-prompt {
+            text-align: center;
+            padding: 80px 40px;
+            background: var(--bg-secondary);
+            border: 0.5px dashed var(--bg-tertiary);
+            border-radius: 2px;
+        }
+
+        .connect-prompt-icon {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--ink-light);
+        }
+
+        .connect-prompt p {
+            color: var(--ink-light);
+            margin-bottom: 24px;
+            letter-spacing: 0.1em;
+        }
+
+        .connect-btn {
+            padding: 12px 32px;
+            background: var(--vermilion);
+            border: none;
+            border-radius: 2px;
+            font-family: var(--font-serif);
+            font-size: 0.95rem;
+            color: var(--bg-primary);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+
+        .connect-btn:hover {
+            background: #802820;
+        }
+
+        /* ===== 搜索和筛选栏 ===== */
+        .search-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            padding: 48px 40px 32px;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            background: var(--bg-primary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.05em;
+            transition: all var(--transition-medium);
+        }
+
+        .search-box input::placeholder {
+            color: var(--ink-faint);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: #fff;
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ink-faint);
+            font-size: 0.9rem;
+            font-family: var(--font-display);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 12px 36px 12px 18px;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--ink-medium);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            transition: all var(--transition-medium);
+        }
+
+        .filter-select:hover {
+            border-color: var(--gold-primary);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+        }
+
+        /* ===== 极简筛选标签 ===== */
+        .filter-tags {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 32px 40px 48px;
+        }
+
+        .filter-tag {
+            padding: 4px 0;
+            background: transparent;
+            border: none;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+            position: relative;
+        }
+
+        .filter-tag::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--vermilion);
+            transition: width 0.3s ease;
+        }
+
+        .filter-tag:hover {
+            color: var(--ink-deep);
+        }
+
+        .filter-tag:hover::after {
+            width: 100%;
+        }
+
+        .filter-tag.active {
+            color: var(--vermilion);
+        }
+
+        .filter-tag.active::after {
+            width: 100%;
+        }
+
+        /* ===== 资产网格 ===== */
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 32px;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .asset-card {
+            position: relative;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all var(--transition-slow);
+            overflow: hidden;
+        }
+
+        .asset-card:hover {
+            border-color: var(--gold-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(122, 110, 95, 0.08);
+        }
+
+        .realm-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transition: transform var(--transition-medium);
+        }
+
+        .asset-card:hover .realm-badge {
+            transform: scale(1.2);
+        }
+
+        .realm-badge.sound { background: var(--realm-sound); }
+        .realm-badge.color { background: var(--realm-color); }
+        .realm-badge.text { background: var(--realm-text); }
+
+        .asset-cover {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--ink-faint);
+            overflow: hidden;
+        }
+
+        .asset-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .asset-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--ink-deep);
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .asset-creator {
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            margin-bottom: 16px;
+            letter-spacing: 0.03em;
+        }
+
+        .asset-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 0.5px solid var(--bg-tertiary);
+        }
+
+        .asset-price {
+            font-size: 1rem;
+            color: var(--vermilion);
+            letter-spacing: 0.05em;
+            font-family: var(--font-display);
+        }
+
+        .asset-price .unit {
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            margin-left: 4px;
+        }
+
+        .asset-type {
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.1em;
+        }
+
+        /* ===== 分页 ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            padding: 60px 40px;
+        }
+
+        .btn-celadon {
+            padding: 12px 28px;
+            background: transparent;
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--ink-medium);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+        }
+
+        .btn-celadon:hover:not(:disabled) {
+            background: var(--gold-primary);
+            color: #fff;
+            border-color: var(--gold-primary);
+        }
+
+        .btn-celadon:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-numbers {
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-number {
+            min-width: 36px;
+            padding: 8px;
+            background: transparent;
+            border: none;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--ink-faint);
+            cursor: pointer;
+            transition: all var(--transition-medium);
+        }
+
+        .page-number:hover {
+            color: var(--ink-medium);
+        }
+
+        .page-number.active {
+            color: var(--ink-deep);
+            border-bottom: 0.5px solid var(--gold-primary);
+        }
+
+        .page-ellipsis {
+            color: var(--ink-faint);
+            padding: 8px;
+        }
+
+        /* ===== 状态提示 - 东方文案 ===== */
+        .loading-state,
+        .error-state,
+        .empty-state-market {
+            text-align: center;
+            padding: 100px 40px;
+            color: var(--ink-light);
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .loading-state .ink-dots {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .loading-state .ink-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, var(--gold-primary) 0%, var(--gold-light) 70%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: inkFloat 2s ease-in-out infinite;
+        }
+
+        .loading-state .ink-dot:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); animation-delay: 0s; }
+        .loading-state .ink-dot:nth-child(2) { top: 25%; right: 10%; animation-delay: 0.3s; }
+        .loading-state .ink-dot:nth-child(3) { bottom: 25%; right: 10%; animation-delay: 0.6s; }
+        .loading-state .ink-dot:nth-child(4) { bottom: 0; left: 50%; transform: translateX(-50%); animation-delay: 0.9s; }
+        .loading-state .ink-dot:nth-child(5) { bottom: 25%; left: 10%; animation-delay: 1.2s; }
+        .loading-state .ink-dot:nth-child(6) { top: 25%; left: 10%; animation-delay: 1.5s; }
+
+        @keyframes inkFloat {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-8px) scale(1.15); opacity: 1; box-shadow: 0 0 20px rgba(184, 155, 108, 0.5); }
+        }
+
+        .loading-state .loading-text {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+        }
+
+        .loading-state .loading-subtext {
+            font-family: var(--font-serif);
+            font-size: 0.875rem;
+            letter-spacing: 0.15em;
+            color: var(--ink-light);
+        }
+
+        .error-state .error-visual {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .error-state .error-mark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(160, 48, 32, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-state .error-icon {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--vermilion);
+        }
+
+        .error-state .error-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            letter-spacing: 0.2em;
+            color: var(--ink-deep);
+            margin-bottom: 0.5rem;
+        }
+
+        .error-state .error-subtitle {
+            font-family: var(--font-serif);
+            font-size: 0.9375rem;
+            letter-spacing: 0.1em;
+            color: var(--ink-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .error-state .retry-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 0.5px solid var(--bg-tertiary);
+            border-radius: 2px;
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+            color: var(--ink-medium);
+            cursor: pointer;
+            transition: all var(--transition-medium);
+        }
+
+        .error-state .retry-btn:hover {
+            background: var(--gold-primary);
+            color: #fff;
+            border-color: var(--gold-primary);
+        }
+
+        .empty-state-market {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .empty-state-market .empty-visual {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 2rem;
+        }
+
+        .empty-state-market .brush-stroke {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border: 1.5px solid var(--bg-tertiary);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .empty-state-market .brush-stroke::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--gold-light);
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+
+        .empty-state-market .empty-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--ink-light);
+            opacity: 0.5;
+        }
+
+        .empty-state-market .empty-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--ink-deep);
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-state-market .empty-subtitle {
+            font-family: var(--font-serif);
+            font-size: 0.9375rem;
+            letter-spacing: 0.15em;
+            color: var(--ink-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state-market .empty-hint {
+            font-size: 0.8125rem;
+            letter-spacing: 0.1em;
+            color: var(--ink-faint);
+        }
+
+        /* Toast 容器 */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            pointer-events: none;
+        }
+
+        /* ===== 页脚 ===== */
+        .footer {
+            text-align: center;
+            padding: 60px 40px;
+            border-top: 0.5px solid var(--bg-tertiary);
+            color: var(--ink-faint);
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+        }
+
+        .footer p {
+            margin: 8px 0;
+            font-family: var(--font-serif);
+        }
+
+        /* 隐藏状态 */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .navbar__nav {
+                display: none;
+            }
+            .navbar__actions {
+                display: none;
+            }
+            .navbar__menu-btn {
+                display: flex;
+            }
+            .navbar__brand {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                letter-spacing: 0.2em;
+            }
+
+            .market-tabs {
+                padding: 0 20px 30px;
+            }
+
+            .tab-btn {
+                padding: 10px 24px;
+                font-size: 0.9rem;
+                letter-spacing: 0.2em;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .filter-group {
+                justify-content: center;
+            }
+
+            .asset-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .realm-categories {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .explore-search-bar {
+                flex-direction: column;
+                padding: 0 20px;
+            }
+
+            .chart-tabs-inner {
+                gap: 8px;
+            }
+
+            .chart-tab-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+
+            .time-filter {
+                gap: 8px;
+            }
+
+            .time-btn {
+                padding: 6px 14px;
+                font-size: 0.75rem;
+            }
+
+            .chart-header {
+                display: none;
+            }
+
+            .stats-info {
+                display: none;
+            }
+
+            .rank {
+                width: 40px;
+                font-size: 1.1rem;
+            }
+
+            .hot-score {
+                width: 60px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .navbar__mobile-menu {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 东方美学导航栏 -->
+    <nav class="navbar" id="navbar" role="navigation" aria-label="主导航">
+        <a href="index.html" class="navbar__brand" aria-label="返回首页">
+            <span class="navbar__logo">ECHO</span>
+        </a>
+        
+        <div class="navbar__nav">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link active">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+        </div>
+        
+        <div class="navbar__actions">
+            <button class="navbar__user" id="walletConnect" type="button" aria-label="连接钱包">
+                <span>入链</span>
+            </button>
+        </div>
+        
+        <button class="navbar__menu-btn" id="menuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobileMenu">
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+            <span class="navbar__menu-line"></span>
+        </button>
+        
+        <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
+            <a href="index.html" class="navbar__link">境</a>
+            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="docs.html" class="navbar__link">典</a>
+            <button class="navbar__user" id="mobileWalletConnect" type="button">
+                <span>入链</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 - 集 -->
+    <header class="marketplace-hero">
+        <h1 class="hero-title">集</h1>
+        <p class="hero-subtitle">随缘而聚，各得其所</p>
+    </header>
+
+    <!-- Tab 导航 -->
+    <nav class="market-tabs-with-create">
+        <div class="tabs-left">
+            <button class="tab-btn active" data-tab="yuan">缘</button>
+            <button class="tab-btn" data-tab="tan">探</button>
+            <button class="tab-btn" data-tab="bang">榜</button>
+        </div>
+        <a href="creator.html" class="create-btn">吾作</a>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="marketplace-container">
+        <!-- ===== 缘 Tab ===== -->
+        <section id="yuan" class="tab-content yuan-content active">
+            <!-- 搜索和筛选栏 -->
+            <section class="search-filter-bar">
+                <div class="search-box">
+                    <span class="search-icon">寻</span>
+                    <input type="text" id="searchInput" placeholder="寻觅..." />
+                </div>
+                
+                <div class="filter-group">
+                    <select id="priceFilter" class="filter-select">
+                        <option value="">价</option>
+                        <option value="0-50">0 - 50</option>
+                        <option value="50-100">50 - 100</option>
+                        <option value="100-500">100 - 500</option>
+                        <option value="500+">500+</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- 极简筛选标签 -->
+            <section class="filter-tags">
+                <button class="filter-tag active">全</button>
+                <button class="filter-tag">新</button>
+                <button class="filter-tag">热</button>
+                <button class="filter-tag">值</button>
+            </section>
+
+            <!-- 加载状态 - 墨染中 -->
+            <div id="yuanLoadingState" class="loading-state">
+                <div class="ink-dots">
+                    <div class="ink-dot"></div>
+                    <div class="ink-dot"></div>
+                    <div class="ink-dot"></div>
+                    <div class="ink-dot"></div>
+                    <div class="ink-dot"></div>
+                    <div class="ink-dot"></div>
+                </div>
+                <div class="loading-text">墨染中</div>
+                <div class="loading-subtext">山水渐显</div>
+            </div>
+
+            <!-- 错误状态 - 网络不畅 -->
+            <div id="yuanErrorState" class="error-state hidden">
+                <div class="error-visual">
+                    <div class="error-mark">
+                        <span class="error-icon">✕</span>
+                    </div>
+                </div>
+                <div class="error-title">网络不畅</div>
+                <div class="error-subtitle">再试一次</div>
+                <button class="retry-btn" onclick="marketplace.loadAssets()">重试</button>
+            </div>
+
+            <!-- 空状态 - 暂无笔墨 -->
+            <div id="yuanEmptyState" class="empty-state-market hidden">
+                <div class="empty-visual">
+                    <div class="brush-stroke"></div>
+                    <div class="empty-icon">✍</div>
+                </div>
+                <div class="empty-title">暂无笔墨</div>
+                <div class="empty-subtitle">随缘而待</div>
+                <div class="empty-hint">可试他词以寻之</div>
+            </div>
+
+            <!-- 资产网格 -->
+            <section id="assetGrid" class="asset-grid hidden">
+                <!-- 资产卡片将通过 JS 动态生成 -->
+            </section>
+
+            <!-- 分页 -->
+            <section id="pagination" class="pagination hidden">
+                <button id="prevPage" class="btn-celadon" disabled>←</button>
+                <div class="page-numbers">
+                    <button class="page-number active">1</button>
+                    <button class="page-number">2</button>
+                    <button class="page-number">3</button>
+                    <span class="page-ellipsis">...</span>
+                    <button class="page-number">12</button>
+                </div>
+                <button id="nextPage" class="btn-celadon">→</button>
+            </section>
+        </section>
+
+        <!-- ===== 探 Tab ===== -->
+        <section id="tan" class="tab-content tan-content">
+            <!-- 搜索栏 -->
+            <div class="explore-search-bar">
+                <div style="position: relative; flex: 1;">
+                    <span style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--ink-faint); font-family: var(--font-display);">寻</span>
+                    <input type="text" class="explore-search-input" id="exploreSearchInput" placeholder="寻觅曲、人、境..." />
+                </div>
+                <button class="explore-search-btn" onclick="exploreSearch()">觅</button>
+            </div>
+
+            <!-- 分类浏览 -->
+            <div class="realm-categories">
+                <div class="realm-category sound" onclick="filterByRealm('sound')">
+                    <div class="realm-icon">♪</div>
+                    <span class="realm-name">音</span>
+                </div>
+                <div class="realm-category color" onclick="filterByRealm('color')">
+                    <div class="realm-icon">◈</div>
+                    <span class="realm-name">色</span>
+                </div>
+                <div class="realm-category text" onclick="filterByRealm('text')">
+                    <div class="realm-icon">✦</div>
+                    <span class="realm-name">文</span>
+                </div>
+            </div>
+
+            <!-- 个性化推荐 -->
+            <section class="explore-section">
+                <div class="explore-section-header">
+                    <h2 class="explore-section-title">为您而荐</h2>
+                    <button class="explore-refresh-btn" onclick="refreshPersonalized()">⟳ 换一批</button>
+                </div>
+                <div class="asset-grid" id="personalizedGrid">
+                    <div class="empty-state-market" style="grid-column: 1 / -1;">
+                        <div class="empty-visual">
+                            <div class="brush-stroke"></div>
+                            <div class="empty-icon">♪</div>
+                        </div>
+                        <div class="empty-title">多听多赏</div>
+                        <div class="empty-subtitle">方可知您所好</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 热门推荐 -->
+            <section class="explore-section">
+                <div class="explore-section-header">
+                    <h2 class="explore-section-title">众人之选</h2>
+                </div>
+                <div class="asset-grid" id="trendingGrid">
+                    <!-- 动态生成 -->
+                </div>
+            </section>
+
+            <!-- 最新上架 -->
+            <section class="explore-section">
+                <div class="explore-section-header">
+                    <h2 class="explore-section-title">新境初开</h2>
+                </div>
+                <div class="asset-grid" id="newReleasesGrid">
+                    <!-- 动态生成 -->
+                </div>
+            </section>
+        </section>
+
+        <!-- ===== 榜 Tab ===== -->
+        <section id="bang" class="tab-content bang-content">
+            <!-- 筛选器 -->
+            <div class="chart-filters">
+                <div class="chart-tabs-inner">
+                    <button class="chart-tab-btn active" data-chart="all" onclick="switchChartTab('all')">总榜</button>
+                    <button class="chart-tab-btn" data-chart="electronic" onclick="switchChartTab('electronic')">电子</button>
+                    <button class="chart-tab-btn" data-chart="rock" onclick="switchChartTab('rock')">摇滚</button>
+                    <button class="chart-tab-btn" data-chart="pop" onclick="switchChartTab('pop')">流行</button>
+                    <button class="chart-tab-btn" data-chart="new" onclick="switchChartTab('new')">新晋</button>
+                </div>
+
+                <div class="time-filter">
+                    <button class="time-btn" data-period="week" onclick="setChartPeriod('week')">本周</button>
+                    <button class="time-btn active" data-period="month" onclick="setChartPeriod('month')">本月</button>
+                    <button class="time-btn" data-period="all" onclick="setChartPeriod('all')">总榜</button>
+                </div>
+            </div>
+
+            <!-- 连接钱包提示 -->
+            <div class="chart-container">
+                <div class="connect-prompt" id="chartConnectPrompt">
+                    <div class="connect-prompt-icon">⛓</div>
+                    <p>连接钱包，观风云之势</p>
+                    <button class="connect-btn" onclick="connectWalletForChart()">入链</button>
+                </div>
+
+                <!-- 榜单内容 -->
+                <div id="chartContentArea" class="hidden">
+                    <div class="chart-header">
+                        <div class="header-rank">序</div>
+                        <div class="header-info">音境</div>
+                        <div class="header-stats">流转</div>
+                        <div class="header-score">热度</div>
+                    </div>
+
+                    <div class="chart-list" id="chartList">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>随用而生，随流而长</p>
+        <p>ECHO Protocol</p>
+    </footer>
+
+    <!-- Toast 容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 全局浮动铸造按钮 -->
+    <a href="creator.html" class="fab-create" title="铸">铸</a>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="../../scripts/contract-config.js"></script>
+    <script src="../scripts/wallet.js"></script>
+    <script src="../../scripts/contract-manager-v3.js"></script>
+    <script src="../../scripts/marketplace.js"></script>
+    <script src="../js/wallet-manager.js"></script>
+    <script src="../js/mobile-nav.js"></script>
+
+    <script>
+        // ===== Tab 切换 =====
+        function initTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.dataset.tab;
+
+                    // 更新按钮状态
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // 更新内容显示
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetTab) {
+                            content.classList.add('active');
+                        }
+                    });
+
+                    // 加载对应内容
+                    if (targetTab === 'tan') {
+                        loadExploreContent();
+                    } else if (targetTab === 'bang') {
+                        loadChartContent();
+                    }
+                });
+            });
+        }
+
+        // ===== 探索功能 =====
+        let allMusicData = [];
+        let exploreLoaded = false;
+
+        function loadExploreContent() {
+            if (exploreLoaded) return;
+            
+            // 尝试连接钱包加载数据
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
+                loadExploreData();
+            } else {
+                // 显示示例数据
+                renderExploreDemoData();
+            }
+            exploreLoaded = true;
+        }
+
+        async function loadExploreData() {
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const contract = new ethers.Contract(
+                    '0xF98f63b7e8064Dcf9c2f25A906B2af89Af4840ce',
+                    ["function getAssetInfo(uint256) view returns (tuple(string,string,string,string,uint256),tuple(address,address,address,address,uint256,uint256,uint256),address)",
+                     "function getCurrentTokenId() view returns (uint256)"],
+                    provider
+                );
+
+                const currentId = await contract.getCurrentTokenId();
+                allMusicData = [];
+
+                for (let i = 0; i < Math.min(currentId.toNumber(), 20); i++) {
+                    try {
+                        const [metadata, blueprint, creator] = await contract.getAssetInfo(i);
+                        if (metadata[2] && (metadata[2].includes('music') || metadata[2].includes('sound'))) {
+                            allMusicData.push({
+                                tokenId: i,
+                                name: metadata[0] || `音境 #${i}`,
+                                genre: metadata[2].replace('music_', '') || 'other',
+                                creator: creator ? (creator.slice(0, 6) + '...' + creator.slice(-4)) : '未知',
+                                price: blueprint[4] ? ethers.utils.formatEther(blueprint[4]) : '0',
+                                createdAt: metadata[4]?.toNumber() || 0
+                            });
+                        }
+                    } catch (e) {}
+                }
+
+                renderExploreData();
+            } catch (e) {
+                console.error('加载探索数据失败:', e);
+                renderExploreDemoData();
+            }
+        }
+
+        function renderExploreData() {
+            const history = JSON.parse(localStorage.getItem('echoUserHistory') || '[]');
+            
+            // 个性化推荐
+            const personalizedGrid = document.getElementById('personalizedGrid');
+            if (history.length === 0 || allMusicData.length === 0) {
+                personalizedGrid.innerHTML = `
+                    <div class="empty-state-market" style="grid-column: 1 / -1;">
+                        <div class="empty-visual">
+                            <div class="brush-stroke"></div>
+                            <div class="empty-icon">♪</div>
+                        </div>
+                        <div class="empty-title">多听多赏</div>
+                        <div class="empty-subtitle">方可知您所好</div>
+                    </div>
+                `;
+            } else {
+                const prefs = analyzeUserPreferences(history);
+                const playedIds = new Set(history.map(h => h.tokenId));
+                const recommendations = allMusicData
+                    .filter(m => !playedIds.has(m.tokenId))
+                    .filter(m => prefs.topGenres.includes(m.genre))
+                    .slice(0, 4);
+                renderAssetGrid(personalizedGrid, recommendations);
+            }
+
+            // 热门推荐
+            const trending = [...allMusicData].sort((a, b) => b.createdAt - a.createdAt).slice(0, 4);
+            renderAssetGrid(document.getElementById('trendingGrid'), trending);
+
+            // 最新上架
+            const newReleases = [...allMusicData].sort((a, b) => b.tokenId - a.tokenId).slice(0, 4);
+            renderAssetGrid(document.getElementById('newReleasesGrid'), newReleases);
+        }
+
+        function renderExploreDemoData() {
+            const demoData = [
+                { tokenId: 1, name: '山水清音', genre: 'classical', creator: '0x1234...5678', price: '10', createdAt: Date.now() / 1000 },
+                { tokenId: 2, name: '城市夜曲', genre: 'electronic', creator: '0xabcd...efgh', price: '25', createdAt: Date.now() / 1000 - 86400 },
+                { tokenId: 3, name: '雨落琴台', genre: 'pop', creator: '0x9876...5432', price: '15', createdAt: Date.now() / 1000 - 172800 },
+                { tokenId: 4, name: '风之诗', genre: 'rock', creator: '0xwxyz...mnop', price: '30', createdAt: Date.now() / 1000 - 259200 }
+            ];
+
+            renderAssetGrid(document.getElementById('trendingGrid'), demoData);
+            renderAssetGrid(document.getElementById('newReleasesGrid'), [...demoData].reverse());
+        }
+
+        function renderAssetGrid(container, items) {
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-market" style="grid-column: 1 / -1;">
+                        <div class="empty-title">暂无笔墨</div>
+                        <div class="empty-subtitle">随缘而待</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const realmIcons = { electronic: '音', rock: '岩', pop: '流', jazz: '爵', classical: '典', other: '韵' };
+            const realmColors = { electronic: 'sound', rock: 'sound', pop: 'sound', jazz: 'sound', classical: 'sound', other: 'sound' };
+
+            container.innerHTML = items.map(item => `
+                <div class="asset-card" onclick="location.href='asset-detail.html?id=${item.tokenId}'">
+                    <span class="realm-badge ${realmColors[item.genre] || 'sound'}"></span>
+                    <div class="asset-cover">${realmIcons[item.genre] || '♪'}</div>
+                    <h3 class="asset-title">${escapeHtml(item.name)}</h3>
+                    <p class="asset-creator">${item.creator}</p>
+                    <div class="asset-meta">
+                        <span class="asset-price">${item.price}<span class="unit">MEER</span></span>
+                        <span class="asset-type">${item.genre}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function analyzeUserPreferences(history) {
+            const prefs = { genres: {} };
+            history.forEach(item => {
+                if (item.genre) prefs.genres[item.genre] = (prefs.genres[item.genre] || 0) + 1;
+            });
+            prefs.topGenres = Object.entries(prefs.genres)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([g]) => g);
+            return prefs;
+        }
+
+        function exploreSearch() {
+            const query = document.getElementById('exploreSearchInput').value;
+            if (query) {
+                Toast.show('info', '搜索', `正在寻觅 "${query}"...`);
+                // 实际搜索逻辑
+            }
+        }
+
+        function filterByRealm(realm) {
+            Toast.show('info', '筛选', `正在加载${realm === 'sound' ? '音' : realm === 'color' ? '色' : '文'}域...`);
+        }
+
+        function refreshPersonalized() {
+            renderExploreData();
+            Toast.show('success', '已刷新', '为您推荐新的音境');
+        }
+
+        // ===== 榜单功能 =====
+        let currentChartTab = 'all';
+        let currentChartPeriod = 'month';
+        let chartData = [];
+        let chartLoaded = false;
+
+        function loadChartContent() {
+            if (chartLoaded) return;
+            
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
+                connectWalletForChart();
+            }
+            chartLoaded = true;
+        }
+
+        async function connectWalletForChart() {
+            if (!window.ethereum) {
+                Toast.show('error', '未安装钱包', '请先安装 MetaMask');
+                return;
+            }
+
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                document.getElementById('chartConnectPrompt').classList.add('hidden');
+                document.getElementById('chartContentArea').classList.remove('hidden');
+                await loadChartData();
+            } catch (error) {
+                console.error('连接失败:', error);
+                Toast.show('error', '连接失败', '请重试');
+            }
+        }
+
+        async function loadChartData() {
+            const chartList = document.getElementById('chartList');
+            chartList.innerHTML = '<div class="loading-state" style="padding: 40px;"><div class="loading-text">载入中</div></div>';
+
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const contract = new ethers.Contract(
+                    '0x5f5AAe09BB85f561b21845729B79E840AB026148',
+                    ["function getAssetInfo(uint256) view returns (tuple(string,string,string,string,uint256),tuple(address,address,address,address,uint256,uint256,uint256),address)",
+                     "function getCurrentTokenId() view returns (uint256)"],
+                    provider
+                );
+
+                const currentId = await contract.getCurrentTokenId();
+                chartData = [];
+
+                for (let i = 0; i < Math.min(currentId.toNumber(), 50); i++) {
+                    try {
+                        const info = await contract.getAssetInfo(i);
+                        const assetType = info[0][2]?.toLowerCase() || '';
+                        
+                        if (assetType.includes('music') || assetType.includes('sound')) {
+                            chartData.push({
+                                tokenId: i,
+                                name: info[0][0] || `音境 #${i}`,
+                                genre: extractGenre(assetType),
+                                artist: info[2] ? (info[2].slice(0, 6) + '...' + info[2].slice(-4)) : '未知创作者',
+                                playCount: Math.floor(Math.random() * 10000) + 100,
+                                purchaseCount: Math.floor(Math.random() * 500) + 10,
+                                favoriteCount: Math.floor(Math.random() * 2000) + 50,
+                                createdAt: Number(info[0][4]) || (Date.now()/1000 - Math.random()*86400*30)
+                            });
+                        }
+                    } catch (e) {}
+                }
+
+                renderChartList();
+            } catch (error) {
+                console.error('加载榜单失败:', error);
+                chartList.innerHTML = `
+                    <div class="empty-state-market" style="padding: 40px;">
+                        <div class="empty-title">加载失败</div>
+                        <div class="empty-subtitle">请稍后重试</div>
+                    </div>
+                `;
+            }
+        }
+
+        function extractGenre(assetType) {
+            const type = assetType.toLowerCase();
+            if (type.includes('electronic')) return 'electronic';
+            if (type.includes('rock')) return 'rock';
+            if (type.includes('pop')) return 'pop';
+            if (type.includes('jazz')) return 'jazz';
+            if (type.includes('classical')) return 'classical';
+            return 'other';
+        }
+
+        function calculateHotScore(music) {
+            let score = 0;
+            const now = Date.now() / 1000;
+            
+            score += (music.playCount || 0) * 1;
+            score += (music.purchaseCount || 0) * 10;
+            score += (music.favoriteCount || 0) * 5;
+            
+            const age = now - (music.createdAt || now);
+            const days = age / 86400;
+            
+            let timeDecay;
+            switch(currentChartPeriod) {
+                case 'week': timeDecay = Math.max(0.1, 1 - (days / 7)); break;
+                case 'month': timeDecay = Math.max(0.3, 1 - (days / 30)); break;
+                case 'all': default: timeDecay = Math.max(0.5, 1 - (days / 90)); break;
+            }
+            
+            if (currentChartTab === 'new' && days <= 7) {
+                score *= 1.5;
+            }
+            
+            return score * timeDecay;
+        }
+
+        function filterAndSortChartData() {
+            let filtered = [...chartData];
+            const now = Date.now() / 1000;
+            
+            switch(currentChartTab) {
+                case 'electronic': filtered = filtered.filter(m => m.genre === 'electronic'); break;
+                case 'rock': filtered = filtered.filter(m => m.genre === 'rock'); break;
+                case 'pop': filtered = filtered.filter(m => m.genre === 'pop'); break;
+                case 'new': filtered = filtered.filter(m => (now - m.createdAt) <= 86400 * 7); break;
+            }
+            
+            filtered.forEach(m => m.hotScore = calculateHotScore(m));
+            filtered.sort((a, b) => b.hotScore - a.hotScore);
+            return filtered.slice(0, 50);
+        }
+
+        function renderChartList() {
+            const container = document.getElementById('chartList');
+            const musicList = filterAndSortChartData();
+            
+            if (musicList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-market" style="padding: 40px;">
+                        <div class="empty-icon">♪</div>
+                        <div class="empty-title">暂无音境</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const genreIcons = { electronic: '音', rock: '岩', pop: '流', jazz: '爵', classical: '典', other: '韵' };
+            const genreNames = { electronic: '电子', rock: '摇滚', pop: '流行', jazz: '爵士', classical: '古典', other: '其他' };
+
+            container.innerHTML = musicList.map((music, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+                
+                return `
+                    <div class="chart-item" onclick="location.href='asset-detail.html?id=${music.tokenId}'">
+                        <div class="rank ${rankClass}">${rank}</div>
+                        <div class="chart-music-info">
+                            <div class="chart-music-cover">${genreIcons[music.genre] || '♪'}</div>
+                            <div class="chart-music-details">
+                                <div class="chart-music-title">${escapeHtml(music.name)}</div>
+                                <div class="chart-music-meta">
+                                    <span class="chart-music-artist">${music.artist}</span>
+                                    <span class="genre-tag">${genreNames[music.genre] || music.genre}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stats-info">
+                            <div class="stat-item"><span>播</span> <span class="stat-value">${formatNumber(music.playCount)}</span></div>
+                            <div class="stat-item"><span>购</span> <span class="stat-value">${formatNumber(music.purchaseCount)}</span></div>
+                            <div class="stat-item"><span>藏</span> <span class="stat-value">${formatNumber(music.favoriteCount)}</span></div>
+                        </div>
+                        <div class="hot-score">${Math.floor(music.hotScore)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchChartTab(tab) {
+            currentChartTab = tab;
+            document.querySelectorAll('.chart-tab-btn').forEach(el => {
+                el.classList.remove('active');
+                if (el.dataset.chart === tab) el.classList.add('active');
+            });
+            if (chartData.length > 0) renderChartList();
+        }
+
+        function setChartPeriod(period) {
+            currentChartPeriod = period;
+            document.querySelectorAll('.time-btn').forEach(el => {
+                el.classList.remove('active');
+                if (el.dataset.period === period) el.classList.add('active');
+            });
+            if (chartData.length > 0) renderChartList();
+        }
+
+        function formatNumber(num) {
+            if (num >= 10000) return (num / 10000).toFixed(1) + '万';
+            if (num >= 1000) return (num / 1000).toFixed(1) + '千';
+            return num.toString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ===== Toast 系统 =====
+        const Toast = {
+            container: document.getElementById('toastContainer'),
+            
+            show(type, title, message, duration = 5000) {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '!' : 'i';
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">${icon}</div>
+                    <div class="toast-content">
+                        <div class="toast-title"></div>
+                        <div class="toast-message"></div>
+                    </div>
+                    <button class="toast-close">×</button>
+                    <div class="toast-progress"><div class="toast-progress-bar" style="animation: toastProgress ${duration}ms linear forwards;"></div></div>
+                `;
+                
+                toast.querySelector('.toast-title').textContent = title;
+                toast.querySelector('.toast-message').textContent = message;
+                toast.querySelector('.toast-close').onclick = function() { this.parentElement.remove(); };
+                
+                if (!document.getElementById('toastAnim')) {
+                    const style = document.createElement('style');
+                    style.id = 'toastAnim';
+                    style.textContent = `
+                        @keyframes toastProgress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+                        .toast { 
+                            display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem 1.5rem; 
+                            min-width: 280px; max-width: 400px; background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,243,239,0.95) 100%); 
+                            border: 0.5px solid var(--bg-tertiary); border-radius: 4px; box-shadow: 0 4px 20px rgba(42,37,32,0.08); 
+                            backdrop-filter: blur(20px); opacity: 0; transform: translateX(100%); 
+                            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; 
+                            margin-bottom: 0.5rem;
+                        }
+                        .toast.show { opacity: 1; transform: translateX(0); }
+                        .toast::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold-primary); }
+                        .toast.success::before { background: var(--realm-text); }
+                        .toast.error::before { background: var(--vermilion); }
+                        .toast-icon { flex-shrink: 0; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; 
+                            border-radius: 50%; font-size: 1rem; background: rgba(184,155,108,0.1); color: var(--gold-primary); }
+                        .toast.success .toast-icon { background: rgba(122,139,124,0.1); color: var(--realm-text); }
+                        .toast.error .toast-icon { background: rgba(160,48,32,0.1); color: var(--vermilion); }
+                        .toast-content { flex: 1; }
+                        .toast-title { font-family: var(--font-display); font-size: 0.95rem; font-weight: 500; letter-spacing: 0.1em; color: var(--ink-deep); margin-bottom: 0.25rem; }
+                        .toast-message { font-family: var(--font-serif); font-size: 0.8rem; letter-spacing: 0.05em; color: var(--ink-light); }
+                        .toast-close { flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; 
+                            background: none; border: none; color: var(--ink-light); cursor: pointer; transition: all 0.2s ease; border-radius: 4px; }
+                        .toast-close:hover { background: rgba(42,37,32,0.05); color: var(--ink-deep); }
+                        .toast-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(184,155,108,0.2); }
+                        .toast-progress-bar { height: 100%; background: var(--gold-primary); width: 100%; transform-origin: left; }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                this.container.appendChild(toast);
+                setTimeout(() => toast.classList.add('show'), 10);
+                
+                if (duration > 0) {
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 400);
+                    }, duration);
+                }
+            }
+        };
+
+        // ===== 导航栏交互 =====
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        menuBtn.addEventListener('click', () => {
+            const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+            menuBtn.setAttribute('aria-expanded', !isExpanded);
+            mobileMenu.classList.toggle('is-open');
+        });
+        
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('is-scrolled');
+            } else {
+                navbar.classList.remove('is-scrolled');
+            }
+        });
+
+        // 筛选标签切换
+        document.querySelectorAll('.filter-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initTabs();
+        });
+    </script>
+
+    <!-- FAB 样式 -->
+    <style>
+        .fab-create {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            background: #A03020;
+            color: #F8F6F1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'LXGW WenKai', serif;
+            font-size: 1.2rem;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(160, 48, 32, 0.3);
+            transition: all 0.4s ease;
+            z-index: 1000;
+        }
+        .fab-create:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(160, 48, 32, 0.4);
+        }
+        @media (max-width: 768px) {
+            .fab-create {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                width: 48px;
+                height: 48px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</body>
+</html>
