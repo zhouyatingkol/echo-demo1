@@ -587,13 +587,22 @@
             letter-spacing: 0.1em;
         }
 
-        /* ===== 境界编号 ===== */
-        .realm-number {
-            font-size: 0.7rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.35em;
-            margin-bottom: 16px;
-            opacity: 0.7;
+        /* ===== 境界高亮字 ===== */
+        .realm-highlight {
+            color: var(--ink-deep);
+            font-weight: 500;
+            position: relative;
+        }
+
+        .realm-highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+            opacity: 0.6;
         }
 
         /* ===== 境界分隔线 ===== */
@@ -733,7 +742,7 @@
         /* 保留 realm-header 样式用于寻和观 */
         .realm-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 80px;
         }
 
         .realm-title {
@@ -746,9 +755,10 @@
 
         .realm-quote {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             color: var(--ink-light);
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
+            line-height: 2;
         }
 
         /* 搜索框 */
@@ -869,7 +879,7 @@
 
         /* ===== 第二境：寻 ===== */
         .realm-xun {
-            padding: 8vh 40px;
+            padding: 6vh 40px;
         }
 
         .realm-categories {
@@ -997,7 +1007,7 @@
 
         /* ===== 第三境：观 ===== */
         .realm-guan {
-            padding: 8vh 40px 120px;
+            padding: 6vh 40px 120px;
             min-height: 100vh;
         }
 
@@ -1203,8 +1213,7 @@
         <div class="realm-divider"></div>
         
         <div class="realm-header">
-            <h2 class="realm-title">遇</h2>
-            <p class="realm-quote">不期而遇，不约而同</p>
+            <p class="realm-quote"><span class="realm-highlight">遇</span>境：不期而<span class="realm-highlight">遇</span>，不约而同</p>
         </div>
 
         <!-- 方案H：无主之境（定稿） -->
@@ -1233,8 +1242,7 @@
         <div class="realm-divider"></div>
 
         <div class="realm-header">
-            <h2 class="realm-title">寻</h2>
-            <p class="realm-quote">循声入色，由色入文</p>
+            <p class="realm-quote"><span class="realm-highlight">寻</span>境：<span class="realm-highlight">寻</span>声入色，由色入文</p>
         </div>
 
         <div class="realm-categories">
@@ -1264,8 +1272,7 @@
         <div class="realm-divider"></div>
 
         <div class="realm-header">
-            <h2 class="realm-title">观</h2>
-            <p class="realm-quote">声动色起，文以载道</p>
+            <p class="realm-quote"><span class="realm-highlight">观</span>境：<span class="realm-highlight">观</span>声动色，文以载道</p>
         </div>
 
         <div class="chart-tabs">
