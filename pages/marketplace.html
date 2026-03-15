@@ -1004,16 +1004,11 @@
 
         .realm-category .name {
             font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 1.5rem;
-            letter-spacing: 0.2em;
+            font-size: 2rem;
+            letter-spacing: 0.3em;
+            text-indent: 0.3em;
             color: var(--ink-deep);
-            margin-bottom: 8px;
-        }
-
-        .realm-category .desc {
-            font-size: 0.85rem;
-            color: var(--ink-light);
-            letter-spacing: 0.1em;
+            margin-top: 8px;
         }
 
         .realm-category .enter-hint {
@@ -1032,8 +1027,7 @@
             transform: translateY(0);
         }
 
-        .realm-category:hover .name,
-        .realm-category:hover .desc {
+        .realm-category:hover .name {
             transform: translateY(-8px);
             transition: transform 0.3s ease;
         }
@@ -1308,7 +1302,6 @@
                     </svg>
                 </div>
                 <div class="name">律</div>
-                <div class="desc">律境</div>
                 <div class="enter-hint">循声入境 →</div>
             </div>
             <div class="realm-category color" onclick="enterRealm('color')" style="position: relative;">
@@ -1323,7 +1316,6 @@
                     </svg>
                 </div>
                 <div class="name">彩</div>
-                <div class="desc">彩境</div>
                 <div class="enter-hint">觅色入境 →</div>
             </div>
             <div class="realm-category text" onclick="enterRealm('text')" style="position: relative;">
@@ -1340,7 +1332,6 @@
                     </svg>
                 </div>
                 <div class="name">章</div>
-                <div class="desc">章境</div>
                 <div class="enter-hint">遇文入境 →</div>
             </div>
         </div>
