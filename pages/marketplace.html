@@ -1498,7 +1498,15 @@
         // 初始化
         generateStreetCards();
         generateDailyCards();
-        generateChartData('sound');
+        
+        // 延迟初始化风云图，确保DOM已加载
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                generateChartData('sound');
+            });
+        } else {
+            generateChartData('sound');
+        }
     </script>
 </main>
 </body>
