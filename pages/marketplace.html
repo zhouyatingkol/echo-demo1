@@ -417,154 +417,7 @@
             font-size: 1.1rem;
         }
 
-        /* ===== 遴选方案切换 ===== */
-        .filter-scheme-toggle {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .filter-scheme-label {
-            font-size: 0.8rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.1em;
-        }
-
-        .filter-scheme-btn {
-            padding: 6px 16px;
-            border: 0.5px solid var(--gold-light);
-            background: transparent;
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 0.85rem;
-            color: var(--ink-light);
-            letter-spacing: 0.15em;
-            cursor: pointer;
-            transition: all 0.4s ease;
-        }
-
-        .filter-scheme-btn:hover {
-            border-color: var(--gold-primary);
-        }
-
-        .filter-scheme-btn.active {
-            border-color: var(--gold-primary);
-            color: var(--ink-deep);
-            background: rgba(166, 139, 91, 0.1);
-        }
-
-        /* ===== 方案D：极简墨字 ===== */
-        .filter-scheme-ink {
-            margin-bottom: 48px;
-        }
-
-        .ink-filter {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .ink-dot {
-            color: var(--ink-faint);
-            font-size: 0.7rem;
-        }
-
-        .ink-item {
-            font-size: 0.95rem;
-            letter-spacing: 0.15em;
-            color: var(--ink-light);
-            cursor: pointer;
-            padding: 6px 12px;
-            position: relative;
-            transition: all 0.4s ease;
-        }
-
-        .ink-item::after {
-            content: '';
-            position: absolute;
-            bottom: 2px;
-            left: 50%;
-            right: 50%;
-            height: 0.5px;
-            background: var(--ink-medium);
-            transition: all 0.4s ease;
-        }
-
-        .ink-item:hover {
-            color: var(--ink-deep);
-        }
-
-        .ink-item:hover::after {
-            left: 25%;
-            right: 25%;
-            opacity: 0.4;
-        }
-
-        .ink-item.active {
-            color: var(--ink-deep);
-        }
-
-        .ink-item.active::after {
-            left: 10%;
-            right: 10%;
-            background: var(--ink-deep);
-            opacity: 0.5;
-        }
-
-        /* ===== 方案C：集市巷道 ===== */
-        .filter-scheme-arch {
-            margin-bottom: 48px;
-        }
-
-        .arch-filter {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-
-        .arch-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.4s ease;
-        }
-
-        .arch-shape {
-            width: 56px;
-            height: 48px;
-            border: 1.5px solid var(--gold-light);
-            border-bottom: none;
-            border-radius: 28px 28px 0 0;
-            position: relative;
-            transition: all 0.4s ease;
-        }
-
-        .arch-shape::before {
-            content: '·';
-            position: absolute;
-            top: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--ink-faint);
-            font-size: 1.2rem;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .arch-name {
-            margin-top: 10px;
-            font-size: 0.8rem;
-            letter-spacing: 0.1em;
-            color: var(--ink-light);
-            transition: all 0.4s ease;
-        }
-
-        .arch-item:hover .arch-shape,
-        .arch-item.active .arch-shape {
+        /* 已删除遴选方案、墨字、巷门样式 */
             border-color: var(--gold-primary);
         }
 
@@ -615,111 +468,12 @@
             color: var(--vermilion);
         }
 
-        /* ===== 浏览模式切换 ===== */
-        .view-mode-toggle {
-            display: flex;
-            justify-content: center;
-            gap: 0;
-            margin-bottom: 48px;
-        }
-
-        .view-mode-btn {
-            padding: 10px 24px;
-            border: 0.5px solid var(--gold-light);
-            background: transparent;
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 0.9rem;
-            color: var(--ink-light);
-            letter-spacing: 0.15em;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .view-mode-btn:first-child {
-            border-radius: 2px 0 0 2px;
-        }
-
-        .view-mode-btn:last-child {
-            border-radius: 0 2px 2px 0;
-        }
-
-        .view-mode-btn:hover {
-            border-color: var(--gold-primary);
-            color: var(--ink-deep);
-        }
-
-        .view-mode-btn.active {
-            background: var(--ink-deep);
-            border-color: var(--ink-deep);
-            color: var(--bg-primary);
-        }
-
-        .mode-icon {
-            font-size: 1rem;
-        }
-
-        /* ===== 方案E：长街漫游 ===== */
-        .street-section-title {
-            font-size: 0.8rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.3em;
-            margin-bottom: 32px;
-            padding-left: 16px;
-            border-left: 2px solid var(--gold-light);
-        }
-
-        .street-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
-        }
-
-        .street-grid .asset-card:nth-child(4n+1) {
-            margin-top: 0;
-        }
-
-        .street-grid .asset-card:nth-child(4n+2) {
-            margin-top: 20px;
-        }
-
-        .street-grid .asset-card:nth-child(4n+3) {
-            margin-top: 40px;
-        }
-
-        .street-grid .asset-card:nth-child(4n+4) {
-            margin-top: 10px;
-        }
-
-        .street-load-more {
-            text-align: center;
-            margin-top: 60px;
-        }
-
-        .street-load-btn {
-            padding: 14px 40px;
-            border: 0.5px solid var(--gold-light);
-            background: transparent;
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 0.9rem;
-            color: var(--ink-light);
-            letter-spacing: 0.2em;
-            cursor: pointer;
-            transition: all 0.4s ease;
-        }
-
-        .street-load-btn:hover {
-            border-color: var(--gold-primary);
-            color: var(--ink-deep);
-        }
-
-        /* ===== 方案H：无主之境 ===== */
+        /* ===== 方案H：无主之境（定稿） ===== */
         .view-mode-daily {
             background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             padding: 40px;
             border-radius: 2px;
+            margin-top: 20px;
         }
 
         .daily-header {
@@ -749,6 +503,93 @@
             font-family: var(--font-display), 'LXGW WenKai', cursive;
             font-size: 0.85rem;
             letter-spacing: 0.15em;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .daily-refresh-btn:hover {
+            background: var(--ink-medium);
+            transform: scale(1.02);
+        }
+
+        .daily-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .daily-card {
+            background: var(--bg-primary);
+            border: 0.5px solid var(--gold-light);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .daily-card:hover {
+            border-color: var(--gold-primary);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        .daily-card-realm {
+            font-size: 0.7rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.2em;
+            margin-bottom: 12px;
+        }
+
+        .daily-card-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .daily-card-icon.sound { background: #8B9DC3; }
+        .daily-card-icon.color { background: #C9A9A6; }
+        .daily-card-icon.text { background: #7A8B7C; }
+
+        .daily-card-name {
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            margin-bottom: 6px;
+            color: var(--ink-deep);
+        }
+
+        .daily-card-desc {
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .daily-card-price {
+            font-size: 0.85rem;
+            color: var(--ink-medium);
+            letter-spacing: 0.1em;
+        }
+
+        .daily-footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.1em;
+        }
+
+        /* 保留 realm-header 样式用于寻和观 */
             cursor: pointer;
             border-radius: 2px;
             transition: all 0.4s ease;
@@ -1318,78 +1159,8 @@
             </div>
         </div>
 
-        <div class="filter-scheme-toggle">
-            <span class="filter-scheme-label">遴选方式</span>
-            <button class="filter-scheme-btn active" data-scheme="ink" onclick="switchFilterScheme('ink')">墨字</button>
-            <button class="filter-scheme-btn" data-scheme="arch" onclick="switchFilterScheme('arch')">巷门</button>
-        </div>
-
-        <!-- 方案D：极简墨字 -->
-        <div class="filter-scheme-ink" id="filterInk">
-            <div class="ink-filter">
-                <span class="ink-item active" data-filter="all">全部</span>
-                <span class="ink-dot">·</span>
-                <span class="ink-item" data-filter="sound">音</span>
-                <span class="ink-dot">·</span>
-                <span class="ink-item" data-filter="color">色</span>
-                <span class="ink-dot">·</span>
-                <span class="ink-item" data-filter="text">文</span>
-                <span class="ink-dot">·</span>
-                <span class="ink-item" data-filter="mine">我的</span>
-            </div>
-        </div>
-
-        <!-- 方案C：集市巷道 -->
-        <div class="filter-scheme-arch" id="filterArch" style="display: none;">
-            <div class="arch-filter">
-                <div class="arch-item active" data-filter="all">
-                    <div class="arch-shape"></div>
-                    <span class="arch-name">全部</span>
-                </div>
-                <div class="arch-item" data-filter="sound">
-                    <div class="arch-shape"></div>
-                    <span class="arch-name">音律巷</span>
-                </div>
-                <div class="arch-item" data-filter="color">
-                    <div class="arch-shape"></div>
-                    <span class="arch-name">色彩坊</span>
-                </div>
-                <div class="arch-item" data-filter="text">
-                    <div class="arch-shape"></div>
-                    <span class="arch-name">文辞阁</span>
-                </div>
-                <div class="arch-item" data-filter="mine">
-                    <div class="arch-shape"></div>
-                    <span class="arch-name">我的</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 浏览模式切换 -->
-        <div class="view-mode-toggle">
-            <button class="view-mode-btn active" data-mode="street" onclick="switchViewMode('street')">
-                <span class="mode-icon">≡</span>
-                <span class="mode-name">长街</span>
-            </button>
-            <button class="view-mode-btn" data-mode="daily" onclick="switchViewMode('daily')">
-                <span class="mode-icon">◈</span>
-                <span class="mode-name">今日</span>
-            </button>
-        </div>
-
-        <!-- 方案E：长街漫游 -->
-        <div class="view-mode-street" id="viewStreet">
-            <div class="street-section-title">今日摊位</div>
-            <div class="asset-grid street-grid" id="streetGrid">
-                <!-- 卡片由 JS 生成 -->
-            </div>
-            <div class="street-load-more">
-                <button class="street-load-btn" onclick="loadMoreStalls()">继续浏览</button>
-            </div>
-        </div>
-
-        <!-- 方案H：无主之境 -->
-        <div class="view-mode-daily" id="viewDaily" style="display: none;">
+        <!-- 方案H：无主之境（定稿） -->
+        <div class="view-mode-daily" id="viewDaily">
             <div class="daily-header">
                 <div class="daily-date" id="dailyDate">乙巳年 六月初八</div>
                 <div class="daily-quote">每次刷新，皆是新缘</div>
@@ -1490,99 +1261,6 @@
             });
         }
 
-        // 筛选方案切换
-        function switchFilterScheme(scheme) {
-            const inkContainer = document.getElementById('filterInk');
-            const archContainer = document.getElementById('filterArch');
-            const btns = document.querySelectorAll('.filter-scheme-btn');
-            
-            btns.forEach(btn => {
-                if (btn.dataset.scheme === scheme) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            
-            if (scheme === 'ink') {
-                inkContainer.style.display = 'block';
-                archContainer.style.display = 'none';
-            } else {
-                inkContainer.style.display = 'none';
-                archContainer.style.display = 'block';
-            }
-        }
-
-        // 墨字筛选点击
-        document.querySelectorAll('.ink-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.ink-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // 巷门筛选点击
-        document.querySelectorAll('.arch-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.arch-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // 浏览模式切换
-        function switchViewMode(mode) {
-            const streetContainer = document.getElementById('viewStreet');
-            const dailyContainer = document.getElementById('viewDaily');
-            const btns = document.querySelectorAll('.view-mode-btn');
-            
-            btns.forEach(btn => {
-                if (btn.dataset.mode === mode) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            
-            if (mode === 'street') {
-                streetContainer.style.display = 'block';
-                dailyContainer.style.display = 'none';
-            } else {
-                streetContainer.style.display = 'none';
-                dailyContainer.style.display = 'block';
-            }
-        }
-
-        // 生成长街卡片
-        function generateStreetCards() {
-            const grid = document.getElementById('streetGrid');
-            const realms = ['音', '色', '文'];
-            const realmClasses = ['sound', 'color', 'text'];
-            const titles = ['夏日微风', '晨光初现', '山水之间', '月夜清音', '墨染流年', '云淡风轻', '琴心剑魄', '竹影清风'];
-            const chars = ['夏', '晨', '山', '月', '墨', '淡', '琴', '竹'];
-
-            for (let i = 0; i < 8; i++) {
-                const realm = realms[i % 3];
-                const realmClass = realmClasses[i % 3];
-                const title = titles[i];
-                const char = chars[i];
-                const price = (Math.random() * 1000 + 100).toFixed(0);
-
-                const card = document.createElement('div');
-                card.className = 'asset-card';
-                card.innerHTML = `
-                    <div class="asset-image">${char}</div>
-                    <div class="asset-info">
-                        <div class="asset-title">${title}</div>
-                        <div class="asset-meta">
-                            <span class="realm-tag ${realmClass}">${realm}</span>
-                            <span>${price} ECHO</span>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            }
-        }
-
         // 生成今日市集卡片
         function generateDailyCards() {
             const grid = document.getElementById('dailyGrid');
@@ -1610,44 +1288,6 @@
             });
         }
 
-        // 加载更多摊位
-        function loadMoreStalls() {
-            const grid = document.getElementById('streetGrid');
-            const realms = ['音', '色', '文'];
-            const realmClasses = ['sound', 'color', 'text'];
-            const titles = ['清风徐来', '烟雨江南', '松间明月', '流水高山'];
-            const chars = ['清', '烟', '松', '流'];
-
-            for (let i = 0; i < 4; i++) {
-                const realm = realms[i % 3];
-                const realmClass = realmClasses[i % 3];
-                const title = titles[i];
-                const char = chars[i];
-                const price = (Math.random() * 1000 + 100).toFixed(0);
-
-                const card = document.createElement('div');
-                card.className = 'asset-card';
-                card.style.opacity = '0';
-                card.innerHTML = `
-                    <div class="asset-image">${char}</div>
-                    <div class="asset-info">
-                        <div class="asset-title">${title}</div>
-                        <div class="asset-meta">
-                            <span class="realm-tag ${realmClass}">${realm}</span>
-                            <span>${price} ECHO</span>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-                
-                // 淡入动画
-                setTimeout(() => {
-                    card.style.transition = 'opacity 0.6s ease';
-                    card.style.opacity = '1';
-                }, i * 100);
-            }
-        }
-
         // 刷新今日市集
         function refreshDaily() {
             const grid = document.getElementById('dailyGrid');
@@ -1662,7 +1302,6 @@
 
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            generateStreetCards();
             generateDailyCards();
         });
 
