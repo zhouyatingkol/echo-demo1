@@ -1043,7 +1043,6 @@
             align-items: center;
             justify-content: center;
             background: radial-gradient(ellipse at center, rgba(42, 40, 37, 0.04) 0%, transparent 70%);
-            border: 0.5px solid var(--gold-light);
         }
 
         .cloud-chart svg {
@@ -1503,13 +1502,11 @@
         generateDailyCards();
         
         // 延迟初始化风云图，确保DOM已加载
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('load', () => {
+            setTimeout(() => {
                 generateChartData('sound');
-            });
-        } else {
-            generateChartData('sound');
-        }
+            }, 100);
+        });
     </script>
 </main>
 </body>
