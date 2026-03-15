@@ -145,31 +145,22 @@
             font-size: 1.1rem;
             color: var(--ink-light);
             letter-spacing: 0.15em;
+            margin-bottom: 40px;
         }
-
-        /* ===== 吾作按钮（浮动） ===== */
-        .fab-create {
-            position: fixed;
-            right: 40px;
-            bottom: 40px;
-            padding: 12px 32px;
-            border-radius: 2px;
+        
+        .hero-create-btn {
+            padding: 12px 40px;
             border: 0.5px solid var(--vermilion);
             background: transparent;
             color: var(--vermilion);
             font-family: var(--font-display);
-            font-size: 0.9rem;
+            font-size: 1rem;
             letter-spacing: 0.2em;
-            cursor: pointer;
-            z-index: 999;
-            transition: all 0.4s ease;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: all 0.4s ease;
         }
         
-        .fab-create:hover {
+        .hero-create-btn:hover {
             background: var(--vermilion);
             color: var(--bg-primary);
         }
@@ -465,11 +456,6 @@
             .navbar__nav {
                 gap: 24px;
             }
-            
-            .fab-create {
-                right: 20px;
-                bottom: 20px;
-            }
         }
     </style>
 </head>
@@ -489,6 +475,7 @@
     <section class="hero">
         <h1 class="hero-title">集</h1>
         <p class="hero-subtitle">随缘而聚，各得其所</p>
+        <a href="creator.html" class="hero-create-btn">吾作</a>
     </section>
 
     <!-- 第一境：遇 -->
@@ -563,9 +550,6 @@
             <!-- 榜单内容由 JS 生成 -->
         </div>
     </section>
-
-    <!-- 吾作按钮 -->
-    <a href="creator.html" class="fab-create">吾作</a>
 
     <script src="../scripts/wallet.js"></script>
     <script>
