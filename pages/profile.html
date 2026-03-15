@@ -13,19 +13,33 @@
     <link rel="stylesheet" href="../css/mobile-optimizations.css">
     <style>
         :root {
+            /* 宣纸质感 */
             --bg-primary: #F8F6F1;
-            --bg-secondary: #F0EDE6;
+            --bg-secondary: #F2EFE8;
+            --bg-tertiary: #EBE7DD;
             --bg-card: #FAFAF8;
+            
+            /* 四阶墨色 */
             --ink-deep: #1A1A1A;
             --ink-medium: #4A4A4A;
-            --ink-light: #8A8A8A;
+            --ink-light: #7A6E5F;
+            --ink-faint: #B5B5B5;
+            
+            /* 宋金 */
             --gold-primary: #B89B6C;
             --gold-light: #D4C4A8;
-            --cinnabar: #A03020;
+            
+            /* 朱红 */
+            --vermilion: #A03020;
+            
+            /* 字体 */
             --font-display: 'LXGW WenKai', cursive;
             --font-serif: 'Noto Serif SC', serif;
             --font-sans: 'Inter', sans-serif;
-            --ease-ink: cubic-bezier(0.23, 1, 0.32, 1);
+            
+            /* 缓动 */
+            --ease-ink: cubic-bezier(0.25, 0.1, 0.25, 1);
+            --ease-breath: cubic-bezier(0.45, 0, 0.55, 1);
         }
 
         * {
@@ -52,59 +66,73 @@
             top: 0;
             left: 0;
             right: 0;
+            height: 60px;
             z-index: 1000;
-            padding: 1.5rem 5vw;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(24px, 5vw, 80px);
             background: transparent;
-            transition: all 0.6s ease;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.8s ease,
+                        backdrop-filter 0.8s ease;
         }
 
         .navbar.scrolled {
-            background: rgba(248, 246, 241, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
-            padding: 1rem 5vw;
+            background: rgba(253, 252, 250, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(122, 110, 95, 0.06);
         }
 
         .navbar__brand {
-            font-size: 1.2rem;
+            font-family: var(--font-display);
+            font-size: 1.25rem;
             font-weight: 400;
-            letter-spacing: 0.3em;
             color: var(--ink-deep);
+            letter-spacing: 0.3em;
             text-decoration: none;
+            opacity: 0.85;
+            transition: opacity 0.4s ease;
+        }
+
+        .navbar__brand:hover {
+            opacity: 1;
         }
 
         .navbar__nav {
             display: flex;
+            align-items: center;
             gap: 3rem;
+            margin: 0 auto;
+            padding: 0 2rem;
         }
 
         .navbar__link {
-            font-family: 'Noto Serif SC', serif;
+            position: relative;
+            font-family: var(--font-serif);
             font-size: 1rem;
-            color: var(--ink-medium);
+            font-weight: 400;
+            color: var(--ink-light);
             text-decoration: none;
             letter-spacing: 0.3em;
-            position: relative;
+            padding: 0.5rem 0;
             transition: color 0.4s ease;
+        }
+
+        .navbar__link:hover {
+            color: var(--ink-deep);
         }
 
         .navbar__link::after {
             content: '';
             position: absolute;
-            bottom: -4px;
+            bottom: 0;
             left: 0;
             width: 0;
-            height: 1px;
+            height: 0.5px;
             background: var(--gold-primary);
-            transition: width 0.4s ease;
-        }
-
-        .navbar__link:hover,
-        .navbar__link.active {
-            color: var(--cinnabar);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .navbar__link:hover::after,
@@ -112,17 +140,75 @@
             width: 100%;
         }
 
+        .navbar__link.active {
+            color: var(--vermilion);
+        }
+
         .navbar__user {
             text-decoration: none;
-            font-size: 0.85rem;
-            color: var(--cinnabar);
-            letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2px;
+            border: 0.5px solid var(--gold-light);
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .navbar__user:hover {
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+            background: rgba(160, 48, 32, 0.05);
         }
 
         /* Hero */
         .profile-hero {
+            position: relative;
             padding: 20vh 10vw 10vh;
             text-align: center;
+            overflow: hidden;
+        }
+
+        /* 宣纸纹理 */
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+        }
+
+        /* 窗棂光晕 */
+        .profile-hero::after {
+            content: '';
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(ellipse at center, 
+                rgba(232, 228, 220, 0.6) 0%, 
+                transparent 70%);
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 1;
+            top: -20%;
+            right: -10%;
+            animation: lightBreath 12s ease-in-out infinite;
+        }
+
+        @keyframes lightBreath {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
         }
 
         .profile-title {
@@ -131,12 +217,17 @@
             font-weight: 400;
             letter-spacing: 0.3em;
             margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
         }
 
         .profile-subtitle {
+            font-family: var(--font-serif);
             font-size: 1rem;
             color: var(--ink-light);
             letter-spacing: 0.15em;
+            position: relative;
+            z-index: 2;
         }
 
         /* Tab 导航 */
@@ -145,7 +236,7 @@
             justify-content: center;
             gap: 4rem;
             padding: 2rem 0;
-            border-bottom: 0.5px solid rgba(0,0,0,0.08);
+            border-bottom: 0.5px solid var(--gold-light);
             margin: 0 10vw;
         }
 
@@ -169,14 +260,14 @@
             left: 50%;
             transform: translateX(-50%);
             width: 0;
-            height: 1px;
-            background: var(--cinnabar);
+            height: 0.5px;
+            background: var(--vermilion);
             transition: width 0.4s ease;
         }
 
         .tab-btn:hover,
         .tab-btn.active {
-            color: var(--cinnabar);
+            color: var(--vermilion);
         }
 
         .tab-btn.active::after {
@@ -237,14 +328,14 @@
         }
 
         .favorites-subtab:hover {
-            border-color: var(--cinnabar);
-            color: var(--cinnabar);
+            border-color: var(--vermilion);
+            color: var(--vermilion);
         }
 
         .favorites-subtab.active {
-            background: var(--cinnabar);
-            border-color: var(--cinnabar);
-            color: white;
+            background: var(--vermilion);
+            border-color: var(--vermilion);
+            color: var(--bg-primary);
         }
 
         .favorites-stats {
@@ -265,7 +356,7 @@
         .fav-stat-value {
             font-size: 1.5rem;
             font-weight: 300;
-            color: var(--cinnabar);
+            color: var(--vermilion);
             font-family: var(--font-display);
         }
 
@@ -349,7 +440,7 @@
             border-radius: 50%;
             background: rgba(0,0,0,0.5);
             border: none;
-            color: var(--cinnabar);
+            color: var(--vermilion);
             font-size: 1rem;
             cursor: pointer;
             display: flex;
@@ -416,7 +507,7 @@
 
         .buy-btn {
             padding: 8px 16px;
-            background: var(--cinnabar);
+            background: var(--vermilion);
             border: none;
             color: var(--bg-primary);
             font-family: var(--font-serif);
@@ -427,7 +518,7 @@
         }
 
         .buy-btn:hover {
-            background: #802820;
+            background: #8B2419;
         }
 
         /* 播放列表 */
