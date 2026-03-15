@@ -236,12 +236,11 @@
 
         /* ===== Hero 区域 ===== */
         .hero {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 160px 40px;
+            padding: 120px 40px 40px;
             text-align: center;
         }
         
@@ -278,39 +277,6 @@
         .hero-create-btn:hover {
             border-color: var(--vermilion);
             color: var(--vermilion);
-        }
-
-        /* ===== 滚动提示 ===== */
-        .scroll-hint {
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            color: var(--ink-faint);
-            font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.75rem;
-            letter-spacing: 0.2em;
-            animation: floatHint 2s ease-in-out infinite;
-        }
-        
-        .scroll-hint::before {
-            content: '';
-            width: 1px;
-            height: 40px;
-            background: linear-gradient(to bottom, var(--gold-light), transparent);
-        }
-        
-        .scroll-hint::after {
-            content: '—  scroll  —';
-        }
-        
-        @keyframes floatHint {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(6px); }
         }
 
         /* ===== 境界分隔 ===== */
@@ -656,15 +622,14 @@
     </nav>
 
     <!-- Hero -->
-    <section class="hero" style="position: relative;">
+    <section class="hero" style="padding: 120px 40px 60px;">
         <h1 class="hero-title">集</h1>
         <p class="hero-subtitle">随缘而聚，各得其所</p>
         <a href="creator.html" class="hero-create-btn">吾作</a>
-        <div class="scroll-hint"></div>
     </section>
 
     <!-- 第一境：遇 -->
-    <section class="realm-yu">
+    <section class="realm-yu" style="padding-top: 40px;">
         <div class="realm-divider"></div>
         
         <div class="realm-header">
