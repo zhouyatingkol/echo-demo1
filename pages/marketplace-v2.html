@@ -325,6 +325,36 @@
             border-color: var(--gold-primary);
         }
 
+        /* 方案 C：遇作为章节标记 */
+        .yu-header-compact {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px;
+        }
+
+        .yu-mark {
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1.1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.2em;
+        }
+
+        .yu-dot {
+            color: var(--gold-primary);
+            font-size: 0.9rem;
+        }
+
+        .yu-quote {
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            flex: 1;
+        }
+
         /* 保留 realm-header 样式用于寻和观 */
         .realm-header {
             text-align: center;
@@ -665,8 +695,10 @@
     <!-- 第一境：遇 -->
     <section class="realm-yu" style="padding-top: 40px;">
         <div class="realm-divider"></div>
-
-        <div class="yu-header">
+        
+        <div class="yu-header-compact">
+            <span class="yu-mark">遇</span>
+            <span class="yu-dot">·</span>
             <span class="yu-quote">此间万物，皆可遇</span>
             <select class="yu-filter">
                 <option value="">价</option>
@@ -676,7 +708,7 @@
                 <option value="500+">500+</option>
             </select>
         </div>
-
+        
         <div class="search-box">
             <span class="search-icon">寻</span>
             <input type="text" class="search-input" placeholder="寻觅..." />
