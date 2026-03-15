@@ -967,9 +967,9 @@
         }
 
         .realm-category .icon {
-            width: 56px;
-            height: 56px;
-            margin-bottom: 20px;
+            width: 64px;
+            height: 64px;
+            margin-bottom: 12px;
             color: var(--ink-light);
             transition: color 0.4s ease, transform 0.4s ease;
             display: flex;
@@ -1004,11 +1004,11 @@
 
         .realm-category .name {
             font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 2rem;
-            letter-spacing: 0.3em;
-            text-indent: 0.3em;
+            font-size: 1.8rem;
+            letter-spacing: 0.25em;
+            text-indent: 0.25em;
             color: var(--ink-deep);
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
         .realm-category .enter-hint {
@@ -1291,14 +1291,10 @@
         <div class="realm-categories">
             <div class="realm-category sound" onclick="enterRealm('sound')" style="position: relative;">
                 <div class="icon">
-                    <svg viewBox="0 0 64 64" width="56" height="56" style="fill: currentColor;">
-                        <!-- 古琴轮廓 - 音律本源 -->
-                        <path d="M20 12 Q32 8 44 12 Q48 20 48 32 Q48 48 32 54 Q16 48 16 32 Q16 20 20 12 Z" 
-                              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                        <line x1="32" y1="16" x2="32" y2="48" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="26" y1="20" x2="26" y2="44" stroke="currentColor" stroke-width="1" opacity="0.6"/>
-                        <line x1="38" y1="20" x2="38" y2="44" stroke="currentColor" stroke-width="1" opacity="0.6"/>
-                        <ellipse cx="32" cy="32" rx="6" ry="3" fill="currentColor" opacity="0.3"/>
+                    <svg viewBox="0 0 64 64" width="64" height="64" style="fill: currentColor;">
+                        <!-- 律 - 钟形 -->
+                        <path d="M20 12 Q32 8 44 12 L42 40 Q32 44 22 40 Z" fill="currentColor" opacity="0.9"/>
+                        <rect x="30" y="40" width="4" height="10" fill="currentColor"/>
                     </svg>
                 </div>
                 <div class="name">律</div>
@@ -1306,13 +1302,12 @@
             </div>
             <div class="realm-category color" onclick="enterRealm('color')" style="position: relative;">
                 <div class="icon">
-                    <svg viewBox="0 0 64 64" width="56" height="56" style="fill: currentColor;">
-                        <!-- 渐变花瓣 - 五色成章 -->
-                        <path d="M32 8 Q40 16 32 24 Q24 16 32 8 Z" fill="currentColor" opacity="0.9"/>
-                        <path d="M32 24 Q44 24 48 32 Q40 32 32 24 Z" fill="currentColor" opacity="0.7"/>
-                        <path d="M32 24 Q20 24 16 32 Q24 32 32 24 Z" fill="currentColor" opacity="0.7"/>
-                        <path d="M32 24 Q40 32 32 40 Q24 32 32 24 Z" fill="currentColor" opacity="0.5"/>
-                        <circle cx="32" cy="24" r="3" fill="var(--bg-secondary)"/>
+                    <svg viewBox="0 0 64 64" width="64" height="64" style="fill: currentColor;">
+                        <!-- 彩 - 四瓣花 -->
+                        <path d="M32 8 Q38 18 32 28 Q26 18 32 8 Z" fill="currentColor" opacity="0.9"/>
+                        <path d="M32 28 Q42 22 52 28 Q42 34 32 28 Z" fill="currentColor" opacity="0.8"/>
+                        <path d="M32 28 Q22 34 12 28 Q22 22 32 28 Z" fill="currentColor" opacity="0.8"/>
+                        <path d="M32 28 Q38 38 32 48 Q26 38 32 28 Z" fill="currentColor" opacity="0.7"/>
                     </svg>
                 </div>
                 <div class="name">彩</div>
@@ -1320,15 +1315,11 @@
             </div>
             <div class="realm-category text" onclick="enterRealm('text')" style="position: relative;">
                 <div class="icon">
-                    <svg viewBox="0 0 64 64" width="56" height="56" style="fill: currentColor;">
-                        <!-- 打开的书卷 - 文章载体 -->
-                        <path d="M12 16 Q20 12 32 16 Q44 12 52 16 L52 48 Q44 44 32 48 Q20 44 12 48 Z" 
-                              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
-                        <line x1="32" y1="16" x2="32" y2="48" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="20" y1="24" x2="28" y2="24" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-                        <line x1="20" y1="32" x2="28" y2="32" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-                        <line x1="36" y1="24" x2="44" y2="24" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-                        <line x1="36" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+                    <svg viewBox="0 0 64 64" width="64" height="64" style="fill: currentColor;">
+                        <!-- 章 - 书卷 -->
+                        <path d="M12 16 Q20 12 32 16 L32 44 Q20 40 12 44 Z" fill="currentColor" opacity="0.9"/>
+                        <path d="M32 16 Q44 12 52 16 L52 44 Q44 40 32 44 Z" fill="currentColor" opacity="0.8"/>
+                        <rect x="30" y="16" width="4" height="28" fill="var(--bg-secondary)" opacity="0.5"/>
                     </svg>
                 </div>
                 <div class="name">章</div>
