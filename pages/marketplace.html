@@ -6,19 +6,19 @@
     <title>集 - ECHO</title>
     <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* ===== 色彩系统 ===== */
+        /* ===== 色彩系统 - 侘寂调色 ===== */
         :root {
-            --bg-primary: #F8F6F1;
-            --bg-secondary: #F2EFE8;
-            --bg-tertiary: #EBE7DD;
-            --ink-deep: #1A1A1A;
-            --ink-medium: #4A4A4A;
-            --ink-light: #7A6E5F;
-            --ink-faint: #B5B5B5;
-            --gold-primary: #B89B6C;
-            --gold-light: #D4C4A8;
-            --vermilion: #A03020;
-            --vermilion-light: rgba(160, 48, 32, 0.4);
+            --bg-primary: #F5F2EA;
+            --bg-secondary: #EDE9DE;
+            --bg-tertiary: #E5E1D4;
+            --ink-deep: #2A2825;
+            --ink-medium: #4A4742;
+            --ink-light: #7A756D;
+            --ink-faint: #B5B0A8;
+            --gold-primary: #A68B5B;
+            --gold-light: #C9B896;
+            --vermilion: #8B2820;
+            --vermilion-light: rgba(139, 40, 32, 0.4);
 
             /* 三域色 */
             --realm-sound: #8B9DC3;
@@ -341,17 +341,31 @@
             transform: translateY(-2px);
         }
 
-        /* ===== 境界分隔 ===== */
+        /* ===== 境界分隔 - 飞白效果 ===== */
         .realm-divider {
-            height: 0.5px;
-            background: var(--gold-light);
+            height: 1px;
             margin: 0 auto;
-            max-width: 200px;
+            max-width: 300px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--gold-light) 10%, 
+                var(--gold-light) 20%, 
+                transparent 25%, 
+                transparent 40%,
+                var(--gold-light) 45%,
+                var(--gold-light) 60%,
+                transparent 65%,
+                transparent 80%,
+                var(--gold-light) 85%,
+                var(--gold-light) 95%,
+                transparent 100%
+            );
+            opacity: 0.6;
         }
 
         /* ===== 第一境：遇 ===== */
         .realm-yu {
-            padding: 80px 40px 120px;
+            padding: 80px 40px 8vh;
         }
 
         .yu-header {
@@ -622,7 +636,7 @@
 
         /* ===== 第二境：寻 ===== */
         .realm-xun {
-            padding: 120px 40px;
+            padding: 8vh 40px;
         }
 
         .realm-categories {
@@ -706,7 +720,7 @@
 
         /* ===== 第三境：观 ===== */
         .realm-guan {
-            padding: 120px 40px;
+            padding: 8vh 40px 120px;
             min-height: 100vh;
         }
 
@@ -903,7 +917,7 @@
     <!-- Hero -->
     <section class="hero">
         <h1 class="hero-title">集</h1>
-        <p class="hero-subtitle">随缘而聚，各得其所</p>
+        <p class="hero-subtitle">万物并育，各归其位</p>
     </section>
 
     <!-- 第一境：遇 -->
