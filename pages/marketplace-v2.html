@@ -342,6 +342,77 @@
             letter-spacing: 0.15em;
         }
 
+        .yu-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .yu-create-btn {
+            padding: 6px 16px;
+            background: var(--vermilion);
+            color: var(--bg-primary);
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-decoration: none;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .yu-create-btn:hover {
+            background: #8B2419;
+        }
+
+        .yu-filter {
+            padding: 6px 12px;
+            border: 0.5px solid var(--gold-light);
+            background: transparent;
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.4s ease;
+        }
+
+        .yu-filter:hover {
+            border-color: var(--gold-primary);
+        }
+
+        .search-box-wrapper {
+            max-width: 520px;
+            margin: 0 auto 60px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .random-btn {
+            padding: 14px 20px;
+            border: 0.5px solid var(--gold-light);
+            background: transparent;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .random-btn:hover {
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+        }
+
         /* 保留 realm-header 样式用于寻和观 */
         .realm-header {
             text-align: center;
@@ -420,8 +491,16 @@
         }
 
         .asset-card:hover {
-            transform: translateY(-2px);
+            transform: rotate(0deg) translateY(-4px);
             border: 0.5px solid var(--gold-primary);
+        }
+
+        .asset-card:nth-child(odd) {
+            transform: rotate(-1deg);
+        }
+
+        .asset-card:nth-child(even) {
+            transform: rotate(1deg);
         }
 
         .asset-image {
@@ -525,6 +604,28 @@
             filter: brightness(1.05);
         }
 
+        .realm-category .enter-hint {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .realm-category:hover .enter-hint {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .realm-category:hover .icon,
+        .realm-category:hover .name,
+        .realm-category:hover .desc {
+            transform: translateY(-8px);
+            transition: transform 0.3s ease;
+        }
+
         .realm-category .icon {
             font-size: 3rem;
             margin-bottom: 16px;
@@ -585,58 +686,85 @@
             background: var(--vermilion);
         }
 
-        /* 榜单表格 */
-        .chart-table {
-            max-width: 900px;
-            margin: 0 auto;
+        /* 风云图 - SVG 气泡图 */
+        .cloud-chart {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .chart-header {
-            display: grid;
-            grid-template-columns: 60px 1fr 100px 100px;
-            gap: 24px;
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--gold-light);
+        .cloud-chart svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .cloud-bubble {
+            cursor: pointer;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+        }
+
+        .cloud-bubble:hover {
+            filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.15));
+            transform: scale(1.05);
+        }
+
+        .cloud-bubble circle {
+            transition: all 0.4s ease;
+        }
+
+        .cloud-bubble-text {
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1.2rem;
+            fill: white;
+            letter-spacing: 0.2em;
+            pointer-events: none;
+        }
+
+        .cloud-bubble-heat {
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.8rem;
+            fill: rgba(255, 255, 255, 0.9);
+            pointer-events: none;
+        }
+
+        .bubble-tooltip {
+            position: absolute;
+            background: var(--bg-secondary);
+            border: 0.5px solid var(--gold-light);
+            padding: 16px 20px;
+            border-radius: 2px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+            min-width: 180px;
+        }
+
+        .bubble-tooltip.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .bubble-tooltip-title {
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1rem;
+            color: var(--ink-deep);
+            margin-bottom: 8px;
+        }
+
+        .bubble-tooltip-stat {
             font-size: 0.85rem;
             color: var(--ink-light);
-            letter-spacing: 0.1em;
+            margin-bottom: 4px;
         }
 
-        .chart-row {
-            display: grid;
-            grid-template-columns: 60px 1fr 100px 100px;
-            gap: 24px;
-            padding: 20px 24px;
-            border-bottom: 0.5px solid rgba(180, 164, 140, 0.3);
-            transition: background 0.3s ease;
-        }
-
-        .chart-row:hover {
-            background: var(--bg-secondary);
-        }
-
-        .chart-rank {
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 1.25rem;
-            color: var(--ink-light);
-        }
-
-        .chart-rank.top3 {
-            color: var(--vermilion);
-        }
-
-        .chart-name {
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            color: var(--ink-deep);
-        }
-
-        .chart-volume,
-        .chart-heat {
-            color: var(--ink-light);
-            font-size: 0.9rem;
-        }
-
-        /* ===== 响应式 ===== */
+        /* 响应式隐藏 */
         @media (max-width: 768px) {
             .navbar__nav {
                 display: none;
@@ -661,13 +789,13 @@
                 grid-template-columns: 1fr;
             }
 
-            .chart-header,
-            .chart-row {
-                grid-template-columns: 40px 1fr 80px;
+            .search-box-wrapper {
+                flex-direction: column;
+                padding: 0 24px;
             }
 
-            .chart-heat {
-                display: none;
+            .random-btn {
+                width: 100%;
             }
         }
 
@@ -713,7 +841,6 @@
     <section class="hero" style="padding: 120px 40px 40px;">
         <h1 class="hero-title">集</h1>
         <p class="hero-subtitle">随缘而聚，各得其所</p>
-        <a href="creator.html" class="hero-create-btn">吾作</a>
     </section>
 
     <!-- 第一境：遇 -->
@@ -721,19 +848,25 @@
         <div class="realm-divider" style="margin-bottom: 32px;"></div>
         
         <div class="yu-header-compact">
-            <span class="yu-quote">此间万物，皆可遇</span>
-            <select class="yu-filter">
-                <option value="">价 ▼</option>
-                <option value="0-50">0 - 50</option>
-                <option value="50-100">50 - 100</option>
-                <option value="100-500">100 - 500</option>
-                <option value="500+">500+</option>
-            </select>
+            <span class="yu-quote">随缘而遇，不期而会</span>
+            <div class="yu-actions">
+                <a href="creator.html" class="yu-create-btn">吾作</a>
+                <select class="yu-filter">
+                    <option value="">价 ▼</option>
+                    <option value="0-50">0 - 50</option>
+                    <option value="50-100">50 - 100</option>
+                    <option value="100-500">100 - 500</option>
+                    <option value="500+">500+</option>
+                </select>
+            </div>
         </div>
         
-        <div class="search-box">
-            <span class="search-icon">寻</span>
-            <input type="text" class="search-input" placeholder="寻觅..." />
+        <div class="search-box-wrapper">
+            <div class="search-box">
+                <span class="search-icon">寻</span>
+                <input type="text" class="search-input" placeholder="寻觅..." />
+            </div>
+            <button class="random-btn" onclick="randomAsset()">随机</button>
         </div>
 
         <div class="asset-grid" id="yuGrid">
@@ -747,24 +880,27 @@
 
         <div class="realm-header">
             <h2 class="realm-title">寻</h2>
-            <p class="realm-quote">三域之境，各有所藏</p>
+            <p class="realm-quote">按域而寻，各入其门</p>
         </div>
 
         <div class="realm-categories">
-            <div class="realm-category sound" onclick="enterRealm('sound')">
+            <div class="realm-category sound" onclick="enterRealm('sound')" style="position: relative;">
                 <div class="icon">♪</div>
                 <div class="name">音</div>
                 <div class="desc">声之境</div>
+                <div class="enter-hint">进入此境 →</div>
             </div>
-            <div class="realm-category color" onclick="enterRealm('color')">
+            <div class="realm-category color" onclick="enterRealm('color')" style="position: relative;">
                 <div class="icon">◈</div>
                 <div class="name">色</div>
                 <div class="desc">色之境</div>
+                <div class="enter-hint">进入此境 →</div>
             </div>
-            <div class="realm-category text" onclick="enterRealm('text')">
+            <div class="realm-category text" onclick="enterRealm('text')" style="position: relative;">
                 <div class="icon">✦</div>
                 <div class="name">文</div>
                 <div class="desc">文之境</div>
+                <div class="enter-hint">进入此境 →</div>
             </div>
         </div>
     </section>
@@ -782,16 +918,18 @@
             <button class="chart-tab active" onclick="switchChart('sound')">音观</button>
             <button class="chart-tab" onclick="switchChart('color')">色观</button>
             <button class="chart-tab" onclick="switchChart('text')">文观</button>
+            <button class="chart-tab" onclick="switchChart('all')">总观</button>
         </div>
 
-        <div class="chart-table" id="chartTable">
-            <div class="chart-header">
-                <span>序</span>
-                <span>音境</span>
-                <span>流转</span>
-                <span>热度</span>
+        <div class="cloud-chart" id="cloudChart">
+            <svg viewBox="0 0 600 400">
+                <!-- 气泡由 JS 生成 -->
+            </svg>
+            <div class="bubble-tooltip" id="bubbleTooltip">
+                <div class="bubble-tooltip-title" id="tooltipTitle"></div>
+                <div class="bubble-tooltip-stat" id="tooltipVolume"></div>
+                <div class="bubble-tooltip-stat" id="tooltipHeat"></div>
             </div>
-            <!-- 榜单内容由 JS 生成 -->
         </div>
     </section>
 
@@ -848,51 +986,112 @@
             }
         }
 
-        // 生成榜单数据
+        // 生成风云图气泡
         function generateChartData(type) {
-            const table = document.getElementById('chartTable');
-            const realmNames = { sound: '音境', color: '色境', text: '文境' };
-            const realmName = realmNames[type];
-
-            // 清空现有行（保留表头）
-            const existingRows = table.querySelectorAll('.chart-row');
-            existingRows.forEach(row => row.remove());
-
-            // 更新表头
-            const header = table.querySelector('.chart-header');
-            if (header) {
-                header.innerHTML = `
-                    <span>序</span>
-                    <span>${realmName}</span>
-                    <span>流转</span>
-                    <span>热度</span>
-                `;
-            }
-
-            // 生成榜单数据
-            const names = {
-                sound: ['清风徐来', '月下独酌', '高山流水', '渔舟唱晚', '梅花三弄'],
-                color: ['春日暖阳', '秋水共长天', '暮色苍茫', '云卷云舒', '星河璀璨'],
-                text: ['静夜思', '春江花月夜', '声声慢', '水调歌头', '雨霖铃']
+            const svg = document.querySelector('#cloudChart svg');
+            const tooltip = document.getElementById('bubbleTooltip');
+            const tooltipTitle = document.getElementById('tooltipTitle');
+            const tooltipVolume = document.getElementById('tooltipVolume');
+            const tooltipHeat = document.getElementById('tooltipHeat');
+            
+            // 清空现有气泡
+            svg.innerHTML = '';
+            
+            // 三域配置
+            const realms = {
+                sound: { name: '音境', color: '#8B9DC3', cx: 150, cy: 200 },
+                color: { name: '色境', color: '#C9A9A6', cx: 300, cy: 150 },
+                text: { name: '文境', color: '#7A8B7C', cx: 450, cy: 200 }
             };
-
-            const typeNames = names[type] || names.sound;
-
-            for (let i = 0; i < 5; i++) {
-                const row = document.createElement('div');
-                row.className = 'chart-row';
-
-                const volume = (Math.random() * 50 + 10).toFixed(1);
-                const heat = Math.floor(Math.random() * 5000 + 1000);
-
-                row.innerHTML = `
-                    <div class="chart-rank ${i < 3 ? 'top3' : ''}">${i + 1}</div>
-                    <div class="chart-name">${typeNames[i]}</div>
-                    <div class="chart-volume">${volume}K</div>
-                    <div class="chart-heat">${heat}</div>
-                `;
-                table.appendChild(row);
-            }
+            
+            // 生成随机热度数据
+            const heatData = {};
+            Object.keys(realms).forEach(key => {
+                heatData[key] = Math.floor(Math.random() * 3000 + 2000);
+            });
+            
+            // 如果是总观，显示所有三域
+            const realmsToShow = type === 'all' ? Object.keys(realms) : [type];
+            
+            realmsToShow.forEach((realmKey, index) => {
+                const realm = realms[realmKey];
+                const heat = heatData[realmKey];
+                const volume = (Math.random() * 50 + 20).toFixed(1);
+                
+                // 根据热度计算圆圈大小 (60-120)
+                const radius = 60 + (heat / 5000) * 60;
+                
+                // 总观模式下调整位置
+                let cx = realm.cx;
+                let cy = realm.cy;
+                if (type === 'all') {
+                    const positions = [
+                        { cx: 150, cy: 200 },
+                        { cx: 300, cy: 200 },
+                        { cx: 450, cy: 200 }
+                    ];
+                    cx = positions[index].cx;
+                    cy = positions[index].cy;
+                }
+                
+                // 创建气泡组
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('class', 'cloud-bubble');
+                g.setAttribute('data-realm', realmKey);
+                g.setAttribute('data-name', realm.name);
+                g.setAttribute('data-volume', volume);
+                g.setAttribute('data-heat', heat);
+                
+                // 创建圆圈
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', cx);
+                circle.setAttribute('cy', cy);
+                circle.setAttribute('r', radius);
+                circle.setAttribute('fill', realm.color);
+                circle.setAttribute('opacity', '0.9');
+                
+                // 创建文字
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', cx);
+                text.setAttribute('y', cy - 5);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('class', 'cloud-bubble-text');
+                text.textContent = realm.name.charAt(0);
+                
+                // 创建热度文字
+                const heatText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                heatText.setAttribute('x', cx);
+                heatText.setAttribute('y', cy + 20);
+                heatText.setAttribute('text-anchor', 'middle');
+                heatText.setAttribute('class', 'cloud-bubble-heat');
+                heatText.textContent = heat.toLocaleString();
+                
+                g.appendChild(circle);
+                g.appendChild(text);
+                g.appendChild(heatText);
+                
+                // 添加悬浮事件
+                g.addEventListener('mouseenter', (e) => {
+                    tooltipTitle.textContent = realm.name;
+                    tooltipVolume.textContent = `流转: ${volume}K`;
+                    tooltipHeat.textContent = `热度: ${heat.toLocaleString()}`;
+                    
+                    const rect = svg.getBoundingClientRect();
+                    tooltip.style.left = (cx + rect.left - 90) + 'px';
+                    tooltip.style.top = (cy + rect.top - radius - 80) + 'px';
+                    tooltip.classList.add('visible');
+                });
+                
+                g.addEventListener('mouseleave', () => {
+                    tooltip.classList.remove('visible');
+                });
+                
+                g.addEventListener('click', () => {
+                    enterRealm(realmKey);
+                });
+                
+                svg.appendChild(g);
+            });
         }
 
         // 进入域
@@ -907,6 +1106,29 @@
             event.target.classList.add('active');
             generateChartData(type);
         }
+
+        // 随机跳转
+        function randomAsset() {
+            const cards = document.querySelectorAll('.asset-card');
+            if (cards.length > 0) {
+                const randomIndex = Math.floor(Math.random() * cards.length);
+                cards[randomIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                cards[randomIndex].style.animation = 'pulse 0.6s ease';
+                setTimeout(() => {
+                    cards[randomIndex].style.animation = '';
+                }, 600);
+            }
+        }
+
+        // 添加 pulse 动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { box-shadow: 0 0 0 0 rgba(160, 48, 32, 0.4); }
+                50% { box-shadow: 0 0 0 10px rgba(160, 48, 32, 0); }
+            }
+        `;
+        document.head.appendChild(style);
 
         // 初始化
         generateYuCards();
