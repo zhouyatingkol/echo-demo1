@@ -374,7 +374,7 @@ class WalletManager {
             }
             if (heroWalletStatus) {
                 heroWalletStatus.textContent = '吾';
-                heroWalletStatus.setAttribute('data-address', this.address);
+                // 首页吾按钮不显示地址，只显示文字
                 heroWalletStatus.classList.add('connected');
                 heroWalletStatus.style.display = 'inline-flex';
             }

@@ -122,12 +122,12 @@
             background: rgba(201, 184, 150, 0.05);
         }
         
-        /* 钱包连接后悬停显示地址 */
-        .navbar__user.connected {
+        /* 钱包连接后悬停显示地址 - 排除首页吾按钮 */
+        .navbar__user.connected:not(#heroWalletStatus) {
             position: relative;
         }
         
-        .navbar__user.connected::after {
+        .navbar__user.connected:not(#heroWalletStatus)::after {
             content: attr(data-address);
             position: absolute;
             top: calc(100% + 8px);
@@ -144,7 +144,7 @@
             transition: all 0.3s ease;
         }
         
-        .navbar__user.connected:hover::after {
+        .navbar__user.connected:not(#heroWalletStatus):hover::after {
             opacity: 1;
             visibility: visible;
         }
