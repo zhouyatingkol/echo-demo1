@@ -505,19 +505,38 @@
             transition: all 0.4s ease;
         }
 
-        .realm-category:hover {
+        .realm-category.sound:hover {
             background: var(--bg-primary);
-            border-color: var(--vermilion);
+            border-color: var(--realm-sound);
+        }
+
+        .realm-category.color:hover {
+            background: var(--bg-primary);
+            border-color: var(--realm-color);
+        }
+
+        .realm-category.text:hover {
+            background: var(--bg-primary);
+            border-color: var(--realm-text);
         }
 
         .realm-category .icon {
             font-size: 3rem;
             margin-bottom: 16px;
             color: var(--ink-light);
+            transition: color 0.4s ease;
         }
 
-        .realm-category:hover .icon {
-            color: var(--vermilion);
+        .realm-category.sound:hover .icon {
+            color: var(--realm-sound);
+        }
+
+        .realm-category.color:hover .icon {
+            color: var(--realm-color);
+        }
+
+        .realm-category.text:hover .icon {
+            color: var(--realm-text);
         }
 
         .realm-category .name {
@@ -740,17 +759,17 @@
         </div>
 
         <div class="realm-categories">
-            <div class="realm-category" onclick="enterRealm('sound')">
+            <div class="realm-category sound" onclick="enterRealm('sound')">
                 <div class="icon">♪</div>
                 <div class="name">音</div>
                 <div class="desc">声之境</div>
             </div>
-            <div class="realm-category" onclick="enterRealm('color')">
+            <div class="realm-category color" onclick="enterRealm('color')">
                 <div class="icon">◈</div>
                 <div class="name">色</div>
                 <div class="desc">色之境</div>
             </div>
-            <div class="realm-category" onclick="enterRealm('text')">
+            <div class="realm-category text" onclick="enterRealm('text')">
                 <div class="icon">✦</div>
                 <div class="name">文</div>
                 <div class="desc">文之境</div>
