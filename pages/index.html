@@ -39,10 +39,10 @@
         }
         
         .navbar__logo {
-            font-family: 'LXGW WenKai', serif;
+            font-family: var(--font-display);
             font-size: 1.25rem;
             font-weight: 400;
-            color: #3A3530;
+            color: var(--ink-deep);
             letter-spacing: 0.3em;
             text-decoration: none;
             opacity: 0.85;
@@ -63,10 +63,10 @@
         
         .navbar__link {
             position: relative;
-            font-family: 'Noto Serif SC', serif;
+            font-family: var(--font-serif);
             font-size: 1rem;
             font-weight: 400;
-            color: #7A6E5F;
+            color: var(--ink-light);
             text-decoration: none;
             letter-spacing: 0.3em;
             padding: 0.5rem 0;
@@ -74,7 +74,7 @@
         }
         
         .navbar__link:hover {
-            color: #3A3530;
+            color: var(--ink-deep);
         }
         
         .navbar__link::after {
@@ -84,7 +84,7 @@
             left: 0;
             width: 0;
             height: 0.5px;
-            background: #C9B896;
+            background: var(--gold-primary);
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
@@ -106,20 +106,20 @@
             gap: 0.75rem;
             padding: 0.5rem 1rem;
             border-radius: 2px;
-            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            border: 0.5px solid var(--gold-light);
             background: transparent;
-            font-family: 'Noto Serif SC', serif;
+            font-family: var(--font-serif);
             font-size: 0.8rem;
-            color: #7A6E5F;
+            color: var(--ink-light);
             letter-spacing: 0.15em;
             cursor: pointer;
             transition: all 0.4s ease;
         }
         
         .navbar__user:hover {
-            border-color: #C9B896;
-            color: #3A3530;
-            background: rgba(201, 184, 150, 0.05);
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+            background: rgba(160, 48, 32, 0.05);
         }
         
         /* 钱包连接后悬停显示地址 - 排除首页吾按钮 */
@@ -177,7 +177,7 @@
         .navbar__user-placeholder svg {
             width: 12px;
             height: 12px;
-            stroke: #7A6E5F;
+            stroke: var(--ink-light);
         }
 
         .navbar__user-avatar {
@@ -208,7 +208,7 @@
         .navbar__menu-line {
             width: 24px;
             height: 1px;
-            background: #7A6E5F;
+            background: var(--ink-light);
             transition: all 0.4s ease;
             transform-origin: center;
         }
@@ -242,13 +242,13 @@
         .navbar__mobile-menu .navbar__link {
             font-size: 1.5rem;
             font-weight: 300;
-            color: #5A5045;
+            color: var(--ink-light);
             padding: 1rem 0;
             letter-spacing: 0.5em;
         }
         
         .navbar__mobile-menu .navbar__link:hover {
-            color: #3A3530;
+            color: var(--ink-deep);
         }
         
         .navbar__mobile-menu .navbar__link::after {
@@ -292,6 +292,9 @@
             /* 宋金 */
             --gold-primary: #B89B6C;
             --gold-light: #D4C4A8;
+            
+            /* 朱红 */
+            --vermilion: #A03020;
             
             /* 三域 - 宋瓷高级感 */
             --realm-sound: #8B9DC3;
@@ -713,7 +716,7 @@
             padding: 0.8rem 2rem;
             border: 1px solid rgba(160, 48, 32, 0.4);
             border-radius: 2px;
-            color: #A03020;
+            color: var(--vermilion);
             font-size: 1.2rem;
             letter-spacing: 0.2em;
             margin-bottom: 1.5rem;
@@ -983,13 +986,13 @@
             right: 2rem;
             width: 56px;
             height: 56px;
-            background: #A03020;
-            color: #F8F6F1;
+            background: var(--vermilion);
+            color: var(--bg-primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'LXGW WenKai', serif;
+            font-family: var(--font-display);
             font-size: 1.2rem;
             text-decoration: none;
             box-shadow: 0 4px 12px rgba(160, 48, 32, 0.3);

@@ -32,7 +32,7 @@
             --seal-red: #A03020;
 
             /* 字体 */
-            --font-display: 'Noto Serif SC', serif;
+            --font-display: 'LXGW WenKai', cursive;
             --font-serif: 'Noto Serif SC', serif;
 
             /* 时长 */
@@ -99,7 +99,7 @@
             font-family: var(--font-display);
             font-size: 1.25rem;
             font-weight: 400;
-            color: #3A3530;
+            color: var(--ink-deep);
             letter-spacing: 0.3em;
             text-decoration: none;
             opacity: 0.85;
@@ -120,10 +120,10 @@
 
         .navbar__link {
             position: relative;
-            font-family: 'Noto Serif SC', serif;
+            font-family: var(--font-serif);
             font-size: 1rem;
             font-weight: 400;
-            color: #7A6E5F;
+            color: var(--ink-light);
             text-decoration: none;
             letter-spacing: 0.3em;
             padding: 0.5rem 0;
@@ -131,7 +131,7 @@
         }
 
         .navbar__link:hover {
-            color: #3A3530;
+            color: var(--ink-deep);
         }
 
         .navbar__link::after {
@@ -167,20 +167,20 @@
             gap: 0.75rem;
             padding: 0.5rem 1rem;
             border-radius: 2px;
-            border: 0.5px solid rgba(122, 110, 95, 0.15);
+            border: 0.5px solid var(--gold-light);
             background: transparent;
-            font-family: var(--font-display);
+            font-family: var(--font-serif);
             font-size: 0.8rem;
-            color: #7A6E5F;
+            color: var(--ink-light);
             letter-spacing: 0.15em;
             cursor: pointer;
             transition: all 0.4s ease;
         }
 
         .navbar__user:hover {
-            border-color: var(--gold-primary);
-            color: #3A3530;
-            background: rgba(201, 184, 150, 0.05);
+            border-color: var(--vermilion);
+            color: var(--vermilion);
+            background: rgba(160, 48, 32, 0.05);
         }
 
         /* 钱包连接后悬停显示地址 */
@@ -223,7 +223,7 @@
         .navbar__user-placeholder svg {
             width: 12px;
             height: 12px;
-            stroke: #7A6E5F;
+            stroke: var(--ink-light);
         }
 
         .navbar__menu-btn {
@@ -243,7 +243,7 @@
         .navbar__menu-line {
             width: 24px;
             height: 1px;
-            background: #7A6E5F;
+            background: var(--ink-light);
             transition: all 0.4s ease;
             transform-origin: center;
         }
@@ -277,7 +277,7 @@
         .navbar__mobile-menu .navbar__link {
             font-size: 1.5rem;
             font-weight: 300;
-            color: #5A5045;
+            color: var(--ink-light);
             padding: 1rem 0;
             letter-spacing: 0.5em;
         }
@@ -317,18 +317,43 @@
             padding: 8vh 5vw 6vh;
             text-align: center;
             position: relative;
+            overflow: hidden;
         }
 
+        /* 宣纸纹理 */
         .creator-hero::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 1px;
-            height: 60px;
-            background: linear-gradient(to bottom, transparent, var(--gold-primary), transparent);
-            opacity: 0.5;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+        }
+
+        /* 窗棂光晕 */
+        .creator-hero::after {
+            content: '';
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(ellipse at center, 
+                rgba(232, 228, 220, 0.6) 0%, 
+                transparent 70%);
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 1;
+            top: -20%;
+            right: -10%;
+            animation: lightBreath 12s ease-in-out infinite;
+        }
+
+        @keyframes lightBreath {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
         }
 
         .creator-title {
@@ -339,6 +364,8 @@
             letter-spacing: 0.3em;
             margin-bottom: 1rem;
             margin-left: 0.3em;
+            position: relative;
+            z-index: 2;
         }
 
         .creator-subtitle {
@@ -347,6 +374,8 @@
             color: var(--ink-light);
             letter-spacing: 0.2em;
             font-weight: 300;
+            position: relative;
+            z-index: 2;
         }
 
         /* ===== 步骤指示器 ===== */
