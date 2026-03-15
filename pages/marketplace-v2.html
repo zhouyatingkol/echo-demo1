@@ -263,20 +263,20 @@
 
         .hero-create-btn {
             padding: 12px 40px;
-            border: 0.5px solid var(--gold-primary);
-            background: transparent;
-            color: var(--ink-deep);
+            background: var(--vermilion);
+            color: var(--bg-primary);
             font-family: var(--font-display), 'LXGW WenKai', cursive;
             font-size: 1rem;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.3em;
+            text-indent: 0.3em;
             text-decoration: none;
             transition: all 0.4s ease;
             cursor: pointer;
         }
 
         .hero-create-btn:hover {
-            border-color: var(--vermilion);
-            color: var(--vermilion);
+            background: #8B2419;
+            transform: translateY(-2px);
         }
 
         /* ===== 境界分隔 ===== */
@@ -325,34 +325,21 @@
             border-color: var(--gold-primary);
         }
 
-        /* 方案 C：遇作为章节标记 */
+        /* 方案 C：遇章节 - 简洁标记 */
         .yu-header-compact {
             max-width: 800px;
-            margin: 0 auto 40px;
+            margin: 0 auto 24px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
             padding: 0 24px;
-        }
-
-        .yu-mark {
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 1.1rem;
-            color: var(--ink-light);
-            letter-spacing: 0.2em;
-        }
-
-        .yu-dot {
-            color: var(--gold-primary);
-            font-size: 0.9rem;
         }
 
         .yu-quote {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
             font-size: 0.9rem;
-            color: var(--ink-light);
-            letter-spacing: 0.1em;
-            flex: 1;
+            color: var(--ink-faint);
+            letter-spacing: 0.15em;
         }
 
         /* 保留 realm-header 样式用于寻和观 */
@@ -378,21 +365,21 @@
 
         /* 搜索框 */
         .search-box {
-            max-width: 500px;
-            margin: 0 auto 80px;
+            max-width: 420px;
+            margin: 0 auto 60px;
             position: relative;
         }
 
         .search-input {
             width: 100%;
-            padding: 16px 24px 16px 48px;
-            border: none;
-            border-bottom: 1px solid var(--gold-light);
+            padding: 14px 24px 14px 48px;
+            border: 0.5px solid var(--gold-light);
+            border-radius: 2px;
             background: transparent;
             font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--ink-deep);
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             outline: none;
             transition: border-color 0.4s ease;
         }
@@ -417,8 +404,8 @@
         /* 卡片网格 */
         .asset-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 32px;
             max-width: 1400px;
             margin: 0 auto;
         }
@@ -428,12 +415,13 @@
             border-radius: 2px;
             overflow: hidden;
             cursor: pointer;
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            transition: all 0.4s ease;
+            border: 0.5px solid transparent;
         }
 
         .asset-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 32px rgba(122, 110, 95, 0.1);
+            transform: translateY(-2px);
+            border: 0.5px solid var(--gold-primary);
         }
 
         .asset-image {
@@ -686,22 +674,20 @@
     </nav>
 
     <!-- Hero -->
-    <section class="hero" style="padding: 120px 40px 60px;">
+    <section class="hero" style="padding: 120px 40px 40px;">
         <h1 class="hero-title">集</h1>
         <p class="hero-subtitle">随缘而聚，各得其所</p>
         <a href="creator.html" class="hero-create-btn">吾作</a>
     </section>
 
     <!-- 第一境：遇 -->
-    <section class="realm-yu" style="padding-top: 40px;">
-        <div class="realm-divider"></div>
+    <section class="realm-yu" style="padding-top: 60px;">
+        <div class="realm-divider" style="margin-bottom: 32px;"></div>
         
         <div class="yu-header-compact">
-            <span class="yu-mark">遇</span>
-            <span class="yu-dot">·</span>
             <span class="yu-quote">此间万物，皆可遇</span>
             <select class="yu-filter">
-                <option value="">价</option>
+                <option value="">价 ▼</option>
                 <option value="0-50">0 - 50</option>
                 <option value="50-100">50 - 100</option>
                 <option value="100-500">100 - 500</option>
