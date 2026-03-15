@@ -454,6 +454,31 @@
             color: var(--ink-light);
         }
 
+        .realm-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 2px;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 0.75rem;
+            color: white;
+            letter-spacing: 0.05em;
+        }
+
+        .realm-tag.sound {
+            background: var(--realm-sound);
+        }
+
+        .realm-tag.color {
+            background: var(--realm-color);
+        }
+
+        .realm-tag.text {
+            background: var(--realm-text);
+        }
+
         /* ===== 第二境：寻 ===== */
         .realm-xun {
             padding: 120px 40px;
@@ -787,10 +812,12 @@
         function generateYuCards() {
             const grid = document.getElementById('yuGrid');
             const realms = ['音', '色', '文'];
+            const realmClasses = ['sound', 'color', 'text'];
             const titles = ['夏日微风', '晨光初现', '山水之间', '月夜清音', '墨染流年', '云淡风轻'];
 
             for (let i = 0; i < 6; i++) {
                 const realm = realms[i % 3];
+                const realmClass = realmClasses[i % 3];
                 const title = titles[i];
                 const price = (Math.random() * 1000 + 100).toFixed(0);
 
@@ -801,7 +828,7 @@
                     <div class="asset-info">
                         <div class="asset-title">${title}</div>
                         <div class="asset-meta">
-                            <span>${realm}</span>
+                            <span class="realm-tag ${realmClass}">${realm}</span>
                             <span>${price} ECHO</span>
                         </div>
                     </div>
