@@ -587,9 +587,31 @@
             letter-spacing: 0.1em;
         }
 
+        /* ===== 境界编号 ===== */
+        .realm-number {
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.3em;
+            margin-bottom: 12px;
+        }
+
+        /* ===== 境界分隔线 ===== */
+        .realm-separator {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+            margin: 80px 40px;
+        }
+
+        /* ===== 页脚布局 ===== */
         .daily-footer {
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
             margin-top: 48px;
+        }
+
+        .daily-update-hint {
             font-size: 0.75rem;
             color: var(--ink-faint);
             letter-spacing: 0.15em;
@@ -1176,6 +1198,7 @@
         <div class="realm-divider"></div>
         
         <div class="realm-header">
+            <div class="realm-number">第一境</div>
             <h2 class="realm-title">遇</h2>
             <p class="realm-quote">不期而遇，不约而同</p>
         </div>
@@ -1185,24 +1208,28 @@
             <div class="daily-header">
                 <div class="daily-date" id="dailyDate">乙巳年 六月初八</div>
                 <div class="daily-quote">今日有缘，随缘随喜</div>
-                <button class="daily-refresh-btn" onclick="refreshDaily()">
-                    <span>⟳</span> 再逛逛
-                </button>
             </div>
             <div class="daily-grid" id="dailyGrid">
                 <!-- 卡片由 JS 生成 -->
             </div>
             <div class="daily-footer">
-                <span>每日辰时更新 · 一期一会</span>
+                <button class="daily-refresh-btn" onclick="refreshDaily()">
+                    <span>⟳</span> 再逛逛
+                </button>
+                <span class="daily-update-hint">每日辰时更新 · 一期一会</span>
             </div>
         </div>
     </section>
+
+    <!-- 分隔线 -->
+    <div class="realm-separator"></div>
 
     <!-- 第二境：寻 -->
     <section class="realm-xun">
         <div class="realm-divider"></div>
 
         <div class="realm-header">
+            <div class="realm-number">第二境</div>
             <h2 class="realm-title">寻</h2>
             <p class="realm-quote">循声入色，由色入文</p>
         </div>
@@ -1234,6 +1261,7 @@
         <div class="realm-divider"></div>
 
         <div class="realm-header">
+            <div class="realm-number">第三境</div>
             <h2 class="realm-title">观</h2>
             <p class="realm-quote">声动色起，文以载道</p>
         </div>
