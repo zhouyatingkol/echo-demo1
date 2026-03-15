@@ -417,45 +417,170 @@
             font-size: 1.1rem;
         }
 
-        /* 筛选标签 */
-        .yu-filters {
+        /* ===== 遴选方案切换 ===== */
+        .filter-scheme-toggle {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 16px;
-            margin-bottom: 48px;
-            flex-wrap: wrap;
+            margin-bottom: 24px;
         }
 
-        .yu-filter-label {
-            font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.85rem;
+        .filter-scheme-label {
+            font-size: 0.8rem;
             color: var(--ink-faint);
             letter-spacing: 0.1em;
         }
 
-        .yu-filter-tag {
+        .filter-scheme-btn {
             padding: 6px 16px;
             border: 0.5px solid var(--gold-light);
             background: transparent;
-            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
             font-size: 0.85rem;
             color: var(--ink-light);
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
             cursor: pointer;
             transition: all 0.4s ease;
         }
 
-        .yu-filter-tag:hover,
-        .yu-filter-tag.active {
+        .filter-scheme-btn:hover {
             border-color: var(--gold-primary);
-            color: var(--ink-deep);
-        }
-            transition: border-color 0.4s ease;
         }
 
-        .yu-filter:hover {
+        .filter-scheme-btn.active {
             border-color: var(--gold-primary);
+            color: var(--ink-deep);
+            background: rgba(166, 139, 91, 0.1);
+        }
+
+        /* ===== 方案D：极简墨字 ===== */
+        .filter-scheme-ink {
+            margin-bottom: 48px;
+        }
+
+        .ink-filter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ink-dot {
+            color: var(--ink-faint);
+            font-size: 0.7rem;
+        }
+
+        .ink-item {
+            font-size: 0.95rem;
+            letter-spacing: 0.15em;
+            color: var(--ink-light);
+            cursor: pointer;
+            padding: 6px 12px;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .ink-item::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            right: 50%;
+            height: 0.5px;
+            background: var(--ink-medium);
+            transition: all 0.4s ease;
+        }
+
+        .ink-item:hover {
+            color: var(--ink-deep);
+        }
+
+        .ink-item:hover::after {
+            left: 25%;
+            right: 25%;
+            opacity: 0.4;
+        }
+
+        .ink-item.active {
+            color: var(--ink-deep);
+        }
+
+        .ink-item.active::after {
+            left: 10%;
+            right: 10%;
+            background: var(--ink-deep);
+            opacity: 0.5;
+        }
+
+        /* ===== 方案C：集市巷道 ===== */
+        .filter-scheme-arch {
+            margin-bottom: 48px;
+        }
+
+        .arch-filter {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .arch-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .arch-shape {
+            width: 56px;
+            height: 48px;
+            border: 1.5px solid var(--gold-light);
+            border-bottom: none;
+            border-radius: 28px 28px 0 0;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .arch-shape::before {
+            content: '·';
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--ink-faint);
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .arch-name {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            color: var(--ink-light);
+            transition: all 0.4s ease;
+        }
+
+        .arch-item:hover .arch-shape,
+        .arch-item.active .arch-shape {
+            border-color: var(--gold-primary);
+        }
+
+        .arch-item:hover .arch-shape::before,
+        .arch-item.active .arch-shape::before {
+            opacity: 1;
+            color: var(--gold-primary);
+        }
+
+        .arch-item:hover .arch-name,
+        .arch-item.active .arch-name {
+            color: var(--ink-deep);
+        }
+
+        .arch-item.active .arch-shape {
+            background: linear-gradient(180deg, rgba(166, 139, 91, 0.05) 0%, transparent 100%);
         }
 
         .search-box-wrapper {
@@ -973,13 +1098,51 @@
             </div>
         </div>
 
-        <div class="yu-filters">
-            <span class="yu-filter-label">筛选：</span>
-            <button class="yu-filter-tag active">全部</button>
-            <button class="yu-filter-tag">音</button>
-            <button class="yu-filter-tag">色</button>
-            <button class="yu-filter-tag">文</button>
-            <button class="yu-filter-tag">我的</button>
+        <div class="filter-scheme-toggle">
+            <span class="filter-scheme-label">遴选方式</span>
+            <button class="filter-scheme-btn active" data-scheme="ink" onclick="switchFilterScheme('ink')">墨字</button>
+            <button class="filter-scheme-btn" data-scheme="arch" onclick="switchFilterScheme('arch')">巷门</button>
+        </div>
+
+        <!-- 方案D：极简墨字 -->
+        <div class="filter-scheme-ink" id="filterInk">
+            <div class="ink-filter">
+                <span class="ink-item active" data-filter="all">全部</span>
+                <span class="ink-dot">·</span>
+                <span class="ink-item" data-filter="sound">音</span>
+                <span class="ink-dot">·</span>
+                <span class="ink-item" data-filter="color">色</span>
+                <span class="ink-dot">·</span>
+                <span class="ink-item" data-filter="text">文</span>
+                <span class="ink-dot">·</span>
+                <span class="ink-item" data-filter="mine">我的</span>
+            </div>
+        </div>
+
+        <!-- 方案C：集市巷道 -->
+        <div class="filter-scheme-arch" id="filterArch" style="display: none;">
+            <div class="arch-filter">
+                <div class="arch-item active" data-filter="all">
+                    <div class="arch-shape"></div>
+                    <span class="arch-name">全部</span>
+                </div>
+                <div class="arch-item" data-filter="sound">
+                    <div class="arch-shape"></div>
+                    <span class="arch-name">音律巷</span>
+                </div>
+                <div class="arch-item" data-filter="color">
+                    <div class="arch-shape"></div>
+                    <span class="arch-name">色彩坊</span>
+                </div>
+                <div class="arch-item" data-filter="text">
+                    <div class="arch-shape"></div>
+                    <span class="arch-name">文辞阁</span>
+                </div>
+                <div class="arch-item" data-filter="mine">
+                    <div class="arch-shape"></div>
+                    <span class="arch-name">我的</span>
+                </div>
+            </div>
         </div>
 
         <div class="asset-grid" id="yuGrid">
@@ -1070,6 +1233,45 @@
                 mobileMenu.classList.toggle('is-open');
             });
         }
+
+        // 筛选方案切换
+        function switchFilterScheme(scheme) {
+            const inkContainer = document.getElementById('filterInk');
+            const archContainer = document.getElementById('filterArch');
+            const btns = document.querySelectorAll('.filter-scheme-btn');
+            
+            btns.forEach(btn => {
+                if (btn.dataset.scheme === scheme) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            if (scheme === 'ink') {
+                inkContainer.style.display = 'block';
+                archContainer.style.display = 'none';
+            } else {
+                inkContainer.style.display = 'none';
+                archContainer.style.display = 'block';
+            }
+        }
+
+        // 墨字筛选点击
+        document.querySelectorAll('.ink-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.ink-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 巷门筛选点击
+        document.querySelectorAll('.arch-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.arch-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
 
         // 生成遇境卡片
         function generateYuCards() {
