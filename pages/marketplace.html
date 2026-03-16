@@ -365,7 +365,7 @@
 
         /* ===== 第一境：遇 ===== */
         .realm-yu {
-            padding: 60px 40px 4vh;
+            padding: 10vh 40px 12vh;
         }
 
         .yu-header {
@@ -608,11 +608,34 @@
 
         /* ===== 境界分隔线（更淡更克制） ===== */
         .realm-separator {
+            height: 80px;
+            margin: 0 auto;
+            max-width: 600px;
+            background: linear-gradient(
+                180deg,
+                transparent 0%,
+                rgba(166, 139, 91, 0.03) 30%,
+                rgba(166, 139, 91, 0.06) 50%,
+                rgba(166, 139, 91, 0.03) 70%,
+                transparent 100%
+            );
+            position: relative;
+        }
+
+        .realm-separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
             height: 1px;
-            background: linear-gradient(90deg, transparent 0%, var(--gold-light) 20%, var(--gold-light) 80%, transparent 100%);
-            margin: 40px auto;
-            max-width: 200px;
-            opacity: 0.5;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(166, 139, 91, 0.15) 30%,
+                rgba(166, 139, 91, 0.15) 70%,
+                transparent 100%
+            );
         }
 
         /* ===== 页脚布局 ===== */
@@ -878,7 +901,7 @@
 
         /* ===== 第二境：寻 ===== */
         .realm-xun {
-            padding: 4vh 40px;
+            padding: 8vh 40px 12vh;
         }
 
         .realm-categories {
@@ -1033,50 +1056,134 @@
             transition: transform 0.3s ease;
         }
 
-        /* ===== 观者身份选择 ===== */
+        /* ===== 寻境画卷微动画 ===== */
+        /* 古琴七弦微颤 */
+        .realm-category.sound:hover .painting svg .string {
+            animation: stringVibrate 0.8s ease-in-out infinite;
+        }
+        
+        .realm-category.sound:hover .painting svg .string:nth-child(1) { animation-delay: 0s; }
+        .realm-category.sound:hover .painting svg .string:nth-child(2) { animation-delay: 0.05s; }
+        .realm-category.sound:hover .painting svg .string:nth-child(3) { animation-delay: 0.1s; }
+        .realm-category.sound:hover .painting svg .string:nth-child(4) { animation-delay: 0.15s; }
+        .realm-category.sound:hover .painting svg .string:nth-child(5) { animation-delay: 0.2s; }
+        .realm-category.sound:hover .painting svg .string:nth-child(6) { animation-delay: 0.25s; }
+        .realm-category.sound:hover .painting svg .string:nth-child(7) { animation-delay: 0.3s; }
+
+        @keyframes stringVibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(0.3px); }
+            75% { transform: translateX(-0.3px); }
+        }
+
+        /* 梅花飘落 - 随机触发 */
+        .realm-category.color .painting svg .petal {
+            opacity: 0;
+        }
+        
+        .realm-category.color:hover .painting svg .petal {
+            animation: petalFall 3s ease-out forwards;
+        }
+
+        @keyframes petalFall {
+            0% { 
+                opacity: 0.8;
+                transform: translate(0, 0) rotate(0deg); 
+            }
+            100% { 
+                opacity: 0;
+                transform: translate(10px, 40px) rotate(45deg); 
+            }
+        }
+
+        /* 书卷毛笔蘸墨 - 墨痕晕开 */
+        .realm-category.text:hover .painting svg .ink-wash {
+            animation: inkSpread 1.2s ease-out forwards;
+        }
+
+        @keyframes inkSpread {
+            0% { 
+                opacity: 0.3;
+                transform: scale(1); 
+            }
+            50% { 
+                opacity: 0.5;
+                transform: scale(1.1); 
+            }
+            100% { 
+                opacity: 0.3;
+                transform: scale(1); 
+            }
+        }
+
+        /* ===== 观者身份选择 —— 印章式 ===== */
         .observer-tabs {
             display: flex;
             justify-content: center;
-            gap: 32px;
-            margin-bottom: 40px;
+            gap: 48px;
+            margin-bottom: 48px;
         }
 
         .observer-tab {
+            width: 64px;
+            height: 64px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            padding: 20px 32px;
+            justify-content: center;
             background: transparent;
-            border: 0.5px solid var(--gold-light);
+            border: 2px solid var(--ink-faint);
             cursor: pointer;
-            transition: all 0.4s ease;
-            opacity: 0.6;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.4;
+            position: relative;
         }
 
-        .observer-tab:hover,
+        /* 朱文印章 - 未选中 */
+        .observer-tab::before {
+            content: attr(data-seal);
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1.5rem;
+            color: var(--vermilion);
+            letter-spacing: 0;
+            transition: all 0.4s ease;
+        }
+
+        .observer-tab:hover {
+            opacity: 0.7;
+            border-color: var(--vermilion-light);
+        }
+
+        /* 白文印章 - 选中 */
         .observer-tab.active {
             opacity: 1;
-            border-color: #B85C4F;
-            background: rgba(184, 92, 79, 0.03);
+            background: var(--vermilion);
+            border-color: var(--vermilion);
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(139, 40, 32, 0.2);
         }
 
-        .observer-tab .tab-icon {
-            font-size: 1.5rem;
-            color: #B85C4F;
+        .observer-tab.active::before {
+            color: var(--bg-primary);
         }
 
-        .observer-tab .tab-name {
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 1rem;
-            color: var(--ink-deep);
-            letter-spacing: 0.1em;
-        }
-
-        .observer-tab .tab-desc {
+        /* 印章标签 */
+        .observer-tab::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 0.75rem;
             color: var(--ink-light);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+            white-space: nowrap;
+            opacity: 0.7;
+            transition: all 0.4s ease;
+        }
+
+        .observer-tab.active::after {
+            color: var(--ink-deep);
+            opacity: 1;
         }
 
         /* ===== 时态选择 ===== */
@@ -1148,7 +1255,7 @@
 
         /* ===== 第三境：观 ===== */
         .realm-guan {
-            padding: 4vh 40px 120px;
+            padding: 10vh 40px 16vh;
             min-height: 100vh;
         }
 
@@ -1382,13 +1489,13 @@
                         <path d="M72 70 Q100 62 128 70" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
                         
                         <!-- 七弦 -->
-                        <line x1="82" y1="75" x2="82" y2="165" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="88" y1="73" x2="88" y2="167" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="94" y1="72" x2="94" y2="168" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="100" y1="71" x2="100" y2="169" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="106" y1="72" x2="106" y2="168" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="112" y1="73" x2="112" y2="167" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="118" y1="75" x2="118" y2="165" stroke="currentColor" stroke-width="0.6"/>
+                        <line class="string" x1="82" y1="75" x2="82" y2="165" stroke="currentColor" stroke-width="0.6"/>
+                        <line class="string" x1="88" y1="73" x2="88" y2="167" stroke="currentColor" stroke-width="0.6"/>
+                        <line class="string" x1="94" y1="72" x2="94" y2="168" stroke="currentColor" stroke-width="0.6"/>
+                        <line class="string" x1="100" y1="71" x2="100" y2="169" stroke="currentColor" stroke-width="0.6"/>
+                        <line class="string" x1="106" y1="72" x2="106" y2="168" stroke="currentColor" stroke-width="0.6"/>
+                        <line class="string" x1="112" y1="73" x2="112" y2="167" stroke="currentColor" stroke-width="0.6"/>
+                        <line class="string" x1="118" y1="75" x2="118" y2="165" stroke="currentColor" stroke-width="0.6"/>
                         
                         <!-- 琴徽 -->
                         <circle cx="100" cy="85" r="1.5" fill="currentColor" opacity="0.7"/>
@@ -1447,6 +1554,9 @@
                         <circle cx="50" cy="90" r="1" fill="currentColor"/>
                         <circle cx="140" cy="70" r="0.8" fill="currentColor"/>
                         
+                        <!-- 飘落花瓣 -->
+                        <circle class="petal" cx="70" cy="60" r="2" fill="currentColor" opacity="0"/>
+                        
                         <!-- 苔点 -->
                         <circle cx="92" cy="200" r="1.5" fill="currentColor" opacity="0.4"/>
                         <circle cx="88" cy="185" r="1" fill="currentColor" opacity="0.3"/>
@@ -1498,8 +1608,8 @@
                         <line x1="165" y1="160" x2="168" y2="155" stroke="currentColor" stroke-width="1"/>
                         
                         <!-- 墨痕 -->
-                        <circle cx="160" cy="195" r="8" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.3"/>
-                        <path d="M155 192 Q160 198 165 192" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+                        <circle class="ink-wash" cx="160" cy="195" r="8" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.3"/>
+                        <path class="ink-wash" d="M155 192 Q160 198 165 192" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
                     </svg>
                 </div>
                 <div class="name">章</div>
@@ -1548,23 +1658,11 @@
             <p class="realm-quote"><span class="realm-highlight">观</span>微知著，静以自得</p>
         </div>
 
-        <!-- 观者身份选择 -->
+        <!-- 观者身份选择 —— 印章式 -->
         <div class="observer-tabs">
-            <button class="observer-tab active" data-role="collector" onclick="switchObserver('collector')">
-                <span class="tab-icon">◈</span>
-                <span class="tab-name">藏家</span>
-                <span class="tab-desc">藏之以心</span>
-            </button>
-            <button class="observer-tab" data-role="creator" onclick="switchObserver('creator')">
-                <span class="tab-icon">✦</span>
-                <span class="tab-name">创作者</span>
-                <span class="tab-desc">观势而起</span>
-            </button>
-            <button class="observer-tab" data-role="wanderer" onclick="switchObserver('wanderer')">
-                <span class="tab-icon">◉</span>
-                <span class="tab-name">漫游者</span>
-                <span class="tab-desc">随遇而安</span>
-            </button>
+            <button class="observer-tab active" data-role="collector" data-seal="藏" data-label="藏家之观" onclick="switchObserver('collector')"></button>
+            <button class="observer-tab" data-role="creator" data-seal="作" data-label="创作者之观" onclick="switchObserver('creator')"></button>
+            <button class="observer-tab" data-role="wanderer" data-seal="游" data-label="漫游者之观" onclick="switchObserver('wanderer')"></button>
         </div>
 
         <!-- 时态选择 -->
