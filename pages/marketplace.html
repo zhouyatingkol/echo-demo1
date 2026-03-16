@@ -1033,6 +1033,119 @@
             transition: transform 0.3s ease;
         }
 
+        /* ===== 观者身份选择 ===== */
+        .observer-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .observer-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 32px;
+            background: transparent;
+            border: 0.5px solid var(--gold-light);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            opacity: 0.6;
+        }
+
+        .observer-tab:hover,
+        .observer-tab.active {
+            opacity: 1;
+            border-color: #B85C4F;
+            background: rgba(184, 92, 79, 0.03);
+        }
+
+        .observer-tab .tab-icon {
+            font-size: 1.5rem;
+            color: #B85C4F;
+        }
+
+        .observer-tab .tab-name {
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.1em;
+        }
+
+        .observer-tab .tab-desc {
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== 时态选择 ===== */
+        .time-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .time-tab {
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.15em;
+            padding: 8px 16px;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .time-tab::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: var(--gold-light);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .time-tab:hover {
+            color: #B85C4F;
+        }
+
+        .time-tab.active {
+            color: #B85C4F;
+        }
+
+        .time-tab.active::before {
+            opacity: 1;
+        }
+
+        /* ===== 气韵描述 ===== */
+        .atmosphere-desc {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
+
+        .atmosphere-label {
+            display: inline-block;
+            padding: 4px 12px;
+            border: 0.5px solid var(--gold-light);
+            margin-right: 16px;
+            font-size: 0.75rem;
+            color: #B85C4F;
+        }
+
+        .atmosphere-text {
+            font-style: italic;
+        }
+
         /* ===== 第三境：观 ===== */
         .realm-guan {
             padding: 4vh 40px 120px;
@@ -1151,6 +1264,15 @@
             font-size: 0.85rem;
             color: var(--ink-light);
             margin-bottom: 4px;
+        }
+
+        .bubble-hint {
+            font-size: 0.75rem;
+            color: var(--gold-primary);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 0.5px solid var(--gold-light);
+            font-style: italic;
         }
 
         /* 响应式隐藏 */
@@ -1426,11 +1548,44 @@
             <p class="realm-quote">律动而彩起，章成而道显</p>
         </div>
 
+        <!-- 观者身份选择 -->
+        <div class="observer-tabs">
+            <button class="observer-tab active" data-role="collector" onclick="switchObserver('collector')">
+                <span class="tab-icon">◈</span>
+                <span class="tab-name">藏家</span>
+                <span class="tab-desc">藏之以心</span>
+            </button>
+            <button class="observer-tab" data-role="creator" onclick="switchObserver('creator')">
+                <span class="tab-icon">✦</span>
+                <span class="tab-name">创作者</span>
+                <span class="tab-desc">观势而起</span>
+            </button>
+            <button class="observer-tab" data-role="wanderer" onclick="switchObserver('wanderer')">
+                <span class="tab-icon">◉</span>
+                <span class="tab-name">漫游者</span>
+                <span class="tab-desc">随遇而安</span>
+            </button>
+        </div>
+
+        <!-- 时态选择 -->
+        <div class="time-tabs">
+            <button class="time-tab active" data-time="now" onclick="switchTime('now')">此刻</button>
+            <button class="time-tab" data-time="past" onclick="switchTime('past')">往昔</button>
+            <button class="time-tab" data-time="rising" onclick="switchTime('rising')">来者可追</button>
+        </div>
+
+        <!-- 域选择 -->
         <div class="chart-tabs">
             <button class="chart-tab active" onclick="switchChart('sound')">律观</button>
             <button class="chart-tab" onclick="switchChart('color')">彩观</button>
             <button class="chart-tab" onclick="switchChart('text')">章观</button>
             <button class="chart-tab" onclick="switchChart('all')">总观</button>
+        </div>
+
+        <!-- 气韵描述 -->
+        <div class="atmosphere-desc" id="atmosphereDesc">
+            <span class="atmosphere-label">气韵</span>
+            <span class="atmosphere-text">律域藏品如古琴余韵，静候知音</span>
         </div>
 
         <div class="cloud-chart" id="cloudChart">
@@ -1441,6 +1596,7 @@
                 <div class="bubble-tooltip-title" id="tooltipTitle"></div>
                 <div class="bubble-tooltip-stat" id="tooltipVolume"></div>
                 <div class="bubble-tooltip-stat" id="tooltipHeat"></div>
+                <div class="bubble-hint">点击查看详情</div>
             </div>
         </div>
     </section>
@@ -1670,11 +1826,111 @@
                 0%, 100% { box-shadow: 0 0 0 0 rgba(160, 48, 32, 0.4); }
                 50% { box-shadow: 0 0 0 10px rgba(160, 48, 32, 0); }
             }
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+            @keyframes drift {
+                0% { transform: translateX(0px); }
+                50% { transform: translateX(15px); }
+                100% { transform: translateX(0px); }
+            }
         `;
         document.head.appendChild(style);
 
         // 初始化
         generateDailyCards();
+        
+        // ===== 观者系统 =====
+        let currentObserver = 'collector';
+        let currentTime = 'now';
+        let currentRealm = 'sound';
+
+        // 观者视角数据
+        const observerData = {
+            collector: {
+                label: '藏家之观',
+                desc: '藏之以心',
+                metric: '被收藏数',
+                atmospheres: {
+                    sound: '律域藏品如古琴余韵，静候知音',
+                    color: '彩域画作似宋瓷开片，温润入心',
+                    text: '章域文字若水墨留白，意在言外',
+                    all: '三域纷呈，各有所藏'
+                }
+            },
+            creator: {
+                label: '创作者之观',
+                desc: '观势而起',
+                metric: '创作热度',
+                atmospheres: {
+                    sound: '律域新风起于青萍之末，细听可知',
+                    color: '彩域流光渐变，新色初现',
+                    text: '章域文脉绵延，新声将起',
+                    all: '三域之势，潮起潮落'
+                }
+            },
+            wanderer: {
+                label: '漫游者之观',
+                desc: '随遇而安',
+                metric: '发现数',
+                atmospheres: {
+                    sound: '律域如溪水流淌，不期而遇',
+                    color: '彩域似云卷云舒，随心而驻',
+                    text: '章域若林间小径，曲径通幽',
+                    all: '漫游三域，处处逢春'
+                }
+            }
+        };
+
+        // 时态数据
+        const timeData = {
+            now: { label: '此刻', modifier: 1 },
+            past: { label: '往昔', modifier: 0.8 },
+            rising: { label: '来者可追', modifier: 1.3 }
+        };
+
+        function switchObserver(role) {
+            currentObserver = role;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.observer-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.role === role) tab.classList.add('active');
+            });
+            
+            updateAtmosphere();
+        }
+
+        function switchTime(time) {
+            currentTime = time;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.time-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.time === time) tab.classList.add('active');
+            });
+            
+            updateAtmosphere();
+        }
+
+        function updateAtmosphere() {
+            const desc = observerData[currentObserver].atmospheres[currentRealm];
+            const atmosphereText = document.querySelector('.atmosphere-text');
+            if (atmosphereText) {
+                atmosphereText.textContent = desc;
+            }
+        }
+
+        // 覆盖原有的 switchChart 函数
+        const originalSwitchChart = switchChart;
+        switchChart = function(type) {
+            currentRealm = type;
+            document.querySelectorAll('.chart-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            updateAtmosphere();
+            generateChartData(type);
+        };
         
         // 初始化风云图
         generateChartData('sound');
