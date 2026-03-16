@@ -686,7 +686,120 @@
             background: var(--vermilion);
         }
 
-        /* 风云图 - SVG 气泡图 */
+        /* ===== 观者身份选择 ===== */
+        .observer-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .observer-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 32px;
+            background: transparent;
+            border: 0.5px solid var(--gold-light);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            opacity: 0.6;
+        }
+
+        .observer-tab:hover,
+        .observer-tab.active {
+            opacity: 1;
+            border-color: var(--vermilion);
+            background: rgba(160, 48, 32, 0.03);
+        }
+
+        .observer-tab .tab-icon {
+            font-size: 1.5rem;
+            color: var(--vermilion);
+        }
+
+        .observer-tab .tab-name {
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.1em;
+        }
+
+        .observer-tab .tab-desc {
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== 时态选择 ===== */
+        .time-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .time-tab {
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.15em;
+            padding: 8px 16px;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .time-tab::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: var(--gold-light);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .time-tab:hover {
+            color: var(--vermilion);
+        }
+
+        .time-tab.active {
+            color: var(--vermilion);
+        }
+
+        .time-tab.active::before {
+            opacity: 1;
+        }
+
+        /* ===== 气韵描述 ===== */
+        .atmosphere-desc {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
+
+        .atmosphere-label {
+            display: inline-block;
+            padding: 4px 12px;
+            border: 0.5px solid var(--gold-light);
+            margin-right: 16px;
+            font-size: 0.75rem;
+            color: var(--vermilion);
+        }
+
+        .atmosphere-text {
+            font-style: italic;
+        }
+
+        /* ===== 风云图 - SVG 气泡图 ===== */
         .cloud-chart {
             max-width: 600px;
             margin: 0 auto 40px;
@@ -719,17 +832,20 @@
 
         .cloud-bubble-text {
             font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             fill: white;
             letter-spacing: 0.2em;
             pointer-events: none;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .cloud-bubble-heat {
+        .cloud-bubble-metric {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.8rem;
-            fill: rgba(255, 255, 255, 0.9);
             pointer-events: none;
+        }
+
+        .cloud-bubble:hover circle {
+            opacity: 0.9;
         }
 
         .bubble-tooltip {
@@ -762,6 +878,15 @@
             font-size: 0.85rem;
             color: var(--ink-light);
             margin-bottom: 4px;
+        }
+
+        .bubble-hint {
+            font-size: 0.75rem;
+            color: var(--gold-primary);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 0.5px solid var(--gold-light);
+            font-style: italic;
         }
 
         /* 响应式隐藏 */
@@ -914,11 +1039,44 @@
             <p class="realm-quote">静观自得，见微知著</p>
         </div>
 
+        <!-- 观者身份选择 -->
+        <div class="observer-tabs">
+            <button class="observer-tab active" data-role="collector" onclick="switchObserver('collector')">
+                <span class="tab-icon">◈</span>
+                <span class="tab-name">藏家</span>
+                <span class="tab-desc">藏之以心</span>
+            </button>
+            <button class="observer-tab" data-role="creator" onclick="switchObserver('creator')">
+                <span class="tab-icon">✦</span>
+                <span class="tab-name">创作者</span>
+                <span class="tab-desc">观势而起</span>
+            </button>
+            <button class="observer-tab" data-role="wanderer" onclick="switchObserver('wanderer')">
+                <span class="tab-icon">◉</span>
+                <span class="tab-name">漫游者</span>
+                <span class="tab-desc">随遇而安</span>
+            </button>
+        </div>
+
+        <!-- 时态选择 -->
+        <div class="time-tabs">
+            <button class="time-tab active" data-time="now" onclick="switchTime('now')">此刻</button>
+            <button class="time-tab" data-time="past" onclick="switchTime('past')">往昔</button>
+            <button class="time-tab" data-time="rising" onclick="switchTime('rising')">来者可追</button>
+        </div>
+
+        <!-- 域选择 -->
         <div class="chart-tabs">
             <button class="chart-tab active" onclick="switchChart('sound')">律观</button>
             <button class="chart-tab" onclick="switchChart('color')">彩观</button>
             <button class="chart-tab" onclick="switchChart('text')">章观</button>
             <button class="chart-tab" onclick="switchChart('all')">总观</button>
+        </div>
+
+        <!-- 气韵描述 -->
+        <div class="atmosphere-desc" id="atmosphereDesc">
+            <span class="atmosphere-label">气韵</span>
+            <span class="atmosphere-text">律域如溪水流淌，静谧中自有节奏</span>
         </div>
 
         <div class="cloud-chart" id="cloudChart">
@@ -929,6 +1087,7 @@
                 <div class="bubble-tooltip-title" id="tooltipTitle"></div>
                 <div class="bubble-tooltip-stat" id="tooltipVolume"></div>
                 <div class="bubble-tooltip-stat" id="tooltipHeat"></div>
+                <div class="bubble-hint">点击查看详情</div>
             </div>
         </div>
     </section>
@@ -997,17 +1156,21 @@
             // 清空现有气泡
             svg.innerHTML = '';
             
-            // 三域配置
+            // 获取时态修饰符
+            const timeModifier = timeData[currentTime].modifier;
+            
+            // 三域配置 - 新命名
             const realms = {
-                sound: { name: '音境', color: '#8B9DC3', cx: 150, cy: 200 },
-                color: { name: '色境', color: '#C9A9A6', cx: 300, cy: 150 },
-                text: { name: '文境', color: '#7A8B7C', cx: 450, cy: 200 }
+                sound: { name: '律境', char: '律', color: '#8B9DC3', cx: 150, cy: 200 },
+                color: { name: '彩境', char: '彩', color: '#C9A9A6', cx: 300, cy: 150 },
+                text: { name: '章境', char: '章', color: '#7A8B7C', cx: 450, cy: 200 }
             };
             
-            // 生成随机热度数据
+            // 根据观者视角和时态生成数据
             const heatData = {};
             Object.keys(realms).forEach(key => {
-                heatData[key] = Math.floor(Math.random() * 3000 + 2000);
+                const baseHeat = Math.floor(Math.random() * 3000 + 2000);
+                heatData[key] = Math.floor(baseHeat * timeModifier);
             });
             
             // 如果是总观，显示所有三域
@@ -1018,10 +1181,10 @@
                 const heat = heatData[realmKey];
                 const volume = (Math.random() * 50 + 20).toFixed(1);
                 
-                // 根据热度计算圆圈大小 (60-120)
+                // 根据热度计算圆圈大小 (60-120)，加入时态影响
                 const radius = 60 + (heat / 5000) * 60;
                 
-                // 总观模式下调整位置
+                // 总观模式下调整位置 - 更流动的布局
                 let cx = realm.cx;
                 let cy = realm.cy;
                 if (type === 'all') {
@@ -1034,6 +1197,10 @@
                     cy = positions[index].cy;
                 }
                 
+                // 添加随机偏移，让气泡像云一样自然
+                const offsetX = (Math.random() - 0.5) * 20;
+                const offsetY = (Math.random() - 0.5) * 20;
+                
                 // 创建气泡组
                 const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                 g.setAttribute('class', 'cloud-bubble');
@@ -1042,49 +1209,83 @@
                 g.setAttribute('data-volume', volume);
                 g.setAttribute('data-heat', heat);
                 
-                // 创建圆圈
+                // 添加漂浮动画 - 每个气泡不同的节奏
+                const floatDuration = 4 + Math.random() * 4;
+                const driftDuration = 6 + Math.random() * 4;
+                const delay = Math.random() * 2;
+                g.style.animation = `float ${floatDuration}s ease-in-out ${delay}s infinite, drift ${driftDuration}s ease-in-out ${delay}s infinite`;
+                
+                // 创建圆圈 - 更柔和的透明度
                 const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', cx);
-                circle.setAttribute('cy', cy);
+                circle.setAttribute('cx', cx + offsetX);
+                circle.setAttribute('cy', cy + offsetY);
                 circle.setAttribute('r', radius);
                 circle.setAttribute('fill', realm.color);
-                circle.setAttribute('opacity', '0.9');
+                circle.setAttribute('opacity', '0.75');
+                circle.style.transition = 'all 0.8s ease';
                 
-                // 创建文字
+                // 创建文字 - 只显示单字，更简洁
                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', cx);
-                text.setAttribute('y', cy - 5);
+                text.setAttribute('x', cx + offsetX);
+                text.setAttribute('y', cy + offsetY + 5);
                 text.setAttribute('text-anchor', 'middle');
                 text.setAttribute('class', 'cloud-bubble-text');
-                text.textContent = realm.name.charAt(0);
+                text.textContent = realm.char;
                 
-                // 创建热度文字
-                const heatText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                heatText.setAttribute('x', cx);
-                heatText.setAttribute('y', cy + 20);
-                heatText.setAttribute('text-anchor', 'middle');
-                heatText.setAttribute('class', 'cloud-bubble-heat');
-                heatText.textContent = heat.toLocaleString();
+                // 根据观者视角显示不同的信息
+                let metricValue = '';
+                if (currentObserver === 'collector') {
+                    metricValue = `${Math.floor(heat / 100)} 藏`;
+                } else if (currentObserver === 'creator') {
+                    metricValue = `${Math.floor(heat / 50)} 作`;
+                } else {
+                    metricValue = `${Math.floor(heat / 80)} 遇`;
+                }
+                
+                // 创建次级文字 - 更淡更细
+                const metricText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                metricText.setAttribute('x', cx + offsetX);
+                metricText.setAttribute('y', cy + offsetY + radius * 0.6);
+                metricText.setAttribute('text-anchor', 'middle');
+                metricText.setAttribute('class', 'cloud-bubble-metric');
+                metricText.setAttribute('font-size', '0.7rem');
+                metricText.setAttribute('fill', 'rgba(255,255,255,0.7)');
+                metricText.textContent = metricValue;
                 
                 g.appendChild(circle);
                 g.appendChild(text);
-                g.appendChild(heatText);
+                g.appendChild(metricText);
                 
-                // 添加悬浮事件
+                // 添加悬浮事件 - 更诗意的提示
                 g.addEventListener('mouseenter', (e) => {
-                    tooltipTitle.textContent = realm.name;
-                    tooltipVolume.textContent = `流转: ${volume}K`;
-                    tooltipHeat.textContent = `热度: ${heat.toLocaleString()}`;
+                    const observerInfo = observerData[currentObserver];
+                    const timeInfo = timeData[currentTime];
+                    
+                    tooltipTitle.textContent = `${realm.name} · ${timeInfo.label}`;
+                    tooltipVolume.textContent = `${observerInfo.metric}: ${Math.floor(heat / (currentObserver === 'collector' ? 100 : currentObserver === 'creator' ? 50 : 80))}`;
+                    tooltipHeat.textContent = `气韵: ${heat > 4000 ? '盛' : heat > 3000 ? '兴' : '潜'}`;
                     
                     const rect = svg.getBoundingClientRect();
-                    tooltip.style.left = (cx + rect.left - 90) + 'px';
-                    tooltip.style.top = (cy + rect.top - radius - 80) + 'px';
+                    tooltip.style.left = (cx + offsetX + rect.left - 90) + 'px';
+                    tooltip.style.top = (cy + offsetY + rect.top - radius - 100) + 'px';
                     tooltip.classList.add('visible');
+                    
+                    // 暂停动画，让用户聚焦
+                    g.style.animationPlayState = 'paused';
                 });
                 
                 g.addEventListener('mouseleave', () => {
                     tooltip.classList.remove('visible');
+                    g.style.animationPlayState = 'running';
                 });
+                
+                g.addEventListener('click', () => {
+                    enterRealm(realmKey);
+                });
+                
+                svg.appendChild(g);
+            });
+        }
                 
                 g.addEventListener('click', () => {
                     enterRealm(realmKey);
@@ -1102,8 +1303,10 @@
 
         // 切换榜单
         function switchChart(type) {
+            currentRealm = type;
             document.querySelectorAll('.chart-tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
+            updateAtmosphere();
             generateChartData(type);
         }
 
@@ -1127,8 +1330,97 @@
                 0%, 100% { box-shadow: 0 0 0 0 rgba(160, 48, 32, 0.4); }
                 50% { box-shadow: 0 0 0 10px rgba(160, 48, 32, 0); }
             }
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+            @keyframes drift {
+                0% { transform: translateX(0px); }
+                50% { transform: translateX(15px); }
+                100% { transform: translateX(0px); }
+            }
         `;
         document.head.appendChild(style);
+
+        // ===== 观者系统 =====
+        let currentObserver = 'collector';
+        let currentTime = 'now';
+        let currentRealm = 'sound';
+
+        // 观者视角数据
+        const observerData = {
+            collector: {
+                label: '藏家之观',
+                desc: '藏之以心',
+                metric: '被收藏数',
+                atmospheres: {
+                    sound: '律域藏品如古琴余韵，静候知音',
+                    color: '彩域画作似宋瓷开片，温润入心',
+                    text: '章域文字若水墨留白，意在言外',
+                    all: '三域纷呈，各有所藏'
+                }
+            },
+            creator: {
+                label: '创作者之观',
+                desc: '观势而起',
+                metric: '创作热度',
+                atmospheres: {
+                    sound: '律域新风起于青萍之末，细听可知',
+                    color: '彩域流光渐变，新色初现',
+                    text: '章域文脉绵延，新声将起',
+                    all: '三域之势，潮起潮落'
+                }
+            },
+            wanderer: {
+                label: '漫游者之观',
+                desc: '随遇而安',
+                metric: '发现数',
+                atmospheres: {
+                    sound: '律域如溪水流淌，不期而遇',
+                    color: '彩域似云卷云舒，随心而驻',
+                    text: '章域若林间小径，曲径通幽',
+                    all: '漫游三域，处处逢春'
+                }
+            }
+        };
+
+        // 时态数据
+        const timeData = {
+            now: { label: '此刻', modifier: 1 },
+            past: { label: '往昔', modifier: 0.8 },
+            rising: { label: '来者可追', modifier: 1.3 }
+        };
+
+        function switchObserver(role) {
+            currentObserver = role;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.observer-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.role === role) tab.classList.add('active');
+            });
+            
+            updateAtmosphere();
+            generateChartData(currentRealm);
+        }
+
+        function switchTime(time) {
+            currentTime = time;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.time-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.time === time) tab.classList.add('active');
+            });
+            
+            updateAtmosphere();
+            generateChartData(currentRealm);
+        }
+
+        function updateAtmosphere() {
+            const desc = observerData[currentObserver].atmospheres[currentRealm];
+            document.querySelector('.atmosphere-text').textContent = desc;
+        }
 
         // 初始化
         generateYuCards();
