@@ -397,17 +397,17 @@
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        /* 音域 - 青瓷色 */
+        /* 律域 - 青瓷色 */
         .domain-card.sound {
             background: var(--realm-sound);
         }
         
-        /* 色域 - 粉瓷色 */
+        /* 彩域 - 粉瓷色 */
         .domain-card.color {
             background: var(--realm-color);
         }
         
-        /* 文域 - 蟹壳青 */
+        /* 章域 - 蟹壳青 */
         .domain-card.text {
             background: var(--realm-text);
         }
@@ -794,7 +794,7 @@
     <!-- 三域入口卡片 -->
     <section class="domains-section">
         <div class="domains-container">
-            <!-- 音域 -->
+            <!-- 律域 -->
             <div class="domain-card sound fade-up" onclick="location.href='market/music.html'">
                 <svg class="domain-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
@@ -805,13 +805,13 @@
                     <path d="M46 28c-3 0-6 2-6 4s3 4 6 4" stroke="rgba(255,255,255,0.9)" stroke-width="1" stroke-linecap="round" fill="none"/>
                 </svg>
                 <div class="domain-info">
-                    <div class="domain-char">音</div>
+                    <div class="domain-char">律</div>
                     <div class="domain-divider"></div>
                     <div class="domain-quote">声至心随</div>
                 </div>
             </div>
 
-            <!-- 色域 -->
+            <!-- 彩域 -->
             <div class="domain-card color fade-up" onclick="location.href='market/art.html'">
                 <svg class="domain-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
@@ -822,13 +822,13 @@
                     <path d="M20 44c3 3 7 5 12 5s9-2 12-5" stroke="rgba(255,255,255,0.4)" stroke-width="0.5" fill="none"/>
                 </svg>
                 <div class="domain-info">
-                    <div class="domain-char">色</div>
+                    <div class="domain-char">彩</div>
                     <div class="domain-divider"></div>
                     <div class="domain-quote">一色天地</div>
                 </div>
             </div>
 
-            <!-- 文域 -->
+            <!-- 章域 -->
             <div class="domain-card text fade-up" onclick="location.href='market/literature.html'">
                 <svg class="domain-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="32" cy="32" r="28" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>
@@ -842,7 +842,7 @@
                     <circle cx="22" cy="38" r="1.5" fill="rgba(255,255,255,0.9)"/>
                 </svg>
                 <div class="domain-info">
-                    <div class="domain-char">文</div>
+                    <div class="domain-char">章</div>
                     <div class="domain-divider"></div>
                     <div class="domain-quote">字间山河</div>
                 </div>
@@ -859,7 +859,7 @@
         <div class="works-grid">
             <!-- 作品卡片 1 -->
             <div class="work-card fade-up">
-                <div class="work-image" data-initial="音"></div>
+                <div class="work-image" data-initial="律"></div>
                 <div class="work-name">山间清风</div>
                 <div class="work-meta">
                     <span>音乐 · 古琴</span>
@@ -869,7 +869,7 @@
 
             <!-- 作品卡片 2 -->
             <div class="work-card fade-up">
-                <div class="work-image" data-initial="色" style="background: linear-gradient(135deg, rgba(201, 169, 166, 0.12) 0%, rgba(139, 157, 195, 0.08) 100%);"></div>
+                <div class="work-image" data-initial="彩" style="background: linear-gradient(135deg, rgba(201, 169, 166, 0.12) 0%, rgba(139, 157, 195, 0.08) 100%);"></div>
                 <div class="work-name">水墨江南</div>
                 <div class="work-meta">
                     <span>绘画 · 数字</span>
@@ -879,7 +879,7 @@
 
             <!-- 作品卡片 3 -->
             <div class="work-card fade-up">
-                <div class="work-image" data-initial="文" style="background: linear-gradient(135deg, rgba(122, 139, 124, 0.1) 0%, rgba(201, 169, 166, 0.08) 100%);"></div>
+                <div class="work-image" data-initial="章" style="background: linear-gradient(135deg, rgba(122, 139, 124, 0.1) 0%, rgba(201, 169, 166, 0.08) 100%);"></div>
                 <div class="work-name">雨后</div>
                 <div class="work-meta">
                     <span>文学 · 散文</span>
@@ -889,7 +889,7 @@
 
             <!-- 作品卡片 4 -->
             <div class="work-card fade-up">
-                <div class="work-image" data-initial="音" style="background: linear-gradient(135deg, rgba(139, 157, 195, 0.15) 0%, rgba(122, 139, 124, 0.08) 100%);"></div>
+                <div class="work-image" data-initial="律" style="background: linear-gradient(135deg, rgba(139, 157, 195, 0.15) 0%, rgba(122, 139, 124, 0.08) 100%);"></div>
                 <div class="work-name">星夜漫步</div>
                 <div class="work-meta">
                     <span>音乐 · 电子</span>
@@ -899,7 +899,7 @@
 
             <!-- 作品卡片 5 -->
             <div class="work-card fade-up">
-                <div class="work-image" data-initial="色" style="background: linear-gradient(135deg, rgba(122, 139, 124, 0.12) 0%, rgba(201, 169, 166, 0.1) 100%);"></div>
+                <div class="work-image" data-initial="彩" style="background: linear-gradient(135deg, rgba(122, 139, 124, 0.12) 0%, rgba(201, 169, 166, 0.1) 100%);"></div>
                 <div class="work-name">竹林深处</div>
                 <div class="work-meta">
                     <span>绘画 · 摄影</span>
@@ -909,7 +909,7 @@
 
             <!-- 作品卡片 6 -->
             <div class="work-card fade-up">
-                <div class="work-image" data-initial="文" style="background: linear-gradient(135deg, rgba(184, 155, 108, 0.08) 0%, rgba(139, 157, 195, 0.08) 100%);"></div>
+                <div class="work-image" data-initial="章" style="background: linear-gradient(135deg, rgba(184, 155, 108, 0.08) 0%, rgba(139, 157, 195, 0.08) 100%);"></div>
                 <div class="work-name">旧时光</div>
                 <div class="work-meta">
                     <span>文学 · 诗歌</span>
@@ -919,7 +919,7 @@
 
             <!-- 作品卡片 7 -->
             <div class="work-card fade-up">
-                <div class="work-image" data-initial="音" style="background: linear-gradient(135deg, rgba(201, 169, 166, 0.1) 0%, rgba(184, 155, 108, 0.06) 100%);"></div>
+                <div class="work-image" data-initial="律" style="background: linear-gradient(135deg, rgba(201, 169, 166, 0.1) 0%, rgba(184, 155, 108, 0.06) 100%);"></div>
                 <div class="work-name">晨曦序曲</div>
                 <div class="work-meta">
                     <span>音乐 · 钢琴</span>
@@ -929,7 +929,7 @@
 
             <!-- 作品卡片 8 -->
             <div class="work-card fade-up">
-                <div class="work-image" data-initial="色" style="background: linear-gradient(135deg, rgba(139, 157, 195, 0.12) 0%, rgba(122, 139, 124, 0.1) 100%);"></div>
+                <div class="work-image" data-initial="彩" style="background: linear-gradient(135deg, rgba(139, 157, 195, 0.12) 0%, rgba(122, 139, 124, 0.1) 100%);"></div>
                 <div class="work-name">青瓷忆</div>
                 <div class="work-meta">
                     <span>绘画 · 水墨</span>

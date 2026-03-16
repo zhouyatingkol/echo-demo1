@@ -287,7 +287,7 @@
             max-width: 200px;
         }
 
-        /* ===== 第一境：遇 ===== */
+        /* ===== 第二境：遇 ===== */
         .realm-yu {
             padding: 80px 40px 120px;
         }
@@ -558,7 +558,7 @@
             background: var(--realm-text);
         }
 
-        /* ===== 第二境：寻 ===== */
+        /* ===== 第一境：寻 ===== */
         .realm-xun {
             padding: 120px 40px;
         }
@@ -843,9 +843,40 @@
         <p class="hero-subtitle">随缘而聚，各得其所</p>
     </section>
 
-    <!-- 第一境：遇 -->
-    <section class="realm-yu" style="padding-top: 60px;">
+    <!-- 第一境：寻 -->
+    <section class="realm-xun" style="padding-top: 60px;">
         <div class="realm-divider" style="margin-bottom: 32px;"></div>
+
+        <div class="realm-header">
+            <h2 class="realm-title">寻</h2>
+            <p class="realm-quote">按域而寻，各入其门</p>
+        </div>
+
+        <div class="realm-categories">
+            <div class="realm-category sound" onclick="enterRealm('sound')" style="position: relative;">
+                <div class="icon">♪</div>
+                <div class="name">律</div>
+                <div class="desc">声之境</div>
+                <div class="enter-hint">进入此境 →</div>
+            </div>
+            <div class="realm-category color" onclick="enterRealm('color')" style="position: relative;">
+                <div class="icon">◈</div>
+                <div class="name">彩</div>
+                <div class="desc">色之境</div>
+                <div class="enter-hint">进入此境 →</div>
+            </div>
+            <div class="realm-category text" onclick="enterRealm('text')" style="position: relative;">
+                <div class="icon">✦</div>
+                <div class="name">章</div>
+                <div class="desc">文之境</div>
+                <div class="enter-hint">进入此境 →</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第二境：遇 -->
+    <section class="realm-yu">
+        <div class="realm-divider"></div>
         
         <div class="yu-header-compact">
             <span class="yu-quote">随缘而遇，不期而会</span>
@@ -863,7 +894,7 @@
         
         <div class="search-box-wrapper">
             <div class="search-box">
-                <span class="search-icon">寻</span>
+                <span class="search-icon">遇</span>
                 <input type="text" class="search-input" placeholder="寻觅..." />
             </div>
             <button class="random-btn" onclick="randomAsset()">随机</button>
@@ -874,50 +905,19 @@
         </div>
     </section>
 
-    <!-- 第二境：寻 -->
-    <section class="realm-xun">
-        <div class="realm-divider"></div>
-
-        <div class="realm-header">
-            <h2 class="realm-title">寻</h2>
-            <p class="realm-quote">按域而寻，各入其门</p>
-        </div>
-
-        <div class="realm-categories">
-            <div class="realm-category sound" onclick="enterRealm('sound')" style="position: relative;">
-                <div class="icon">♪</div>
-                <div class="name">音</div>
-                <div class="desc">声之境</div>
-                <div class="enter-hint">进入此境 →</div>
-            </div>
-            <div class="realm-category color" onclick="enterRealm('color')" style="position: relative;">
-                <div class="icon">◈</div>
-                <div class="name">色</div>
-                <div class="desc">色之境</div>
-                <div class="enter-hint">进入此境 →</div>
-            </div>
-            <div class="realm-category text" onclick="enterRealm('text')" style="position: relative;">
-                <div class="icon">✦</div>
-                <div class="name">文</div>
-                <div class="desc">文之境</div>
-                <div class="enter-hint">进入此境 →</div>
-            </div>
-        </div>
-    </section>
-
     <!-- 第三境：观 -->
     <section class="realm-guan">
         <div class="realm-divider"></div>
 
         <div class="realm-header">
             <h2 class="realm-title">观</h2>
-            <p class="realm-quote">声至名归，于此显</p>
+            <p class="realm-quote">静观自得，见微知著</p>
         </div>
 
         <div class="chart-tabs">
-            <button class="chart-tab active" onclick="switchChart('sound')">音观</button>
-            <button class="chart-tab" onclick="switchChart('color')">色观</button>
-            <button class="chart-tab" onclick="switchChart('text')">文观</button>
+            <button class="chart-tab active" onclick="switchChart('sound')">律观</button>
+            <button class="chart-tab" onclick="switchChart('color')">彩观</button>
+            <button class="chart-tab" onclick="switchChart('text')">章观</button>
             <button class="chart-tab" onclick="switchChart('all')">总观</button>
         </div>
 
@@ -960,7 +960,7 @@
         // 生成遇境卡片
         function generateYuCards() {
             const grid = document.getElementById('yuGrid');
-            const realms = ['音', '色', '文'];
+            const realms = ['律', '彩', '章'];
             const realmClasses = ['sound', 'color', 'text'];
             const titles = ['夏日微风', '晨光初现', '山水之间', '月夜清音', '墨染流年', '云淡风轻'];
 
