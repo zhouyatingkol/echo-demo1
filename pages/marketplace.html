@@ -6,19 +6,19 @@
     <title>集 - ECHO</title>
     <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai:wght@300;400;700&family=Noto+Serif+SC:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* ===== 色彩系统 - 侘寂调色 ===== */
+        /* ===== 色彩系统 ===== */
         :root {
-            --bg-primary: #F5F2EA;
-            --bg-secondary: #EDE9DE;
-            --bg-tertiary: #E5E1D4;
-            --ink-deep: #2A2825;
-            --ink-medium: #4A4742;
-            --ink-light: #7A756D;
-            --ink-faint: #B5B0A8;
-            --gold-primary: #A68B5B;
-            --gold-light: #C9B896;
-            --vermilion: #8B2820;
-            --vermilion-light: rgba(139, 40, 32, 0.4);
+            --bg-primary: #F8F6F1;
+            --bg-secondary: #F2EFE8;
+            --bg-tertiary: #EBE7DD;
+            --ink-deep: #1A1A1A;
+            --ink-medium: #4A4A4A;
+            --ink-light: #7A6E5F;
+            --ink-faint: #B5B5B5;
+            --gold-primary: #B89B6C;
+            --gold-light: #D4C4A8;
+            --vermilion: #A03020;
+            --vermilion-light: rgba(160, 48, 32, 0.4);
 
             /* 三域色 */
             --realm-sound: #8B9DC3;
@@ -43,10 +43,6 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html {
-            font-size: 20px;
-        }
 
         body {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
@@ -113,7 +109,7 @@
 
         .navbar__link {
             position: relative;
-            font-family: var(--font-serif);
+            font-family: 'Noto Serif SC', serif;
             font-size: 1rem;
             font-weight: 400;
             color: var(--ink-light);
@@ -139,7 +135,8 @@
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .navbar__link:hover::after {
+        .navbar__link:hover::after,
+        .navbar__link.active::after {
             width: 100%;
         }
 
@@ -159,7 +156,7 @@
             border-radius: 2px;
             border: 0.5px solid rgba(122, 110, 95, 0.15);
             background: transparent;
-            font-family: var(--font-serif);
+            font-family: 'Noto Serif SC', serif;
             font-size: 0.8rem;
             color: var(--ink-light);
             letter-spacing: 0.15em;
@@ -168,9 +165,9 @@
         }
 
         .navbar__user:hover {
-            border-color: var(--vermilion);
-            color: var(--vermilion);
-            background: rgba(160, 48, 32, 0.05);
+            border-color: #C9B896;
+            color: var(--ink-deep);
+            background: rgba(201, 184, 150, 0.05);
         }
 
         .navbar__menu-btn {
@@ -237,87 +234,31 @@
             display: none;
         }
 
-        /* 全页纹理背景 */
-        .page-texture {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.4;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
-        }
-
         /* ===== Hero 区域 ===== */
         .hero {
-            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 140px 10vw 8vh;
+            padding: 120px 40px 40px;
             text-align: center;
-            overflow: hidden;
-        }
-
-        /* 宣纸纹理 */
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.4;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
-        }
-
-        /* 窗棂光晕 */
-        .hero::after {
-            content: '';
-            position: absolute;
-            width: 60vw;
-            height: 60vw;
-            background: radial-gradient(ellipse at center, 
-                rgba(232, 228, 220, 0.6) 0%, 
-                transparent 70%);
-            filter: blur(60px);
-            pointer-events: none;
-            z-index: 1;
-            top: -20%;
-            right: -10%;
-            animation: lightBreath 12s ease-in-out infinite;
-        }
-
-        @keyframes lightBreath {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
         }
 
         .hero-title {
-            font-family: var(--font-display);
-            font-size: 2.8rem;
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 3.5rem;
             font-weight: 400;
-            letter-spacing: 0.5em;
+            letter-spacing: 0.3em;
             color: var(--ink-deep);
-            margin-bottom: 1.2rem;
-            position: relative;
-            z-index: 2;
+            margin-bottom: 16px;
         }
 
         .hero-subtitle {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
             font-size: 1.1rem;
-            color: var(--ink-medium);
-            letter-spacing: 0.2em;
-            margin-top: 0;
-            margin-bottom: 3rem;
-            position: relative;
-            z-index: 2;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            margin-bottom: 40px;
         }
 
         .hero-create-btn {
@@ -329,11 +270,8 @@
             letter-spacing: 0.3em;
             text-indent: 0.3em;
             text-decoration: none;
-            border-radius: 2px;
             transition: all 0.4s ease;
             cursor: pointer;
-            position: relative;
-            z-index: 2;
         }
 
         .hero-create-btn:hover {
@@ -341,64 +279,106 @@
             transform: translateY(-2px);
         }
 
-        /* ===== 境界分隔 - 飞白效果 ===== */
+        /* ===== 境界分隔 ===== */
         .realm-divider {
             height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
             margin: 0 auto;
-            max-width: 300px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                var(--gold-light) 10%, 
-                var(--gold-light) 20%, 
-                transparent 25%, 
-                transparent 40%,
-                var(--gold-light) 45%,
-                var(--gold-light) 60%,
-                transparent 65%,
-                transparent 80%,
-                var(--gold-light) 85%,
-                var(--gold-light) 95%,
-                transparent 100%
-            );
-            opacity: 0.6;
+            max-width: 200px;
         }
 
-        /* ===== 第一境：遇 ===== */
+        /* ===== 第二境：遇 ===== */
         .realm-yu {
-            padding: 60px 40px 4vh;
+            padding: 80px 40px 120px;
         }
 
         .yu-header {
-            text-align: center;
-            margin-bottom: 40px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
         }
 
         .yu-quote {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--ink-light);
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
         }
 
-        /* 搜索框样式已移至下方统一定义 */
+        .yu-filter {
+            padding: 8px 16px;
+            border: 0.5px solid var(--gold-light);
+            background: transparent;
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.4s ease;
+        }
 
-        /* 已删除遴选方案、墨字、巷门样式 */
+        .yu-filter:hover {
             border-color: var(--gold-primary);
         }
 
-        .arch-item:hover .arch-shape::before,
-        .arch-item.active .arch-shape::before {
-            opacity: 1;
-            color: var(--gold-primary);
+        /* 方案 C：遇章节 - 简洁标记 */
+        .yu-header-compact {
+            max-width: 800px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
         }
 
-        .arch-item:hover .arch-name,
-        .arch-item.active .arch-name {
-            color: var(--ink-deep);
+        .yu-quote {
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.15em;
         }
 
-        .arch-item.active .arch-shape {
-            background: linear-gradient(180deg, rgba(166, 139, 91, 0.05) 0%, transparent 100%);
+        .yu-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .yu-create-btn {
+            padding: 6px 16px;
+            background: var(--vermilion);
+            color: var(--bg-primary);
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-decoration: none;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .yu-create-btn:hover {
+            background: #8B2419;
+        }
+
+        .yu-filter {
+            padding: 6px 12px;
+            border: 0.5px solid var(--gold-light);
+            background: transparent;
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.4s ease;
+        }
+
+        .yu-filter:hover {
+            border-color: var(--gold-primary);
         }
 
         .search-box-wrapper {
@@ -412,39 +392,6 @@
         .search-box {
             flex: 1;
             position: relative;
-            display: flex;
-            align-items: center;
-            border-bottom: 0.5px solid rgba(166, 139, 91, 0.15);
-            padding: 12px 0;
-            transition: border-color 0.4s ease;
-        }
-
-        .search-box:focus-within {
-            border-bottom-color: var(--gold-light);
-        }
-
-        .search-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 1rem;
-            color: var(--ink-deep);
-            letter-spacing: 0.1em;
-            padding-left: 32px;
-            outline: none;
-        }
-
-        .search-input::placeholder {
-            color: var(--ink-faint);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0;
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            color: var(--ink-faint);
-            font-size: 1.1rem;
         }
 
         .random-btn {
@@ -466,282 +413,10 @@
             color: var(--vermilion);
         }
 
-        /* ===== 方案H：无主之境（定稿） ===== */
-        .view-mode-daily {
-            padding: 60px 40px;
-        }
-
-        .daily-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .daily-date {
-            font-size: 0.75rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.2em;
-            margin-bottom: 12px;
-        }
-
-        .daily-quote {
-            font-size: 1rem;
-            color: var(--ink-light);
-            letter-spacing: 0.2em;
-            margin-bottom: 24px;
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-        }
-
-        .daily-refresh-btn {
-            padding: 12px 32px;
-            border: 0.5px solid var(--gold-light);
-            background: transparent;
-            color: var(--ink-light);
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 0.85rem;
-            letter-spacing: 0.2em;
-            cursor: pointer;
-            border-radius: 2px;
-            transition: all 0.4s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .daily-refresh-btn:hover {
-            border-color: var(--gold-primary);
-            color: var(--ink-deep);
-            background: rgba(166, 139, 91, 0.05);
-        }
-
-        .daily-refresh-btn span {
-            font-size: 1rem;
-        }
-
-        .daily-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
-            max-width: 720px;
-            margin: 0 auto;
-        }
-
-        .daily-card {
-            background: var(--bg-secondary);
-            border: 0.5px solid rgba(166, 139, 91, 0.3);
-            padding: 32px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s ease;
-        }
-
-        .daily-card:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        }
-
-        .daily-card-realm {
-            font-size: 0.7rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.25em;
-            margin-bottom: 16px;
-        }
-
-        .daily-card-icon {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            color: white;
-            opacity: 0.85;
-        }
-
-        .daily-card-icon.sound { background: #8B9DC3; }
-        .daily-card-icon.color { background: #C9A9A6; }
-        .daily-card-icon.text { background: #7A8B7C; }
-
-        .daily-card-name {
-            font-size: 1.1rem;
-            letter-spacing: 0.15em;
-            margin-bottom: 8px;
-            color: var(--ink-deep);
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-        }
-
-        .daily-card-desc {
-            font-size: 0.8rem;
-            color: var(--ink-light);
-            letter-spacing: 0.1em;
-            margin-bottom: 16px;
-            line-height: 1.6;
-        }
-
-        .daily-card-price {
-            font-size: 0.85rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.1em;
-        }
-
-        /* ===== 境界高亮字（朱红印章感） ===== */
-        .realm-highlight {
-            color: #B85C4F;
-            font-weight: 600;
-            letter-spacing: 0.25em;
-            position: relative;
-            display: inline-block;
-        }
-
-        .realm-highlight::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #B85C4F, transparent);
-            opacity: 0.5;
-        }
-
-        /* ===== 境界分隔线（更淡更克制） ===== */
-        .realm-separator {
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, var(--gold-light) 20%, var(--gold-light) 80%, transparent 100%);
-            margin: 40px auto;
-            max-width: 200px;
-            opacity: 0.5;
-        }
-
-        /* ===== 页脚布局 ===== */
-        .daily-footer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 24px;
-            margin-top: 32px;
-        }
-
-        .daily-update-hint {
-            font-size: 0.75rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.15em;
-        }
-
-        .daily-card-desc {
-            font-size: 0.75rem;
-            color: var(--ink-light);
-            letter-spacing: 0.1em;
-            margin-bottom: 12px;
-        }
-
-        .daily-card-price {
-            font-size: 0.85rem;
-            color: var(--ink-medium);
-            letter-spacing: 0.1em;
-        }
-
-        .daily-footer {
-            text-align: center;
-            margin-top: 32px;
-            font-size: 0.75rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.1em;
-        }
-
-        /* 保留 realm-header 样式用于寻和观 */
-            cursor: pointer;
-            border-radius: 2px;
-            transition: all 0.4s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .daily-refresh-btn:hover {
-            background: var(--ink-medium);
-            transform: scale(1.02);
-        }
-
-        .daily-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
-            max-width: 720px;
-            margin: 0 auto;
-        }
-
-        .daily-card {
-            background: var(--bg-primary);
-            border: 0.5px solid var(--gold-light);
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s ease;
-        }
-
-        .daily-card:hover {
-            border-color: var(--gold-primary);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-        }
-
-        .daily-card-realm {
-            font-size: 0.7rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.2em;
-            margin-bottom: 12px;
-        }
-
-        .daily-card-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .daily-card-icon.sound { background: #8B9DC3; }
-        .daily-card-icon.color { background: #C9A9A6; }
-        .daily-card-icon.text { background: #7A8B7C; }
-
-        .daily-card-name {
-            font-size: 1rem;
-            letter-spacing: 0.15em;
-            margin-bottom: 6px;
-            color: var(--ink-deep);
-        }
-
-        .daily-card-desc {
-            font-size: 0.75rem;
-            color: var(--ink-light);
-            letter-spacing: 0.1em;
-            margin-bottom: 12px;
-        }
-
-        .daily-card-price {
-            font-size: 0.85rem;
-            color: var(--ink-medium);
-            letter-spacing: 0.1em;
-        }
-
-        .daily-footer {
-            text-align: center;
-            margin-top: 32px;
-            font-size: 0.75rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.1em;
-        }
-
         /* 保留 realm-header 样式用于寻和观 */
         .realm-header {
             text-align: center;
-            margin-bottom: 48px;
+            margin-bottom: 60px;
         }
 
         .realm-title {
@@ -754,10 +429,9 @@
 
         .realm-quote {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             color: var(--ink-light);
-            letter-spacing: 0.15em;
-            line-height: 2;
+            letter-spacing: 0.1em;
         }
 
         /* 搜索框 */
@@ -798,12 +472,12 @@
             color: var(--ink-faint);
         }
 
-        /* 卡片网格 - 3列规整 */
+        /* 卡片网格 */
         .asset-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 32px;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -817,8 +491,16 @@
         }
 
         .asset-card:hover {
-            transform: translateY(-4px);
+            transform: rotate(0deg) translateY(-4px);
             border: 0.5px solid var(--gold-primary);
+        }
+
+        .asset-card:nth-child(odd) {
+            transform: rotate(-1deg);
+        }
+
+        .asset-card:nth-child(even) {
+            transform: rotate(1deg);
         }
 
         .asset-image {
@@ -876,151 +558,60 @@
             background: var(--realm-text);
         }
 
-        /* ===== 第二境：寻 ===== */
+        /* ===== 第一境：寻 ===== */
         .realm-xun {
-            padding: 4vh 40px;
+            padding: 120px 40px;
         }
 
         .realm-categories {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
+            gap: 32px;
             max-width: 1000px;
             margin: 0 auto;
         }
 
         .realm-category {
-            aspect-ratio: 3/4;
-            border-radius: 4px;
+            aspect-ratio: 1;
+            border-radius: 2px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.6s ease;
-            background: linear-gradient(180deg, var(--bg-secondary) 0%, #E8E4D8 100%);
-            border: 0.5px solid rgba(166, 139, 91, 0.25);
-            box-shadow: 
-                inset 0 1px 0 rgba(255,255,255,0.6),
-                0 4px 20px rgba(0, 0, 0, 0.04);
-            position: relative;
-            overflow: hidden;
-            padding-bottom: 40px;
+            transition: all 0.4s ease;
+            background-image: url('../assets/images/rice-paper.png');
+            background-size: cover;
+            background-blend-mode: multiply;
         }
 
-        .realm-category::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, transparent 0%, transparent 100%);
-            opacity: 0;
-            transition: opacity 0.6s ease;
+        .realm-category.sound {
+            background-color: var(--realm-sound);
         }
 
-        .realm-category.sound:hover::before {
-            background: radial-gradient(circle at center, var(--realm-sound) 0%, transparent 70%);
-            opacity: 0.08;
+        .realm-category.color {
+            background-color: var(--realm-color);
         }
 
-        .realm-category.color:hover::before {
-            background: radial-gradient(circle at center, var(--realm-color) 0%, transparent 70%);
-            opacity: 0.08;
+        .realm-category.text {
+            background-color: var(--realm-text);
         }
 
-        .realm-category.text:hover::before {
-            background: radial-gradient(circle at center, var(--realm-text) 0%, transparent 70%);
-            opacity: 0.08;
-        }
-
-        .realm-category:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-            transform: translateY(-4px);
-        }
-
-        .realm-category.sound:hover {
-            border-color: var(--realm-sound);
-            box-shadow: 0 8px 32px rgba(139, 157, 195, 0.12);
-        }
-
-        .realm-category.color:hover {
-            border-color: var(--realm-color);
-            box-shadow: 0 8px 32px rgba(201, 169, 166, 0.12);
-        }
-
+        .realm-category.sound:hover,
+        .realm-category.color:hover,
         .realm-category.text:hover {
-            border-color: var(--realm-text);
-            box-shadow: 0 8px 32px rgba(122, 139, 124, 0.12);
+            transform: translateY(-4px);
+            filter: brightness(1.05);
         }
 
         .realm-category .enter-hint {
             position: absolute;
             bottom: 20px;
-            font-size: 0.75rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.1em;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .realm-category:hover .enter-hint {
-            opacity: 1;
-        }
-
-        .realm-category .painting {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 180px;
-            height: 220px;
-            color: var(--ink-medium);
-            transition: color 0.6s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .realm-category .painting svg {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .realm-category:hover .painting {
-            color: var(--realm-sound);
-        }
-
-        .realm-category.color:hover .painting {
-            color: var(--realm-color);
-        }
-
-        .realm-category.text:hover .painting {
-            color: var(--realm-text);
-        }
-
-        .realm-category .name {
-            position: relative;
-            z-index: 2;
-            font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 2.4rem;
-            letter-spacing: 0.35em;
-            text-indent: 0.35em;
-            color: var(--ink-deep);
-            margin-top: auto;
-            margin-bottom: 12px;
-        }
-
-        .realm-category .enter-hint {
-            position: relative;
-            z-index: 2;
-            font-size: 0.8rem;
-            color: var(--ink-faint);
-            letter-spacing: 0.15em;
-            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
             opacity: 0;
             transform: translateY(10px);
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
         }
 
         .realm-category:hover .enter-hint {
@@ -1028,14 +619,35 @@
             transform: translateY(0);
         }
 
-        .realm-category:hover .name {
+        .realm-category:hover .icon,
+        .realm-category:hover .name,
+        .realm-category:hover .desc {
             transform: translateY(-8px);
             transition: transform 0.3s ease;
         }
 
+        .realm-category .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .realm-category .name {
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .realm-category .desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 8px;
+        }
+
         /* ===== 第三境：观 ===== */
         .realm-guan {
-            padding: 4vh 40px 120px;
+            padding: 120px 40px;
             min-height: 100vh;
         }
 
@@ -1061,7 +673,7 @@
 
         .chart-tab:hover,
         .chart-tab.active {
-            color: var(--ink-deep);
+            color: var(--vermilion);
         }
 
         .chart-tab.active::after {
@@ -1070,20 +682,132 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 0.5px;
-            background: var(--gold-primary);
+            height: 1px;
+            background: var(--vermilion);
         }
 
-        /* 风云图 - 水墨气泡 */
+        /* ===== 观者身份选择 ===== */
+        .observer-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .observer-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px 32px;
+            background: transparent;
+            border: 0.5px solid var(--gold-light);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            opacity: 0.6;
+        }
+
+        .observer-tab:hover,
+        .observer-tab.active {
+            opacity: 1;
+            border-color: var(--vermilion);
+            background: rgba(160, 48, 32, 0.03);
+        }
+
+        .observer-tab .tab-icon {
+            font-size: 1.5rem;
+            color: var(--vermilion);
+        }
+
+        .observer-tab .tab-name {
+            font-family: var(--font-display), 'LXGW WenKai', cursive;
+            font-size: 1rem;
+            color: var(--ink-deep);
+            letter-spacing: 0.1em;
+        }
+
+        .observer-tab .tab-desc {
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== 时态选择 ===== */
+        .time-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .time-tab {
+            font-family: var(--font-serif), 'Noto Serif SC', serif;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.15em;
+            padding: 8px 16px;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .time-tab::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: var(--gold-light);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .time-tab:hover {
+            color: var(--vermilion);
+        }
+
+        .time-tab.active {
+            color: var(--vermilion);
+        }
+
+        .time-tab.active::before {
+            opacity: 1;
+        }
+
+        /* ===== 气韵描述 ===== */
+        .atmosphere-desc {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
+
+        .atmosphere-label {
+            display: inline-block;
+            padding: 4px 12px;
+            border: 0.5px solid var(--gold-light);
+            margin-right: 16px;
+            font-size: 0.75rem;
+            color: var(--vermilion);
+        }
+
+        .atmosphere-text {
+            font-style: italic;
+        }
+
+        /* ===== 风云图 - SVG 气泡图 ===== */
         .cloud-chart {
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto 40px;
             position: relative;
             height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(ellipse at center, rgba(42, 40, 37, 0.04) 0%, transparent 70%);
         }
 
         .cloud-chart svg {
@@ -1108,17 +832,20 @@
 
         .cloud-bubble-text {
             font-family: var(--font-display), 'LXGW WenKai', cursive;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             fill: white;
             letter-spacing: 0.2em;
             pointer-events: none;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .cloud-bubble-heat {
+        .cloud-bubble-metric {
             font-family: var(--font-serif), 'Noto Serif SC', serif;
-            font-size: 0.8rem;
-            fill: rgba(255, 255, 255, 0.9);
             pointer-events: none;
+        }
+
+        .cloud-bubble:hover circle {
+            opacity: 0.9;
         }
 
         .bubble-tooltip {
@@ -1151,6 +878,15 @@
             font-size: 0.85rem;
             color: var(--ink-light);
             margin-bottom: 4px;
+        }
+
+        .bubble-hint {
+            font-size: 0.75rem;
+            color: var(--gold-primary);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 0.5px solid var(--gold-light);
+            font-style: italic;
         }
 
         /* 响应式隐藏 */
@@ -1196,9 +932,6 @@
     </style>
 </head>
 <body>
-    <!-- 全页纹理背景 -->
-    <div class="page-texture"></div>
-    
     <!-- 导航栏 -->
     <nav class="navbar" id="navbar">
         <a href="index.html" class="navbar__brand" aria-label="返回首页">
@@ -1206,7 +939,7 @@
         </a>
         <div class="navbar__nav">
             <a href="index.html" class="navbar__link">境</a>
-            <a href="marketplace.html" class="navbar__link active">集</a>
+            <a href="marketplace-v2.html" class="navbar__link active">集</a>
             <a href="docs.html" class="navbar__link">典</a>
         </div>
         <div class="navbar__actions">
@@ -1221,7 +954,7 @@
         </button>
         <div class="navbar__mobile-menu" id="mobileMenu" aria-hidden="true">
             <a href="index.html" class="navbar__link">境</a>
-            <a href="marketplace.html" class="navbar__link">集</a>
+            <a href="marketplace-v2.html" class="navbar__link">集</a>
             <a href="docs.html" class="navbar__link">典</a>
             <button class="navbar__user" id="mobileWalletConnect" type="button">
                 <span>入链</span>
@@ -1229,208 +962,121 @@
         </div>
     </nav>
 
-    <main>
     <!-- Hero -->
-    <section class="hero">
+    <section class="hero" style="padding: 120px 40px 40px;">
         <h1 class="hero-title">集</h1>
-        <p class="hero-subtitle">万籁归藏，自得其所</p>
+        <p class="hero-subtitle">随缘而聚，各得其所</p>
     </section>
 
-    <!-- 第一境：遇 -->
-    <section class="realm-yu">
-        <div class="realm-divider"></div>
-        
-        <div class="realm-header">
-            <p class="realm-quote">不期而<span class="realm-highlight">遇</span>，不谋而合</p>
-        </div>
-
-        <!-- 方案H：无主之境（定稿） -->
-        <div class="view-mode-daily" id="viewDaily">
-            <div class="daily-header">
-                <div class="daily-date" id="dailyDate">乙巳年 六月初八</div>
-                <div class="daily-quote">今日有缘，随缘随喜</div>
-            </div>
-            <div class="daily-grid" id="dailyGrid">
-                <!-- 卡片由 JS 生成 -->
-            </div>
-            <div class="daily-footer">
-                <button class="daily-refresh-btn" onclick="refreshDaily()">
-                    <span>⟳</span> 随喜
-                </button>
-                <span class="daily-update-hint">每日辰时更新 · 一期一会</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- 分隔线 -->
-    <div class="realm-separator realm-separator-light"></div>
-
-    <!-- 第二境：寻 -->
-    <section class="realm-xun">
-        <div class="realm-divider"></div>
+    <!-- 第一境：寻 -->
+    <section class="realm-xun" style="padding-top: 60px;">
+        <div class="realm-divider" style="margin-bottom: 32px;"></div>
 
         <div class="realm-header">
-            <p class="realm-quote"><span class="realm-highlight">寻</span>声觅色，因色遇文</p>
+            <h2 class="realm-title">寻</h2>
+            <p class="realm-quote">按域而寻，各入其门</p>
         </div>
 
         <div class="realm-categories">
             <div class="realm-category sound" onclick="enterRealm('sound')" style="position: relative;">
-                <div class="painting">
-                    <svg viewBox="0 0 200 240" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-                        <!-- 远山淡影 -->
-                        <path d="M20 120 Q50 80 80 100 T140 90 T180 110" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
-                        <path d="M40 140 Q70 110 100 125 T160 115" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.2"/>
-                        
-                        <!-- 古琴主体 -->
-                        <path d="M70 60 Q100 50 130 60 Q135 80 135 120 Q135 160 130 180 Q100 190 70 180 Q65 160 65 120 Q65 80 70 60 Z" 
-                              fill="none" stroke="currentColor" stroke-width="1.5"/>
-                        
-                        <!-- 琴面弧度 -->
-                        <path d="M72 70 Q100 62 128 70" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
-                        
-                        <!-- 七弦 -->
-                        <line x1="82" y1="75" x2="82" y2="165" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="88" y1="73" x2="88" y2="167" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="94" y1="72" x2="94" y2="168" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="100" y1="71" x2="100" y2="169" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="106" y1="72" x2="106" y2="168" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="112" y1="73" x2="112" y2="167" stroke="currentColor" stroke-width="0.6"/>
-                        <line x1="118" y1="75" x2="118" y2="165" stroke="currentColor" stroke-width="0.6"/>
-                        
-                        <!-- 琴徽 -->
-                        <circle cx="100" cy="85" r="1.5" fill="currentColor" opacity="0.7"/>
-                        <circle cx="100" cy="100" r="1.5" fill="currentColor" opacity="0.7"/>
-                        <circle cx="100" cy="115" r="1.5" fill="currentColor" opacity="0.7"/>
-                        <circle cx="100" cy="130" r="1.5" fill="currentColor" opacity="0.7"/>
-                        <circle cx="100" cy="145" r="1.5" fill="currentColor" opacity="0.7"/>
-                        
-                        <!-- 岳山 -->
-                        <rect x="75" y="68" width="50" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-                        
-                        <!-- 雁足 -->
-                        <circle cx="85" cy="175" r="3" fill="none" stroke="currentColor" stroke-width="1"/>
-                        <circle cx="115" cy="175" r="3" fill="none" stroke="currentColor" stroke-width="1"/>
-                        
-                        <!-- 流水暗示 -->
-                        <path d="M30 200 Q60 195 90 200 T150 198" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
-                        <path d="M35 208 Q65 203 95 208 T145 206" fill="none" stroke="currentColor" stroke-width="0.4" opacity="0.3"/>
-                    </svg>
-                </div>
+                <div class="icon">♪</div>
                 <div class="name">律</div>
-                <div class="enter-hint">循声入境 →</div>
+                <div class="desc">声之境</div>
+                <div class="enter-hint">进入此境 →</div>
             </div>
-            
             <div class="realm-category color" onclick="enterRealm('color')" style="position: relative;">
-                <div class="painting">
-                    <svg viewBox="0 0 200 240" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-                        <!-- 老干 -->
-                        <path d="M100 220 Q90 180 95 140 Q92 100 85 60" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                        <path d="M85 60 Q82 45 88 35" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                        
-                        <!-- 分枝 -->
-                        <path d="M95 130 Q70 110 50 90" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                        <path d="M95 110 Q120 90 140 70" fill="none" stroke="currentColor" stroke-width="1"/>
-                        <path d="M92 150 Q110 140 125 125" fill="none" stroke="currentColor" stroke-width="0.8"/>
-                        
-                        <!-- 梅花1 - 盛 -->
-                        <circle cx="50" cy="90" r="8" fill="none" stroke="currentColor" stroke-width="1"/>
-                        <circle cx="50" cy="90" r="3" fill="currentColor" opacity="0.3"/>
-                        <path d="M50 82 L50 86 M50 94 L50 98 M42 90 L46 90 M54 90 L58 90" stroke="currentColor" stroke-width="0.8"/>
-                        
-                        <!-- 梅花2 - 半开 -->
-                        <circle cx="140" cy="70" r="6" fill="none" stroke="currentColor" stroke-width="1"/>
-                        <path d="M140 64 Q144 68 140 72 Q136 68 140 64" fill="currentColor" opacity="0.2"/>
-                        
-                        <!-- 梅花3 - 含苞 -->
-                        <ellipse cx="125" cy="125" rx="4" ry="6" fill="none" stroke="currentColor" stroke-width="0.8"/>
-                        
-                        <!-- 梅花4 - 侧 -->
-                        <circle cx="70" cy="55" r="5" fill="none" stroke="currentColor" stroke-width="0.8"/>
-                        
-                        <!-- 梅花5 - 远景 -->
-                        <circle cx="155" cy="100" r="4" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.6"/>
-                        
-                        <!-- 花蕊点缀 -->
-                        <circle cx="50" cy="90" r="1" fill="currentColor"/>
-                        <circle cx="140" cy="70" r="0.8" fill="currentColor"/>
-                        
-                        <!-- 苔点 -->
-                        <circle cx="92" cy="200" r="1.5" fill="currentColor" opacity="0.4"/>
-                        <circle cx="88" cy="185" r="1" fill="currentColor" opacity="0.3"/>
-                    </svg>
-                </div>
+                <div class="icon">◈</div>
                 <div class="name">彩</div>
-                <div class="enter-hint">觅色入境 →</div>
+                <div class="desc">色之境</div>
+                <div class="enter-hint">进入此境 →</div>
             </div>
-            
             <div class="realm-category text" onclick="enterRealm('text')" style="position: relative;">
-                <div class="painting">
-                    <svg viewBox="0 0 200 240" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-                        <!-- 书案 -->
-                        <line x1="30" y1="200" x2="170" y2="200" stroke="currentColor" stroke-width="1" opacity="0.3"/>
-                        
-                        <!-- 左卷轴 -->
-                        <path d="M60 180 Q55 140 60 100 Q55 80 60 70" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                        <path d="M60 70 Q75 65 90 70" fill="none" stroke="currentColor" stroke-width="1"/>
-                        <path d="M90 70 Q95 80 90 100 Q95 140 90 180" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                        
-                        <!-- 右卷轴 -->
-                        <path d="M110 180 Q105 140 110 100 Q105 80 110 70" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                        <path d="M110 70 Q125 65 140 70" fill="none" stroke="currentColor" stroke-width="1"/>
-                        <path d="M140 70 Q145 80 140 100 Q145 140 140 180" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                        
-                        <!-- 卷轴纹理 - 左 -->
-                        <line x1="68" y1="85" x2="82" y2="85" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        <line x1="68" y1="100" x2="82" y2="100" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        <line x1="68" y1="115" x2="82" y2="115" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        <line x1="68" y1="130" x2="80" y2="130" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        <line x1="68" y1="145" x2="82" y2="145" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        <line x1="68" y1="160" x2="82" y2="160" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        
-                        <!-- 卷轴纹理 - 右 -->
-                        <line x1="118" y1="85" x2="132" y2="85" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        <line x1="118" y1="100" x2="132" y2="100" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        <line x1="118" y1="115" x2="132" y2="115" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        <line x1="118" y1="130" x2="130" y2="130" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
-                        
-                        <!-- 中间展开的空白 -->
-                        <path d="M90 75 L110 75" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
-                        <path d="M90 175 L110 175" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
-                        
-                        <!-- 镇纸 -->
-                        <rect x="85" y="185" width="30" height="4" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
-                        
-                        <!-- 毛笔 -->
-                        <line x1="150" y1="190" x2="165" y2="160" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="165" y1="160" x2="168" y2="155" stroke="currentColor" stroke-width="1"/>
-                        
-                        <!-- 墨痕 -->
-                        <circle cx="160" cy="195" r="8" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.3"/>
-                        <path d="M155 192 Q160 198 165 192" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
-                    </svg>
-                </div>
+                <div class="icon">✦</div>
                 <div class="name">章</div>
-                <div class="enter-hint">遇文入境 →</div>
+                <div class="desc">文之境</div>
+                <div class="enter-hint">进入此境 →</div>
             </div>
         </div>
     </section>
 
-    <!-- 分隔线 -->
-    <div class="realm-separator realm-separator-light"></div>
+    <!-- 第二境：遇 -->
+    <section class="realm-yu">
+        <div class="realm-divider"></div>
+        
+        <div class="yu-header-compact">
+            <span class="yu-quote">随缘而遇，不期而会</span>
+            <div class="yu-actions">
+                <a href="creator.html" class="yu-create-btn">吾作</a>
+                <select class="yu-filter">
+                    <option value="">价 ▼</option>
+                    <option value="0-50">0 - 50</option>
+                    <option value="50-100">50 - 100</option>
+                    <option value="100-500">100 - 500</option>
+                    <option value="500+">500+</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="search-box-wrapper">
+            <div class="search-box">
+                <span class="search-icon">遇</span>
+                <input type="text" class="search-input" placeholder="寻觅..." />
+            </div>
+            <button class="random-btn" onclick="randomAsset()">随机</button>
+        </div>
+
+        <div class="asset-grid" id="yuGrid">
+            <!-- 卡片由 JS 生成 -->
+        </div>
+    </section>
 
     <!-- 第三境：观 -->
     <section class="realm-guan">
         <div class="realm-divider"></div>
 
         <div class="realm-header">
-            <p class="realm-quote">声动而色起，文成而道显</p>
+            <h2 class="realm-title">观</h2>
+            <p class="realm-quote">静观自得，见微知著</p>
         </div>
 
+        <!-- 观者身份选择 -->
+        <div class="observer-tabs">
+            <button class="observer-tab active" data-role="collector" onclick="switchObserver('collector')">
+                <span class="tab-icon">◈</span>
+                <span class="tab-name">藏家</span>
+                <span class="tab-desc">藏之以心</span>
+            </button>
+            <button class="observer-tab" data-role="creator" onclick="switchObserver('creator')">
+                <span class="tab-icon">✦</span>
+                <span class="tab-name">创作者</span>
+                <span class="tab-desc">观势而起</span>
+            </button>
+            <button class="observer-tab" data-role="wanderer" onclick="switchObserver('wanderer')">
+                <span class="tab-icon">◉</span>
+                <span class="tab-name">漫游者</span>
+                <span class="tab-desc">随遇而安</span>
+            </button>
+        </div>
+
+        <!-- 时态选择 -->
+        <div class="time-tabs">
+            <button class="time-tab active" data-time="now" onclick="switchTime('now')">此刻</button>
+            <button class="time-tab" data-time="past" onclick="switchTime('past')">往昔</button>
+            <button class="time-tab" data-time="rising" onclick="switchTime('rising')">来者可追</button>
+        </div>
+
+        <!-- 域选择 -->
         <div class="chart-tabs">
             <button class="chart-tab active" onclick="switchChart('sound')">律观</button>
             <button class="chart-tab" onclick="switchChart('color')">彩观</button>
             <button class="chart-tab" onclick="switchChart('text')">章观</button>
             <button class="chart-tab" onclick="switchChart('all')">总观</button>
+        </div>
+
+        <!-- 气韵描述 -->
+        <div class="atmosphere-desc" id="atmosphereDesc">
+            <span class="atmosphere-label">气韵</span>
+            <span class="atmosphere-text">律域如溪水流淌，静谧中自有节奏</span>
         </div>
 
         <div class="cloud-chart" id="cloudChart">
@@ -1441,11 +1087,11 @@
                 <div class="bubble-tooltip-title" id="tooltipTitle"></div>
                 <div class="bubble-tooltip-stat" id="tooltipVolume"></div>
                 <div class="bubble-tooltip-stat" id="tooltipHeat"></div>
+                <div class="bubble-hint">点击查看详情</div>
             </div>
         </div>
     </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="../scripts/wallet.js"></script>
     <script>
         // 导航栏滚动效果
@@ -1470,49 +1116,34 @@
             });
         }
 
-        // 生成今日市集卡片
-        function generateDailyCards() {
-            const grid = document.getElementById('dailyGrid');
-            const items = [
-                { realm: '声之境', realmClass: 'sound', icon: '♪', name: '夏日微风', desc: '微风轻拂，如沐春霖', price: 581 },
-                { realm: '色之境', realmClass: 'color', icon: '◆', name: '晨光初现', desc: '霞光初绽，晨曦微露', price: 164 },
-                { realm: '文之境', realmClass: 'text', icon: '✦', name: '山水之间', desc: '笔墨山水，意境悠远', price: 1079 },
-                { realm: '文之境', realmClass: 'text', icon: '◈', name: '墨染流年', desc: '岁月如水，墨染春秋', price: 308 },
-                { realm: '色之境', realmClass: 'color', icon: '◇', name: '云淡风轻', desc: '云卷云舒，悠然自得', price: 708 },
-                { realm: '声之境', realmClass: 'sound', icon: '♫', name: '月夜清音', desc: '月华如水，清音绕梁', price: 188 }
-            ];
+        // 生成遇境卡片
+        function generateYuCards() {
+            const grid = document.getElementById('yuGrid');
+            const realms = ['律', '彩', '章'];
+            const realmClasses = ['sound', 'color', 'text'];
+            const titles = ['夏日微风', '晨光初现', '山水之间', '月夜清音', '墨染流年', '云淡风轻'];
 
-            grid.innerHTML = '';
-            items.forEach(item => {
+            for (let i = 0; i < 6; i++) {
+                const realm = realms[i % 3];
+                const realmClass = realmClasses[i % 3];
+                const title = titles[i];
+                const price = (Math.random() * 1000 + 100).toFixed(0);
+
                 const card = document.createElement('div');
-                card.className = 'daily-card';
+                card.className = 'asset-card';
                 card.innerHTML = `
-                    <div class="daily-card-realm">${item.realm}</div>
-                    <div class="daily-card-icon ${item.realmClass}">${item.icon}</div>
-                    <div class="daily-card-name">${item.name}</div>
-                    <div class="daily-card-desc">${item.desc}</div>
-                    <div class="daily-card-price">${item.price} ECHO</div>
+                    <div class="asset-image">${realm}</div>
+                    <div class="asset-info">
+                        <div class="asset-title">${title}</div>
+                        <div class="asset-meta">
+                            <span class="realm-tag ${realmClass}">${realm}</span>
+                            <span>${price} ECHO</span>
+                        </div>
+                    </div>
                 `;
                 grid.appendChild(card);
-            });
+            }
         }
-
-        // 刷新今日市集
-        function refreshDaily() {
-            const grid = document.getElementById('dailyGrid');
-            grid.style.opacity = '0';
-            
-            setTimeout(() => {
-                generateDailyCards();
-                grid.style.transition = 'opacity 0.4s ease';
-                grid.style.opacity = '1';
-            }, 200);
-        }
-
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            generateDailyCards();
-        });
 
         // 生成风云图气泡
         function generateChartData(type) {
@@ -1525,44 +1156,50 @@
             // 清空现有气泡
             svg.innerHTML = '';
             
-            // 三域配置 - 固定三角形布局
+            // 获取时态修饰符
+            const timeModifier = timeData[currentTime].modifier;
+            
+            // 三域配置 - 新命名
             const realms = {
-                sound: { name: '律境', color: '#8B9DC3' },
-                color: { name: '彩境', color: '#C9A9A6' },
-                text: { name: '章境', color: '#7A8B7C' }
+                sound: { name: '律境', char: '律', color: '#8B9DC3', cx: 150, cy: 200 },
+                color: { name: '彩境', char: '彩', color: '#C9A9A6', cx: 300, cy: 150 },
+                text: { name: '章境', char: '章', color: '#7A8B7C', cx: 450, cy: 200 }
             };
             
-            // 固定位置 - 品字形布局
-            const positions = {
-                sound: { cx: 180, cy: 200 },
-                color: { cx: 320, cy: 200 },
-                text: { cx: 250, cy: 280 }
-            };
-            
-            // 生成随机热度数据
+            // 根据观者视角和时态生成数据
             const heatData = {};
             Object.keys(realms).forEach(key => {
-                heatData[key] = Math.floor(Math.random() * 3000 + 2000);
+                const baseHeat = Math.floor(Math.random() * 3000 + 2000);
+                heatData[key] = Math.floor(baseHeat * timeModifier);
             });
             
-            // 显示所有三域 - "众星捧月"效果
-            const allRealms = Object.keys(realms);
+            // 如果是总观，显示所有三域
+            const realmsToShow = type === 'all' ? Object.keys(realms) : [type];
             
-            // 先渲染非选中领域（作为背景星）
-            const backgroundRealms = allRealms.filter(key => key !== type && type !== 'all');
-            const focusRealms = type === 'all' ? allRealms : [type];
-            
-            // 渲染函数
-            const renderRealm = (realmKey, isFocus) => {
+            realmsToShow.forEach((realmKey, index) => {
                 const realm = realms[realmKey];
                 const heat = heatData[realmKey];
                 const volume = (Math.random() * 50 + 20).toFixed(1);
-                const pos = positions[realmKey];
                 
-                // 焦点领域正常显示，背景领域缩小淡化
-                const scale = isFocus ? 1 : 0.6;
-                const opacity = isFocus ? 0.9 : 0.35;
-                const radius = (60 + (heat / 5000) * 60) * scale;
+                // 根据热度计算圆圈大小 (60-120)，加入时态影响
+                const radius = 60 + (heat / 5000) * 60;
+                
+                // 总观模式下调整位置 - 更流动的布局
+                let cx = realm.cx;
+                let cy = realm.cy;
+                if (type === 'all') {
+                    const positions = [
+                        { cx: 150, cy: 200 },
+                        { cx: 300, cy: 200 },
+                        { cx: 450, cy: 200 }
+                    ];
+                    cx = positions[index].cx;
+                    cy = positions[index].cy;
+                }
+                
+                // 添加随机偏移，让气泡像云一样自然
+                const offsetX = (Math.random() - 0.5) * 20;
+                const offsetY = (Math.random() - 0.5) * 20;
                 
                 // 创建气泡组
                 const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -1571,57 +1208,75 @@
                 g.setAttribute('data-name', realm.name);
                 g.setAttribute('data-volume', volume);
                 g.setAttribute('data-heat', heat);
-                g.style.cursor = 'pointer';
                 
-                // 创建圆圈
+                // 添加漂浮动画 - 每个气泡不同的节奏
+                const floatDuration = 4 + Math.random() * 4;
+                const driftDuration = 6 + Math.random() * 4;
+                const delay = Math.random() * 2;
+                g.style.animation = `float ${floatDuration}s ease-in-out ${delay}s infinite, drift ${driftDuration}s ease-in-out ${delay}s infinite`;
+                
+                // 创建圆圈 - 更柔和的透明度
                 const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', pos.cx);
-                circle.setAttribute('cy', pos.cy);
+                circle.setAttribute('cx', cx + offsetX);
+                circle.setAttribute('cy', cy + offsetY);
                 circle.setAttribute('r', radius);
                 circle.setAttribute('fill', realm.color);
-                circle.setAttribute('opacity', opacity);
-                circle.style.transition = 'all 0.4s ease';
+                circle.setAttribute('opacity', '0.75');
+                circle.style.transition = 'all 0.8s ease';
                 
-                // 创建文字 - 仅焦点领域显示
-                if (isFocus) {
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.setAttribute('x', pos.cx);
-                    text.setAttribute('y', pos.cy - 5);
-                    text.setAttribute('text-anchor', 'middle');
-                    text.setAttribute('class', 'cloud-bubble-text');
-                    text.textContent = realm.name.charAt(0);
-                    
-                    const heatText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    heatText.setAttribute('x', pos.cx);
-                    heatText.setAttribute('y', pos.cy + 20);
-                    heatText.setAttribute('text-anchor', 'middle');
-                    heatText.setAttribute('class', 'cloud-bubble-heat');
-                    heatText.textContent = heat.toLocaleString();
-                    
-                    g.appendChild(text);
-                    g.appendChild(heatText);
+                // 创建文字 - 只显示单字，更简洁
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', cx + offsetX);
+                text.setAttribute('y', cy + offsetY + 5);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('class', 'cloud-bubble-text');
+                text.textContent = realm.char;
+                
+                // 根据观者视角显示不同的信息
+                let metricValue = '';
+                if (currentObserver === 'collector') {
+                    metricValue = `${Math.floor(heat / 100)} 藏`;
+                } else if (currentObserver === 'creator') {
+                    metricValue = `${Math.floor(heat / 50)} 作`;
+                } else {
+                    metricValue = `${Math.floor(heat / 80)} 遇`;
                 }
                 
-                g.appendChild(circle);
+                // 创建次级文字 - 更淡更细
+                const metricText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                metricText.setAttribute('x', cx + offsetX);
+                metricText.setAttribute('y', cy + offsetY + radius * 0.6);
+                metricText.setAttribute('text-anchor', 'middle');
+                metricText.setAttribute('class', 'cloud-bubble-metric');
+                metricText.setAttribute('font-size', '0.7rem');
+                metricText.setAttribute('fill', 'rgba(255,255,255,0.7)');
+                metricText.textContent = metricValue;
                 
-                // 添加悬浮事件
+                g.appendChild(circle);
+                g.appendChild(text);
+                g.appendChild(metricText);
+                
+                // 添加悬浮事件 - 更诗意的提示
                 g.addEventListener('mouseenter', (e) => {
-                    tooltipTitle.textContent = realm.name;
-                    tooltipVolume.textContent = `流转: ${volume}K`;
-                    tooltipHeat.textContent = `热度: ${heat.toLocaleString()}`;
+                    const observerInfo = observerData[currentObserver];
+                    const timeInfo = timeData[currentTime];
+                    
+                    tooltipTitle.textContent = `${realm.name} · ${timeInfo.label}`;
+                    tooltipVolume.textContent = `${observerInfo.metric}: ${Math.floor(heat / (currentObserver === 'collector' ? 100 : currentObserver === 'creator' ? 50 : 80))}`;
+                    tooltipHeat.textContent = `气韵: ${heat > 4000 ? '盛' : heat > 3000 ? '兴' : '潜'}`;
                     
                     const rect = svg.getBoundingClientRect();
-                    tooltip.style.left = (pos.cx + rect.left - 90) + 'px';
-                    tooltip.style.top = (pos.cy + rect.top - radius - 80) + 'px';
+                    tooltip.style.left = (cx + offsetX + rect.left - 90) + 'px';
+                    tooltip.style.top = (cy + offsetY + rect.top - radius - 100) + 'px';
                     tooltip.classList.add('visible');
                     
-                    // 悬浮时轻微放大
-                    circle.setAttribute('r', radius * 1.1);
+                    // 暂停动画，让用户聚焦
+                    g.style.animationPlayState = 'paused';
                 });
                 
                 g.addEventListener('mouseleave', () => {
                     tooltip.classList.remove('visible');
-                    circle.setAttribute('r', radius);
+                    g.style.animationPlayState = 'running';
                 });
                 
                 g.addEventListener('click', () => {
@@ -1629,12 +1284,15 @@
                 });
                 
                 svg.appendChild(g);
-            };
-            
-            // 先渲染背景领域（在底层）
-            backgroundRealms.forEach(key => renderRealm(key, false));
-            // 再渲染焦点领域（在顶层）
-            focusRealms.forEach(key => renderRealm(key, true));
+            });
+        }
+                
+                g.addEventListener('click', () => {
+                    enterRealm(realmKey);
+                });
+                
+                svg.appendChild(g);
+            });
         }
 
         // 进入域
@@ -1645,8 +1303,10 @@
 
         // 切换榜单
         function switchChart(type) {
+            currentRealm = type;
             document.querySelectorAll('.chart-tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
+            updateAtmosphere();
             generateChartData(type);
         }
 
@@ -1670,64 +1330,101 @@
                 0%, 100% { box-shadow: 0 0 0 0 rgba(160, 48, 32, 0.4); }
                 50% { box-shadow: 0 0 0 10px rgba(160, 48, 32, 0); }
             }
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+            @keyframes drift {
+                0% { transform: translateX(0px); }
+                50% { transform: translateX(15px); }
+                100% { transform: translateX(0px); }
+            }
         `;
         document.head.appendChild(style);
 
+        // ===== 观者系统 =====
+        let currentObserver = 'collector';
+        let currentTime = 'now';
+        let currentRealm = 'sound';
+
+        // 观者视角数据
+        const observerData = {
+            collector: {
+                label: '藏家之观',
+                desc: '藏之以心',
+                metric: '被收藏数',
+                atmospheres: {
+                    sound: '律域藏品如古琴余韵，静候知音',
+                    color: '彩域画作似宋瓷开片，温润入心',
+                    text: '章域文字若水墨留白，意在言外',
+                    all: '三域纷呈，各有所藏'
+                }
+            },
+            creator: {
+                label: '创作者之观',
+                desc: '观势而起',
+                metric: '创作热度',
+                atmospheres: {
+                    sound: '律域新风起于青萍之末，细听可知',
+                    color: '彩域流光渐变，新色初现',
+                    text: '章域文脉绵延，新声将起',
+                    all: '三域之势，潮起潮落'
+                }
+            },
+            wanderer: {
+                label: '漫游者之观',
+                desc: '随遇而安',
+                metric: '发现数',
+                atmospheres: {
+                    sound: '律域如溪水流淌，不期而遇',
+                    color: '彩域似云卷云舒，随心而驻',
+                    text: '章域若林间小径，曲径通幽',
+                    all: '漫游三域，处处逢春'
+                }
+            }
+        };
+
+        // 时态数据
+        const timeData = {
+            now: { label: '此刻', modifier: 1 },
+            past: { label: '往昔', modifier: 0.8 },
+            rising: { label: '来者可追', modifier: 1.3 }
+        };
+
+        function switchObserver(role) {
+            currentObserver = role;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.observer-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.role === role) tab.classList.add('active');
+            });
+            
+            updateAtmosphere();
+            generateChartData(currentRealm);
+        }
+
+        function switchTime(time) {
+            currentTime = time;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.time-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.time === time) tab.classList.add('active');
+            });
+            
+            updateAtmosphere();
+            generateChartData(currentRealm);
+        }
+
+        function updateAtmosphere() {
+            const desc = observerData[currentObserver].atmospheres[currentRealm];
+            document.querySelector('.atmosphere-text').textContent = desc;
+        }
+
         // 初始化
-        generateDailyCards();
-        
-        // 初始化风云图
+        generateYuCards();
         generateChartData('sound');
     </script>
-
-    <!-- 全局浮动铸造按钮 -->
-    <a href="creator.html" class="fab-create" title="铸">铸</a>
-    <style>
-        .fab-create {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 56px;
-            height: 56px;
-            background: var(--vermilion);
-            color: var(--bg-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-display);
-            font-size: 1.2rem;
-            text-decoration: none;
-            box-shadow: 0 4px 12px rgba(160, 48, 32, 0.3);
-            transition: all 0.4s ease;
-            z-index: 1000;
-            animation: fabBreathe 4s ease-in-out infinite;
-        }
-        .fab-create:hover {
-            transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 8px 24px rgba(160, 48, 32, 0.4);
-            animation: none;
-        }
-        @keyframes fabBreathe {
-            0%, 100% { 
-                transform: scale(1); 
-                box-shadow: 0 4px 12px rgba(160, 48, 32, 0.3);
-            }
-            50% { 
-                transform: scale(1.03); 
-                box-shadow: 0 6px 16px rgba(160, 48, 32, 0.35);
-            }
-        }
-        @media (max-width: 768px) {
-            .fab-create {
-                bottom: 1.5rem;
-                right: 1.5rem;
-                width: 48px;
-                height: 48px;
-                font-size: 1rem;
-            }
-        }
-    </style>
-</main>
 </body>
 </html>
