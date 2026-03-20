@@ -1,7 +1,12 @@
 /**
- * ECHO 资产编码系统 v2.1
+ * ECHO 资产编码系统 v2.2
  * 双层生命结构：先天基因 + 后天演化
- * 更新：12变势机制 + 诗意文案
+ * 更新：128bit 基因码架构（v0.3 预备）
+ * 
+ * 基因码结构：
+ * - 权力基因(12bit) + 唯一标识(116bit随机) = 128bit 总长度
+ * - 权力基因：(用<<9) | (扩<<6) | (衍<<3) | 益
+ * - 唯一标识：116bit 随机数 (防止碰撞)
  */
 
 // ==================== 配置 ====================
@@ -51,11 +56,28 @@ const CONFIG = {
 };
 
 // 先天八卦（按传统数序：1乾、2兑、3离、4震、5巽、6坎、7艮、8坤）
-// 编程索引：0乾、1兑、2离、3震、4巽、5坎、6艮、7坤 → 不对！
-// 修正：传统乾=1，坤=8；但二进制0=全阴=坤，7=全阳=乾
-// 所以调整为：0坤、1艮、2坎、3巽、4震、5离、6兑、7乾
+// 编程索引：0坤、1艮、2坎、3巽、4震、5离、6兑、7乾
 const TRIGRAMS = ['坤', '艮', '坎', '巽', '震', '离', '兑', '乾'];
 const TRIGRAM_SYMBOLS = ['☷', '☶', '☵', '☴', '☳', '☲', '☱', '☰'];
+
+// 先天八卦爻画（从下往上：初爻、二爻、三爻）
+// 1=阳爻，0=阴爻
+const TRIGRAM_LINES = {
+  0: [0, 0, 0],  // 坤 ☷ 阴阴阴
+  1: [1, 0, 0],  // 艮 ☶ 阳阴阴
+  2: [0, 1, 0],  // 坎 ☵ 阴阳阴
+  3: [1, 1, 0],  // 巽 ☴ 阳阳阴
+  4: [0, 0, 1],  // 震 ☳ 阴阴阳
+  5: [1, 0, 1],  // 离 ☲ 阳阴阳
+  6: [0, 1, 1],  // 兑 ☱ 阴阳阳
+  7: [1, 1, 1]   // 乾 ☰ 阳阳阳
+};
+
+// 从爻画反查卦索引
+const LINES_TO_TRIGRAM = {
+  '0,0,0': 0, '1,0,0': 1, '0,1,0': 2, '1,1,0': 3,
+  '0,0,1': 4, '1,0,1': 5, '0,1,1': 6, '1,1,1': 7
+};
 
 // 64卦（先天八卦序：上卦为高位，下卦为低位）
 // TRIGRAMS = ['坤', '艮', '坎', '巽', '震', '离', '兑', '乾']
@@ -77,14 +99,6 @@ const HEXAGRAMS = [
   '泽坤萃', '泽山咸', '泽水困', '泽风大过', '泽雷随', '泽火革', '兑为泽', '泽天夬',
   // 上卦=乾(7)
   '天坤否', '天山遁', '天水讼', '天风姤', '天雷无妄', '天火同人', '天泽履', '乾为天'
-];
-  '风天小畜', '风泽中孚', '风火家人', '风雷益', '巽为风', '风水涣', '风山渐', '风地观',
-  // 上卦=坎(5)
-  '水天需', '水泽节', '水火既济', '水雷屯', '水风井', '坎为水', '水山蹇', '水地比',
-  // 上卦=艮(6)
-  '山天大畜', '山泽损', '山火贲', '山雷颐', '山风蛊', '山水蒙', '艮为山', '山地剥',
-  // 上卦=坤(7)
-  '地天泰', '地泽临', '地火明夷', '地雷复', '地风升', '地水师', '地山谦', '坤为地'
 ];
 
 // 诗意文案（易经原文风格）
@@ -121,10 +135,12 @@ const BIAN_SHI_CONFIG = {
 /**
  * 编码：四权力 → 基因码 → 卦象
  * 
- * 卦象计算：
- * - 上卦 = (永 + 阔) mod 8  → 天道：创造与传播的合力
- * - 下卦 = (延 + 益) mod 8  → 地道：生长与回归的循环
+ * 梅花易数起卦法：
+ * - 上卦 = 用 mod 8          (天道)
+ * - 下卦 = 扩 mod 8          (地道)
+ * - 动爻 = (衍 + 益) mod 6   (人道，哪一爻变，1-6)
  * - 卦序 = 上卦 × 8 + 下卦 + 1 (1-64)
+ * - 变卦 = 根据动爻改变对应阴阳爻
  */
 function encodeAsset(yong, kuo, yan, yi) {
   if (![yong, kuo, yan, yi].every(v => v >= 0 && v <= 7)) {
@@ -133,10 +149,15 @@ function encodeAsset(yong, kuo, yan, yi) {
 
   const geneCode = (yong << 9) | (kuo << 6) | (yan << 3) | yi;
   
-  // 卦象计算
-  const upperIdx = (yong + kuo) % 8;
-  const lowerIdx = (yan + yi) % 8;
+  // 梅花易数起卦
+  const upperIdx = yong % 8;           // 上卦：天道 (用)
+  const lowerIdx = kuo % 8;            // 下卦：地道 (扩)
+  const changingLine = ((yan + yi) % 6) + 1;  // 动爻：人道 (衍+益)，1-6
+  
   const hexIndex = upperIdx * 8 + lowerIdx;
+  
+  // 计算变卦
+  const changedHexagram = calculateChangedHexagramMeihua(upperIdx, lowerIdx, changingLine);
   
   return {
     geneCode,
@@ -156,16 +177,214 @@ function encodeAsset(yong, kuo, yan, yi) {
       index: hexIndex + 1,  // 1-64
       upperIdx,
       lowerIdx
+    },
+    changingLine: changingLine,  // 动爻 1-6
+    changedHexagram: changedHexagram  // 变卦信息
+  };
+}
+
+// ==================== 128bit 基因码架构 (v0.3) ====================
+
+/**
+ * 生成116bit随机唯一标识符
+ * 使用加密安全的随机数生成（Node.js和浏览器环境兼容）
+ * @returns {BigInt} 116bit随机数
+ */
+function generateUniqueId116() {
+  // 116bit = 14.5字节，我们需要生成15字节然后取高116bit
+  const bytes = new Uint8Array(15);
+  
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    // 浏览器环境
+    crypto.getRandomValues(bytes);
+  } else if (typeof require !== 'undefined') {
+    // Node.js环境
+    const nodeCrypto = require('crypto');
+    nodeCrypto.randomFillSync(bytes);
+  } else {
+    // 降级方案：使用Math.random（不推荐用于生产环境）
+    for (let i = 0; i < bytes.length; i++) {
+      bytes[i] = Math.floor(Math.random() * 256);
     }
+  }
+  
+  // 取高116bit（清空第一个字节的高4bit）
+  bytes[0] = bytes[0] & 0x0F;
+  
+  // 转换为BigInt
+  let result = BigInt(0);
+  for (let i = 0; i < bytes.length; i++) {
+    result = (result << BigInt(8)) | BigInt(bytes[i]);
+  }
+  
+  return result;
+}
+
+/**
+ * 编码：四权力 → 128bit完整基因码
+ * 
+ * 结构：
+ * - 高12bit: 权力基因 (用<<9) | (扩<<6) | (衍<<3) | 益
+ * - 低116bit: 随机唯一标识符
+ * 
+ * 总长度：128bit，碰撞概率极低（约2^-116）
+ * 
+ * @param {number} yong - 用 (0-7)
+ * @param {number} kuo - 扩 (0-7)
+ * @param {number} yan - 衍 (0-7)
+ * @param {number} yi - 益 (0-7)
+ * @param {BigInt|string} uniqueId - 可选的116bit唯一标识符（自动生成如果未提供）
+ * @returns {Object} 包含128bit完整基因码和相关信息
+ */
+function encodeAssetFull(yong, kuo, yan, yi, uniqueId = null) {
+  if (![yong, kuo, yan, yi].every(v => v >= 0 && v <= 7)) {
+    throw new Error('参数必须在 0-7 之间');
+  }
+
+  // 生成12bit权力基因
+  const powerGene = (yong << 9) | (kuo << 6) | (yan << 3) | yi;
+  
+  // 生成或验证116bit唯一标识符
+  let uid;
+  if (uniqueId === null) {
+    uid = generateUniqueId116();
+  } else {
+    uid = BigInt.asUintN(116, BigInt(uniqueId));
+  }
+  
+  // 组合128bit基因码：高12bit是权力基因，低116bit是唯一标识
+  // 权力基因左移116位
+  const fullGeneCode = (BigInt(powerGene) << BigInt(116)) | uid;
+  
+  // 卦象计算（仍使用12bit权力基因，确保向后兼容）
+  const upperIdx = yong % 8;
+  const lowerIdx = kuo % 8;
+  const changingLine = ((yan + yi) % 6) + 1;
+  const hexIndex = upperIdx * 8 + lowerIdx;
+  const changedHexagram = calculateChangedHexagramMeihua(upperIdx, lowerIdx, changingLine);
+  
+  return {
+    // 128bit完整基因码
+    fullGeneCode,
+    fullGeneCodeHex: '0x' + fullGeneCode.toString(16).padStart(32, '0'),
+    fullGeneCodeBinary: fullGeneCode.toString(2).padStart(128, '0'),
+    
+    // 组成部分
+    powerGene,
+    powerGeneBinary: powerGene.toString(2).padStart(12, '0'),
+    uniqueId: uid,
+    uniqueIdHex: '0x' + uid.toString(16).padStart(29, '0'),
+    uniqueIdBinary: uid.toString(2).padStart(116, '0'),
+    
+    // 四权力参数
+    params: {
+      yong: CONFIG.yong[yong],
+      kuo: CONFIG.kuo[kuo],
+      yan: CONFIG.yan[yan],
+      yi: CONFIG.yi[yi]
+    },
+    
+    // 卦象（基于12bit权力基因）
+    trigrams: {
+      upper: { name: TRIGRAMS[upperIdx], symbol: TRIGRAM_SYMBOLS[upperIdx], index: upperIdx },
+      lower: { name: TRIGRAMS[lowerIdx], symbol: TRIGRAM_SYMBOLS[lowerIdx], index: lowerIdx }
+    },
+    hexagram: {
+      name: HEXAGRAMS[hexIndex],
+      index: hexIndex + 1,  // 1-64
+      upperIdx,
+      lowerIdx
+    },
+    changingLine: changingLine,
+    changedHexagram: changedHexagram,
+    
+    // 元数据
+    version: 'v0.3-128bit',
+    bitLength: 128
   };
 }
 
 /**
- * 气数计算：混沌但可重现
- * 使用 Logistic 混沌映射：x(n+1) = r * x(n) * (1 - x(n))
- * 当 r = 3.99 时，系统进入混沌状态——敏感、不可预测、有深层规律
- * 符合"气"的概念：确定性中的不确定性，周而复始的自然流转
+ * 从128bit完整基因码解析
+ * @param {BigInt|string} fullGeneCode - 128bit基因码
+ * @returns {Object} 解析后的组成部分
  */
+function parseFullGeneCode(fullGeneCode) {
+  const fullCode = BigInt.asUintN(128, BigInt(fullGeneCode));
+  
+  // 提取高12bit权力基因
+  const powerGene = Number(fullCode >> BigInt(116));
+  
+  // 提取低116bit唯一标识
+  const uniqueIdMask = (BigInt(1) << BigInt(116)) - BigInt(1);
+  const uniqueId = fullCode & uniqueIdMask;
+  
+  // 解析四权力
+  const yong = (powerGene >> 9) & 0x7;
+  const kuo = (powerGene >> 6) & 0x7;
+  const yan = (powerGene >> 3) & 0x7;
+  const yi = powerGene & 0x7;
+  
+  // 卦象计算
+  const upperIdx = yong % 8;
+  const lowerIdx = kuo % 8;
+  const changingLine = ((yan + yi) % 6) + 1;
+  const hexIndex = upperIdx * 8 + lowerIdx;
+  const changedHexagram = calculateChangedHexagramMeihua(upperIdx, lowerIdx, changingLine);
+  
+  return {
+    fullGeneCode: fullCode,
+    powerGene,
+    uniqueId,
+    params: {
+      yong: CONFIG.yong[yong],
+      kuo: CONFIG.kuo[kuo],
+      yan: CONFIG.yan[yan],
+      yi: CONFIG.yi[yi]
+    },
+    trigrams: {
+      upper: { name: TRIGRAMS[upperIdx], symbol: TRIGRAM_SYMBOLS[upperIdx], index: upperIdx },
+      lower: { name: TRIGRAMS[lowerIdx], symbol: TRIGRAM_SYMBOLS[lowerIdx], index: lowerIdx }
+    },
+    hexagram: {
+      name: HEXAGRAMS[hexIndex],
+      index: hexIndex + 1,
+      upperIdx,
+      lowerIdx
+    },
+    changingLine: changingLine,
+    changedHexagram: changedHexagram
+  };
+}
+
+/**
+ * 计算碰撞概率
+ * @param {number} n - 资产数量
+ * @param {number} bits - 基因码位数（默认116bit唯一标识部分）
+ * @returns {Object} 碰撞概率信息
+ */
+function calculateCollisionProbability(n, bits = 116) {
+  // 使用近似公式：p ≈ n² / (2 * 2^bits)
+  const space = BigInt(1) << BigInt(bits);
+  const nBig = BigInt(n);
+  const nSquared = nBig * nBig;
+  const denominator = BigInt(2) * space;
+  
+  // 将概率转换为可读的浮点数
+  const probability = Number(nSquared) / Number(denominator);
+  const percentage = probability * 100;
+  
+  return {
+    assetCount: n,
+    bitLength: bits,
+    totalSpace: space.toString(),
+    probability,
+    percentage,
+    safeFor: probability < 0.001 ? '安全使用' : 
+             probability < 0.01 ? '可接受' : 
+             probability < 0.5 ? '需谨慎' : '高风险'
+  };
+}
 function calculateQi(geneCode, timestamp) {
   // 混沌参数：3.99 接近混沌临界值 4.0
   const r = 3.99;
@@ -312,31 +531,73 @@ class BianShiSystem {
 }
 
 /**
- * 计算之卦（变卦）
+ * 梅花易数变卦计算
  * 
- * 变爻规则：阳变阴，阴变阳
- * 简化实现：根据变爻数量和强度计算偏移
+ * 动爻规则：
+ * - 动爻 1-6 对应初爻到上爻
+ * - 阳爻变阴，阴爻变阳
+ * - 变卦代表事物发展的趋势
+ * 
+ * @param {number} upperIdx - 上卦索引 (0-7)
+ * @param {number} lowerIdx - 下卦索引 (0-7)
+ * @param {number} changingLine - 动爻 (1-6, 1为初爻，6为上爻)
+ * @returns {Object} 变卦信息
  */
-function calculateChangedHexagram(mainHexIndex, changingLines) {
-  if (!changingLines || changingLines.length === 0) {
-    return {
-      original: mainHexIndex,
-      changed: mainHexIndex,
-      transition: '定静'
-    };
+function calculateChangedHexagramMeihua(upperIdx, lowerIdx, changingLine) {
+  // 获取上下卦的爻画
+  const upperLines = [...TRIGRAM_LINES[upperIdx]];  // 四、五、上爻
+  const lowerLines = [...TRIGRAM_LINES[lowerIdx]];  // 初、二、三爻
+  
+  // 确定哪一爻变（1=初爻，2=二爻，3=三爻，4=四爻，5=五爻，6=上爻）
+  // 下卦：初(1)、二(2)、三(3)
+  // 上卦：四(4)、五(5)、上(6)
+  const linePosition = changingLine;
+  
+  // 变爻
+  if (linePosition <= 3) {
+    // 变下卦的爻 (初、二、三)
+    const idx = linePosition - 1;  // 0-2
+    lowerLines[idx] = lowerLines[idx] === 1 ? 0 : 1;
+  } else {
+    // 变上卦的爻 (四、五、六)
+    const idx = linePosition - 4;  // 0-2
+    upperLines[idx] = upperLines[idx] === 1 ? 0 : 1;
   }
   
-  // 根据变爻计算偏移（简化算法）
-  const changePower = changingLines.length;
-  const offset = changePower * 7 % 64;  // 偏移量
-  const changedIndex = (mainHexIndex - 1 + offset) % 64;
+  // 计算变卦后的卦索引
+  const newUpperIdx = LINES_TO_TRIGRAM[upperLines.join(',')];
+  const newLowerIdx = LINES_TO_TRIGRAM[lowerLines.join(',')];
+  const changedHexIndex = newUpperIdx * 8 + newLowerIdx;
+  
+  // 获取爻名
+  const lineNames = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
+  const changedLineName = lineNames[linePosition - 1];
+  
+  // 判断阴阳变化
+  let originalYinYang, changedYinYang;
+  if (linePosition <= 3) {
+    originalYinYang = lowerLines[linePosition - 1] === 1 ? '阳' : '阴';
+    changedYinYang = TRIGRAM_LINES[lowerIdx][linePosition - 1] === 1 ? '阳变阴' : '阴变阳';
+  } else {
+    originalYinYang = upperLines[linePosition - 4] === 1 ? '阳' : '阴';
+    changedYinYang = TRIGRAM_LINES[upperIdx][linePosition - 4] === 1 ? '阳变阴' : '阴变阳';
+  }
   
   return {
-    original: mainHexIndex,
-    changed: changedIndex + 1,
-    changedHexagram: HEXAGRAMS[changedIndex],
-    changingLines: changingLines.length,
-    transition: changingLines.length >= 3 ? '亟变' : changingLines.length >= 1 ? '渐变' : '定静'
+    changingLine: changingLine,        // 动爻 1-6
+    changingLineName: changedLineName, // 爻位名称
+    changeType: changedYinYang,        // 阴阳变化
+    original: {
+      upper: { name: TRIGRAMS[upperIdx], symbol: TRIGRAM_SYMBOLS[upperIdx], index: upperIdx },
+      lower: { name: TRIGRAMS[lowerIdx], symbol: TRIGRAM_SYMBOLS[lowerIdx], index: lowerIdx },
+      hexagram: HEXAGRAMS[upperIdx * 8 + lowerIdx]
+    },
+    changed: {
+      upper: { name: TRIGRAMS[newUpperIdx], symbol: TRIGRAM_SYMBOLS[newUpperIdx], index: newUpperIdx },
+      lower: { name: TRIGRAMS[newLowerIdx], symbol: TRIGRAM_SYMBOLS[newLowerIdx], index: newLowerIdx },
+      hexagram: HEXAGRAMS[changedHexIndex],
+      index: changedHexIndex + 1  // 1-64
+    }
   };
 }
 
@@ -380,15 +641,24 @@ function generatePoeticView(assetData, qiData, bianShiData) {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    // 向后兼容：12bit编码（v2.x）
     encodeAsset,
+    // 128bit完整编码（v0.3）
+    encodeAssetFull,
+    parseFullGeneCode,
+    generateUniqueId116,
+    calculateCollisionProbability,
+    // 其他功能
     calculateQi,
     getQiDescription,
     BianShiSystem,
-    calculateChangedHexagram,
+    calculateChangedHexagramMeihua,
     generatePoeticView,
     CONFIG,
     TRIGRAMS,
     TRIGRAM_SYMBOLS,
+    TRIGRAM_LINES,
+    LINES_TO_TRIGRAM,
     HEXAGRAMS,
     POETRY,
     BIAN_SHI_CONFIG
@@ -397,15 +667,24 @@ if (typeof module !== 'undefined' && module.exports) {
 
 if (typeof window !== 'undefined') {
   window.EchoEncoder = {
+    // 向后兼容：12bit编码（v2.x）
     encodeAsset,
+    // 128bit完整编码（v0.3）
+    encodeAssetFull,
+    parseFullGeneCode,
+    generateUniqueId116,
+    calculateCollisionProbability,
+    // 其他功能
     calculateQi,
     getQiDescription,
     BianShiSystem,
-    calculateChangedHexagram,
+    calculateChangedHexagramMeihua,
     generatePoeticView,
     CONFIG,
     TRIGRAMS,
     TRIGRAM_SYMBOLS,
+    TRIGRAM_LINES,
+    LINES_TO_TRIGRAM,
     HEXAGRAMS,
     POETRY,
     BIAN_SHI_CONFIG

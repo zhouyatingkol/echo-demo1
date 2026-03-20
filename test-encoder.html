@@ -761,12 +761,12 @@
                     <h3 style="letter-spacing: 0.1em; margin-bottom: 20px;">精确数据</h3>
                     <p style="text-align: left; font-family: 'Noto Serif SC', monospace; font-size: 0.9em; line-height: 2;">
                         <strong>基因码：</strong><span id="precise-gene">101011100010</span> (258)<br>
-                        <strong>上卦：</strong><span id="precise-upper">巽（风）</span> = (5+3) mod 8 = 5<br>
-                        <strong>下卦：</strong><span id="precise-lower">离（火）</span> = (5+2) mod 8 = 7<br>
-                        <strong>卦序：</strong>5×8+7+1 = <span id="precise-number">48</span><br>
-                        <strong>气数：</strong><span id="precise-qi">0.632145</span><br>
-                        <strong>变爻：</strong><span id="precise-lines">九三（使用频次）</span><br>
-                        <strong>之卦：</strong><span id="precise-changed">火风鼎</span>
+                        <strong>上卦：</strong><span id="precise-upper">巽（风）</span> = 用 mod 8 = 5<br>
+                        <strong>下卦：</strong><span id="precise-lower">离（火）</span> = 扩 mod 8 = 3<br>
+                        <strong>卦序：</strong>5×8+3+1 = <span id="precise-number">48</span><br>
+                        <strong>动爻：</strong><span id="precise-changing-line">第3爻</span> = (衍+益) mod 6 = (5+2) mod 6 = 1<br>
+                        <strong>变卦：</strong><span id="precise-changed">风火家人→火风鼎</span><br>
+                        <strong>气数：</strong><span id="precise-qi">0.632145</span>
                     </p>
                     <button class="share-btn" onclick="copyPreciseData()" style="margin-top: 20px;">复制全部数据</button>
                 </div>
@@ -990,26 +990,13 @@
                 const qiDesc = EchoEncoder.getQiDescription(qi);
                 
                 // 检测卦象变化
-                const isHexagramChanged = lastHexagram && lastHexagram !== result.hexagram;
-                lastHexagram = result.hexagram;
+                const currentHexagram = result.hexagram.name;
+                const isHexagramChanged = lastHexagram && lastHexagram !== currentHexagram;
+                lastHexagram = currentHexagram;
                 
                 if (isHexagramChanged && playSound) {
                     AudioSys.playTrigramChange();
                 }
-                
-                // 模拟使用数据
-                const usageData = {
-                    usageCount: Math.floor(Math.random() * 200),
-                    platformCount: Math.floor(Math.random() * 10),
-                    derivativeCount: Math.floor(Math.random() * 20),
-                    tradeVolume: Math.floor(Math.random() * 2000),
-                    communityScore: Math.floor(Math.random() * 100),
-                    creatorActivity: Math.floor(Math.random() * 30)
-                };
-                
-                const changeData = EchoEncoder.detectChangingLines(result.geneCode, usageData, timestamp);
-                const changedHex = EchoEncoder.calculateChangedHexagram(result.hexagramNumber, changeData.changingLines);
-                const poetic = EchoEncoder.generatePoeticView(result, qiDesc, changeData);
                 
                 // 更新结果 - 带动画
                 const resultBox = document.getElementById('resultBox');
@@ -1021,9 +1008,9 @@
                 document.getElementById('gene-code').innerHTML = 
                     result.geneCodeBinary.match(/.{3}/g).join(' ') +
                     '<button class="copy-btn" id="copyBtn" onclick="copyGeneCode()">复制</button>';
-                document.getElementById('trigrams').textContent = result.upperTrigram + result.lowerTrigram;
-                document.getElementById('hexagram-name').textContent = result.hexagram;
-                document.getElementById('hexagram-number').textContent = `第 ${result.hexagramNumber} 卦`;
+                document.getElementById('trigrams').textContent = result.trigrams.upper.name + result.trigrams.lower.name;
+                document.getElementById('hexagram-name').textContent = result.hexagram.name;
+                document.getElementById('hexagram-number').textContent = `第 ${result.hexagram.index} 卦`;
                 
                 // 更新气数显示 - 带诗意引用
                 const qiDisplay = document.getElementById('qi-display');
@@ -1040,30 +1027,47 @@
                 }
                 
                 // 更新诗意层
-                document.getElementById('poetic-title').textContent = poetic.title;
-                document.getElementById('poetic-subtitle').textContent = poetic.subtitle;
-                document.getElementById('poetic-phrase').textContent = `${poetic.qiPhrase} · ${poetic.changePhrase}`;
+                const relationWords = {
+                    '乾乾': '健', '坤坤': '顺', '坎离': '济', '离坎': '交',
+                    '震艮': '止', '巽兑': '悦', '巽离': '明', '离巽': '柔',
+                    '乾坤': '交', '坤乾': '泰'
+                };
+                const upperName = result.trigrams.upper.name;
+                const lowerName = result.trigrams.lower.name;
+                const relation = relationWords[upperName + lowerName] || '育';
+                
+                document.getElementById('poetic-title').textContent = result.hexagram.name.slice(0, 2);
+                document.getElementById('poetic-subtitle').textContent = `${upperName}${lowerName}${relation}之象`;
+                document.getElementById('poetic-phrase').textContent = `${qiDesc.word} · 动${result.changingLine}爻→${result.changedHexagram.changed.hexagram.slice(0,2)}`;
                 document.getElementById('poetic-phrase').style.color = qiDesc.color;
-                document.getElementById('poetic-desc').innerHTML = poetic.description.replace(/，/g, '，<br>');
+                document.getElementById('poetic-desc').innerHTML = 
+                    `此器${CONFIG.yong[y]}而${CONFIG.kuo[k]}，${CONFIG.yan[ya]}以${CONFIG.yi[yi]}，${qiDesc.word}。`;
                 
                 // 更新精确层
                 document.getElementById('precise-gene').textContent = result.geneCodeBinary;
-                document.getElementById('precise-upper').textContent = `${result.upperTrigram}（${getTrigramMeaning(result.upperTrigram)}）= (${y}+${k}) mod 8 = ${(y+k)%8}`;
-                document.getElementById('precise-lower').textContent = `${result.lowerTrigram}（${getTrigramMeaning(result.lowerTrigram)}）= (${ya}+${yi}) mod 8 = ${(ya+yi)%8}`;
-                document.getElementById('precise-number').textContent = result.hexagramNumber;
+                document.getElementById('precise-upper').textContent = 
+                    `${result.trigrams.upper.name}（${result.trigrams.upper.symbol}）`;
+                document.getElementById('precise-lower').textContent = 
+                    `${result.trigrams.lower.name}（${result.trigrams.lower.symbol}）`;
+                document.getElementById('precise-number').textContent = result.hexagram.index;
                 document.getElementById('precise-qi').textContent = qi.toFixed(6);
                 
-                const linesText = changeData.changingLines.length > 0 
-                    ? changeData.changingLines.map(l => `${l.line === 6 ? '上' : l.line === 1 ? '初' : ['二','三','四','五'][l.line-2]}九（${l.name}）`).join('、')
-                    : '无';
-                document.getElementById('precise-lines').textContent = linesText;
-                document.getElementById('precise-changed').textContent = changedHex.changedHexagram;
+                // 动爻信息
+                const lineNames = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
+                const changingLineName = lineNames[result.changingLine - 1];
+                document.getElementById('precise-changing-line').textContent = 
+                    `第${result.changingLine}爻(${changingLineName}) = (${ya}+${yi}) mod 6 + 1 = ${result.changingLine}`;
+                
+                // 变卦信息
+                const changed = result.changedHexagram;
+                document.getElementById('precise-changed').textContent = 
+                    `${changed.original.hexagram} → ${changed.changed.hexagram}`;
                 
                 // 更新12变势条
-                updateChangeBar(changeData.changingLines.length);
+                updateChangeBar(result.changingLine);
                 
                 // 变爻音效
-                if (changeData.changingLines.length > 0 && playSound) {
+                if (playSound) {
                     setTimeout(() => AudioSys.playChangingLine(), 200);
                 }
             }
@@ -1143,10 +1147,10 @@
             const lower = document.getElementById('precise-lower').textContent;
             const num = document.getElementById('precise-number').textContent;
             const qi = document.getElementById('precise-qi').textContent;
-            const lines = document.getElementById('precise-lines').textContent;
+            const changingLine = document.getElementById('precise-changing-line').textContent;
             const changed = document.getElementById('precise-changed').textContent;
             
-            const text = `ECHO编码\n基因码：${gene}\n上卦：${upper}\n下卦：${lower}\n卦序：${num}\n气数：${qi}\n变爻：${lines}\n之卦：${changed}`;
+            const text = `ECHO编码\n基因码：${gene}\n上卦：${upper}\n下卦：${lower}\n卦序：${num}\n气数：${qi}\n动爻：${changingLine}\n变卦：${changed}`;
             
             navigator.clipboard.writeText(text).then(() => {
                 const btn = event.target;
