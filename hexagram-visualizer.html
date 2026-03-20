@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO 编码系统 · 六十四卦图</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1a1a;
+            --ink-light: #4a4a4a;
+            --paper: #faf8f5;
+            --paper-warm: #f5f0e8;
+            --accent: #c9a961;
+            --accent-light: #d4b978;
+            --yang: #1a1a1a;
+            --yin: #e8e4dc;
+            --shadow: rgba(0, 0, 0, 0.06);
+            --shadow-hover: rgba(0, 0, 0, 0.12);
+            --highlight: #e8d4a8;
+            --season-spring: #a8c4a0;
+            --season-summer: #d4a574;
+            --season-autumn: #c9a961;
+            --season-winter: #9db4c0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', 'Songti SC', serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            background: linear-gradient(180deg, var(--paper-warm) 0%, var(--paper) 100%);
+            border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            margin-bottom: 12px;
+            color: var(--ink);
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: var(--ink-light);
+            letter-spacing: 0.15em;
+            font-weight: 300;
+        }
+
+        /* Solar Term Banner */
+        .solar-banner {
+            background: linear-gradient(135deg, var(--paper-warm) 0%, rgba(201, 169, 97, 0.1) 100%);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(201, 169, 97, 0.15);
+        }
+
+        .solar-current {
+            display: inline-flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .solar-label {
+            font-size: 0.85rem;
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
+        }
+
+        .solar-name {
+            font-size: 1.8rem;
+            color: var(--accent);
+            font-weight: 500;
+            letter-spacing: 0.15em;
+        }
+
+        .solar-hex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 20px;
+            background: white;
+            border-radius: 25px;
+            border: 1px solid rgba(201, 169, 97, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .solar-hex:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .solar-hex .hex-symbol {
+            font-size: 1.5rem;
+        }
+
+        .solar-hex .hex-info {
+            text-align: left;
+        }
+
+        .solar-hex .hex-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .solar-hex .hex-number {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Search */
+        .search-container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px 50px 18px 24px;
+            border: 1px solid rgba(201, 169, 97, 0.3);
+            border-radius: 50px;
+            background: var(--paper);
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--ink);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px var(--shadow-hover);
+        }
+
+        .search-box::placeholder {
+            color: #999;
+            font-weight: 300;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .search-hints {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .search-hint {
+            padding: 6px 14px;
+            background: rgba(201, 169, 97, 0.08);
+            border: 1px solid rgba(201, 169, 97, 0.2);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-hint:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 10px 24px;
+            border: 1px solid var(--accent);
+            background: transparent;
+            color: var(--ink);
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.1em;
+        }
+
+        .control-btn:hover, .control-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Grid */
+        .grid-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hexagram-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 16px;
+        }
+
+        /* Hexagram Card */
+        .hex-card {
+            background: var(--paper);
+            border: 1px solid rgba(201, 169, 97, 0.15);
+            border-radius: 10px;
+            padding: 18px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hex-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .hex-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px var(--shadow-hover);
+            border-color: rgba(201, 169, 97, 0.4);
+        }
+
+        .hex-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .hex-card.hidden {
+            display: none;
+        }
+
+        .hex-card.twelve-changes {
+            background: linear-gradient(135deg, var(--highlight) 0%, var(--paper-warm) 100%);
+            border-color: var(--accent);
+        }
+
+        .hex-card.twelve-changes::after {
+            content: '十二变势';
+            position: absolute;
+            top: 8px;
+            right: -25px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 25px;
+            transform: rotate(45deg);
+            letter-spacing: 0.05em;
+        }
+
+        .hex-card.season-active {
+            box-shadow: 0 0 0 2px var(--season-spring);
+        }
+
+        .hex-symbol-trigram {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            line-height: 1;
+            letter-spacing: 0.1em;
+        }
+
+        .hex-name-full {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--ink);
+            margin-bottom: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        .hex-number-display {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .hex-season {
+            font-size: 0.7rem;
+            color: var(--ink-light);
+            margin-top: 6px;
+            padding: 3px 8px;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 26, 26, 0.88);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--paper);
+            border-radius: 16px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: rgba(201, 169, 97, 0.1);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--ink);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: var(--accent);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 50px;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+        }
+
+        .modal-trigrams {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            letter-spacing: 0.2em;
+        }
+
+        .modal-name-full {
+            font-size: 2.2rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+            letter-spacing: 0.1em;
+        }
+
+        .modal-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: var(--ink-light);
+        }
+
+        .modal-meta span {
+            padding: 4px 12px;
+            background: rgba(201, 169, 97, 0.08);
+            border-radius: 15px;
+        }
+
+        .modal-section {
+            margin-bottom: 28px;
+        }
+
+        .modal-section h3 {
+            font-size: 0.85rem;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .modal-section p {
+            font-size: 1.05rem;
+            line-height: 2;
+            color: var(--ink);
+            text-align: justify;
+        }
+
+        .asset-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .asset-tag {
+            padding: 8px 16px;
+            background: rgba(201, 169, 97, 0.1);
+            border: 1px solid rgba(201, 169, 97, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--ink);
+            transition: all 0.3s ease;
+        }
+
+        .asset-tag:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Lineage Evolution Graph */
+        .lineage-section {
+            margin-top: 35px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(201, 169, 97, 0.2);
+        }
+
+        .lineage-title {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            margin-bottom: 25px;
+        }
+
+        .lineage-subtitle {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            margin-bottom: 20px;
+        }
+
+        .lineage-graph {
+            position: relative;
+            min-height: 400px;
+            padding: 20px;
+        }
+
+        .lineage-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            padding: 30px 40px;
+            background: var(--paper-warm);
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            z-index: 10;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lineage-center .center-symbol {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .lineage-center .center-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .lineage-center .center-number {
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-top: 3px;
+        }
+
+        .lineage-node {
+            position: absolute;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid rgba(201, 169, 97, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .lineage-node:hover {
+            background: var(--paper-warm);
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px var(--shadow-hover);
+        }
+
+        .lineage-node.twelve {
+            background: linear-gradient(135deg, var(--highlight) 0%, white 100%);
+            border-width: 2px;
+            border-color: var(--accent);
+        }
+
+        .lineage-node .node-symbol {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .lineage-node .node-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .lineage-node .node-prob {
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-top: 4px;
+        }
+
+        .lineage-line {
+            position: absolute;
+            background: linear-gradient(90deg, var(--accent), rgba(201, 169, 97, 0.3));
+            transform-origin: left center;
+            z-index: 1;
+            border-radius: 2px;
+        }
+
+        /* Lines visualization */
+        .lines-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin: 25px 0;
+        }
+
+        .yao-line {
+            width: 100px;
+            height: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .yao-yang {
+            background: var(--yang);
+        }
+
+        .yao-yin {
+            background: transparent;
+            position: relative;
+        }
+
+        .yao-yin::before,
+        .yao-yin::after {
+            content: '';
+            position: absolute;
+            width: 45%;
+            height: 100%;
+            background: var(--yang);
+            border-radius: 4px;
+        }
+
+        .yao-yin::before {
+            left: 0;
+        }
+
+        .yao-yin::after {
+            right: 0;
+        }
+
+        /* Season indicator */
+        .season-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        .season-spring { background: rgba(168, 196, 160, 0.2); color: #5a7a52; }
+        .season-summer { background: rgba(212, 165, 116, 0.2); color: #8b6914; }
+        .season-autumn { background: rgba(201, 169, 97, 0.2); color: #8b7355; }
+        .season-winter { background: rgba(157, 180, 192, 0.2); color: #4a6270; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ink-light);
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+        }
+
+        .footer .divider {
+            width: 60px;
+            height: 1px;
+            background: var(--accent);
+            margin: 0 auto 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .hexagram-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .hexagram-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+            .modal-body {
+                padding: 30px;
+            }
+            .lineage-graph {
+                min-height: 300px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hexagram-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hex-symbol-trigram {
+                font-size: 1.3rem;
+            }
+            .hex-name-full {
+                font-size: 0.85rem;
+            }
+            .lineage-center {
+                width: 100px;
+                height: 100px;
+                padding: 15px;
+            }
+            .lineage-center .center-symbol {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hex-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .hex-card:nth-child(1) { animation-delay: 0.02s; }
+        .hex-card:nth-child(2) { animation-delay: 0.04s; }
+        .hex-card:nth-child(3) { animation-delay: 0.06s; }
+        .hex-card:nth-child(4) { animation-delay: 0.08s; }
+        .hex-card:nth-child(5) { animation-delay: 0.10s; }
+        .hex-card:nth-child(6) { animation-delay: 0.12s; }
+        .hex-card:nth-child(7) { animation-delay: 0.14s; }
+        .hex-card:nth-child(8) { animation-delay: 0.16s; }
+        .hex-card:nth-child(9) { animation-delay: 0.18s; }
+        .hex-card:nth-child(10) { animation-delay: 0.20s; }
+        .hex-card:nth-child(11) { animation-delay: 0.22s; }
+        .hex-card:nth-child(12) { animation-delay: 0.24s; }
+        .hex-card:nth-child(13) { animation-delay: 0.26s; }
+        .hex-card:nth-child(14) { animation-delay: 0.28s; }
+        .hex-card:nth-child(15) { animation-delay: 0.30s; }
+        .hex-card:nth-child(16) { animation-delay: 0.32s; }
+        .hex-card:nth-child(17) { animation-delay: 0.34s; }
+        .hex-card:nth-child(18) { animation-delay: 0.36s; }
+        .hex-card:nth-child(19) { animation-delay: 0.38s; }
+        .hex-card:nth-child(20) { animation-delay: 0.40s; }
+        .hex-card:nth-child(21) { animation-delay: 0.42s; }
+        .hex-card:nth-child(22) { animation-delay: 0.44s; }
+        .hex-card:nth-child(23) { animation-delay: 0.46s; }
+        .hex-card:nth-child(24) { animation-delay: 0.48s; }
+        .hex-card:nth-child(25) { animation-delay: 0.50s; }
+        .hex-card:nth-child(26) { animation-delay: 0.52s; }
+        .hex-card:nth-child(27) { animation-delay: 0.54s; }
+        .hex-card:nth-child(28) { animation-delay: 0.56s; }
+        .hex-card:nth-child(29) { animation-delay: 0.58s; }
+        .hex-card:nth-child(30) { animation-delay: 0.60s; }
+        .hex-card:nth-child(31) { animation-delay: 0.62s; }
+        .hex-card:nth-child(32) { animation-delay: 0.64s; }
+        .hex-card:nth-child(33) { animation-delay: 0.66s; }
+        .hex-card:nth-child(34) { animation-delay: 0.68s; }
+        .hex-card:nth-child(35) { animation-delay: 0.70s; }
+        .hex-card:nth-child(36) { animation-delay: 0.72s; }
+        .hex-card:nth-child(37) { animation-delay: 0.74s; }
+        .hex-card:nth-child(38) { animation-delay: 0.76s; }
+        .hex-card:nth-child(39) { animation-delay: 0.78s; }
+        .hex-card:nth-child(40) { animation-delay: 0.80s; }
+        .hex-card:nth-child(41) { animation-delay: 0.82s; }
+        .hex-card:nth-child(42) { animation-delay: 0.84s; }
+        .hex-card:nth-child(43) { animation-delay: 0.86s; }
+        .hex-card:nth-child(44) { animation-delay: 0.88s; }
+        .hex-card:nth-child(45) { animation-delay: 0.90s; }
+        .hex-card:nth-child(46) { animation-delay: 0.92s; }
+        .hex-card:nth-child(47) { animation-delay: 0.94s; }
+        .hex-card:nth-child(48) { animation-delay: 0.96s; }
+        .hex-card:nth-child(49) { animation-delay: 0.98s; }
+        .hex-card:nth-child(50) { animation-delay: 1.00s; }
+        .hex-card:nth-child(51) { animation-delay: 1.02s; }
+        .hex-card:nth-child(52) { animation-delay: 1.04s; }
+        .hex-card:nth-child(53) { animation-delay: 1.06s; }
+        .hex-card:nth-child(54) { animation-delay: 1.08s; }
+        .hex-card:nth-child(55) { animation-delay: 1.10s; }
+        .hex-card:nth-child(56) { animation-delay: 1.12s; }
+        .hex-card:nth-child(57) { animation-delay: 1.14s; }
+        .hex-card:nth-child(58) { animation-delay: 1.16s; }
+        .hex-card:nth-child(59) { animation-delay: 1.18s; }
+        .hex-card:nth-child(60) { animation-delay: 1.20s; }
+        .hex-card:nth-child(61) { animation-delay: 1.22s; }
+        .hex-card:nth-child(62) { animation-delay: 1.24s; }
+        .hex-card:nth-child(63) { animation-delay: 1.26s; }
+        .hex-card:nth-child(64) { animation-delay: 1.28s; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>六十四卦图</h1>
+        <p class="subtitle">ECHO 编码系统 · 易经智慧 · 十二变势</p>
+    </header>
+
+    <div class="solar-banner">
+        <div class="solar-current">
+            <span class="solar-label">当前节气</span>
+            <span class="solar-name" id="currentSolarTerm">春分</span>
+            <div class="solar-hex" id="solarHexagram">
+                <span class="hex-symbol">☴☲</span>
+                <div class="hex-info">
+                    <div class="hex-name">风火家人</div>
+                    <div class="hex-number">第 37 卦</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" class="search-box" id="searchBox" placeholder="试试：所有温润的卦 / 适合音乐的卦 / 家族相关的卦...">
+        <span class="search-icon">⌕</span>
+        <div class="search-hints">
+            <span class="search-hint" data-query="温润">温润如水</span>
+            <span class="search-hint" data-query="音乐">音乐艺术</span>
+            <span class="search-hint" data-query="家族">家族传承</span>
+            <span class="search-hint" data-query="生长">生发成长</span>
+            <span class="search-hint" data-query="安定">安稳静定</span>
+            <span class="search-hint" data-query="变动">变化革新</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn active" data-view="all">全部</button>
+        <button class="control-btn" data-view="upper">上经</button>
+        <button class="control-btn" data-view="lower">下经</button>
+        <button class="control-btn" data-view="twelve">十二变势</button>
+        <button class="control-btn" data-view="season">本季活跃</button>
+    </div>
+
+    <div class="grid-container">
+        <div class="hexagram-grid" id="hexagramGrid"></div>
+    </div>
+
+    <footer class="footer">
+        <div class="divider"></div>
+        <p>天地定位，山泽通气，雷风相薄，水火不相射</p>
+        <p style="margin-top: 8px; font-size: 0.75rem; opacity: 0.6;">ECHO ENCODING SYSTEM · 十二变势演化</p>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">×</button>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 八卦符号
+        const trigrams = {
+            '乾': { symbol: '☰', nature: '天', attribute: '刚健' },
+            '坤': { symbol: '☷', nature: '地', attribute: '柔顺' },
+            '震': { symbol: '☳', nature: '雷', attribute: '动' },
+            '巽': { symbol: '☴', nature: '风', attribute: '入' },
+            '坎': { symbol: '☵', nature: '水', attribute: '陷' },
+            '离': { symbol: '☲', nature: '火', attribute: '丽' },
+            '艮': { symbol: '☶', nature: '山', attribute: '止' },
+            '兑': { symbol: '☱', nature: '泽', attribute: '悦' }
+        };
+
+        // 二十四节气（每个卦分配一个节气）
+        const solarTerms = [
+            { name: '立春', season: 'spring', hexIndex: 0 },   // 1. 乾
+            { name: '雨水', season: 'spring', hexIndex: 1 },   // 2. 坤
+            { name: '惊蛰', season: 'spring', hexIndex: 2 },   // 3. 屯
+            { name: '春分', season: 'spring', hexIndex: 3 },   // 4. 蒙
+            { name: '清明', season: 'spring', hexIndex: 4 },   // 5. 需
+            { name: '谷雨', season: 'spring', hexIndex: 5 },   // 6. 讼
+            { name: '立夏', season: 'summer', hexIndex: 6 },   // 7. 师
+            { name: '小满', season: 'summer', hexIndex: 7 },   // 8. 比
+            { name: '芒种', season: 'summer', hexIndex: 8 },   // 9. 小畜
+            { name: '夏至', season: 'summer', hexIndex: 9 },   // 10. 履
+            { name: '小暑', season: 'summer', hexIndex: 10 },  // 11. 泰
+            { name: '大暑', season: 'summer', hexIndex: 11 },  // 12. 否
+            { name: '立秋', season: 'autumn', hexIndex: 12 },  // 13. 同人
+            { name: '处暑', season: 'autumn', hexIndex: 13 },  // 14. 大有
+            { name: '白露', season: 'autumn', hexIndex: 14 },  // 15. 谦
+            { name: '秋分', season: 'autumn', hexIndex: 15 },  // 16. 豫
+            { name: '寒露', season: 'autumn', hexIndex: 16 },  // 17. 随
+            { name: '霜降', season: 'autumn', hexIndex: 17 },  // 18. 蛊
+            { name: '立冬', season: 'winter', hexIndex: 18 },  // 19. 临
+            { name: '小雪', season: 'winter', hexIndex: 19 },  // 20. 观
+            { name: '大雪', season: 'winter', hexIndex: 20 },  // 21. 噬嗑
+            { name: '冬至', season: 'winter', hexIndex: 21 },  // 22. 贲
+            { name: '小寒', season: 'winter', hexIndex: 22 },  // 23. 剥
+            { name: '大寒', season: 'winter', hexIndex: 23 },  // 24. 复
+            { name: '立春', season: 'spring', hexIndex: 24 },  // 25. 无妄
+            { name: '雨水', season: 'spring', hexIndex: 25 },  // 26. 大畜
+            { name: '惊蛰', season: 'spring', hexIndex: 26 },  // 27. 颐
+            { name: '春分', season: 'spring', hexIndex: 27 },  // 28. 大过
+            { name: '清明', season: 'spring', hexIndex: 28 },  // 29. 坎
+            { name: '谷雨', season: 'spring', hexIndex: 29 },  // 30. 离
+            { name: '立夏', season: 'summer', hexIndex: 30 },  // 31. 咸
+            { name: '小满', season: 'summer', hexIndex: 31 },  // 32. 恒
+            { name: '芒种', season: 'summer', hexIndex: 32 },  // 33. 遁
+            { name: '夏至', season: 'summer', hexIndex: 33 },  // 34. 大壮
+            { name: '小暑', season: 'summer', hexIndex: 34 },  // 35. 晋
+            { name: '大暑', season: 'summer', hexIndex: 35 },  // 36. 明夷
+            { name: '立秋', season: 'autumn', hexIndex: 36 },  // 37. 家人
+            { name: '处暑', season: 'autumn', hexIndex: 37 },  // 38. 睽
+            { name: '白露', season: 'autumn', hexIndex: 38 },  // 39. 蹇
+            { name: '秋分', season: 'autumn', hexIndex: 39 },  // 40. 解
+            { name: '寒露', season: 'autumn', hexIndex: 40 },  // 41. 损
+            { name: '霜降', season: 'autumn', hexIndex: 41 },  // 42. 益
+            { name: '立冬', season: 'winter', hexIndex: 42 },  // 43. 夬
+            { name: '小雪', season: 'winter', hexIndex: 43 },  // 44. 姤
+            { name: '大雪', season: 'winter', hexIndex: 44 },  // 45. 萃
+            { name: '冬至', season: 'winter', hexIndex: 45 },  // 46. 升
+            { name: '小寒', season: 'winter', hexIndex: 46 },  // 47. 困
+            { name: '大寒', season: 'winter', hexIndex: 47 },  // 48. 井
+            { name: '立春', season: 'spring', hexIndex: 48 },  // 49. 革
+            { name: '雨水', season: 'spring', hexIndex: 49 },  // 50. 鼎
+            { name: '惊蛰', season: 'spring', hexIndex: 50 },  // 51. 震
+            { name: '春分', season: 'spring', hexIndex: 51 },  // 52. 艮
+            { name: '清明', season: 'spring', hexIndex: 52 },  // 53. 渐
+            { name: '谷雨', season: 'spring', hexIndex: 53 },  // 54. 归妹
+            { name: '立夏', season: 'summer', hexIndex: 54 },  // 55. 丰
+            { name: '小满', season: 'summer', hexIndex: 55 },  // 56. 旅
+            { name: '芒种', season: 'summer', hexIndex: 56 },  // 57. 巽
+            { name: '夏至', season: 'summer', hexIndex: 57 },  // 58. 兑
+            { name: '小暑', season: 'summer', hexIndex: 58 },  // 59. 涣
+            { name: '大暑', season: 'summer', hexIndex: 59 },  // 60. 节
+            { name: '立秋', season: 'autumn', hexIndex: 60 },  // 61. 中孚
+            { name: '处暑', season: 'autumn', hexIndex: 61 },  // 62. 小过
+            { name: '白露', season: 'autumn', hexIndex: 62 },  // 63. 既济
+            { name: '秋分', season: 'autumn', hexIndex: 63 }   // 64. 未济
+        ];
+
+        // 六十四卦数据（含上下卦、诗意关键词）
+        const hexagrams = [
+            { number: 1, name: "乾", upper: "乾", lower: "乾", fullName: "乾为天", lines: [1,1,1,1,1,1], text: "元亨利贞。", meaning: "天行健，君子以自强不息。", keywords: ["刚健", "创始", "强大", "主动", "领导力", "阳刚", "进取", "天道"], assets: ["主权货币", "黄金储备", "央行票据", "国家债券"], group: "upper" },
+            { number: 2, name: "坤", upper: "坤", lower: "坤", fullName: "坤为地", lines: [0,0,0,0,0,0], text: "元亨，利牝马之贞。", meaning: "地势坤，君子以厚德载物。", keywords: ["柔顺", "包容", "承载", "滋养", "母亲", "土地", "稳定", "孕育"], assets: ["房地产", "土地资源", "基础设施", "大宗商品"], group: "upper" },
+            { number: 3, name: "屯", upper: "坎", lower: "震", fullName: "水雷屯", lines: [0,1,0,0,0,1], text: "元亨利贞，勿用有攸往。", meaning: "云雷屯，君子以经纶。", keywords: ["初创", "萌芽", "困难", "孕育", "新生", "艰难", "开始", "创业"], assets: ["创业股权", "风险投资", "初创企业", "孵化项目"], group: "upper" },
+            { number: 4, name: "蒙", upper: "艮", lower: "坎", fullName: "山水蒙", lines: [1,0,0,0,1,0], text: "亨。匪我求童蒙，童蒙求我。", meaning: "山下出泉，蒙；君子以果行育德。", keywords: ["启蒙", "教育", "幼稚", "学习", "启发", "蒙昧", "教导", "成长"], assets: ["教育投资", "培训资产", "知识产权", "专利组合"], group: "upper" },
+            { number: 5, name: "需", upper: "坎", lower: "乾", fullName: "水天需", lines: [0,1,0,1,1,1], text: "有孚，光亨，贞吉。", meaning: "云上于天，需；君子以饮食宴乐。", keywords: ["等待", "需求", "滋养", "耐心", "期待", "饮食", "安乐", "温润"], assets: ["定期存款", "固定收益", "等待期权", "流动性储备"], group: "upper" },
+            { number: 6, name: "讼", upper: "乾", lower: "坎", fullName: "天水讼", lines: [1,1,1,0,1,0], text: "有孚，窒惕，中吉终凶。", meaning: "天与水违行，讼；君子以作事谋始。", keywords: ["争论", "诉讼", "冲突", "对立", "争议", "不和", "矛盾", "辩驳"], assets: ["诉讼资产", "索赔权", "法律信托", "仲裁收益"], group: "upper" },
+            { number: 7, name: "师", upper: "坤", lower: "坎", fullName: "地水师", lines: [0,0,0,0,1,0], text: "贞，丈人吉，无咎。", meaning: "地中有水，师；君子以容民畜众。", keywords: ["军队", "纪律", "组织", "战争", "策略", "领导", "管理", "权威"], assets: ["军工资产", "防务投资", "安全产业", "战略储备"], group: "upper" },
+            { number: 8, name: "比", upper: "坎", lower: "坤", fullName: "水地比", lines: [0,1,0,0,0,0], text: "吉。原筮元永贞，无咎。", meaning: "地上有水，比；先王以建万国，亲诸侯。", keywords: ["亲近", "团结", "合作", "辅佐", "联合", "亲密", "依附", "和谐"], assets: ["联盟股权", "合资资产", "合作基金", "战略同盟"], group: "upper" },
+            { number: 9, name: "小畜", upper: "巽", lower: "乾", fullName: "风天小畜", lines: [0,0,1,1,1,1], text: "亨。密云不雨，自我西郊。", meaning: "风行天上，小畜；君子以懿文德。", keywords: ["积蓄", "小有", "等待", "文雅", "修养", "积累", "准备", "渐进"], assets: ["小额储蓄", "零散资产", "零钱管理", "微型投资"], group: "upper" },
+            { number: 10, name: "履", upper: "乾", lower: "兑", fullName: "天泽履", lines: [1,1,1,0,0,1], text: "虎尾，不咥人，亨。", meaning: "上天下泽，履；君子以辨上下，定民志。", keywords: ["践行", "礼节", "谨慎", "行走", "规范", "秩序", "礼仪", "稳健"], assets: ["合规资产", "审查通过", "标准认证", "合规基金"], group: "upper" },
+            { number: 11, name: "泰", upper: "坤", lower: "乾", fullName: "地天泰", lines: [0,0,0,1,1,1], text: "小往大来，吉亨。", meaning: "天地交，泰；后以财成天地之道，辅相天地之宜。", keywords: ["通达", "顺利", "和谐", "交流", "通泰", "平安", "通畅", "吉祥"], assets: ["优质资产", "核心配置", "蓝筹股权", "稳定收益"], group: "upper" },
+            { number: 12, name: "否", upper: "乾", lower: "坤", fullName: "天地否", lines: [1,1,1,0,0,0], text: "否之匪人，不利君子贞，大往小来。", meaning: "天地不交，否；君子以俭德辟难，不可荣以禄。", keywords: ["闭塞", "不顺", "阻隔", "困难", "停滞", "不通", "挫折", "逆境"], assets: ["不良资产", "困境资产", "重组标的", "清算价值"], group: "upper" },
+            { number: 13, name: "同人", upper: "乾", lower: "离", fullName: "天火同人", lines: [1,1,1,1,0,1], text: "同人于野，亨。利涉大川，利君子贞。", meaning: "天与火，同人；君子以类族辨物。", keywords: ["团结", "共识", "合作", "大同", "和谐", "联合", "公共", "社交"], assets: ["共同基金", "合伙资产", "众筹项目", "社区代币"], group: "upper" },
+            { number: 14, name: "大有", upper: "离", lower: "乾", fullName: "火天大有", lines: [1,0,1,1,1,1], text: "元亨。", meaning: "火在天上，大有；君子以遏恶扬善，顺天休命。", keywords: ["丰盛", "拥有", "繁荣", "富足", "光明", "盛大", "收获", "成功"], assets: ["高净值资产", "富豪配置", "家族信托", "顶级股权"], group: "upper" },
+            { number: 15, name: "谦", upper: "坤", lower: "艮", fullName: "地山谦", lines: [0,0,0,1,0,0], text: "亨，君子有终。", meaning: "地中有山，谦；君子以裒多益寡，称物平施。", keywords: ["谦虚", "低调", "退让", "平和", "虚心", "内敛", "低调", "柔和"], assets: ["保守资产", "低杠杆投资", "稳健基金", "防御配置"], group: "upper" },
+            { number: 16, name: "豫", upper: "震", lower: "坤", fullName: "雷地豫", lines: [0,0,1,0,0,0], text: "利建侯行师。", meaning: "雷出地奋，豫；先王以作乐崇德，殷荐之上帝。", keywords: ["喜悦", "音乐", "欢乐", "预备", "安逸", "愉快", "娱乐", "享乐"], assets: ["娱乐资产", "文化产业", "游戏投资", "休闲产业"], group: "upper" },
+            { number: 17, name: "随", upper: "兑", lower: "震", fullName: "泽雷随", lines: [0,0,1,0,0,1], text: "元亨利贞，无咎。", meaning: "泽中有雷，随；君子以向晦入宴息。", keywords: ["随从", "顺应", "跟随", "灵活", "适应", "随和", "追随", "顺应"], assets: ["指数基金", "ETF", "被动投资", "跟踪资产"], group: "upper" },
+            { number: 18, name: "蛊", upper: "艮", lower: "巽", fullName: "山风蛊", lines: [1,0,0,0,1,1], text: "元亨，利涉大川。先甲三日，后甲三日。", meaning: "山下有风，蛊；君子以振民育德。", keywords: ["腐败", "革新", "整治", "变化", "改革", "整顿", "除旧", "更新"], assets: ["重组资产", "困境反转", "僵尸企业", "价值修复"], group: "upper" },
+            { number: 19, name: "临", upper: "坤", lower: "兑", fullName: "地泽临", lines: [0,0,0,0,0,1], text: "元，亨，利，贞。至于八月有凶。", meaning: "泽上有地，临；君子以教思无穷，容保民无疆。", keywords: ["临近", "督导", "观察", "管理", "临近", "监督", "教导", "领导"], assets: ["即将上市", "Pre-IPO", "IPO排队", "上市辅导"], group: "upper" },
+            { number: 20, name: "观", upper: "巽", lower: "坤", fullName: "风地观", lines: [0,0,1,0,0,0], text: "盥而不荐，有孚颙若。", meaning: "风行地上，观；先王以省方观民设教。", keywords: ["观察", "瞻仰", "审视", "了解", "观光", "学习", "仰望", "考察"], assets: ["观察仓", "调研标的", "跟踪观察", "研究配置"], group: "upper" },
+            { number: 21, name: "噬嗑", upper: "离", lower: "震", fullName: "火雷噬嗑", lines: [1,0,1,0,0,1], text: "亨。利用狱。", meaning: "雷电噬嗑；先王以明罚敕法。", keywords: ["咬合", "刑罚", "决断", "惩治", "执行", "法律", "审判", "裁决"], assets: ["司法资产", "执法收益", "合规成本", "罚金收入"], group: "upper" },
+            { number: 22, name: "贲", upper: "艮", lower: "离", fullName: "山火贲", lines: [1,0,0,1,0,1], text: "亨。小利有攸往。", meaning: "山下有火，贲；君子以明庶政，无敢折狱。", keywords: ["装饰", "文采", "美丽", "修饰", "外表", "艺术", "文化", "美学"], assets: ["品牌资产", "IP价值", "外观设计", "营销资产"], group: "upper" },
+            { number: 23, name: "剥", upper: "艮", lower: "坤", fullName: "山地剥", lines: [1,0,0,0,0,0], text: "不利有攸往。", meaning: "山附于地，剥；上以厚下安宅。", keywords: ["剥落", "衰败", "消减", "剥离", "损失", "衰退", "消亡", "结束"], assets: ["折旧资产", "减值资产", "退出投资", "清算标的"], group: "upper" },
+            { number: 24, name: "复", upper: "坤", lower: "震", fullName: "地雷复", lines: [0,0,0,0,0,1], text: "亨。出入无疾，朋来无咎。", meaning: "雷在地中，复；先王以至日闭关，商旅不行。", keywords: ["回复", "归来", "复兴", "循环", "恢复", "返归", "周期", "再生"], assets: ["复苏资产", "周期反转", "底部布局", "反弹标的"], group: "upper" },
+            { number: 25, name: "无妄", upper: "乾", lower: "震", fullName: "天雷无妄", lines: [1,1,1,0,0,1], text: "元亨利贞。其匪正有眚，不利有攸往。", meaning: "天下雷行，物与无妄；先王以茂对时，育万物。", keywords: ["真实", "无妄", "自然", "真诚", "真实", "不妄", "本性", "朴实"], assets: ["真实资产", "实物背书", "硬资产", "真实收益"], group: "upper" },
+            { number: 26, name: "大畜", upper: "艮", lower: "乾", fullName: "山天大畜", lines: [1,0,0,1,1,1], text: "利贞，不家食吉，利涉大川。", meaning: "天在山中，大畜；君子以多识前言往行，以畜其德。", keywords: ["积蓄", "蓄积", "停止", "蓄养", "积累", "储备", "涵养", "积蓄"], assets: ["大额存单", "机构存款", "大额资产", "战略储备"], group: "upper" },
+            { number: 27, name: "颐", upper: "艮", lower: "震", fullName: "山雷颐", lines: [1,0,0,0,0,1], text: "贞吉。观颐，自求口实。", meaning: "山下有雷，颐；君子以慎言语，节饮食。", keywords: ["颐养", "养育", "养生", "自求", "保养", "养育", "饮食", "健康"], assets: ["养老资产", "年金保险", "退休金", "长期护理"], group: "upper" },
+            { number: 28, name: "大过", upper: "兑", lower: "巽", fullName: "泽风大过", lines: [0,1,1,1,1,0], text: "栋桡，利有攸往，亨。", meaning: "泽灭木，大过；君子以独立不惧，遁世无闷。", keywords: ["过度", "超越", "非常", "特别", "过度", "超越", "突破", "极限"], assets: ["高杠杆", "杠杆收购", "并购贷款", "过桥融资"], group: "upper" },
+            { number: 29, name: "坎", upper: "坎", lower: "坎", fullName: "坎为水", lines: [0,1,0,0,1,0], text: "习坎，有孚，维心亨，行有尚。", meaning: "水洊至，习坎；君子以常德行，习教事。", keywords: ["险陷", "危险", "流动", "深邃", "水险", "坎坷", "危险", "困难"], assets: ["流动资产", "现金管理", "短期债券", "货币基金"], group: "upper" },
+            { number: 30, name: "离", upper: "离", lower: "离", fullName: "离为火", lines: [1,0,1,1,0,1], text: "利贞，亨。畜牝牛，吉。", meaning: "明两作，离；大人以继明照于四方。", keywords: ["光明", "依附", "美丽", "文明", "火光", "附着", "美丽", "照耀"], assets: ["光明资产", "照明产业", "能源投资", "光伏资产"], group: "lower" },
+            { number: 31, name: "咸", upper: "兑", lower: "艮", fullName: "泽山咸", lines: [0,0,1,1,0,0], text: "亨，利贞，取女吉。", meaning: "山上有泽，咸；君子以虚受人。", keywords: ["感应", "感情", "心动", "交感", "感应", "感情", "婚姻", "相爱"], assets: ["感性资产", "情感投资", "体验经济", "服务资产"], group: "lower" },
+            { number: 32, name: "恒", upper: "震", lower: "巽", fullName: "雷风恒", lines: [0,0,1,0,0,1], text: "亨，无咎，利贞，利有攸往。", meaning: "雷风，恒；君子以立不易方。", keywords: ["恒久", "持久", "稳定", "不变", "恒定", "持久", "稳定", "长远"], assets: ["长期持有", "永恒资产", "核心仓位", "战略配置"], group: "lower" },
+            { number: 33, name: "遁", upper: "乾", lower: "艮", fullName: "天山遁", lines: [1,1,1,1,0,0], text: "亨，小利贞。", meaning: "天下有山，遁；君子以远小人，不恶而严。", keywords: ["隐退", "逃避", "避让", "退避", "退隐", "逃避", "避让", "隐藏"], assets: ["避险资产", "撤退仓位", "现金为王", "防御配置"], group: "lower" },
+            { number: 34, name: "大壮", upper: "震", lower: "乾", fullName: "雷天大壮", lines: [0,0,1,1,1,1], text: "利贞。", meaning: "雷在天上，大壮；君子以非礼弗履。", keywords: ["强盛", "壮大", "刚健", "强劲", "强壮", "壮大", "强盛", "阳刚"], assets: ["高增长", "成长资产", "扩张期", "激进配置"], group: "lower" },
+            { number: 35, name: "晋", upper: "离", lower: "坤", fullName: "火地晋", lines: [1,0,1,0,0,0], text: "康侯用锡马蕃庶，昼日三接。", meaning: "明出地上，晋；君子以自昭明德。", keywords: ["进步", "晋升", "前进", "上升", "晋级", "进步", "前进", "发展"], assets: ["晋升资产", "升职收益", "职业发展", "晋升期权"], group: "lower" },
+            { number: 36, name: "明夷", upper: "坤", lower: "离", fullName: "地火明夷", lines: [0,0,0,1,0,1], text: "利艰贞。", meaning: "明入地中，明夷；君子以莅众，用晦而明。", keywords: ["黑暗", "受伤", "隐蔽", "光明受损", "晦暗", "受伤", "隐蔽", "韬晦"], assets: ["隐匿资产", "离岸财富", "私密信托", "暗池交易"], group: "lower" },
+            { number: 37, name: "家人", upper: "巽", lower: "离", fullName: "风火家人", lines: [0,0,1,1,0,1], text: "利女贞。", meaning: "风自火出，家人；君子以言有物，而行有恒。", keywords: ["家庭", "家族", "亲情", "温暖", "家务", "家族", "亲情", "温馨"], assets: ["家庭资产", "家族财富", "家办投资", "传承资产"], group: "lower" },
+            { number: 38, name: "睽", upper: "离", lower: "兑", fullName: "火泽睽", lines: [1,0,1,0,0,1], text: "小事吉。", meaning: "上火下泽，睽；君子以同而异。", keywords: ["背离", "分离", "不合", "矛盾", "乖离", "分离", "矛盾", "背离"], assets: ["分离资产", "拆分上市", "分拆收益", "剥离资产"], group: "lower" },
+            { number: 39, name: "蹇", upper: "坎", lower: "艮", fullName: "水山蹇", lines: [0,1,0,1,0,0], text: "利西南，不利东北；利见大人，贞吉。", meaning: "山上有水，蹇；君子以反身修德。", keywords: ["艰难", "困难", "险阻", "困厄", "艰难", "困难", "险阻", "困境"], assets: ["困难资产", "困境投资", "障碍收益", "艰难前行"], group: "lower" },
+            { number: 40, name: "解", upper: "震", lower: "坎", fullName: "雷水解", lines: [0,0,1,0,1,0], text: "利西南，无所往，其来复吉。", meaning: "雷雨作，解；君子以赦过宥罪。", keywords: ["解脱", "释放", "解除", "解决", "解脱", "解除", "释放", "缓解"], assets: ["解套资产", "流动性释放", "债务重组", "纾困基金"], group: "lower" },
+            { number: 41, name: "损", upper: "艮", lower: "兑", fullName: "山泽损", lines: [1,0,0,0,0,1], text: "有孚，元吉，无咎，可贞，利有攸往。", meaning: "山下有泽，损；君子以惩忿窒欲。", keywords: ["减损", "损失", "节约", "减少", "减损", "损失", "节约", "控制"], assets: ["减损资产", "减值计提", "亏损投资", "止损仓位"], group: "lower" },
+            { number: 42, name: "益", upper: "巽", lower: "震", fullName: "风雷益", lines: [0,0,1,0,1,1], text: "利有攸往，利涉大川。", meaning: "风雷，益；君子以见善则迁，有过则改。", keywords: ["增益", "益处", "增加", "受益", "增益", "受益", "增加", "利益"], assets: ["增值资产", "收益增长", "复利投资", "增益仓位"], group: "lower" },
+            { number: 43, name: "夬", upper: "兑", lower: "乾", fullName: "泽天夬", lines: [0,1,1,1,1,1], text: "扬于王庭，孚号有厉。", meaning: "泽上于天，夬；君子以施禄及下，居德则忌。", keywords: ["决断", "果断", "裁决", "决断", "决策", "果断", "裁决", "判定"], assets: ["决策资产", "裁决投资", "关键投票", "控制权"], group: "lower" },
+            { number: 44, name: "姤", upper: "乾", lower: "巽", fullName: "天风姤", lines: [1,1,1,0,1,1], text: "女壮，勿用取女。", meaning: "天下有风，姤；后以施命诰四方。", keywords: ["相遇", "邂逅", "遇见", "不期", "相遇", "邂逅", "遇见", "机会"], assets: ["偶遇资产", "机会投资", "意外之财", "随机收益"], group: "lower" },
+            { number: 45, name: "萃", upper: "兑", lower: "坤", fullName: "泽地萃", lines: [0,0,0,0,0,1], text: "亨。王假有庙，利见大人，亨，利贞。", meaning: "泽上于地，萃；君子以除戎器，戒不虞。", keywords: ["聚集", "汇聚", "集合", "聚集", "萃集", "汇集", "集合", "团聚"], assets: ["聚集资产", "集合投资", "汇聚收益", "集群配置"], group: "lower" },
+            { number: 46, name: "升", upper: "巽", lower: "坤", fullName: "地风升", lines: [0,0,1,0,0,0], text: "元亨，用见大人，勿恤，南征吉。", meaning: "地中生木，升；君子以顺德，积小以高大。", keywords: ["上升", "升起", "登高", "提升", "上升", "提升", "登高", "进步"], assets: ["上升资产", "升值投资", "上升趋势", "增长配置"], group: "lower" },
+            { number: 47, name: "困", upper: "兑", lower: "坎", fullName: "泽水困", lines: [0,1,1,0,1,0], text: "亨，贞，大人吉，无咎。", meaning: "泽无水，困；君子以致命遂志。", keywords: ["困厄", "困境", "困穷", "困守", "困境", "困厄", "困难", "受困"], assets: ["困境资产", "困境投资", "困难收益", "逆境配置"], group: "lower" },
+            { number: 48, name: "井", upper: "坎", lower: "巽", fullName: "水风井", lines: [0,1,0,0,1,1], text: "改邑不改井，无丧无得，往来井井。", meaning: "木上有水，井；君子以劳民劝相。", keywords: ["水井", "源泉", "滋养", "井养", "水源", "滋养", "供养", "稳定"], assets: ["基础设施", "公用事业", "管道资产", "固定收益"], group: "lower" },
+            { number: 49, name: "革", upper: "兑", lower: "离", fullName: "泽火革", lines: [0,1,1,1,0,1], text: "巳日乃孚，元亨利贞，悔亡。", meaning: "泽中有火，革；君子以治历明时。", keywords: ["变革", "革命", "改革", "革新", "变革", "革命", "改革", "革新"], assets: ["变革资产", "转型投资", "创新项目", "改革收益"], group: "lower" },
+            { number: 50, name: "鼎", upper: "离", lower: "巽", fullName: "火风鼎", lines: [1,0,1,0,1,1], text: "元吉，亨。", meaning: "木上有火，鼎；君子以正位凝命。", keywords: ["鼎新", "稳重", "鼎立", "鼎盛", "鼎新", "稳重", "权威", "核心"], assets: ["核心资产", "鼎足之势", "稳固投资", "重心配置"], group: "lower" },
+            { number: 51, name: "震", upper: "震", lower: "震", fullName: "震为雷", lines: [0,0,1,0,0,1], text: "亨。震来虩虩，笑言哑哑。", meaning: "洊雷，震；君子以恐惧修省。", keywords: ["震动", "惊雷", "震惊", "行动", "震动", "惊雷", "恐惧", "警醒"], assets: ["波动资产", "震动投资", "高风险", "剧烈波动"], group: "lower" },
+            { number: 52, name: "艮", upper: "艮", lower: "艮", fullName: "艮为山", lines: [1,0,0,1,0,0], text: "艮其背，不获其身，行其庭，不见其人，无咎。", meaning: "兼山，艮；君子以思不出其位。", keywords: ["停止", "静止", "止步", "静止", "停止", "止步", "稳重", "安定"], assets: ["静止资产", "冻结资金", "停止投资", "观望仓位"], group: "lower" },
+            { number: 53, name: "渐", upper: "巽", lower: "艮", fullName: "风山渐", lines: [0,0,1,1,0,0], text: "女归吉，利贞。", meaning: "山上有木，渐；君子以居贤德善俗。", keywords: ["渐进", "逐渐", "进展", "渐进", "逐渐", "缓进", "稳定", "有序"], assets: ["渐进资产", "定投计划", "逐步建仓", "阶梯投资"], group: "lower" },
+            { number: 54, name: "归妹", upper: "兑", lower: "震", fullName: "泽雷归妹", lines: [0,0,1,0,0,1], text: "征凶，无攸利。", meaning: "泽上有雷，归妹；君子以永终知敝。", keywords: ["嫁女", "归宿", "回归", "归妹", "嫁娶", "归宿", "回归", "少女"], assets: ["回归资产", "回归投资", "返乡置业", "回归收益"], group: "lower" },
+            { number: 55, name: "丰", upper: "震", lower: "离", fullName: "雷火丰", lines: [0,0,1,1,0,1], text: "亨，王假之，勿忧，宜日中。", meaning: "雷电皆至，丰；君子以折狱致刑。", keywords: ["丰盛", "盛大", "丰满", "丰盛", "盛大", "丰收", "繁荣", "盛大"], assets: ["丰盛资产", "丰收投资", "鼎盛时期", "高峰收益"], group: "lower" },
+            { number: 56, name: "旅", upper: "离", lower: "艮", fullName: "火山旅", lines: [1,0,1,1,0,0], text: "小亨，旅贞吉。", meaning: "山上有火，旅；君子以明慎用刑，而不留狱。", keywords: ["旅行", "旅途", "行旅", "旅人", "旅行", "旅途", "漂泊", "行旅"], assets: ["旅行资产", "旅游投资", "酒店物业", "航空股权"], group: "lower" },
+            { number: 57, name: "巽", upper: "巽", lower: "巽", fullName: "巽为风", lines: [0,0,1,0,1,1], text: "小亨，利有攸往，利见大人。", meaning: "随风，巽；君子以申命行事。", keywords: ["顺从", "进入", "谦逊", "风入", "顺从", "进入", "谦逊", "柔和"], assets: ["柔顺资产", "灵活投资", "顺应市场", "机动配置"], group: "lower" },
+            { number: 58, name: "兑", upper: "兑", lower: "兑", fullName: "兑为泽", lines: [0,0,1,0,1,1], text: "亨，利贞。", meaning: "丽泽，兑；君子以朋友讲习。", keywords: ["喜悦", "愉快", "和悦", "喜悦", "愉快", "和悦", "欢乐", "口舌"], assets: ["喜悦资产", "享乐投资", "消费升级", "快乐经济"], group: "lower" },
+            { number: 59, name: "涣", upper: "巽", lower: "坎", fullName: "风水涣", lines: [0,0,1,0,1,0], text: "亨。王假有庙，利涉大川，利贞。", meaning: "风行水上，涣；先王以享于帝立庙。", keywords: ["涣散", "散布", "离散", "消散", "涣散", "散布", "离散", "分离"], assets: ["分散资产", "分散投资", "风险分散", "配置分散"], group: "lower" },
+            { number: 60, name: "节", upper: "坎", lower: "兑", fullName: "水泽节", lines: [0,1,0,0,1,1], text: "亨。苦节不可贞。", meaning: "泽上有水，节；君子以制数度，议德行。", keywords: ["节制", "节约", "节度", "节俭", "节制", "节约", "节度", "适中"], assets: ["节制资产", "节流投资", "成本控制", "节约配置"], group: "lower" },
+            { number: 61, name: "中孚", upper: "巽", lower: "兑", fullName: "风泽中孚", lines: [0,0,1,0,1,1], text: "豚鱼吉，利涉大川，利贞。", meaning: "泽上有风，中孚；君子以议狱缓死。", keywords: ["诚信", "信用", "信服", "中孚", "诚信", "信用", "信服", "真诚"], assets: ["诚信资产", "信用评级", "可信投资", "信义配置"], group: "lower" },
+            { number: 62, name: "小过", upper: "震", lower: "艮", fullName: "雷山小过", lines: [0,0,1,1,0,0], text: "亨，利贞，可小事，不可大事。", meaning: "山上有雷，小过；君子以行过乎恭，丧过乎哀，用过乎俭。", keywords: ["小过", "过失", "小事", "小过", "过失", "小事", "过度", "超越"], assets: ["小过失", "小额损失", "小错投资", "调整仓位"], group: "lower" },
+            { number: 63, name: "既济", upper: "坎", lower: "离", fullName: "水火既济", lines: [0,1,0,1,0,1], text: "亨，小利贞，初吉终乱。", meaning: "水在火上，既济；君子以思患而预防之。", keywords: ["已成", "完成", "既济", "完成", "已成", "成功", "成就", "结束"], assets: ["已完成", "成熟资产", "完工项目", "已兑现"], group: "lower" },
+            { number: 64, name: "未济", upper: "离", lower: "坎", fullName: "火水未济", lines: [1,0,1,0,1,0], text: "亨，小狐汔济，濡其尾，无攸利。", meaning: "火在水上，未济；君子以慎辨物居方。", keywords: ["未成", "未完成", "未济", "未完成", "未成", "未来", "开始", "潜力"], assets: ["未完成", "潜力资产", "进行中", "未来收益"], group: "lower" }
+        ];
+
+        // 12变势血缘关系（每个卦演化到其他卦的概率）
+        const twelveChanges = {
+            1: { targets: [44, 28, 43, 14, 9, 6, 2, 11, 33, 25, 10, 26], probabilities: [0.95, 0.88, 0.82, 0.75, 0.68, 0.62, 0.55, 0.48, 0.42, 0.35, 0.28, 0.22] },
+            2: { targets: [24, 7, 19, 16, 8, 4, 1, 20, 12, 3, 45, 46], probabilities: [0.95, 0.88, 0.82, 0.75, 0.68, 0.62, 0.55, 0.48, 0.42, 0.35, 0.28, 0.22] },
+            3: { targets: [17, 42, 40, 24, 25, 18, 27, 4, 8, 63, 51, 62], probabilities: [0.92, 0.85, 0.78, 0.72, 0.65, 0.58, 0.52, 0.45, 0.38, 0.32, 0.25, 0.18] },
+            4: { targets: [18, 41, 22, 27, 23, 7, 3, 52, 8, 40, 63, 2], probabilities: [0.92, 0.85, 0.78, 0.72, 0.65, 0.58, 0.52, 0.45, 0.38, 0.32, 0.25, 0.18] },
+            5: { targets: [9, 60, 63, 11, 37, 26, 48, 42, 17, 29, 8, 55], probabilities: [0.90, 0.83, 0.76, 0.70, 0.63, 0.56, 0.50, 0.43, 0.36, 0.30, 0.24, 0.17] },
+            6: { targets: [10, 47, 64, 29, 44, 59, 40, 7, 3, 48, 12, 28], probabilities: [0.90, 0.83, 0.76, 0.70, 0.63, 0.56, 0.50, 0.43, 0.36, 0.30, 0.24, 0.17] },
+            7: { targets: [8, 4, 19, 2, 63, 24, 6, 3, 48, 29, 40, 15], probabilities: [0.93, 0.86, 0.79, 0.73, 0.66, 0.59, 0.53, 0.46, 0.39, 0.33, 0.26, 0.19] },
+            8: { targets: [3, 20, 45, 2, 16, 5, 7, 29, 46, 48, 17, 4], probabilities: [0.93, 0.86, 0.79, 0.73, 0.66, 0.59, 0.53, 0.46, 0.39, 0.33, 0.26, 0.19] },
+            9: { targets: [5, 37, 26, 11, 14, 13, 1, 61, 53, 44, 57, 20], probabilities: [0.91, 0.84, 0.77, 0.71, 0.64, 0.57, 0.51, 0.44, 0.37, 0.31, 0.24, 0.18] },
+            10: { targets: [6, 38, 43, 1, 28, 58, 34, 14, 26, 58, 33, 25], probabilities: [0.91, 0.84, 0.77, 0.71, 0.64, 0.57, 0.51, 0.44, 0.37, 0.31, 0.24, 0.18] },
+            11: { targets: [12, 25, 34, 1, 46, 32, 19, 5, 9, 15, 45, 11], probabilities: [0.94, 0.87, 0.80, 0.74, 0.67, 0.60, 0.54, 0.47, 0.40, 0.34, 0.27, 0.20] },
+            12: { targets: [11, 20, 33, 1, 24, 45, 46, 7, 8, 25, 15, 39], probabilities: [0.94, 0.87, 0.80, 0.74, 0.67, 0.60, 0.54, 0.47, 0.40, 0.34, 0.27, 0.20] },
+            13: { targets: [49, 30, 37, 14, 55, 9, 1, 38, 63, 36, 50, 56], probabilities: [0.89, 0.82, 0.75, 0.69, 0.62, 0.55, 0.49, 0.42, 0.35, 0.29, 0.22, 0.16] },
+            14: { targets: [50, 38, 30, 1, 13, 37, 9, 55, 34, 56, 26, 42], probabilities: [0.89, 0.82, 0.75, 0.69, 0.62, 0.55, 0.49, 0.42, 0.35, 0.29, 0.22, 0.16] },
+            15: { targets: [39, 62, 52, 46, 11, 16, 32, 7, 2, 53, 23, 31], probabilities: [0.88, 0.81, 0.74, 0.68, 0.61, 0.54, 0.48, 0.41, 0.34, 0.28, 0.21, 0.15] },
+            16: { targets: [35, 40, 62, 2, 24, 51, 32, 8, 4, 15, 54, 7], probabilities: [0.88, 0.81, 0.74, 0.68, 0.61, 0.54, 0.48, 0.41, 0.34, 0.28, 0.21, 0.15] },
+            17: { targets: [58, 51, 3, 42, 32, 25, 8, 40, 62, 4, 54, 16], probabilities: [0.87, 0.80, 0.73, 0.67, 0.60, 0.53, 0.47, 0.40, 0.33, 0.27, 0.20, 0.14] },
+            18: { targets: [52, 4, 23, 27, 46, 3, 50, 22, 63, 41, 36, 8], probabilities: [0.87, 0.80, 0.73, 0.67, 0.60, 0.53, 0.47, 0.40, 0.33, 0.27, 0.20, 0.14] },
+            19: { targets: [7, 24, 41, 2, 11, 45, 46, 15, 8, 3, 20, 33], probabilities: [0.86, 0.79, 0.72, 0.66, 0.59, 0.52, 0.46, 0.39, 0.32, 0.26, 0.19, 0.13] },
+            20: { targets: [8, 12, 42, 2, 45, 59, 3, 60, 17, 53, 46, 57], probabilities: [0.86, 0.79, 0.72, 0.66, 0.59, 0.52, 0.46, 0.39, 0.32, 0.26, 0.19, 0.13] },
+            21: { targets: [27, 56, 35, 50, 38, 16, 55, 63, 36, 30, 22, 13], probabilities: [0.85, 0.78, 0.71, 0.65, 0.58, 0.51, 0.45, 0.38, 0.31, 0.25, 0.18, 0.12] },
+            22: { targets: [52, 18, 36, 27, 50, 37, 63, 4, 21, 38, 56, 30], probabilities: [0.85, 0.78, 0.71, 0.65, 0.58, 0.51, 0.45, 0.38, 0.31, 0.25, 0.18, 0.12] },
+            23: { targets: [2, 24, 27, 4, 52, 15, 41, 39, 8, 18, 7, 2], probabilities: [0.84, 0.77, 0.70, 0.64, 0.57, 0.50, 0.44, 0.37, 0.30, 0.24, 0.17, 0.11] },
+            24: { targets: [2, 7, 19, 3, 16, 51, 40, 62, 27, 42, 4, 8], probabilities: [0.84, 0.77, 0.70, 0.64, 0.57, 0.50, 0.44, 0.37, 0.30, 0.24, 0.17, 0.11] },
+            25: { targets: [12, 11, 44, 1, 34, 26, 51, 43, 9, 28, 17, 6], probabilities: [0.83, 0.76, 0.69, 0.63, 0.56, 0.49, 0.43, 0.36, 0.29, 0.23, 0.16, 0.10] },
+            26: { targets: [9, 22, 41, 11, 1, 33, 10, 52, 15, 14, 28, 18], probabilities: [0.83, 0.76, 0.69, 0.63, 0.56, 0.49, 0.43, 0.36, 0.29, 0.23, 0.16, 0.10] },
+            27: { targets: [21, 24, 23, 3, 28, 4, 18, 52, 42, 62, 40, 16], probabilities: [0.82, 0.75, 0.68, 0.62, 0.55, 0.48, 0.42, 0.35, 0.28, 0.22, 0.15, 0.09] },
+            28: { targets: [61, 44, 1, 25, 43, 10, 27, 33, 26, 11, 57, 9], probabilities: [0.82, 0.75, 0.68, 0.62, 0.55, 0.48, 0.42, 0.35, 0.28, 0.22, 0.15, 0.09] },
+            29: { targets: [59, 48, 3, 6, 40, 7, 47, 63, 64, 29, 8, 5], probabilities: [0.81, 0.74, 0.67, 0.61, 0.54, 0.47, 0.41, 0.34, 0.27, 0.21, 0.14, 0.08] },
+            30: { targets: [13, 56, 49, 14, 38, 55, 37, 21, 50, 36, 22, 63], probabilities: [0.81, 0.74, 0.67, 0.61, 0.54, 0.47, 0.41, 0.34, 0.27, 0.21, 0.14, 0.08] },
+            31: { targets: [33, 45, 52, 62, 39, 53, 15, 41, 8, 2, 28, 57], probabilities: [0.80, 0.73, 0.66, 0.60, 0.53, 0.46, 0.40, 0.33, 0.26, 0.20, 0.13, 0.07] },
+            32: { targets: [34, 46, 40, 11, 16, 42, 17, 51, 62, 54, 15, 3], probabilities: [0.80, 0.73, 0.66, 0.60, 0.53, 0.46, 0.40, 0.33, 0.26, 0.20, 0.13, 0.07] },
+            33: { targets: [31, 12, 44, 1, 25, 28, 26, 15, 10, 11, 43, 52], probabilities: [0.79, 0.72, 0.65, 0.59, 0.52, 0.45, 0.39, 0.32, 0.25, 0.19, 0.12, 0.06] },
+            34: { targets: [32, 11, 25, 1, 14, 51, 17, 40, 10, 9, 62, 43], probabilities: [0.79, 0.72, 0.65, 0.59, 0.52, 0.45, 0.39, 0.32, 0.25, 0.19, 0.12, 0.06] },
+            35: { targets: [21, 16, 56, 14, 30, 13, 55, 37, 36, 50, 46, 42], probabilities: [0.78, 0.71, 0.64, 0.58, 0.51, 0.44, 0.38, 0.31, 0.24, 0.18, 0.11, 0.05] },
+            36: { targets: [22, 63, 52, 30, 38, 37, 13, 21, 56, 50, 35, 14], probabilities: [0.78, 0.71, 0.64, 0.58, 0.51, 0.44, 0.38, 0.31, 0.24, 0.18, 0.11, 0.05] },
+            37: { targets: [9, 63, 50, 14, 30, 22, 13, 55, 36, 53, 42, 20], probabilities: [0.77, 0.70, 0.63, 0.57, 0.50, 0.43, 0.37, 0.30, 0.23, 0.17, 0.10, 0.04] },
+            38: { targets: [10, 64, 14, 30, 13, 36, 56, 21, 50, 22, 63, 55], probabilities: [0.77, 0.70, 0.63, 0.57, 0.50, 0.43, 0.37, 0.30, 0.23, 0.17, 0.10, 0.04] },
+            39: { targets: [15, 3, 53, 31, 62, 7, 2, 41, 19, 24, 4, 52], probabilities: [0.76, 0.69, 0.62, 0.56, 0.49, 0.42, 0.36, 0.29, 0.22, 0.16, 0.09, 0.03] },
+            40: { targets: [3, 16, 32, 29, 7, 6, 17, 51, 64, 24, 62, 59], probabilities: [0.76, 0.69, 0.62, 0.56, 0.49, 0.42, 0.36, 0.29, 0.22, 0.16, 0.09, 0.03] },
+            41: { targets: [4, 60, 26, 18, 23, 27, 39, 22, 52, 15, 19, 8], probabilities: [0.75, 0.68, 0.61, 0.55, 0.48, 0.41, 0.35, 0.28, 0.21, 0.15, 0.08, 0.02] },
+            42: { targets: [20, 59, 3, 11, 40, 17, 32, 46, 16, 57, 48, 24], probabilities: [0.75, 0.68, 0.61, 0.55, 0.48, 0.41, 0.35, 0.28, 0.21, 0.15, 0.08, 0.02] },
+            43: { targets: [1, 28, 10, 44, 33, 26, 34, 14, 58, 25, 57, 11], probabilities: [0.74, 0.67, 0.60, 0.54, 0.47, 0.40, 0.34, 0.27, 0.20, 0.14, 0.07, 0.01] },
+            44: { targets: [1, 28, 33, 43, 25, 9, 6, 57, 14, 10, 58, 26], probabilities: [0.74, 0.67, 0.60, 0.54, 0.47, 0.40, 0.34, 0.27, 0.20, 0.14, 0.07, 0.01] },
+            45: { targets: [31, 8, 20, 2, 11, 19, 46, 58, 33, 15, 39, 57], probabilities: [0.73, 0.66, 0.59, 0.53, 0.46, 0.39, 0.33, 0.26, 0.19, 0.13, 0.06, 0.01] },
+            46: { targets: [32, 18, 11, 15, 35, 24, 45, 53, 19, 42, 20, 31], probabilities: [0.73, 0.66, 0.59, 0.53, 0.46, 0.39, 0.33, 0.26, 0.19, 0.13, 0.06, 0.01] },
+            47: { targets: [6, 29, 59, 58, 64, 40, 48, 7, 63, 17, 57, 3], probabilities: [0.72, 0.65, 0.58, 0.52, 0.45, 0.38, 0.32, 0.25, 0.18, 0.12, 0.05, 0.01] },
+            48: { targets: [29, 5, 18, 7, 59, 57, 8, 46, 20, 42, 63, 60], probabilities: [0.72, 0.65, 0.58, 0.52, 0.45, 0.38, 0.32, 0.25, 0.18, 0.12, 0.05, 0.01] },
+            49: { targets: [30, 13, 38, 55, 14, 50, 63, 56, 36, 37, 22, 21], probabilities: [0.71, 0.64, 0.57, 0.51, 0.44, 0.37, 0.31, 0.24, 0.17, 0.11, 0.04, 0.01] },
+            50: { targets: [37, 14, 56, 30, 13, 55, 36, 22, 38, 63, 49, 21], probabilities: [0.71, 0.64, 0.57, 0.51, 0.44, 0.37, 0.31, 0.24, 0.17, 0.11, 0.04, 0.01] },
+            51: { targets: [17, 54, 62, 16, 32, 34, 40, 24, 25, 57, 3, 7], probabilities: [0.70, 0.63, 0.56, 0.50, 0.43, 0.36, 0.30, 0.23, 0.16, 0.10, 0.03, 0.01] },
+            52: { targets: [31, 15, 18, 22, 4, 27, 23, 39, 62, 41, 53, 36], probabilities: [0.70, 0.63, 0.56, 0.50, 0.43, 0.36, 0.30, 0.23, 0.16, 0.10, 0.03, 0.01] },
+            53: { targets: [39, 52, 15, 31, 57, 62, 46, 20, 37, 41, 42, 54], probabilities: [0.69, 0.62, 0.55, 0.49, 0.42, 0.35, 0.29, 0.22, 0.15, 0.09, 0.02, 0.01] },
+            54: { targets: [51, 17, 40, 62, 32, 16, 57, 3, 24, 4, 46, 58], probabilities: [0.69, 0.62, 0.55, 0.49, 0.42, 0.35, 0.29, 0.22, 0.15, 0.09, 0.02, 0.01] },
+            55: { targets: [30, 49, 62, 37, 14, 50, 21, 13, 38, 36, 56, 63], probabilities: [0.68, 0.61, 0.54, 0.48, 0.41, 0.34, 0.28, 0.21, 0.14, 0.08, 0.02, 0.01] },
+            56: { targets: [35, 30, 50, 21, 13, 55, 37, 22, 38, 36, 62, 14], probabilities: [0.68, 0.61, 0.54, 0.48, 0.41, 0.34, 0.28, 0.21, 0.14, 0.08, 0.02, 0.01] },
+            57: { targets: [48, 59, 9, 61, 20, 53, 44, 38, 17, 58, 42, 31], probabilities: [0.67, 0.60, 0.53, 0.47, 0.40, 0.33, 0.27, 0.20, 0.13, 0.07, 0.01, 0.01] },
+            58: { targets: [17, 61, 10, 47, 43, 57, 44, 28, 38, 45, 64, 1], probabilities: [0.67, 0.60, 0.53, 0.47, 0.40, 0.33, 0.27, 0.20, 0.13, 0.07, 0.01, 0.01] },
+            59: { targets: [29, 6, 57, 42, 64, 20, 48, 47, 40, 7, 63, 17], probabilities: [0.66, 0.59, 0.52, 0.46, 0.39, 0.32, 0.26, 0.19, 0.12, 0.06, 0.01, 0.01] },
+            60: { targets: [5, 41, 61, 38, 20, 48, 63, 29, 17, 64, 42, 8], probabilities: [0.66, 0.59, 0.52, 0.46, 0.39, 0.32, 0.26, 0.19, 0.12, 0.06, 0.01, 0.01] },
+            61: { targets: [60, 58, 28, 44, 10, 43, 57, 17, 38, 45, 64, 1], probabilities: [0.65, 0.58, 0.51, 0.45, 0.38, 0.31, 0.25, 0.18, 0.11, 0.05, 0.01, 0.01] },
+            62: { targets: [16, 51, 15, 31, 53, 32, 40, 24, 54, 55, 3, 56], probabilities: [0.65, 0.58, 0.51, 0.45, 0.38, 0.31, 0.25, 0.18, 0.11, 0.05, 0.01, 0.01] },
+            63: { targets: [37, 22, 36, 13, 21, 30, 50, 38, 56, 55, 14, 6], probabilities: [0.64, 0.57, 0.50, 0.44, 0.37, 0.30, 0.24, 0.17, 0.10, 0.04, 0.01, 0.01] },
+            64: { targets: [38, 21, 40, 6, 29, 47, 59, 48, 30, 17, 63, 58], probabilities: [0.64, 0.57, 0.50, 0.44, 0.37, 0.30, 0.24, 0.17, 0.10, 0.04, 0.01, 0.01] }
+        };
+
+        // 诗意关键词映射
+        const poeticKeywords = {
+            '温润': ['需', '坤', '坎', '兑', '家人', '井', '既济', '未济'],
+            '音乐': ['豫', '兑', '随', '中孚', '升', '谦', '咸', '家人'],
+            '家族': ['家人', '萃', '同人', '比', '随', '临', '观', '鼎'],
+            '生长': ['震', '巽', '屯', '蒙', '颐', '大过', '升', '益'],
+            '安定': ['艮', '坤', '谦', '恒', '渐', '节', '颐', '井'],
+            '变动': ['革', '鼎', '震', '巽', '涣', '随', '豫', '大过'],
+            '光明': ['离', '大有', '晋', '明夷', '同人', '贲', '丰', '旅'],
+            '黑暗': ['坎', '明夷', '蹇', '困', '讼', '否', '剥', '蛊'],
+            '喜悦': ['兑', '豫', '丰', '履', '泰', '大有', '晋', '复'],
+            '困难': ['蹇', '困', '屯', '坎', '讼', '否', '剥', '明夷'],
+            '强大': ['乾', '大壮', '大有', '夬', '丰', '震', '同人', '泰'],
+            '柔和': ['坤', '巽', '兑', '谦', '小畜', '观', '渐', '中孚']
+        };
+
+        // 获取当前节气
+        function getCurrentSolarTerm() {
+            const now = new Date();
+            const month = now.getMonth();
+            const day = now.getDate();
+            
+            // 简化计算，实际应使用精确的天文算法
+            const termIndex = Math.floor((month * 2 + (day > 15 ? 1 : 0))) % 24;
+            return solarTerms[termIndex] || solarTerms[0];
+        }
+
+        // 获取卦的完整名称
+        function getFullHexagramName(hex) {
+            const upper = trigrams[hex.upper];
+            const lower = trigrams[hex.lower];
+            return `${upper.symbol}${lower.symbol}`;
+        }
+
+        // 获取节气信息
+        function getSolarTermInfo(hexNumber) {
+            return solarTerms.find(t => t.hexIndex === hexNumber - 1);
+        }
+
+        // 渲染六爻
+        function renderLines(lines) {
+            return lines.map(line => 
+                `<div class="yao-line ${line === 1 ? 'yao-yang' : 'yao-yin'}"></div>`
+            ).join('');
+        }
+
+        // 创建卦卡
+        function createHexCard(hex) {
+            const solarInfo = getSolarTermInfo(hex.number);
+            const changes = twelveChanges[hex.number];
+            const isTwelve = changes && changes.targets.length >= 12;
+            
+            return `
+                <div class="hex-card ${isTwelve ? 'twelve-changes' : ''}" 
+                     data-number="${hex.number}" 
+                     data-name="${hex.name}"
+                     data-fullname="${hex.fullName}"
+                     data-season="${solarInfo ? solarInfo.season : ''}"
+                     data-keywords="${hex.keywords.join(',')}">
+                    <div class="hex-symbol-trigram">${getFullHexagramName(hex)}</div>
+                    <div class="hex-name-full">${hex.fullName}</div>
+                    <div class="hex-number-display">第 ${hex.number} 卦 · ${hex.name}</div>
+                    ${solarInfo ? `<div class="hex-season season-${solarInfo.season}">${solarInfo.name}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // 渲染网格
+        function renderGrid(filter = 'all', searchTerm = '') {
+            const grid = document.getElementById('hexagramGrid');
+            let filtered = hexagrams;
+
+            if (filter === 'upper') {
+                filtered = hexagrams.filter(h => h.number <= 30);
+            } else if (filter === 'lower') {
+                filtered = hexagrams.filter(h => h.number > 30);
+            } else if (filter === 'twelve') {
+                filtered = hexagrams.filter(h => {
+                    const changes = twelveChanges[h.number];
+                    return changes && changes.targets.length >= 12;
+                });
+            } else if (filter === 'season') {
+                const current = getCurrentSolarTerm();
+                const seasonTerms = solarTerms.filter(t => t.season === current.season);
+                const seasonHexNumbers = seasonTerms.map(t => t.hexIndex + 1);
+                filtered = hexagrams.filter(h => seasonHexNumbers.includes(h.number));
+            }
+
+            // 诗意搜索
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                
+                // 检查是否是诗意关键词
+                let matchingHexNumbers = [];
+                for (const [keyword, hexNames] of Object.entries(poeticKeywords)) {
+                    if (term.includes(keyword) || keyword.includes(term)) {
+                        hexNames.forEach(name => {
+                            const hex = hexagrams.find(h => h.name === name || h.fullName.includes(name));
+                            if (hex) matchingHexNumbers.push(hex.number);
+                        });
+                    }
+                }
+
+                filtered = filtered.filter(h => {
+                    // 关键词匹配
+                    if (matchingHexNumbers.includes(h.number)) return true;
+                    
+                    // 基本信息匹配
+                    const basicMatch = h.name.includes(term) ||
+                        h.fullName.includes(term) ||
+                        h.text.includes(term) ||
+                        h.meaning.includes(term);
+                    
+                    // 诗意关键词匹配
+                    const keywordMatch = h.keywords.some(k => k.includes(term) || term.includes(k));
+                    
+                    return basicMatch || keywordMatch;
+                });
+            }
+
+            grid.innerHTML = filtered.map(createHexCard).join('');
+
+            // 添加点击事件
+            document.querySelectorAll('.hex-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const number = parseInt(card.dataset.number);
+                    openModal(number);
+                });
+            });
+        }
+
+        // 打开详情弹窗
+        function openModal(number) {
+            const hex = hexagrams.find(h => h.number === number);
+            const solarInfo = getSolarTermInfo(number);
+            const changes = twelveChanges[number];
+            const modal = document.getElementById('modalOverlay');
+            const modalBody = document.getElementById('modalBody');
+            
+            // 获取演化目标卦
+            const targetHexes = changes ? changes.targets.map((n, i) => ({
+                hex: hexagrams.find(h => h.number === n),
+                prob: changes.probabilities[i]
+            })).filter(item => item.hex) : [];
+
+            modalBody.innerHTML = `
+                <div class="modal-header">
+                    <div class="modal-trigrams">${getFullHexagramName(hex)}</div>
+                    <h2 class="modal-name-full">${hex.fullName} · ${hex.name}</h2>
+                    <div class="modal-meta">
+                        <span>第 ${hex.number} 卦</span>
+                        <span>${hex.group === 'upper' ? '上经' : '下经'}</span>
+                        ${solarInfo ? `<span class="season-indicator season-${solarInfo.season}">${solarInfo.name}</span>` : ''}
+                    </div>
+                </div>
+
+                <div class="lines-visual">
+                    ${renderLines(hex.lines)}
+                </div>
+
+                <div class="modal-section">
+                    <h3>卦辞</h3>
+                    <p>${hex.text}</p>
+                </div>
+
+                <div class="modal-section">
+                    <h3>象曰</h3>
+                    <p>${hex.meaning}</p>
+                </div>
+
+                <div class="modal-section">
+                    <h3>意境关键词</h3>
+                    <div class="asset-tags">
+                        ${hex.keywords.map(k => `<span class="asset-tag">${k}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h3>资产映射</h3>
+                    <div class="asset-tags">
+                        ${hex.assets.map(a => `<span class="asset-tag">${a}</span>`).join('')}
+                    </div>
+                </div>
+
+                ${changes ? `
+                <div class="lineage-section">
+                    <h3 class="lineage-title">十二变势演化图</h3>
+                    <p class="lineage-subtitle">线条粗细代表演化概率 · 满十二变势卦已高亮</p>
+                    <div class="lineage-graph" id="lineageGraph">
+                        <div class="lineage-center">
+                            <div class="center-symbol">${getFullHexagramName(hex)}</div>
+                            <div class="center-name">${hex.name}</div>
+                            <div class="center-number">第${hex.number}卦</div>
+                        </div>
+                        ${targetHexes.map((item, index) => {
+                            const angle = (index / targetHexes.length) * 2 * Math.PI - Math.PI / 2;
+                            const radius = 150;
+                            const x = Math.cos(angle) * radius;
+                            const y = Math.sin(angle) * radius;
+                            const thickness = Math.max(2, item.prob * 4);
+                            const isTwelve = twelveChanges[item.hex.number] && twelveChanges[item.hex.number].targets.length >= 12;
+                            return `
+                                <div class="lineage-line" 
+                                     style="left: 50%; top: 50%; 
+                                            width: ${radius}px; 
+                                            height: ${thickness}px;
+                                            transform: translate(0, -50%) rotate(${angle}rad);">
+                                </div>
+                                <div class="lineage-node ${isTwelve ? 'twelve' : ''}"
+                                     style="left: calc(50% + ${x}px); top: calc(50% + ${y}px); transform: translate(-50%, -50%);"
+                                     onclick="openModal(${item.hex.number}); event.stopPropagation();">
+                                    <div class="node-symbol">${getFullHexagramName(item.hex)}</div>
+                                    <div class="node-name">${item.hex.name}</div>
+                                    <div class="node-prob">${(item.prob * 100).toFixed(0)}%</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            const modal = document.getElementById('modalOverlay');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // 更新节气显示
+        function updateSolarDisplay() {
+            const current = getCurrentSolarTerm();
+            const hex = hexagrams[current.hexIndex];
+            
+            document.getElementById('currentSolarTerm').textContent = current.name;
+            
+            const solarHexEl = document.getElementById('solarHexagram');
+            solarHexEl.innerHTML = `
+                <span class="hex-symbol">${getFullHexagramName(hex)}</span>
+                <div class="hex-info">
+                    <div class="hex-name">${hex.fullName}</div>
+                    <div class="hex-number">第 ${hex.number} 卦</div>
+                </div>
+            `;
+            solarHexEl.onclick = () => openModal(hex.number);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSolarDisplay();
+            renderGrid();
+
+            // 搜索功能
+            const searchBox = document.getElementById('searchBox');
+            let searchTimeout;
+            searchBox.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const activeView = document.querySelector('.control-btn.active');
+                    const view = activeView ? activeView.dataset.view : 'all';
+                    renderGrid(view, e.target.value);
+                }, 300);
+            });
+
+            // 搜索提示点击
+            document.querySelectorAll('.search-hint').forEach(hint => {
+                hint.addEventListener('click', () => {
+                    searchBox.value = hint.dataset.query;
+                    const activeView = document.querySelector('.control-btn.active');
+                    const view = activeView ? activeView.dataset.view : 'all';
+                    renderGrid(view, hint.dataset.query);
+                });
+            });
+
+            // 视图切换
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderGrid(btn.dataset.view, searchBox.value);
+                });
+            });
+
+            // 关闭弹窗事件
+            document.getElementById('modalClose').addEventListener('click', closeModal);
+            document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeModal();
+            });
+
+            // ESC关闭
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        });
+
+        // 全局暴露openModal供onclick使用
+        window.openModal = openModal;
+    </script>
+</body>
+</html>
