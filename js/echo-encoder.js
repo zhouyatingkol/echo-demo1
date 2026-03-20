@@ -384,18 +384,3 @@ if (typeof window !== 'undefined') {
   };
 }
 
-// ES Module 导出
-export {
-  encodeAsset,
-  calculateQi,
-  getQiDescription,
-  BianShiSystem,
-  calculateChangedHexagram,
-  generatePoeticView,
-  CONFIG,
-  TRIGRAMS,
-  TRIGRAM_SYMBOLS,
-  HEXAGRAMS,
-  POETRY,
-  BIAN_SHI_CONFIG
-};
