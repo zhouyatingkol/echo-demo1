@@ -162,12 +162,28 @@ function encodeAsset(yong, kuo, yan, yi) {
 
 /**
  * 气数计算：混沌但可重现
- * 使用黄金比例产生伪随机但确定的结果
+ * 使用 Logistic 混沌映射：x(n+1) = r * x(n) * (1 - x(n))
+ * 当 r = 3.99 时，系统进入混沌状态——敏感、不可预测、有深层规律
+ * 符合"气"的概念：确定性中的不确定性，周而复始的自然流转
  */
 function calculateQi(geneCode, timestamp) {
-  const PHI = 1.618033988749;
-  const seed = geneCode * timestamp * PHI;
-  return Math.abs(Math.sin(seed));
+  // 混沌参数：3.99 接近混沌临界值 4.0
+  const r = 3.99;
+
+  // 初始值：由基因码决定（0-1之间），确保不同资产有不同的混沌起点
+  let x = (geneCode % 9973) / 9973; // 使用质数增加分布均匀性
+  if (x === 0) x = 0.618; // 避免0点（不动点），用黄金比例作为备用
+
+  // 迭代次数：基于时间戳变化，使气数随时间自然流转
+  // 每天不同时间，同一资产的气数也不同
+  const iterations = 50 + (timestamp % 50);
+
+  // 混沌迭代：微小的初始差异会导致巨大的结果差异（蝴蝶效应）
+  for (let i = 0; i < iterations; i++) {
+    x = r * x * (1 - x);
+  }
+
+  return x; // 0-1 之间
 }
 
 /**
