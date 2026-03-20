@@ -572,11 +572,11 @@
         </div>
     </div>
     
-    <script src="js/echo-encoder.js?v=7"></script>
+    <script src="js/echo-encoder.js?v=8"></script>
     
     <script>
-        // 配置
-        const CONFIG = {
+        // 页面配置（避免与 echo-encoder.js 的 CONFIG 冲突）
+        const PAGE_CONFIG = {
             yong: ['禁','锁','借','阅','采','用','持','归'],
             yongDesc: ['封存','私藏','期借','只读','采样','按需','持有','归属'],
             kuo: ['独','友','圈','域','网','链','元','道'],
@@ -634,15 +634,15 @@
                 const yi = parseInt(document.getElementById('yi').value);
                 
                 // 更新参数显示
-                document.getElementById('yong-val').textContent = CONFIG.yong[y];
-                document.getElementById('kuo-val').textContent = CONFIG.kuo[k];
-                document.getElementById('yan-val').textContent = CONFIG.yan[ya];
-                document.getElementById('yi-val').textContent = CONFIG.yi[yi];
+                document.getElementById('yong-val').textContent = PAGE_CONFIG.yong[y];
+                document.getElementById('kuo-val').textContent = PAGE_CONFIG.kuo[k];
+                document.getElementById('yan-val').textContent = PAGE_CONFIG.yan[ya];
+                document.getElementById('yi-val').textContent = PAGE_CONFIG.yi[yi];
                 
-                document.getElementById('yong-desc').textContent = CONFIG.yongDesc[y];
-                document.getElementById('kuo-desc').textContent = CONFIG.kuoDesc[k];
-                document.getElementById('yan-desc').textContent = CONFIG.yanDesc[ya];
-                document.getElementById('yi-desc').textContent = CONFIG.yiDesc[yi];
+                document.getElementById('yong-desc').textContent = PAGE_PAGE_CONFIG.yongDesc[y];
+                document.getElementById('kuo-desc').textContent = PAGE_PAGE_CONFIG.kuoDesc[k];
+                document.getElementById('yan-desc').textContent = PAGE_PAGE_CONFIG.yanDesc[ya];
+                document.getElementById('yi-desc').textContent = PAGE_PAGE_CONFIG.yiDesc[yi];
                 
                 // 更新滑块填充
                 document.getElementById('yong-fill').style.width = ((y + 1) / 8 * 100) + '%';
