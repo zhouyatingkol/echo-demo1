@@ -91,9 +91,15 @@ const POETRY = {
   }
 };
 
-// 12变势配置
+// 变势配置（可自定义：6/8/12/24）
 const BIAN_SHI_CONFIG = {
-  max: 12,           // 满12触发变爻
+  default: 8,        // 默认8变势（中板 Moderato）
+  options: {
+    6: { name: '快板', desc: 'Allegro - 短促敏锐' },
+    8: { name: '中板', desc: 'Moderato - 平衡流动' },
+    12: { name: '慢板', desc: 'Adagio - 绵长深沉' },
+    24: { name: '广板', desc: 'Largo - 缓慢庄重' }
+  },
   decay: 3,          // 3天无活动减1
   threshold: 0.7     // 指标达标概率阈值
 };
@@ -167,15 +173,22 @@ function randomPick(arr) {
 }
 
 /**
- * 12变势系统
+ * 变势系统（可配置节拍）
  * 
  * 机制：
  * - 指标达标 → 积累变势 (+1)
- * - 满12点 → 触发变爻 → 清空重置
+ * - 满max点 → 触发变爻 → 清空重置
  * - 3天无活动 → 变势衰减 (-1)
+ * 
+ * 节拍选择：
+ * - 6 = 快板 (Allegro) - 适合热点内容
+ * - 8 = 中板 (Moderato) - 默认，平衡流动
+ * - 12 = 慢板 (Adagio) - 适合艺术作品
+ * - 24 = 广板 (Largo) - 适合传世资产
  */
 class BianShiSystem {
-  constructor() {
+  constructor(max = BIAN_SHI_CONFIG.default) {
+    this.max = max;        // 变势上限（可自定义）
     this.bianShi = 0;      // 当前变势
     this.lastActivity = Date.now();
     this.changingLines = []; // 已触发的变爻
@@ -221,8 +234,8 @@ class BianShiSystem {
     
     this.lastActivity = now;
     
-    // 检查是否满12触发
-    const shouldTrigger = this.bianShi >= BIAN_SHI_CONFIG.max;
+    // 检查是否满触发
+    const shouldTrigger = this.bianShi >= this.max;
     if (shouldTrigger) {
       this.changingLines = triggered.map(t => t.line);
       this.bianShi = 0;  // 清空重置
@@ -230,7 +243,8 @@ class BianShiSystem {
     
     return {
       bianShi: this.bianShi,
-      max: BIAN_SHI_CONFIG.max,
+      max: this.max,
+      tempo: BIAN_SHI_CONFIG.options[this.max],
       triggered: shouldTrigger,
       changingLines: shouldTrigger ? this.changingLines : [],
       pendingLines: triggered,
@@ -242,6 +256,30 @@ class BianShiSystem {
     this.bianShi = 0;
     this.changingLines = [];
     this.lastActivity = Date.now();
+  }
+
+  /**
+   * 重新设定节拍
+   * @param {number} newMax - 新节拍 (6/8/12/24)
+   * @returns {boolean} 是否设置成功
+   */
+  setTempo(newMax) {
+    if (BIAN_SHI_CONFIG.options[newMax]) {
+      this.max = newMax;
+      this.bianShi = Math.min(this.bianShi, this.max);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 获取当前节拍信息
+   */
+  getTempoInfo() {
+    return {
+      current: this.max,
+      ...BIAN_SHI_CONFIG.options[this.max]
+    };
   }
 }
 
