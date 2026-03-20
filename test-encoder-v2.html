@@ -587,11 +587,15 @@
             yiDesc: ['封存','独一','稀少','罕见','流通','大众','开源','归道']
         };
         
-        // 初始化12变势圆点
-        function initBianShiDots() {
+        // 初始化12变势圆点（支持动态数量）
+        function initBianShiDots(max = 8) {
             const container = document.getElementById('bianshi-bar');
+            if (!container) {
+                console.error('bianshi-bar element not found');
+                return;
+            }
             container.innerHTML = '';
-            for (let i = 1; i <= 12; i++) {
+            for (let i = 1; i <= max; i++) {
                 const dot = document.createElement('div');
                 dot.className = 'bianshi-dot';
                 dot.textContent = i;
@@ -599,14 +603,49 @@
             }
         }
         
-        initBianShiDots();
+        // DOM 加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+            console.log('ECHO Encoder initializing...');
+            
+            // 检查 EchoEncoder 是否加载
+            if (typeof EchoEncoder === 'undefined') {
+                console.error('EchoEncoder not loaded! Check js/echo-encoder.js');
+                document.getElementById('hex-name').textContent = '脚本加载失败';
+                return;
+            }
+            console.log('EchoEncoder loaded:', EchoEncoder);
+            
+            // 初始化圆点（默认8个）
+            initBianShiDots(8);
+            
+            // 绑定事件
+            ['yong', 'kuo', 'yan', 'yi'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', update);
+                    el.addEventListener('change', update); // 兼容旧浏览器
+                    console.log(`Event bound to ${id}`);
+                } else {
+                    console.error(`Element ${id} not found`);
+                }
+            });
+            
+            // 初始更新
+            try {
+                update();
+                console.log('Initial update complete');
+            } catch (e) {
+                console.error('Initial update failed:', e);
+            }
+        });
         
-        // 更新显示
+        // 更新显示函数
         function update() {
-            const y = parseInt(document.getElementById('yong').value);
-            const k = parseInt(document.getElementById('kuo').value);
-            const ya = parseInt(document.getElementById('yan').value);
-            const yi = parseInt(document.getElementById('yi').value);
+            try {
+                const y = parseInt(document.getElementById('yong').value);
+                const k = parseInt(document.getElementById('kuo').value);
+                const ya = parseInt(document.getElementById('yan').value);
+                const yi = parseInt(document.getElementById('yi').value);
             
             // 更新参数显示
             document.getElementById('yong-val').textContent = CONFIG.yong[y];
@@ -632,8 +671,8 @@
                 const qi = EchoEncoder.calculateQi(result.geneCode, timestamp);
                 const qiDesc = EchoEncoder.getQiDescription(qi);
                 
-                // 模拟变势
-                const mockBianShi = Math.floor(qi * 12);
+                // 模拟变势（8变势）
+                const mockBianShi = Math.floor(qi * 8);
                 updateBianShi(mockBianShi);
                 
                 // 更新基因码
@@ -652,7 +691,7 @@
                 document.getElementById('qi-level').textContent = `气数 ${qi.toFixed(4)} · ${qiDesc.level}`;
                 
                 // 更新诗意层
-                const bianShiData = { bianShi: mockBianShi, max: 12, transition: mockBianShi > 8 ? '亟变' : mockBianShi > 3 ? '渐变' : '定静' };
+                const bianShiData = { bianShi: mockBianShi, max: 8, transition: mockBianShi > 6 ? '亟变' : mockBianShi > 2 ? '渐变' : '定静' };
                 const poetic = EchoEncoder.generatePoeticView(result, qiDesc, bianShiData);
                 
                 document.getElementById('poetic-title').textContent = poetic.title;
@@ -679,12 +718,12 @@
                 if (idx < count) {
                     dot.classList.add('active');
                 }
-                if (idx === 11 && count >= 12) {
+                if (idx === 7 && count >= 8) {
                     dot.classList.add('glowing');
                 }
             });
             
-            const status = count >= 12 ? '变爻触发' : count > 8 ? '趋近' : count > 3 ? '渐积' : '初生';
+            const status = count >= 8 ? '变爻触发' : count > 6 ? '趋近' : count > 2 ? '渐积' : '初生';
             document.getElementById('bianshi-status').textContent = status;
         }
         
