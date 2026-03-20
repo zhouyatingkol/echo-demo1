@@ -572,7 +572,7 @@
         </div>
     </div>
     
-    <script src="js/echo-encoder.js?v=8"></script>
+    <script src="js/echo-encoder.js?v=9"></script>
     
     <script>
         // 页面配置（避免与 echo-encoder.js 的 CONFIG 冲突）
@@ -715,14 +715,52 @@
         ['yong','kuo','yan','yi'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
-                el.addEventListener('input', update);
-                el.addEventListener('change', update);
+                el.addEventListener('input', () => {
+                    checkYongLock();
+                    update();
+                });
+                el.addEventListener('change', () => {
+                    checkYongLock();
+                    update();
+                });
             }
         });
+        
+        // 检查用是否锁定扩衍
+        function checkYongLock() {
+            const yongVal = parseInt(document.getElementById('yong').value);
+            const kuoEl = document.getElementById('kuo');
+            const yanEl = document.getElementById('yan');
+            const kuoItem = kuoEl.closest('.power-item');
+            const yanItem = yanEl.closest('.power-item');
+            
+            if (yongVal === 0) {
+                // 用=禁，锁定扩衍
+                kuoEl.value = 0;
+                kuoEl.disabled = true;
+                kuoItem.style.opacity = '0.5';
+                kuoItem.title = '需先开放使用权';
+                
+                yanEl.value = 0;
+                yanEl.disabled = true;
+                yanItem.style.opacity = '0.5';
+                yanItem.title = '需先开放使用权';
+            } else {
+                // 用开放，解除锁定
+                kuoEl.disabled = false;
+                kuoItem.style.opacity = '1';
+                kuoItem.title = '';
+                
+                yanEl.disabled = false;
+                yanItem.style.opacity = '1';
+                yanItem.title = '';
+            }
+        }
 
         // 初始化
+        checkYongLock();
         update();
-        console.log('ECHO Encoder initialized');
+        console.log('🎋 ECHO Encoder initialized');
     </script>
 </body>
 </html>
