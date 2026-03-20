@@ -474,8 +474,8 @@
         
         <!-- 界面切换 -->
         <div class="layer-toggle">
-            <button class="layer-btn active" onclick="showLayer('poetic')">意境</button>
-            <button class="layer-btn" onclick="showLayer('precise')">明细</button>
+            <button class="layer-btn active" onclick="showLayer('poetic', event)">意境</button>
+            <button class="layer-btn" onclick="showLayer('precise', event)">明细</button>
         </div>
         
         <!-- 诗意层 -->
@@ -730,9 +730,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('bianshi-status').textContent = status;
         }
         
-        function showLayer(layer) {
+        function showLayer(layer, evt) {
             document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if (evt && evt.target) {
+                evt.target.classList.add('active');
+            } else if (event && event.target) {
+                event.target.classList.add('active');
+            }
             
             if (layer === 'poetic') {
                 document.getElementById('poetic-layer').style.display = 'block';
@@ -750,6 +754,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('yi').value = yi;
             update();
         }
+        
+        // 显式挂载到 window 对象以确保全局可用
+        window.loadCase = loadCase;
+        window.showLayer = showLayer;
+        window.update = update;
         
         // 绑定事件（仅在DOMContentLoaded中执行一次）
         // 事件绑定已移至DOMContentLoaded中
