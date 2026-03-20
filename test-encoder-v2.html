@@ -572,7 +572,7 @@
         </div>
     </div>
     
-    <script src="js/echo-encoder.js?v=6"></script>
+    <script src="js/echo-encoder.js?v=7"></script>
     
     <script>
         // 配置
@@ -748,17 +748,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         function loadCase(y, k, ya, yi) {
+            console.log('loadCase 被调用:', y, k, ya, yi);
             document.getElementById('yong').value = y;
             document.getElementById('kuo').value = k;
             document.getElementById('yan').value = ya;
             document.getElementById('yi').value = yi;
             update();
+            console.log('loadCase 完成');
         }
         
         // 显式挂载到 window 对象以确保全局可用
         window.loadCase = loadCase;
         window.showLayer = showLayer;
         window.update = update;
+        console.log('函数已挂载到 window:', typeof window.loadCase);
         
         // 绑定事件（仅在DOMContentLoaded中执行一次）
         // 事件绑定已移至DOMContentLoaded中
