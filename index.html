@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO - 东方美学数字资产协议</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1a1a;
+            --paper: #faf8f5;
+            --paper-warm: #f5f0e8;
+            --accent: #c9a961;
+            --brown: #8b7355;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: var(--paper-warm);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        
+        .logo {
+            font-size: 5rem;
+            font-weight: 300;
+            letter-spacing: 0.5em;
+            margin-bottom: 20px;
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--brown);
+            letter-spacing: 0.3em;
+            margin-bottom: 60px;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .nav-item {
+            background: var(--paper);
+            border: 1px solid rgba(201,169,97,0.3);
+            padding: 40px 30px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--ink);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            border-color: var(--brown);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        
+        .nav-char {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .nav-name {
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            margin-bottom: 10px;
+        }
+        
+        .nav-desc {
+            font-size: 0.85rem;
+            color: var(--brown);
+        }
+        
+        .footer {
+            margin-top: 80px;
+            font-size: 0.8rem;
+            color: var(--brown);
+            letter-spacing: 0.1em;
+        }
+        
+        @media (max-width: 480px) {
+            .nav-grid { grid-template-columns: 1fr; }
+            .logo { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">ECHO</div>
+    <div class="tagline">万物有灵 · 皆可生长</div>
+    
+    <div class="nav-grid">
+        <a href="test-encoder-v2.html" class="nav-item">
+            <div class="nav-char">铸</div>
+            <div class="nav-name">资产编码</div>
+            <div class="nav-desc">生此一物 · 归于你</div>
+        </a>
+        
+        <a href="hexagram-visualizer.html" class="nav-item">
+            <div class="nav-char">卦</div>
+            <div class="nav-name">六十四卦</div>
+            <div class="nav-desc">天地定位 · 山泽通气</div>
+        </a>
+        
+        <a href="docs/ENCODING-SYSTEM.md" class="nav-item">
+            <div class="nav-char">典</div>
+            <div class="nav-name">技术文档</div>
+            <div class="nav-desc">知来处 · 明去处</div>
+        </a>
+        
+        <a href="https://github.com/zhouyatingkol/echo-demo1" class="nav-item" target="_blank">
+            <div class="nav-char">源</div>
+            <div class="nav-name">开源仓库</div>
+            <div class="nav-desc">GitHub · 共建生长</div>
+        </a>
+    </div>
+    
+    <div class="footer">
+        ECHO Encoding System v2.1 · 十二变势 · 双层生命
+    </div>
+</body>
+</html>
