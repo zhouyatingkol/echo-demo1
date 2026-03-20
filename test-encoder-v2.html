@@ -586,14 +586,11 @@
             yi: ['藏','孤','稀','罕','流','众','源','道'],
             yiDesc: ['封存','独一','稀少','罕见','流通','大众','开源','归道']
         };
-        
-        // 初始化12变势圆点（支持动态数量）
+
+        // 初始化变势圆点
         function initBianShiDots(max = 8) {
             const container = document.getElementById('bianshi-bar');
-            if (!container) {
-                console.error('bianshi-bar element not found');
-                return;
-            }
+            if (!container) return;
             container.innerHTML = '';
             for (let i = 1; i <= max; i++) {
                 const dot = document.createElement('div');
@@ -602,43 +599,32 @@
                 container.appendChild(dot);
             }
         }
-        
-        // DOM 加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
-            console.log('ECHO Encoder initializing...');
-            
-            // 检查 EchoEncoder 是否加载
-            if (typeof EchoEncoder === 'undefined') {
-                console.error('EchoEncoder not loaded! Check js/echo-encoder.js');
-                document.getElementById('hex-name').textContent = '脚本加载失败';
-                return;
-            }
-            console.log('EchoEncoder loaded:', EchoEncoder);
-            
-            // 初始化圆点（默认8个）
-            initBianShiDots(8);
-            
-            // 绑定事件
-            ['yong', 'kuo', 'yan', 'yi'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.addEventListener('input', update);
-                    el.addEventListener('change', update); // 兼容旧浏览器
-                    console.log(`Event bound to ${id}`);
-                } else {
-                    console.error(`Element ${id} not found`);
-                }
+
+        // 更新变势显示
+        function updateBianShi(count) {
+            document.getElementById('bianshi-count').textContent = count;
+            const dots = document.querySelectorAll('.bianshi-dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.remove('active', 'glowing');
+                if (idx < count) dot.classList.add('active');
+                if (idx === 7 && count >= 8) dot.classList.add('glowing');
             });
+            const status = count >= 8 ? '变爻触发' : count > 6 ? '趋近' : count > 2 ? '渐积' : '初生';
+            document.getElementById('bianshi-status').textContent = status;
+        }
+
+        // 切换显示层
+        function showLayer(layer, evt) {
+            document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
+            const target = evt && evt.target ? evt.target : (event && event.target ? event.target : null);
+            if (target) target.classList.add('active');
             
-            // 初始更新
-            try {
-                update();
-                console.log('Initial update complete');
-            } catch (e) {
-                console.error('Initial update failed:', e);
-            }
-        });
-        
+            const poeticLayer = document.getElementById('poetic-layer');
+            const preciseLayer = document.getElementById('precise-layer');
+            if (poeticLayer) poeticLayer.style.display = layer === 'poetic' ? 'block' : 'none';
+            if (preciseLayer) preciseLayer.style.display = layer === 'poetic' ? 'none' : 'block';
+        }
+
         // 更新显示函数
         function update() {
             try {
@@ -646,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const k = parseInt(document.getElementById('kuo').value);
                 const ya = parseInt(document.getElementById('yan').value);
                 const yi = parseInt(document.getElementById('yi').value);
-            
+                
                 // 更新参数显示
                 document.getElementById('yong-val').textContent = CONFIG.yong[y];
                 document.getElementById('kuo-val').textContent = CONFIG.kuo[k];
@@ -671,26 +657,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     const qi = EchoEncoder.calculateQi(result.geneCode, timestamp);
                     const qiDesc = EchoEncoder.getQiDescription(qi);
                     
-                    // 模拟变势（8变势）
                     const mockBianShi = Math.floor(qi * 8);
                     updateBianShi(mockBianShi);
                     
-                    // 更新基因码
                     document.getElementById('gene-code').textContent = result.geneCodeBinary.match(/.{3}/g).join(' ');
-                    
-                    // 更新卦象
                     document.getElementById('hex-symbols').textContent = result.trigrams.upper.symbol + result.trigrams.lower.symbol;
                     document.getElementById('hex-name').textContent = result.hexagram.name;
                     document.getElementById('hex-number').textContent = `第 ${result.hexagram.index} 卦`;
                     
-                    // 更新气数
                     const qiDisplay = document.getElementById('qi-display');
                     qiDisplay.style.borderColor = qiDesc.color;
                     document.getElementById('qi-word').textContent = qiDesc.word;
                     document.getElementById('qi-word').style.color = qiDesc.color;
                     document.getElementById('qi-level').textContent = `气数 ${qi.toFixed(4)} · ${qiDesc.level}`;
                     
-                    // 更新诗意层
                     const bianShiData = { bianShi: mockBianShi, max: 8, transition: mockBianShi > 6 ? '亟变' : mockBianShi > 2 ? '渐变' : '定静' };
                     const poetic = EchoEncoder.generatePoeticView(result, qiDesc, bianShiData);
                     
@@ -700,7 +680,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('poetic-phrase').style.color = qiDesc.color;
                     document.getElementById('poetic-desc').innerHTML = poetic.description.replace(/，/g, '，<br>');
                     
-                    // 更新精确层
                     document.getElementById('precise-binary').textContent = result.geneCodeBinary;
                     document.getElementById('precise-decimal').textContent = result.geneCode;
                     document.getElementById('precise-upper').textContent = `(${y}+${k}) mod 8 = ${result.trigrams.upper.index} = ${result.trigrams.upper.name}`;
@@ -712,41 +691,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Update error:', e);
             }
         }
-        
-        function updateBianShi(count) {
-            document.getElementById('bianshi-count').textContent = count;
-            const dots = document.querySelectorAll('.bianshi-dot');
-            dots.forEach((dot, idx) => {
-                dot.classList.remove('active', 'glowing');
-                if (idx < count) {
-                    dot.classList.add('active');
-                }
-                if (idx === 7 && count >= 8) {
-                    dot.classList.add('glowing');
-                }
-            });
-            
-            const status = count >= 8 ? '变爻触发' : count > 6 ? '趋近' : count > 2 ? '渐积' : '初生';
-            document.getElementById('bianshi-status').textContent = status;
-        }
-        
-        function showLayer(layer, evt) {
-            document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
-            if (evt && evt.target) {
-                evt.target.classList.add('active');
-            } else if (event && event.target) {
-                event.target.classList.add('active');
-            }
-            
-            if (layer === 'poetic') {
-                document.getElementById('poetic-layer').style.display = 'block';
-                document.getElementById('precise-layer').style.display = 'none';
-            } else {
-                document.getElementById('poetic-layer').style.display = 'none';
-                document.getElementById('precise-layer').style.display = 'block';
-            }
-        }
-        
+
+        // 加载测试用例
         function loadCase(y, k, ya, yi) {
             console.log('loadCase 被调用:', y, k, ya, yi);
             document.getElementById('yong').value = y;
@@ -756,15 +702,27 @@ document.addEventListener('DOMContentLoaded', function() {
             update();
             console.log('loadCase 完成');
         }
-        
-        // 显式挂载到 window 对象以确保全局可用
+
+        // 显式挂载到 window
         window.loadCase = loadCase;
         window.showLayer = showLayer;
         window.update = update;
-        console.log('函数已挂载到 window:', typeof window.loadCase);
-        
-        // 绑定事件（仅在DOMContentLoaded中执行一次）
-        // 事件绑定已移至DOMContentLoaded中
+
+        // 初始化变势圆点
+        initBianShiDots(8);
+
+        // 绑定事件
+        ['yong','kuo','yan','yi'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', update);
+                el.addEventListener('change', update);
+            }
+        });
+
+        // 初始化
+        update();
+        console.log('ECHO Encoder initialized');
     </script>
 </body>
 </html>
