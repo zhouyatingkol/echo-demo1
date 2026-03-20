@@ -572,7 +572,7 @@
         </div>
     </div>
     
-    <script src="js/echo-encoder.js?v=2"></script>
+    <script src="js/echo-encoder.js?v=5"></script>
     
     <script>
         // 配置
@@ -647,66 +647,69 @@ document.addEventListener('DOMContentLoaded', function() {
                 const ya = parseInt(document.getElementById('yan').value);
                 const yi = parseInt(document.getElementById('yi').value);
             
-            // 更新参数显示
-            document.getElementById('yong-val').textContent = CONFIG.yong[y];
-            document.getElementById('kuo-val').textContent = CONFIG.kuo[k];
-            document.getElementById('yan-val').textContent = CONFIG.yan[ya];
-            document.getElementById('yi-val').textContent = CONFIG.yi[yi];
-            
-            document.getElementById('yong-desc').textContent = CONFIG.yongDesc[y];
-            document.getElementById('kuo-desc').textContent = CONFIG.kuoDesc[k];
-            document.getElementById('yan-desc').textContent = CONFIG.yanDesc[ya];
-            document.getElementById('yi-desc').textContent = CONFIG.yiDesc[yi];
-            
-            // 更新滑块填充
-            document.getElementById('yong-fill').style.width = ((y + 1) / 8 * 100) + '%';
-            document.getElementById('kuo-fill').style.width = ((k + 1) / 8 * 100) + '%';
-            document.getElementById('yan-fill').style.width = ((ya + 1) / 8 * 100) + '%';
-            document.getElementById('yi-fill').style.width = ((yi + 1) / 8 * 100) + '%';
-            
-            // 使用 EchoEncoder 计算
-            if (typeof EchoEncoder !== 'undefined') {
-                const result = EchoEncoder.encodeAsset(y, k, ya, yi);
-                const timestamp = Date.now();
-                const qi = EchoEncoder.calculateQi(result.geneCode, timestamp);
-                const qiDesc = EchoEncoder.getQiDescription(qi);
+                // 更新参数显示
+                document.getElementById('yong-val').textContent = CONFIG.yong[y];
+                document.getElementById('kuo-val').textContent = CONFIG.kuo[k];
+                document.getElementById('yan-val').textContent = CONFIG.yan[ya];
+                document.getElementById('yi-val').textContent = CONFIG.yi[yi];
                 
-                // 模拟变势（8变势）
-                const mockBianShi = Math.floor(qi * 8);
-                updateBianShi(mockBianShi);
+                document.getElementById('yong-desc').textContent = CONFIG.yongDesc[y];
+                document.getElementById('kuo-desc').textContent = CONFIG.kuoDesc[k];
+                document.getElementById('yan-desc').textContent = CONFIG.yanDesc[ya];
+                document.getElementById('yi-desc').textContent = CONFIG.yiDesc[yi];
                 
-                // 更新基因码
-                document.getElementById('gene-code').textContent = result.geneCodeBinary.match(/.{3}/g).join(' ');
+                // 更新滑块填充
+                document.getElementById('yong-fill').style.width = ((y + 1) / 8 * 100) + '%';
+                document.getElementById('kuo-fill').style.width = ((k + 1) / 8 * 100) + '%';
+                document.getElementById('yan-fill').style.width = ((ya + 1) / 8 * 100) + '%';
+                document.getElementById('yi-fill').style.width = ((yi + 1) / 8 * 100) + '%';
                 
-                // 更新卦象
-                document.getElementById('hex-symbols').textContent = result.trigrams.upper.symbol + result.trigrams.lower.symbol;
-                document.getElementById('hex-name').textContent = result.hexagram.name;
-                document.getElementById('hex-number').textContent = `第 ${result.hexagram.index} 卦`;
-                
-                // 更新气数
-                const qiDisplay = document.getElementById('qi-display');
-                qiDisplay.style.borderColor = qiDesc.color;
-                document.getElementById('qi-word').textContent = qiDesc.word;
-                document.getElementById('qi-word').style.color = qiDesc.color;
-                document.getElementById('qi-level').textContent = `气数 ${qi.toFixed(4)} · ${qiDesc.level}`;
-                
-                // 更新诗意层
-                const bianShiData = { bianShi: mockBianShi, max: 8, transition: mockBianShi > 6 ? '亟变' : mockBianShi > 2 ? '渐变' : '定静' };
-                const poetic = EchoEncoder.generatePoeticView(result, qiDesc, bianShiData);
-                
-                document.getElementById('poetic-title').textContent = poetic.title;
-                document.getElementById('poetic-subtitle').textContent = poetic.subtitle;
-                document.getElementById('poetic-phrase').textContent = `${poetic.qiPhrase} · ${poetic.changePhrase}`;
-                document.getElementById('poetic-phrase').style.color = qiDesc.color;
-                document.getElementById('poetic-desc').innerHTML = poetic.description.replace(/，/g, '，<br>');
-                
-                // 更新精确层
-                document.getElementById('precise-binary').textContent = result.geneCodeBinary;
-                document.getElementById('precise-decimal').textContent = result.geneCode;
-                document.getElementById('precise-upper').textContent = `(${y}+${k}) mod 8 = ${result.trigrams.upper.index} = ${result.trigrams.upper.name}`;
-                document.getElementById('precise-lower').textContent = `(${ya}+${yi}) mod 8 = ${result.trigrams.lower.index} = ${result.trigrams.lower.name}`;
-                document.getElementById('precise-hexnum').textContent = `${result.trigrams.upper.index}×8+${result.trigrams.lower.index}+1 = ${result.hexagram.index}`;
-                document.getElementById('precise-qi').textContent = qi.toFixed(6);
+                // 使用 EchoEncoder 计算
+                if (typeof EchoEncoder !== 'undefined') {
+                    const result = EchoEncoder.encodeAsset(y, k, ya, yi);
+                    const timestamp = Date.now();
+                    const qi = EchoEncoder.calculateQi(result.geneCode, timestamp);
+                    const qiDesc = EchoEncoder.getQiDescription(qi);
+                    
+                    // 模拟变势（8变势）
+                    const mockBianShi = Math.floor(qi * 8);
+                    updateBianShi(mockBianShi);
+                    
+                    // 更新基因码
+                    document.getElementById('gene-code').textContent = result.geneCodeBinary.match(/.{3}/g).join(' ');
+                    
+                    // 更新卦象
+                    document.getElementById('hex-symbols').textContent = result.trigrams.upper.symbol + result.trigrams.lower.symbol;
+                    document.getElementById('hex-name').textContent = result.hexagram.name;
+                    document.getElementById('hex-number').textContent = `第 ${result.hexagram.index} 卦`;
+                    
+                    // 更新气数
+                    const qiDisplay = document.getElementById('qi-display');
+                    qiDisplay.style.borderColor = qiDesc.color;
+                    document.getElementById('qi-word').textContent = qiDesc.word;
+                    document.getElementById('qi-word').style.color = qiDesc.color;
+                    document.getElementById('qi-level').textContent = `气数 ${qi.toFixed(4)} · ${qiDesc.level}`;
+                    
+                    // 更新诗意层
+                    const bianShiData = { bianShi: mockBianShi, max: 8, transition: mockBianShi > 6 ? '亟变' : mockBianShi > 2 ? '渐变' : '定静' };
+                    const poetic = EchoEncoder.generatePoeticView(result, qiDesc, bianShiData);
+                    
+                    document.getElementById('poetic-title').textContent = poetic.title;
+                    document.getElementById('poetic-subtitle').textContent = poetic.subtitle;
+                    document.getElementById('poetic-phrase').textContent = `${poetic.qiPhrase} · ${poetic.changePhrase}`;
+                    document.getElementById('poetic-phrase').style.color = qiDesc.color;
+                    document.getElementById('poetic-desc').innerHTML = poetic.description.replace(/，/g, '，<br>');
+                    
+                    // 更新精确层
+                    document.getElementById('precise-binary').textContent = result.geneCodeBinary;
+                    document.getElementById('precise-decimal').textContent = result.geneCode;
+                    document.getElementById('precise-upper').textContent = `(${y}+${k}) mod 8 = ${result.trigrams.upper.index} = ${result.trigrams.upper.name}`;
+                    document.getElementById('precise-lower').textContent = `(${ya}+${yi}) mod 8 = ${result.trigrams.lower.index} = ${result.trigrams.lower.name}`;
+                    document.getElementById('precise-hexnum').textContent = `${result.trigrams.upper.index}×8+${result.trigrams.lower.index}+1 = ${result.hexagram.index}`;
+                    document.getElementById('precise-qi').textContent = qi.toFixed(6);
+                }
+            } catch(e) {
+                console.error('Update error:', e);
             }
         }
         
