@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>铸 - ECHO编码系统</title>
+    <script src="js/echo-encoder.js?v=5"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Serif SC", serif;
+            background: linear-gradient(135deg, #faf8f5 0%, #f5f0e8 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: #2c2c2c;
+        }
+        .subtitle {
+            text-align: center;
+            color: #8b7355;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: rgba(255,255,255,0.7);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .section-title {
+            font-size: 12px;
+            color: #8b7355;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        .power-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .power-item {
+            text-align: center;
+        }
+        .power-label {
+            font-size: 10px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .power-char {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+        .power-desc {
+            font-size: 11px;
+            color: #666;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .gene-code {
+            background: #1a1a1a;
+            color: #c9b896;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 3px;
+        }
+        .hexagram {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .hex-symbols {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .hex-name {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .hex-number {
+            font-size: 12px;
+            color: #999;
+        }
+        .test-cases {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .test-case {
+            padding: 12px;
+            background: #f5f0e8;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .test-case:hover {
+            background: #e8e0d0;
+        }
+        .test-case-title {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .test-case-powers {
+            font-size: 10px;
+            color: #8b7355;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>铸</h1>
+        <p class="subtitle">生此一物 · 归于你</p>
+        
+        <div class="card">
+            <div class="section-title">先天基因 · 四权力配置</div>
+            
+            <div class="power-grid">
+                <div class="power-item">
+                    <div class="power-label">永 · 存在方式</div>
+                    <div class="power-char" id="yong-val">用</div>
+                    <div class="power-desc" id="yong-desc">按需付费</div>
+                    <input type="range" id="yong" min="0" max="7" value="5">
+                </div>
+                <div class="power-item">
+                    <div class="power-label">阔 · 连接范围</div>
+                    <div class="power-char" id="kuo-val">域</div>
+                    <div class="power-desc" id="kuo-desc">特定领域</div>
+                    <input type="range" id="kuo" min="0" max="7" value="3">
+                </div>
+                <div class="power-item">
+                    <div class="power-label">延 · 衍生能力</div>
+                    <div class="power-char" id="yan-val">融</div>
+                    <div class="power-desc" id="yan-desc">融合改编</div>
+                    <input type="range" id="yan" min="0" max="7" value="5">
+                </div>
+                <div class="power-item">
+                    <div class="power-label">益 · 代谢模式</div>
+                    <div class="power-char" id="yi-val">稀</div>
+                    <div class="power-desc" id="yi-desc">限量稀少</div>
+                    <input type="range" id="yi" min="0" max="7" value="2">
+                </div>
+            </div>
+            
+            <div class="gene-code" id="gene-code">101 011 101 010</div>
+            
+            <div class="hexagram">
+                <div class="hex-symbols" id="hex-symbols">☶☰</div>
+                <div class="hex-name" id="hex-name">山天大畜</div>
+                <div class="hex-number" id="hex-number">第 7 卦</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="section-title">测试用例</div>
+            <div class="test-cases">
+                <div class="test-case" onclick="loadCase(5,3,5,2)">
+                    <div class="test-case-title">默认</div>
+                    <div class="test-case-powers">用·域·融·稀</div>
+                </div>
+                <div class="test-case" onclick="loadCase(1,0,0,1)">
+                    <div class="test-case-title">私人日记</div>
+                    <div class="test-case-powers">锁·独·止·孤</div>
+                </div>
+                <div class="test-case" onclick="loadCase(7,7,7,6)">
+                    <div class="test-case-title">开源代码</div>
+                    <div class="test-case-powers">归·道·生·源</div>
+                </div>
+            <div>
+        </div>
+    </div>
+    
+    <script>
+        // 配置
+        const CONFIG = {
+            yong: ['禁','锁','借','阅','采','用','持','归'],
+            yongDesc: ['封存','私藏','期借','只读','采样','按需','持有','归属'],
+            kuo: ['独','友','圈','域','网','链','元','道'],
+            kuoDesc: ['自闭','好友','小圈','领域','网络','跨链','元界','无界'],
+            yan: ['止','赏','评','引','混','融','造','生'],
+            yanDesc: ['禁止','欣赏','评论','引用','混剪','融合','创造','化生'],
+            yi: ['藏','孤','稀','罕','流','众','源','道'],
+            yiDesc: ['封存','独一','稀少','罕见','流通','大众','开源','归道']
+        };
+        
+        // 更新函数
+        function update() {
+            const y = parseInt(document.getElementById('yong').value);
+            const k = parseInt(document.getElementById('kuo').value);
+            const ya = parseInt(document.getElementById('yan').value);
+            const yi = parseInt(document.getElementById('yi').value);
+            
+            // 更新显示
+            document.getElementById('yong-val').textContent = CONFIG.yong[y];
+            document.getElementById('kuo-val').textContent = CONFIG.kuo[k];
+            document.getElementById('yan-val').textContent = CONFIG.yan[ya];
+            document.getElementById('yi-val').textContent = CONFIG.yi[yi];
+            
+            document.getElementById('yong-desc').textContent = CONFIG.yongDesc[y];
+            document.getElementById('kuo-desc').textContent = CONFIG.kuoDesc[k];
+            document.getElementById('yan-desc').textContent = CONFIG.yanDesc[ya];
+            document.getElementById('yi-desc').textContent = CONFIG.yiDesc[yi];
+            
+            // 使用 EchoEncoder
+            if (typeof EchoEncoder !== 'undefined') {
+                const result = EchoEncoder.encodeAsset(y, k, ya, yi);
+                document.getElementById('gene-code').textContent = result.geneCodeBinary.match(/.{3}/g).join(' ');
+                document.getElementById('hex-symbols').textContent = result.trigrams.upper.symbol + result.trigrams.lower.symbol;
+                document.getElementById('hex-name').textContent = result.hexagram.name;
+                document.getElementById('hex-number').textContent = '第 ' + result.hexagram.index + ' 卦';
+            }
+        }
+        
+        // 加载测试用例
+        function loadCase(y, k, ya, yi) {
+            document.getElementById('yong').value = y;
+            document.getElementById('kuo').value = k;
+            document.getElementById('yan').value = ya;
+            document.getElementById('yi').value = yi;
+            update();
+            console.log('加载用例:', y, k, ya, yi);
+        }
+        
+        // 绑定事件
+        ['yong','kuo','yan','yi'].forEach(id => {
+            document.getElementById(id).addEventListener('input', update);
+        });
+        
+        // 初始化
+        update();
+        console.log('🎋 ECHO Encoder 初始化完成');
+    </script>
+</body>
+</html>
