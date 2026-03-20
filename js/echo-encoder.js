@@ -91,12 +91,13 @@ const POETRY = {
   }
 };
 
-// 变势配置（可自定义：6/8/12/24）
+// 变势配置（可自定义：6/8/9/12/24）
 const BIAN_SHI_CONFIG = {
-  default: 8,        // 默认8变势（中板 Moderato）
+  default: 9,        // 默认9变势（九爻）
   options: {
     6: { name: '快板', desc: 'Allegro - 短促敏锐' },
     8: { name: '中板', desc: 'Moderato - 平衡流动' },
+    9: { name: '九爻', desc: '潜龙勿用 → 飞龙在天 → 用九' },
     12: { name: '慢板', desc: 'Adagio - 绵长深沉' },
     24: { name: '广板', desc: 'Largo - 缓慢庄重' }
   },
