@@ -6,6 +6,7 @@
     <title>ECHO 资产编码测试</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
         
         * {
             margin: 0;
@@ -13,12 +14,30 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --ink: #2a2a2a;
+            --ink-light: #4a4a4a;
+            --ochre: #8b7355;
+            --ochre-light: #a88b6a;
+            --paper: #f5f0e8;
+            --paper-dark: #e8e0d5;
+            --vermilion: #c93756;
+            --jade: #5a8a6e;
+            --gold: #c9a227;
+        }
+        
         body {
             font-family: 'Noto Serif SC', serif;
-            background: #f5f0e8;
-            color: #3a3a3a;
+            background: var(--paper);
+            color: var(--ink);
             padding: 40px 20px;
             line-height: 1.8;
+            /* 宣纸纹理 */
+            background-image: 
+                radial-gradient(ellipse at 20% 30%, rgba(139,115,85,0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(139,115,85,0.03) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-blend-mode: multiply;
         }
         
         .container {
@@ -28,38 +47,47 @@
         
         h1 {
             text-align: center;
-            font-size: 2em;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3em;
             margin-bottom: 10px;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.3em;
+            color: var(--ink);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
         
         .subtitle {
             text-align: center;
-            color: #8b7355;
+            color: var(--ochre);
             margin-bottom: 40px;
-            font-size: 0.9em;
+            font-size: 0.95em;
+            letter-spacing: 0.15em;
         }
         
         .section {
-            background: #fff;
-            border-radius: 8px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 4px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--paper-dark);
+            box-shadow: 
+                0 2px 8px rgba(0,0,0,0.04),
+                inset 0 1px 0 rgba(255,255,255,0.8);
+            backdrop-filter: blur(4px);
         }
         
         .section-title {
-            font-size: 1.2em;
+            font-size: 1.1em;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #e8e0d5;
-            color: #5a5a5a;
+            border-bottom: 1px solid var(--paper-dark);
+            color: var(--ink-light);
+            letter-spacing: 0.1em;
         }
         
         .params-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
         
@@ -69,113 +97,273 @@
         
         .param-label {
             font-size: 0.85em;
-            color: #8b7355;
+            color: var(--ochre);
             margin-bottom: 8px;
+            letter-spacing: 0.1em;
         }
         
         .param-value {
-            font-size: 1.5em;
-            font-weight: 600;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2em;
+            font-weight: 400;
             margin-bottom: 5px;
+            color: var(--ink);
+            transition: all 0.4s ease;
+        }
+        
+        .param-value.changing {
+            animation: brushStroke 0.6s ease;
+        }
+        
+        @keyframes brushStroke {
+            0% { opacity: 0.3; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
         }
         
         .param-desc {
             font-size: 0.75em;
-            color: #999;
+            color: #888;
         }
         
+        /* 东方风格滑块 */
         input[type="range"] {
             width: 100%;
-            margin-top: 10px;
+            margin-top: 12px;
+            -webkit-appearance: none;
+            height: 4px;
+            background: linear-gradient(to right, var(--paper-dark), var(--ochre));
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--ink);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: var(--ochre);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: var(--ink);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         
         .result-box {
-            background: #f9f7f4;
-            border: 1px solid #e8e0d5;
+            background: linear-gradient(135deg, rgba(249,247,244,0.8) 0%, rgba(255,255,255,0.4) 100%);
+            border: 1px solid var(--paper-dark);
             border-radius: 8px;
             padding: 30px;
             text-align: center;
             margin-top: 20px;
+            transition: all 0.5s ease;
+        }
+        
+        .result-box.transitioning {
+            opacity: 0.6;
+            transform: scale(0.98);
         }
         
         .hexagram-display {
-            font-size: 3em;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3.5em;
             margin-bottom: 10px;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.5em;
+            color: var(--ink);
+            transition: all 0.5s ease;
         }
         
         .hexagram-name {
-            font-size: 1.5em;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2em;
             margin-bottom: 5px;
+            color: var(--ink);
         }
         
         .hexagram-number {
             font-size: 0.85em;
-            color: #999;
+            color: var(--ochre);
+            letter-spacing: 0.2em;
         }
         
         .gene-code {
-            font-family: monospace;
-            font-size: 0.9em;
-            background: #3a3a3a;
-            color: #f5f0e8;
-            padding: 10px 15px;
+            font-family: 'Noto Serif SC', monospace;
+            font-size: 1em;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 12px 20px;
             border-radius: 4px;
             margin: 15px 0;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.3em;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--ochre);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            cursor: pointer;
+            font-family: inherit;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .gene-code:hover .copy-btn {
+            opacity: 1;
+            right: -70px;
+        }
+        
+        .copy-btn:hover {
+            background: var(--ink);
+        }
+        
+        .copy-btn.copied {
+            background: var(--jade);
         }
         
         .qi-display {
             margin-top: 20px;
-            padding: 20px;
+            padding: 25px;
             border-radius: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
+            border-left: 3px solid transparent;
         }
         
         .qi-word {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            letter-spacing: 0.15em;
+        }
+        
+        .qi-quote {
+            font-size: 0.9em;
+            color: var(--ink-light);
+            font-style: italic;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
         }
         
         .qi-level {
-            font-size: 0.85em;
-            opacity: 0.7;
+            font-size: 0.8em;
+            opacity: 0.6;
+            letter-spacing: 0.1em;
         }
         
         .poetic-view {
             margin-top: 30px;
-            padding: 40px;
-            background: linear-gradient(135deg, #f5f0e8 0%, #fff 100%);
-            border: 1px solid #e8e0d5;
+            padding: 50px 40px;
+            background: 
+                linear-gradient(135deg, rgba(245,240,232,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            border: 1px solid var(--paper-dark);
             border-radius: 8px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .poetic-view::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid var(--paper-dark);
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0.5;
         }
         
         .poetic-title {
-            font-size: 2.5em;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 4em;
             margin-bottom: 10px;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.4em;
+            color: var(--ink);
+            transition: all 0.5s ease;
         }
         
         .poetic-subtitle {
-            font-size: 1em;
-            color: #8b7355;
+            font-size: 1.1em;
+            color: var(--ochre);
             margin-bottom: 30px;
+            letter-spacing: 0.2em;
         }
         
         .poetic-phrase {
-            font-size: 1.3em;
-            margin: 20px 0;
-            font-style: italic;
+            font-size: 1.4em;
+            margin: 25px 0;
+            font-family: 'Ma Shan Zheng', cursive;
+            letter-spacing: 0.2em;
+            transition: all 0.5s ease;
         }
         
         .poetic-desc {
-            font-size: 1em;
-            line-height: 2;
-            max-width: 400px;
+            font-size: 1.05em;
+            line-height: 2.2;
+            max-width: 420px;
             margin: 0 auto;
-            color: #5a5a5a;
+            color: var(--ink-light);
+            letter-spacing: 0.05em;
+        }
+        
+        .share-btn {
+            margin-top: 30px;
+            padding: 12px 35px;
+            background: transparent;
+            border: 1px solid var(--ochre);
+            color: var(--ochre);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.95em;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .share-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139,115,85,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .share-btn:hover::before {
+            left: 100%;
+        }
+        
+        .share-btn:hover {
+            background: var(--ochre);
+            color: white;
         }
         
         .layer-toggle {
@@ -186,24 +374,43 @@
         }
         
         .layer-btn {
-            padding: 10px 30px;
-            border: 1px solid #8b7355;
+            padding: 12px 35px;
+            border: 1px solid var(--ochre);
             background: transparent;
-            color: #8b7355;
+            color: var(--ochre);
             cursor: pointer;
             border-radius: 4px;
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            letter-spacing: 0.1em;
+            position: relative;
+            overflow: hidden;
         }
         
         .layer-btn.active {
-            background: #8b7355;
-            color: #fff;
+            background: var(--ochre);
+            color: white;
         }
         
         .layer-btn:hover {
-            background: #8b7355;
-            color: #fff;
+            background: var(--ochre);
+            color: white;
+        }
+        
+        .layer-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--ink);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .layer-btn:hover::after {
+            width: 80%;
         }
         
         .hidden {
@@ -218,64 +425,286 @@
         }
         
         .test-case {
-            padding: 15px;
-            background: #f9f7f4;
+            padding: 18px 15px;
+            background: rgba(249,247,244,0.6);
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
         }
         
         .test-case:hover {
-            background: #e8e0d5;
+            background: rgba(232,224,213,0.5);
+            border-color: var(--ochre);
+            transform: translateY(-2px);
         }
         
         .test-case-name {
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: var(--ink);
+            letter-spacing: 0.05em;
         }
         
         .test-case-params {
             font-size: 0.75em;
-            color: #999;
+            color: var(--ochre);
+            letter-spacing: 0.1em;
+        }
+        
+        /* 12变势条 */
+        .change-bar-container {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 4px;
+        }
+        
+        .change-bar-title {
+            font-size: 0.85em;
+            color: var(--ochre);
+            margin-bottom: 15px;
+            letter-spacing: 0.1em;
+        }
+        
+        .change-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+        }
+        
+        .change-cell {
+            flex: 1;
+            height: 36px;
+            background: var(--paper-dark);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            color: var(--ochre);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .change-cell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--gold) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .change-cell.active {
+            background: var(--ochre);
+            color: white;
+            box-shadow: 0 2px 8px rgba(139,115,85,0.4);
+        }
+        
+        .change-cell.active::before {
+            opacity: 0.3;
+        }
+        
+        .change-cell.glowing {
+            animation: cellGlow 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes cellGlow {
+            0%, 100% { box-shadow: 0 0 5px var(--gold); }
+            50% { box-shadow: 0 0 20px var(--gold), 0 0 30px var(--ochre); }
+        }
+        
+        .change-cell span {
+            position: relative;
+            z-index: 1;
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+        
+        /* 分享卡片模态框 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .share-card {
+            background: var(--paper);
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid var(--paper-dark);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .share-card::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px solid var(--paper-dark);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        
+        .share-card-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            letter-spacing: 0.3em;
+        }
+        
+        .share-card-subtitle {
+            color: var(--ochre);
+            margin-bottom: 25px;
+            letter-spacing: 0.1em;
+        }
+        
+        .share-card-code {
+            font-family: monospace;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            letter-spacing: 0.2em;
+            font-size: 0.9em;
+        }
+        
+        .share-card-phrase {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.3em;
+            color: var(--ochre);
+            margin: 20px 0;
+            letter-spacing: 0.15em;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--ochre);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: var(--paper-dark);
+        }
+        
+        /* 音效开关 */
+        .audio-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.8);
+            border: 1px solid var(--paper-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            z-index: 100;
+        }
+        
+        .audio-toggle:hover {
+            background: var(--ochre);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .audio-toggle.muted {
+            opacity: 0.5;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .params-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .test-cases {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .poetic-title {
+                font-size: 2.5em;
+            }
         }
     </style>
 </head>
 <body>
+    <button class="audio-toggle" id="audioToggle" title="切换音效">🔔</button>
+    
     <div class="container">
-        <h1>ECHO 资产编码系统</h1>
-        <p class="subtitle">双层生命结构 · 精确与模糊并存</p>
+        <h1>易编码</h1>
+        <p class="subtitle">观物取象 · 生生不息</p>
         
         <div class="section">
-            <h2 class="section-title">参数设置（精确层）</h2>
+            <h2 class="section-title">四象参数</h2>
             <div class="params-grid">
                 <div class="param-group">
-                    <div class="param-label">永 · 存在方式</div>
+                    <div class="param-label">永 · 存在</div>
                     <div class="param-value" id="yong-display">用</div>
-                    <div class="param-desc" id="yong-desc">按需付费</div>
+                    <div class="param-desc" id="yong-desc">按需而取</div>
                     <input type="range" id="yong" min="0" max="7" value="5">
                 </div>
                 <div class="param-group">
-                    <div class="param-label">阔 · 连接范围</div>
+                    <div class="param-label">阔 · 连接</div>
                     <div class="param-value" id="kuo-display">域</div>
-                    <div class="param-desc" id="kuo-desc">特定领域</div>
+                    <div class="param-desc" id="kuo-desc">一方天地</div>
                     <input type="range" id="kuo" min="0" max="7" value="3">
                 </div>
                 <div class="param-group">
-                    <div class="param-label">延 · 衍生能力</div>
+                    <div class="param-label">延 · 演化</div>
                     <div class="param-value" id="yan-display">融</div>
-                    <div class="param-desc" id="yan-desc">融合改编</div>
+                    <div class="param-desc" id="yan-desc">融会贯通</div>
                     <input type="range" id="yan" min="0" max="7" value="5">
                 </div>
                 <div class="param-group">
-                    <div class="param-label">益 · 代谢模式</div>
+                    <div class="param-label">益 · 代谢</div>
                     <div class="param-value" id="yi-display">稀</div>
-                    <div class="param-desc" id="yi-desc">限量稀少</div>
+                    <div class="param-desc" id="yi-desc">稀世之物</div>
                     <input type="range" id="yi" min="0" max="7" value="2">
                 </div>
             </div>
             
-            <div class="result-box">
-                <div class="gene-code" id="gene-code">101 011 100 010</div>
+            <div class="result-box" id="resultBox">
+                <div class="gene-code" id="gene-code">
+                    101 011 100 010
+                    <button class="copy-btn" id="copyBtn" onclick="copyGeneCode()">复制</button>
+                </div>
                 <div class="hexagram-display" id="trigrams">巽火</div>
                 <div class="hexagram-name" id="hexagram-name">风火家人</div>
                 <div class="hexagram-number" id="hexagram-number">第 37 卦</div>
@@ -283,15 +712,35 @@
             
             <div class="qi-display" id="qi-display">
                 <div class="qi-word" id="qi-word">温润中和</div>
-                <div class="qi-level" id="qi-level">气数：0.63（medium）</div>
+                <div class="qi-quote" id="qi-quote">「含章可贞，以时发也」</div>
+                <div class="qi-level" id="qi-level">气数：0.63</div>
+            </div>
+            
+            <!-- 12变势条 -->
+            <div class="change-bar-container">
+                <div class="change-bar-title">十二变势 · 流转不息</div>
+                <div class="change-bar" id="changeBar">
+                    <div class="change-cell" data-index="0"><span>子</span></div>
+                    <div class="change-cell" data-index="1"><span>丑</span></div>
+                    <div class="change-cell" data-index="2"><span>寅</span></div>
+                    <div class="change-cell" data-index="3"><span>卯</span></div>
+                    <div class="change-cell" data-index="4"><span>辰</span></div>
+                    <div class="change-cell" data-index="5"><span>巳</span></div>
+                    <div class="change-cell" data-index="6"><span>午</span></div>
+                    <div class="change-cell" data-index="7"><span>未</span></div>
+                    <div class="change-cell" data-index="8"><span>申</span></div>
+                    <div class="change-cell" data-index="9"><span>酉</span></div>
+                    <div class="change-cell" data-index="10"><span>戌</span></div>
+                    <div class="change-cell" data-index="11"><span>亥</span></div>
+                </div>
             </div>
         </div>
         
         <div class="section">
-            <h2 class="section-title">界面切换</h2>
+            <h2 class="section-title">观象</h2>
             <div class="layer-toggle">
-                <button class="layer-btn active" onclick="showLayer('poetic')">模糊层（大众）</button>
-                <button class="layer-btn" onclick="showLayer('precise')">精确层（创作者）</button>
+                <button class="layer-btn active" onclick="showLayer('poetic')">意象</button>
+                <button class="layer-btn" onclick="showLayer('precise')">数理</button>
             </div>
             
             <div id="poetic-layer">
@@ -303,13 +752,14 @@
                         此器用而域，融化稀，<br>
                         温润中和，宜养不宜争。
                     </div>
+                    <button class="share-btn" onclick="openShareModal()">分享此器</button>
                 </div>
             </div>
             
             <div id="precise-layer" class="hidden">
                 <div class="result-box">
-                    <h3>精确数据</h3>
-                    <p style="margin-top: 15px; text-align: left; font-family: monospace; font-size: 0.9em;">
+                    <h3 style="letter-spacing: 0.1em; margin-bottom: 20px;">精确数据</h3>
+                    <p style="text-align: left; font-family: 'Noto Serif SC', monospace; font-size: 0.9em; line-height: 2;">
                         <strong>基因码：</strong><span id="precise-gene">101011100010</span> (258)<br>
                         <strong>上卦：</strong><span id="precise-upper">巽（风）</span> = (5+3) mod 8 = 5<br>
                         <strong>下卦：</strong><span id="precise-lower">离（火）</span> = (5+2) mod 8 = 7<br>
@@ -318,44 +768,160 @@
                         <strong>变爻：</strong><span id="precise-lines">九三（使用频次）</span><br>
                         <strong>之卦：</strong><span id="precise-changed">火风鼎</span>
                     </p>
+                    <button class="share-btn" onclick="copyPreciseData()" style="margin-top: 20px;">复制全部数据</button>
                 </div>
             </div>
         </div>
         
         <div class="section">
-            <h2 class="section-title">测试用例</h2>
+            <h2 class="section-title">试例</h2>
             <div class="test-cases">
                 <div class="test-case" onclick="loadTestCase(5,3,5,2)">
-                    <div class="test-case-name">限量音乐</div>
+                    <div class="test-case-name">限量音律</div>
                     <div class="test-case-params">用·域·混·稀</div>
                 </div>
                 <div class="test-case" onclick="loadTestCase(1,0,0,1)">
-                    <div class="test-case-name">私人日记</div>
+                    <div class="test-case-name">私人札记</div>
                     <div class="test-case-params">锁·独·止·孤</div>
                 </div>
                 <div class="test-case" onclick="loadTestCase(7,7,7,6)">
-                    <div class="test-case-name">开源代码</div>
+                    <div class="test-case-name">开源之道</div>
                     <div class="test-case-params">归·道·生·源</div>
                 </div>
                 <div class="test-case" onclick="loadTestCase(0,0,0,0)">
-                    <div class="test-case-name">封存档案</div>
+                    <div class="test-case-name">封存卷宗</div>
                     <div class="test-case-params">禁·独·止·藏</div>
                 </div>
                 <div class="test-case" onclick="loadTestCase(3,5,2,5)">
-                    <div class="test-case-name">会员内容</div>
+                    <div class="test-case-name">会员珍藏</div>
                     <div class="test-case-params">阅·链·评·众</div>
                 </div>
                 <div class="test-case" onclick="loadTestCase(6,6,6,3)">
-                    <div class="test-case-name">数字艺术</div>
+                    <div class="test-case-name">数字丹青</div>
                     <div class="test-case-params">持·元·造·罕</div>
                 </div>
             </div>
         </div>
     </div>
     
+    <!-- 分享卡片模态框 -->
+    <div class="modal-overlay" id="shareModal">
+        <div class="share-card">
+            <button class="modal-close" onclick="closeShareModal()">×</button>
+            <div class="share-card-title" id="share-title">家人</div>
+            <div class="share-card-subtitle" id="share-subtitle">风火相育之象</div>
+            <div class="share-card-phrase" id="share-phrase">温润中和 · 渐变</div>
+            <div class="share-card-code" id="share-code">101011100010</div>
+            <p style="color: var(--ochre); font-size: 0.85em; margin-top: 15px; letter-spacing: 0.1em;">扫码识器 · 溯源归宗</p>
+        </div>
+    </div>
+    
     <script src="echo-encoder.js"></script>
     <script>
-        // 配置数据
+        // ===== 五音音频系统 =====
+        const AudioSys = {
+            ctx: null,
+            enabled: true,
+            
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            
+            // 五音频率
+            notes: {
+                gong: 261.63,   // 宫 C4 - 调卦象
+                shang: 293.66,  // 商 D4
+                jue: 329.63,    // 角 E4
+                zhi: 392.00,    // 徵 G4 - 气数高
+                yu: 440.00,     // 羽 A4 - 气数低
+                bianzhi: 369.99 // 变徵 F#4 - 变爻触发
+            },
+            
+            playTone(freq, duration = 0.15, type = 'sine') {
+                if (!this.enabled || !this.ctx) return;
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = type;
+                osc.frequency.value = freq;
+                
+                // 古朴包络
+                gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.start(this.ctx.currentTime);
+                osc.stop(this.ctx.currentTime + duration);
+            },
+            
+            playTrigramChange() {
+                // 调卦象：宫音
+                this.playTone(this.notes.gong, 0.2, 'sine');
+            },
+            
+            playChangingLine() {
+                // 变爻触发：变徵音
+                this.playTone(this.notes.bianzhi, 0.25, 'triangle');
+            },
+            
+            playQiLevel(qi) {
+                // 气数反馈
+                if (qi > 0.7) {
+                    this.playTone(this.notes.zhi, 0.3, 'sine'); // 高：徵
+                } else if (qi < 0.3) {
+                    this.playTone(this.notes.yu, 0.3, 'sine');  // 低：羽
+                } else {
+                    this.playTone(this.notes.jue, 0.2, 'sine'); // 中：角
+                }
+            },
+            
+            playSlide() {
+                // 滑块微调音
+                this.playTone(this.notes.shang, 0.08, 'sine');
+            }
+        };
+        
+        // ===== 易经诗意语料库 =====
+        const YiQuotes = {
+            high: [
+                "飞龙在天，利见大人",
+                "见龙在田，德施普也",
+                "君子终日乾乾，夕惕若",
+                "或跃在渊，进无咎也",
+                "同声相应，同气相求"
+            ],
+            medium: [
+                "含章可贞，以时发也",
+                "直方大，不习无不利",
+                "地势坤，君子以厚德载物",
+                "谦谦君子，卑以自牧也",
+                "君子以俭德辟难"
+            ],
+            low: [
+                "履霜，坚冰至",
+                "潜龙勿用，阳在下也",
+                "括囊无咎，慎不害也",
+                "亢龙有悔，盈不可久也",
+                "君子以恐惧修省"
+            ]
+        };
+        
+        function getQuoteByQi(qi) {
+            let pool;
+            if (qi > 0.65) pool = YiQuotes.high;
+            else if (qi < 0.35) pool = YiQuotes.low;
+            else pool = YiQuotes.medium;
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+        
+        // ===== 配置数据 =====
         const CONFIG = {
             yong: ['禁','锁','借','阅','采','用','持','归'],
             yongDesc: ['封存','私藏','期借','只读','采样','按需','持有','归属'],
@@ -367,7 +933,7 @@
             yiDesc: ['封存','独一','稀少','罕见','流通','大众','开源','归道']
         };
         
-        // 获取DOM元素
+        // ===== DOM 元素 =====
         const inputs = {
             yong: document.getElementById('yong'),
             kuo: document.getElementById('kuo'),
@@ -389,12 +955,21 @@
             yi: document.getElementById('yi-desc')
         };
         
-        // 更新显示
-        function updateDisplay() {
+        let lastHexagram = '';
+        let changeMomentum = 0; // 12变势当前值
+        
+        // ===== 更新显示 =====
+        function updateDisplay(playSound = true) {
             const y = parseInt(inputs.yong.value);
             const k = parseInt(inputs.kuo.value);
             const ya = parseInt(inputs.yan.value);
             const yi = parseInt(inputs.yi.value);
+            
+            // 触发参数动画
+            Object.keys(displays).forEach(key => {
+                displays[key].classList.add('changing');
+                setTimeout(() => displays[key].classList.remove('changing'), 600);
+            });
             
             // 更新参数显示
             displays.yong.textContent = CONFIG.yong[y];
@@ -414,6 +989,14 @@
                 const qi = EchoEncoder.calculateQi(result.geneCode, timestamp);
                 const qiDesc = EchoEncoder.getQiDescription(qi);
                 
+                // 检测卦象变化
+                const isHexagramChanged = lastHexagram && lastHexagram !== result.hexagram;
+                lastHexagram = result.hexagram;
+                
+                if (isHexagramChanged && playSound) {
+                    AudioSys.playTrigramChange();
+                }
+                
                 // 模拟使用数据
                 const usageData = {
                     usageCount: Math.floor(Math.random() * 200),
@@ -428,19 +1011,33 @@
                 const changedHex = EchoEncoder.calculateChangedHexagram(result.hexagramNumber, changeData.changingLines);
                 const poetic = EchoEncoder.generatePoeticView(result, qiDesc, changeData);
                 
-                // 更新结果
-                document.getElementById('gene-code').textContent = result.geneCodeBinary.match(/.{3}/g).join(' ');
+                // 更新结果 - 带动画
+                const resultBox = document.getElementById('resultBox');
+                if (isHexagramChanged) {
+                    resultBox.classList.add('transitioning');
+                    setTimeout(() => resultBox.classList.remove('transitioning'), 500);
+                }
+                
+                document.getElementById('gene-code').innerHTML = 
+                    result.geneCodeBinary.match(/.{3}/g).join(' ') +
+                    '<button class="copy-btn" id="copyBtn" onclick="copyGeneCode()">复制</button>';
                 document.getElementById('trigrams').textContent = result.upperTrigram + result.lowerTrigram;
                 document.getElementById('hexagram-name').textContent = result.hexagram;
                 document.getElementById('hexagram-number').textContent = `第 ${result.hexagramNumber} 卦`;
                 
-                // 更新气数显示
+                // 更新气数显示 - 带诗意引用
                 const qiDisplay = document.getElementById('qi-display');
-                qiDisplay.style.background = qiDesc.color + '20';
-                qiDisplay.style.borderLeft = `4px solid ${qiDesc.color}`;
+                const quote = getQuoteByQi(qi);
+                qiDisplay.style.background = qiDesc.color + '15';
+                qiDisplay.style.borderLeftColor = qiDesc.color;
                 document.getElementById('qi-word').textContent = qiDesc.word;
                 document.getElementById('qi-word').style.color = qiDesc.color;
-                document.getElementById('qi-level').textContent = `气数：${qi.toFixed(4)}（${qiDesc.level}）`;
+                document.getElementById('qi-quote').textContent = `「${quote}」`;
+                document.getElementById('qi-level').textContent = `气数：${qi.toFixed(4)}`;
+                
+                if (playSound) {
+                    AudioSys.playQiLevel(qi);
+                }
                 
                 // 更新诗意层
                 document.getElementById('poetic-title').textContent = poetic.title;
@@ -461,7 +1058,39 @@
                     : '无';
                 document.getElementById('precise-lines').textContent = linesText;
                 document.getElementById('precise-changed').textContent = changedHex.changedHexagram;
+                
+                // 更新12变势条
+                updateChangeBar(changeData.changingLines.length);
+                
+                // 变爻音效
+                if (changeData.changingLines.length > 0 && playSound) {
+                    setTimeout(() => AudioSys.playChangingLine(), 200);
+                }
             }
+        }
+        
+        // ===== 12变势条更新 =====
+        function updateChangeBar(activeCount) {
+            const cells = document.querySelectorAll('.change-cell');
+            
+            // 基于当前参数计算一个稳定的"变势值"(0-12)
+            const y = parseInt(inputs.yong.value);
+            const k = parseInt(inputs.kuo.value);
+            const ya = parseInt(inputs.yan.value);
+            const yi = parseInt(inputs.yi.value);
+            
+            // 计算变势值 (0-12)
+            const changeValue = ((y + k + ya + yi) * 17) % 13;
+            
+            cells.forEach((cell, index) => {
+                cell.classList.remove('active', 'glowing');
+                if (index <= changeValue) {
+                    cell.classList.add('active');
+                }
+                if (index === changeValue) {
+                    cell.classList.add('glowing');
+                }
+            });
         }
         
         function getTrigramMeaning(t) {
@@ -469,16 +1098,16 @@
             return meanings[t] || '';
         }
         
-        // 加载测试用例
+        // ===== 加载测试用例 =====
         function loadTestCase(y, k, ya, yi) {
             inputs.yong.value = y;
             inputs.kuo.value = k;
             inputs.yan.value = ya;
             inputs.yi.value = yi;
-            updateDisplay();
+            updateDisplay(true);
         }
         
-        // 切换显示层
+        // ===== 切换显示层 =====
         function showLayer(layer) {
             document.querySelectorAll('.layer-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -490,15 +1119,92 @@
                 document.getElementById('poetic-layer').classList.add('hidden');
                 document.getElementById('precise-layer').classList.remove('hidden');
             }
+            
+            AudioSys.init();
         }
         
-        // 绑定事件
-        Object.values(inputs).forEach(input => {
-            input.addEventListener('input', updateDisplay);
+        // ===== 复制功能 =====
+        function copyGeneCode() {
+            const code = document.getElementById('gene-code').textContent.replace('复制', '').trim();
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '复制';
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        }
+        
+        function copyPreciseData() {
+            const gene = document.getElementById('precise-gene').textContent;
+            const upper = document.getElementById('precise-upper').textContent;
+            const lower = document.getElementById('precise-lower').textContent;
+            const num = document.getElementById('precise-number').textContent;
+            const qi = document.getElementById('precise-qi').textContent;
+            const lines = document.getElementById('precise-lines').textContent;
+            const changed = document.getElementById('precise-changed').textContent;
+            
+            const text = `ECHO编码\n基因码：${gene}\n上卦：${upper}\n下卦：${lower}\n卦序：${num}\n气数：${qi}\n变爻：${lines}\n之卦：${changed}`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const original = btn.textContent;
+                btn.textContent = '已复制';
+                setTimeout(() => btn.textContent = original, 1500);
+            });
+        }
+        
+        // ===== 分享模态框 =====
+        function openShareModal() {
+            const title = document.getElementById('poetic-title').textContent;
+            const subtitle = document.getElementById('poetic-subtitle').textContent;
+            const phrase = document.getElementById('poetic-phrase').textContent;
+            const code = document.getElementById('gene-code').textContent.replace('复制', '').trim().replace(/\s/g, '');
+            
+            document.getElementById('share-title').textContent = title;
+            document.getElementById('share-subtitle').textContent = subtitle;
+            document.getElementById('share-phrase').textContent = phrase;
+            document.getElementById('share-code').textContent = code;
+            
+            document.getElementById('shareModal').classList.add('active');
+            AudioSys.init();
+        }
+        
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+        
+        // 点击模态框外部关闭
+        document.getElementById('shareModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeShareModal();
         });
         
-        // 初始化
-        updateDisplay();
+        // ===== 音效开关 =====
+        document.getElementById('audioToggle').addEventListener('click', function() {
+            AudioSys.enabled = !AudioSys.enabled;
+            this.textContent = AudioSys.enabled ? '🔔' : '🔕';
+            this.classList.toggle('muted', !AudioSys.enabled);
+            if (AudioSys.enabled) AudioSys.init();
+        });
+        
+        // ===== 绑定事件 =====
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', () => {
+                AudioSys.init();
+                AudioSys.playSlide();
+                updateDisplay(true);
+            });
+        });
+        
+        // 点击页面初始化音频
+        document.addEventListener('click', () => {
+            AudioSys.init();
+        }, { once: true });
+        
+        // ===== 初始化 =====
+        updateDisplay(false);
     </script>
 </body>
 </html>
