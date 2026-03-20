@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DEBUG - ECHO</title>
+    <script src="js/echo-encoder.js?v=5"></script>
+</head>
+<body>
+    <h1>调试页面</h1>
+    <p>永: <input type="range" id="yong" min="0" max="7" value="5"> <span id="yong-val">5</span></p>
+    <p>阔: <input type="range" id="kuo" min="0" max="7" value="3"> <span id="kuo-val">3</span></p>
+    <p>延: <input type="range" id="yan" min="0" max="7" value="5"> <span id="yan-val">5</span></p>
+    <p>益: <input type="range" id="yi" min="0" max="7" value="2"> <span id="yi-val">2</span></p>
+    
+    <button onclick="testLoad()">点击测试 - 私人日记</button>
+    
+    <div id="result" style="margin-top:20px;padding:10px;background:#f0f0f0;"></div>
+    
+    <script>
+        function update() {
+            document.getElementById('yong-val').textContent = document.getElementById('yong').value;
+            document.getElementById('kuo-val').textContent = document.getElementById('kuo').value;
+            document.getElementById('yan-val').textContent = document.getElementById('yan').value;
+            document.getElementById('yi-val').textContent = document.getElementById('yi').value;
+            
+            const result = document.getElementById('result');
+            if (typeof EchoEncoder !== 'undefined') {
+                const r = EchoEncoder.encodeAsset(
+                    parseInt(document.getElementById('yong').value),
+                    parseInt(document.getElementById('kuo').value),
+                    parseInt(document.getElementById('yan').value),
+                    parseInt(document.getElementById('yi').value)
+                );
+                result.innerHTML = '卦象: ' + r.hexagram.name + '<br>基因码: ' + r.geneCodeBinary;
+            } else {
+                result.textContent = 'EchoEncoder 未加载';
+            }
+        }
+        
+        function testLoad() {
+            console.log('按钮被点击了');
+            document.getElementById('yong').value = 1;
+            document.getElementById('kuo').value = 0;
+            document.getElementById('yan').value = 0;
+            document.getElementById('yi').value = 1;
+            update();
+            console.log('已设置为 1,0,0,1');
+        }
+        
+        ['yong','kuo','yan','yi'].forEach(id => {
+            document.getElementById(id).addEventListener('input', update);
+        });
+        
+        update();
+        console.log('页面加载完成');
+    </script>
+</body>
+</html>
