@@ -748,13 +748,8 @@ document.addEventListener('DOMContentLoaded', function() {
             update();
         }
         
-        // 绑定事件
-        ['yong', 'kuo', 'yan', 'yi'].forEach(id => {
-            document.getElementById(id).addEventListener('input', update);
-        });
-        
-        // 初始化
-        update();
+        // 绑定事件（仅在DOMContentLoaded中执行一次）
+        // 事件绑定已移至DOMContentLoaded中
     </script>
 </body>
 </html>
