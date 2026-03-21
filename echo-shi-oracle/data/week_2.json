@@ -1,0 +1,146 @@
+{
+  "week": 2,
+  "startBlock": 1008001,
+  "endBlock": 1016000,
+  "assets": {
+    "ASSET_001": {
+      "name": "《墨竹》",
+      "type": "digital_art",
+      "hexagram": 44,
+      "hexagramName": "姤",
+      "position": 5,
+      "positionName": "九五",
+      "shiValue": 7800,
+      "dimensions": {
+        "yong": 88,
+        "kuo": 94,
+        "yan": 82,
+        "yi": 70
+      },
+      "coordinates": {
+        "x": 15,
+        "y": 38,
+        "z": 32
+      },
+      "zone": "growth",
+      "transition": {
+        "from": "九四",
+        "to": "九五",
+        "direction": "up"
+      }
+    },
+    "ASSET_002": {
+      "name": "《山水》",
+      "type": "digital_art",
+      "hexagram": 14,
+      "hexagramName": "大有",
+      "position": 5,
+      "positionName": "六五",
+      "shiValue": 9200,
+      "dimensions": {
+        "yong": 98,
+        "kuo": 92,
+        "yan": 88,
+        "yi": 93
+      },
+      "coordinates": {
+        "x": 48,
+        "y": 70,
+        "z": 92
+      },
+      "zone": "peak",
+      "transition": {
+        "from": "乾",
+        "to": "大有",
+        "direction": "stable"
+      }
+    },
+    "ASSET_003": {
+      "name": "《云纹瓷》",
+      "type": "digital_collectible",
+      "hexagram": 30,
+      "hexagramName": "离",
+      "position": 3,
+      "positionName": "九三",
+      "shiValue": 6200,
+      "dimensions": {
+        "yong": 72,
+        "kuo": 75,
+        "yan": 88,
+        "yi": 62
+      },
+      "coordinates": {
+        "x": 26,
+        "y": 48,
+        "z": 18
+      },
+      "zone": "rising",
+      "transition": {
+        "from": "六二",
+        "to": "九三",
+        "direction": "up"
+      }
+    },
+    "ASSET_004": {
+      "name": "《青铜鼎》",
+      "type": "digital_collectible",
+      "hexagram": 24,
+      "hexagramName": "复",
+      "position": 1,
+      "positionName": "初九",
+      "shiValue": 3800,
+      "dimensions": {
+        "yong": 45,
+        "kuo": 50,
+        "yan": 52,
+        "yi": 38
+      },
+      "coordinates": {
+        "x": 12,
+        "y": 20,
+        "z": 10
+      },
+      "zone": "rising",
+      "transition": {
+        "from": "剥",
+        "to": "复",
+        "direction": "recovery"
+      }
+    },
+    "ASSET_005": {
+      "name": "《琉璃盏》",
+      "type": "digital_art",
+      "hexagram": 55,
+      "hexagramName": "丰",
+      "position": 4,
+      "positionName": "九四",
+      "shiValue": 7500,
+      "dimensions": {
+        "yong": 85,
+        "kuo": 88,
+        "yan": 78,
+        "yi": 82
+      },
+      "coordinates": {
+        "x": 60,
+        "y": 40,
+        "z": 72
+      },
+      "zone": "peak",
+      "transition": {
+        "from": "革",
+        "to": "丰",
+        "direction": "up"
+      }
+    }
+  },
+  "hexagramDistribution": {
+    "peak": [14, 55],
+    "growth": [11, 44, 46],
+    "rising": [9, 24, 26, 30, 42, 54],
+    "stable": [2, 4, 7, 8, 15, 23, 39, 52],
+    "transformation": [40, 45, 49, 53, 58, 62],
+    "decline": [12, 20, 33, 47],
+    "dormant": [6, 18, 29, 36, 51]
+  }
+}

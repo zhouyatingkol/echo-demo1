@@ -1,0 +1,121 @@
+{
+  "week": 1,
+  "startBlock": 1000000,
+  "endBlock": 1008000,
+  "assets": {
+    "ASSET_001": {
+      "name": "《墨竹》",
+      "type": "digital_art",
+      "hexagram": 44,
+      "hexagramName": "姤",
+      "position": 4,
+      "positionName": "九四",
+      "shiValue": 7200,
+      "dimensions": {
+        "yong": 85,
+        "kuo": 92,
+        "yan": 78,
+        "yi": 65
+      },
+      "coordinates": {
+        "x": 12,
+        "y": 34,
+        "z": 28
+      },
+      "zone": "growth"
+    },
+    "ASSET_002": {
+      "name": "《山水》",
+      "type": "digital_art",
+      "hexagram": 1,
+      "hexagramName": "乾",
+      "position": 5,
+      "positionName": "九五",
+      "shiValue": 8900,
+      "dimensions": {
+        "yong": 95,
+        "kuo": 88,
+        "yan": 82,
+        "yi": 90
+      },
+      "coordinates": {
+        "x": 45,
+        "y": 67,
+        "z": 89
+      },
+      "zone": "peak"
+    },
+    "ASSET_003": {
+      "name": "《云纹瓷》",
+      "type": "digital_collectible",
+      "hexagram": 30,
+      "hexagramName": "离",
+      "position": 2,
+      "positionName": "六二",
+      "shiValue": 5600,
+      "dimensions": {
+        "yong": 65,
+        "kuo": 70,
+        "yan": 85,
+        "yi": 55
+      },
+      "coordinates": {
+        "x": 23,
+        "y": 45,
+        "z": 12
+      },
+      "zone": "rising"
+    },
+    "ASSET_004": {
+      "name": "《青铜鼎》",
+      "type": "digital_collectible",
+      "hexagram": 23,
+      "hexagramName": "剥",
+      "position": 6,
+      "positionName": "上九",
+      "shiValue": 3200,
+      "dimensions": {
+        "yong": 35,
+        "kuo": 40,
+        "yan": 45,
+        "yi": 30
+      },
+      "coordinates": {
+        "x": 8,
+        "y": 15,
+        "z": 5
+      },
+      "zone": "decline"
+    },
+    "ASSET_005": {
+      "name": "《琉璃盏》",
+      "type": "digital_art",
+      "hexagram": 49,
+      "hexagramName": "革",
+      "position": 3,
+      "positionName": "九三",
+      "shiValue": 6800,
+      "dimensions": {
+        "yong": 78,
+        "kuo": 82,
+        "yan": 70,
+        "yi": 75
+      },
+      "coordinates": {
+        "x": 56,
+        "y": 34,
+        "z": 67
+      },
+      "zone": "transformation"
+    }
+  },
+  "hexagramDistribution": {
+    "peak": [1, 14, 34, 43],
+    "growth": [11, 19, 35, 44, 46],
+    "rising": [9, 26, 30, 42, 54],
+    "stable": [2, 4, 7, 8, 15, 23, 39, 52],
+    "transformation": [40, 45, 49, 53, 58, 62],
+    "decline": [12, 20, 33, 47],
+    "dormant": [6, 18, 29, 36, 51]
+  }
+}

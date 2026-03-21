@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO 势场可视化</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header>
+            <h1>ECHO 势场可视化</h1>
+            <p class="subtitle">万物有灵，皆可生长。势在流动，位在变化。</p>
+        </header>
+
+        <!-- 查询区域 -->
+        <section class="query-section">
+            <div class="search-box">
+                <input type="text" id="assetInput" placeholder="输入资产ID (如: ASSET_001)">
+                <button onclick="queryAsset()">查询势位</button>
+            </div>
+        </section>
+
+        <!-- 资产卡片 -->
+        <section id="assetCard" class="asset-card hidden">
+            <div class="card-header">
+                <h2 id="assetName">《墨竹》</h2>
+                <span id="assetId" class="asset-id">ASSET_001</span>
+            </div>
+            <div class="shi-position">
+                <div class="position-main">
+                    <span id="fieldName" class="field-name">姤势场</span>
+                    <span class="separator">·</span>
+                    <span id="yaoPosition" class="yao-position">九四势位</span>
+                </div>
+                <div id="shiEnergy" class="shi-energy">势能: 7200</div>
+            </div>
+            <div class="dimensions">
+                <div class="dimension">
+                    <span class="dim-label">用</span>
+                    <div class="dim-bar">
+                        <div id="yongBar" class="dim-fill" style="width: 85%"></div>
+                    </div>
+                    <span id="yongValue" class="dim-value">85</span>
+                </div>
+                <div class="dimension">
+                    <span class="dim-label">扩</span>
+                    <div class="dim-bar">
+                        <div id="kuoBar" class="dim-fill" style="width: 92%"></div>
+                    </div>
+                    <span id="kuoValue" class="dim-value">92</span>
+                </div>
+                <div class="dimension">
+                    <span class="dim-label">衍</span>
+                    <div class="dim-bar">
+                        <div id="yanBar" class="dim-fill" style="width: 78%"></div>
+                    </div>
+                    <span id="yanValue" class="dim-value">78</span>
+                </div>
+                <div class="dimension">
+                    <span class="dim-label">益</span>
+                    <div class="dim-bar">
+                        <div id="yiBar" class="dim-fill" style="width: 65%"></div>
+                    </div>
+                    <span id="yiValue" class="dim-value">65</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 势场地图 -->
+        <section class="field-map-section">
+            <h3>64势场分布图</h3>
+            <div id="fieldMap" class="field-map"></div>
+            <div class="legend">
+                <span class="legend-item"><span class="dot" style="background: #e74c3c"></span> 乾势场 (全面领先)</span>
+                <span class="legend-item"><span class="dot" style="background: #3498db"></span> 姤势场 (高开放)</span>
+                <span class="legend-item"><span class="dot" style="background: #2ecc71"></span> 坤势场 (稳健)</span>
+                <span class="legend-item"><span class="dot" style="background: #9b59b6"></span> 其他势场</span>
+            </div>
+        </section>
+
+        <!-- 周演化 -->
+        <section class="evolution-section">
+            <h3>势场演化 (4周)</h3>
+            <div class="week-selector">
+                <button onclick="loadWeek(1)" class="week-btn active">第1周</button>
+                <button onclick="loadWeek(2)" class="week-btn">第2周</button>
+                <button onclick="loadWeek(3)" class="week-btn">第3周</button>
+                <button onclick="loadWeek(4)" class="week-btn">第4周</button>
+            </div>
+            <div id="evolutionChart" class="evolution-chart"></div>
+        </section>
+
+        <!-- 跃迁历史 -->
+        <section id="transitionSection" class="transition-section hidden">
+            <h3>跃迁历史</h3>
+            <div id="transitionTimeline" class="timeline"></div>
+        </section>
+    </div>
+
+    <script src="js/chart.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    color: #e0e0e0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* 头部 */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    background: linear-gradient(90deg, #e0e0e0, #a0a0a0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #888;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+}
+
+/* 查询区域 */
+.query-section {
+    margin-bottom: 40px;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 25px;
+    background: rgba(255,255,255,0.05);
+    color: #e0e0e0;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.08);
+}
+
+.search-box button {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-box button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+}
+
+/* 资产卡片 */
+.asset-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 40px;
+    backdrop-filter: blur(10px);
+}
+
+.asset-card.hidden {
+    display: none;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-header h2 {
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: #fff;
+}
+
+.asset-id {
+    color: #666;
+    font-size: 0.85rem;
+    font-family: monospace;
+}
+
+.shi-position {
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
+}
+
+.position-main {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.field-name {
+    color: #3498db;
+    font-weight: 500;
+}
+
+.separator {
+    margin: 0 10px;
+    color: #666;
+}
+
+.yao-position {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+.shi-energy {
+    font-size: 1.2rem;
+    color: #f39c12;
+}
+
+/* 维度条 */
+.dimensions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.dimension {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dim-label {
+    width: 30px;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+.dim-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dim-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+
+.dim-value {
+    width: 40px;
+    text-align: right;
+    font-family: monospace;
+    color: #aaa;
+}
+
+/* 势场地图 */
+.field-map-section {
+    margin-bottom: 40px;
+}
+
+.field-map-section h3 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: 20px;
+    color: #aaa;
+}
+
+.field-map {
+    width: 100%;
+    height: 400px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* 演化区域 */
+.evolution-section {
+    margin-bottom: 40px;
+}
+
+.evolution-section h3 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: 20px;
+    color: #aaa;
+}
+
+.week-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.week-btn {
+    padding: 8px 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.week-btn:hover {
+    border-color: rgba(255,255,255,0.4);
+    color: #e0e0e0;
+}
+
+.week-btn.active {
+    background: rgba(52, 152, 219, 0.2);
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.evolution-chart {
+    width: 100%;
+    height: 300px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 15px;
+}
+
+/* 跃迁历史 */
+.transition-section.hidden {
+    display: none;
+}
+
+.transition-section h3 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: 20px;
+    color: #aaa;
+}
+
+.timeline {
+    padding: 20px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 15px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .dimensions {
+        grid-template-columns: 1fr;
+    }
+    
+    .legend {
+        flex-direction: column;
+        align-items: center;
+    }
+}
